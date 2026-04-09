@@ -1,21 +1,10 @@
-app_name = "Nerum"
-version = "0.1"
+from fastapi import FastAPI
+from routes.workflow import router
 
-def run_workflow(workflow_name, steps):
-    print(f"\n[Nerum] Running: {workflow_name}")
-    for step in steps:
-        print(f"  -> {step}")
-    print(f"  Completed!")
+app = FastAPI(title="Nerum", version="0.1")
 
-print(f"{app_name} v{version} started!")
+app.include_router(router, prefix="/workflow")
 
-run_workflow("Send Welcome Email", [
-    "Trigger: New user signed up",
-    "Action: Send email",
-    "Action: Log to database"
-])
-
-run_workflow("WhatsApp Alert", [
-    "Trigger: Payment received",
-    "Action: Send WhatsApp message",
-])
+@app.get("/")
+def home():
+    return {"message": "Welcome to Nerum!", "version": "0.1"}
