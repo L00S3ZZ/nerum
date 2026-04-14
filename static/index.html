@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Nerum</title>
+    <style>
+        body { font-family: Arial; background: #0f0f0f; color: white; padding: 40px; }
+        h1 { color: #6366f1; }
+        input { padding: 10px; width: 300px; border-radius: 8px; border: none; }
+        button { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px; }
+        .workflow { background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #6366f1; }
+    </style>
+</head>
+<body>
+    <h1>Nerum</h1>
+    <p>AI Workflow Automation</p>
+    <input id="wname" placeholder="Workflow name..." />
+    <button onclick="createWorkflow()">Create</button>
+    <h3>Your Workflows</h3>
+    <div id="list"></div>
+    <script>
+        async function loadWorkflows() {
+            const res = await fetch("http://localhost:8000/workflow/all");
+            const data = await res.json();
+            document.getElementById("list").innerHTML = data.workflows
+                .map(w => `<div class="workflow">${w.id}. ${w.name} — ${w.status}</div>`)
+                .join("");
+        }
+        async function createWorkflow() {
+            const name = document.getElementById("wname").value;
+            await fetch(`http://localhost:8000/workflow/create/${name}`, {method:"POST"});
+            loadWorkflows();
+        }
+        loadWorkflows();
+    </script>
+</body>
+</html>
