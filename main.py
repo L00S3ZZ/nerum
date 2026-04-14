@@ -16,6 +16,9 @@ app.include_router(router, prefix="/workflow")
 from routes.gmail import router as gmail_router
 app.include_router(gmail_router, prefix="/gmail")
 
+from routes.sheets import router as sheets_router
+app.include_router(sheets_router, prefix="/sheets")
+
 @app.get("/")
 def home():
     return {"message": "Welcome to Nerum!", "version": "0.1"}
