@@ -1,6 +1,5 @@
 from fastapi import APIRouter
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import os
 
@@ -11,15 +10,19 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets"
 ]
 
+def get_credentials_path(filename):
+    secret_path = f"/etc/secrets/{filename}"
+    if os.path.exists(secret_path):
+        return secret_path
+    return filename
+
 def get_sheets_service():
+    token_path = get_credentials_path("token.json")
     creds = None
-    if os.path.exists("token.json"):
-        creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    if os.path.exists(token_path):
+        creds = Credentials.from_authorized_user_file(token_path, SCOPES)
     if not creds or not creds.valid:
-        flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
-        creds = flow.run_local_server(port=0)
-        with open("token.json", "w") as token:
-            token.write(creds.to_json())
+        raise Exception("Sheets credentials not found or expired. Please re-authenticate.")
     return build("sheets", "v4", credentials=creds)
 
 @router.post("/append")

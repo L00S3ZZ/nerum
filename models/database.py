@@ -16,4 +16,11 @@ class Workflow(Base):
     name = Column(String, nullable=False)
     status = Column(String, default="active")
 
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, nullable=False)
+    email = Column(String, unique=True, nullable=False)
+    hashed_password = Column(String, nullable=False)
+
 Base.metadata.create_all(bind=engine)
