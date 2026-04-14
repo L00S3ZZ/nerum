@@ -11,3 +11,4 @@ python-multipart
 aiofiles
 bcrypt==4.0.1
 httpx
+twilio
