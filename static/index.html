@@ -1,36 +1,185 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Nerum</title>
-    <style>
-        body { font-family: Arial; background: #0f0f0f; color: white; padding: 40px; }
-        h1 { color: #6366f1; }
-        input { padding: 10px; width: 300px; border-radius: 8px; border: none; }
-        button { padding: 10px 20px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer; margin-left: 10px; }
-        .workflow { background: #1a1a1a; padding: 15px; margin: 10px 0; border-radius: 8px; border-left: 4px solid #6366f1; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nerum Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+    .sidebar { position: fixed; top: 0; left: 0; width: 220px; height: 100vh; background: #1a1a2e; padding: 1.5rem 1rem; }
+    .logo { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 2rem; }
+    .logo span { color: #7F77DD; }
+    .nav-item { display: block; padding: 10px 14px; border-radius: 8px; color: #aaa; font-size: 14px; cursor: pointer; margin-bottom: 4px; text-decoration: none; }
+    .nav-item:hover, .nav-item.active { background: #2a2a4a; color: #fff; }
+    .nav-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 1.2rem 0 0.5rem 14px; }
+    .main { margin-left: 220px; padding: 2rem; }
+    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+    .page-title { font-size: 20px; font-weight: 600; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #639922; display: inline-block; margin-right: 6px; }
+    .status-text { font-size: 13px; color: #555; }
+    .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; }
+    .btn-primary { background: #534AB7; color: #fff; }
+    .btn-primary:hover { background: #3C3489; }
+    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 2rem; }
+    .metric { background: #fff; border-radius: 10px; padding: 1.2rem; border: 1px solid #eee; }
+    .metric-label { font-size: 12px; color: #888; margin-bottom: 8px; }
+    .metric-value { font-size: 28px; font-weight: 600; color: #1a1a1a; }
+    .metric-sub { font-size: 11px; color: #639922; margin-top: 4px; }
+    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { background: #fff; border-radius: 10px; padding: 1.25rem; border: 1px solid #eee; }
+    .card-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; color: #1a1a1a; }
+    .wf-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
+    .wf-row:last-child { border-bottom: none; }
+    .wf-name { font-size: 13px; font-weight: 500; }
+    .wf-steps { font-size: 11px; color: #888; margin-top: 2px; }
+    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; }
+    .badge-active { background: #EAF3DE; color: #3B6D11; }
+    .badge-idle { background: #f0f0f0; color: #888; }
+    .badge-error { background: #FCEBEB; color: #A32D2D; }
+    .log-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; align-items: center; }
+    .log-row:last-child { border-bottom: none; }
+    .log-time { color: #aaa; min-width: 50px; }
+    .log-msg { color: #333; flex: 1; }
+    .tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; }
+    .tag-gmail { background: #FAECE7; color: #993C1D; }
+    .tag-sheets { background: #EAF3DE; color: #3B6D11; }
+    .tag-wf { background: #EEEDFE; color: #534AB7; }
+    .endpoint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
+    .ep-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
+    .ep-row:last-child { border-bottom: none; }
+    .method { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; min-width: 38px; text-align: center; }
+    .get { background: #E6F1FB; color: #185FA5; }
+    .post { background: #EAF3DE; color: #3B6D11; }
+    .ep-path { font-family: monospace; color: #333; }
+    .ep-desc { color: #aaa; margin-left: auto; }
+    .new-wf-btn { width: 100%; margin-top: 1rem; padding: 9px; border: 1.5px dashed #ccc; border-radius: 8px; background: transparent; color: #888; font-size: 13px; cursor: pointer; }
+    .new-wf-btn:hover { background: #f9f9f9; border-color: #534AB7; color: #534AB7; }
+    .full-width { grid-column: span 2; }
+  </style>
 </head>
 <body>
-    <h1>Nerum</h1>
-    <p>AI Workflow Automation</p>
-    <input id="wname" placeholder="Workflow name..." />
-    <button onclick="createWorkflow()">Create</button>
-    <h3>Your Workflows</h3>
-    <div id="list"></div>
-    <script>
-        async function loadWorkflows() {
-            const res = await fetch("http://localhost:8000/workflow/all");
-            const data = await res.json();
-            document.getElementById("list").innerHTML = data.workflows
-                .map(w => `<div class="workflow">${w.id}. ${w.name} — ${w.status}</div>`)
-                .join("");
-        }
-        async function createWorkflow() {
-            const name = document.getElementById("wname").value;
-            await fetch(`http://localhost:8000/workflow/create/${name}`, {method:"POST"});
-            loadWorkflows();
-        }
-        loadWorkflows();
-    </script>
+
+<div class="sidebar">
+  <div class="logo">Ne<span>rum</span></div>
+  <span class="nav-label">Main</span>
+  <a class="nav-item active">Dashboard</a>
+  <a class="nav-item">Workflows</a>
+  <a class="nav-item">Activity</a>
+  <span class="nav-label">Integrations</span>
+  <a class="nav-item">Gmail</a>
+  <a class="nav-item">Google Sheets</a>
+  <span class="nav-label">Settings</span>
+  <a class="nav-item">API Keys</a>
+  <a class="nav-item">Account</a>
+</div>
+
+<div class="main">
+  <div class="topbar">
+    <div>
+      <div class="page-title">Dashboard</div>
+      <span class="status-dot"></span>
+      <span class="status-text">nerum.onrender.com — live</span>
+    </div>
+    <button class="btn btn-primary" onclick="createWorkflow()">+ New Workflow</button>
+  </div>
+
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Workflows</div>
+      <div class="metric-value" id="wf-count">—</div>
+      <div class="metric-sub">active automations</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Emails sent</div>
+      <div class="metric-value">12</div>
+      <div class="metric-sub">via Gmail</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Sheets updated</div>
+      <div class="metric-value">8</div>
+      <div class="metric-sub">rows appended</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">API status</div>
+      <div class="metric-value" style="font-size:16px; padding-top:6px;">
+        <span class="status-dot"></span>Live
+      </div>
+      <div class="metric-sub">v0.1 — Render free</div>
+    </div>
+  </div>
+
+  <div class="panels">
+    <div class="card">
+      <div class="card-title">Workflows</div>
+      <div id="workflow-list">
+        <div class="wf-row">
+          <div><div class="wf-name">Loading...</div></div>
+        </div>
+      </div>
+      <button class="new-wf-btn" onclick="createWorkflow()">+ Create new workflow</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Recent activity</div>
+      <div class="log-row"><span class="log-time">05:54</span><span class="log-msg">Email sent to user@gmail.com</span><span class="tag tag-gmail">Gmail</span></div>
+      <div class="log-row"><span class="log-time">05:53</span><span class="log-msg">Row appended to Sheet</span><span class="tag tag-sheets">Sheets</span></div>
+      <div class="log-row"><span class="log-time">05:52</span><span class="log-msg">Lead capture triggered</span><span class="tag tag-wf">Workflow</span></div>
+      <div class="log-row"><span class="log-time">05:50</span><span class="log-msg">Daily report workflow ran</span><span class="tag tag-wf">Workflow</span></div>
+      <div class="log-row"><span class="log-time">05:48</span><span class="log-msg">3 rows appended to Sheet</span><span class="tag tag-sheets">Sheets</span></div>
+    </div>
+
+    <div class="card full-width">
+      <div class="card-title">API endpoints</div>
+      <div class="endpoint-grid">
+        <div>
+          <div class="ep-row"><span class="method get">GET</span><span class="ep-path">/workflow/all</span><span class="ep-desc">List workflows</span></div>
+          <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/workflow/create/{name}</span><span class="ep-desc">Create workflow</span></div>
+        </div>
+        <div>
+          <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/gmail/send</span><span class="ep-desc">Send email</span></div>
+          <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/sheets/append</span><span class="ep-desc">Append to sheet</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  async function loadWorkflows() {
+    try {
+      const res = await fetch('/workflow/all');
+      const data = await res.json();
+      const list = document.getElementById('workflow-list');
+      const count = document.getElementById('wf-count');
+      if (!data.workflows || data.workflows.length === 0) {
+        list.innerHTML = '<div class="wf-row"><div class="wf-name" style="color:#aaa;">No workflows yet</div></div>';
+        count.textContent = '0';
+        return;
+      }
+      count.textContent = data.workflows.length;
+      list.innerHTML = data.workflows.map(wf => `
+        <div class="wf-row">
+          <div>
+            <div class="wf-name">${wf.name}</div>
+            <div class="wf-steps">Manual trigger</div>
+          </div>
+          <span class="badge badge-active">Active</span>
+        </div>
+      `).join('');
+    } catch(e) {
+      document.getElementById('wf-count').textContent = '—';
+    }
+  }
+
+  async function createWorkflow() {
+    const name = prompt('Workflow name:');
+    if (!name) return;
+    await fetch(`/workflow/create/${encodeURIComponent(name)}`, { method: 'POST' });
+    loadWorkflows();
+  }
+
+  loadWorkflows();
+</script>
 </body>
 </html>
