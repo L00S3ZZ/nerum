@@ -1,83 +1,121 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Nerum</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f5f5; color: #1a1a1a; }
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:linear-gradient(135deg,#26215C 0%,#534AB7 50%,#7F77DD 100%);min-height:100vh;color:#fff}
 
-    /* AUTH PAGE */
-    .auth-page { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #f5f5f5; }
-    .auth-box { background: #fff; border-radius: 12px; border: 1px solid #eee; padding: 2.5rem; width: 100%; max-width: 400px; }
-    .auth-logo { font-size: 26px; font-weight: 700; color: #1a1a1a; margin-bottom: 0.3rem; }
-    .auth-logo span { color: #534AB7; }
-    .auth-sub { font-size: 13px; color: #888; margin-bottom: 2rem; }
-    .auth-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1px solid #eee; border-radius: 8px; overflow: hidden; }
-    .auth-tab { flex: 1; padding: 9px; text-align: center; font-size: 13px; cursor: pointer; background: #f9f9f9; color: #888; border: none; }
-    .auth-tab.active { background: #534AB7; color: #fff; }
-    .form-group { margin-bottom: 1rem; }
-    .form-group label { font-size: 12px; color: #555; display: block; margin-bottom: 5px; }
-    .form-group input { width: 100%; padding: 10px 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 14px; outline: none; }
-    .form-group input:focus { border-color: #534AB7; }
-    .auth-btn { width: 100%; padding: 11px; background: #534AB7; color: #fff; border: none; border-radius: 8px; font-size: 14px; cursor: pointer; margin-top: 0.5rem; }
-    .auth-btn:hover { background: #3C3489; }
-    .auth-error { font-size: 12px; color: #A32D2D; background: #FCEBEB; padding: 8px 12px; border-radius: 6px; margin-bottom: 1rem; display: none; }
-    .auth-success { font-size: 12px; color: #3B6D11; background: #EAF3DE; padding: 8px 12px; border-radius: 6px; margin-bottom: 1rem; display: none; }
+    /* AUTH */
+    .auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh}
+    .auth-box{background:rgba(255,255,255,0.12);backdrop-filter:blur(20px);border:1px solid rgba(255,255,255,0.2);border-radius:20px;padding:2.5rem;width:100%;max-width:400px}
+    .auth-logo{font-size:28px;font-weight:700;color:#fff;margin-bottom:4px}
+    .auth-logo span{color:#AFA9EC}
+    .auth-sub{font-size:13px;color:rgba(255,255,255,0.6);margin-bottom:2rem}
+    .auth-tabs{display:flex;background:rgba(255,255,255,0.1);border-radius:10px;padding:4px;margin-bottom:1.5rem}
+    .auth-tab{flex:1;padding:8px;text-align:center;font-size:13px;cursor:pointer;border-radius:8px;color:rgba(255,255,255,0.6);border:none;background:transparent}
+    .auth-tab.active{background:rgba(255,255,255,0.2);color:#fff}
+    .form-group{margin-bottom:1rem}
+    .form-group label{font-size:12px;color:rgba(255,255,255,0.7);display:block;margin-bottom:5px}
+    .form-group input{width:100%;padding:11px 14px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);border-radius:10px;font-size:14px;color:#fff;outline:none}
+    .form-group input::placeholder{color:rgba(255,255,255,0.35)}
+    .form-group input:focus{border-color:rgba(255,255,255,0.5)}
+    .auth-btn{width:100%;padding:12px;background:rgba(255,255,255,0.9);color:#26215C;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer;margin-top:0.5rem}
+    .auth-btn:hover{background:#fff}
+    .auth-error{font-size:12px;color:#ff8a7a;background:rgba(255,80,80,0.15);border:1px solid rgba(255,80,80,0.3);padding:8px 12px;border-radius:8px;margin-bottom:1rem;display:none}
+    .auth-success{font-size:12px;color:#5DCAA5;background:rgba(93,202,165,0.15);border:1px solid rgba(93,202,165,0.3);padding:8px 12px;border-radius:8px;margin-bottom:1rem;display:none}
 
     /* DASHBOARD */
-    .dashboard { display: none; }
-    .sidebar { position: fixed; top: 0; left: 0; width: 220px; height: 100vh; background: #1a1a2e; padding: 1.5rem 1rem; }
-    .logo { font-size: 22px; font-weight: 700; color: #fff; margin-bottom: 2rem; }
-    .logo span { color: #7F77DD; }
-    .nav-item { display: block; padding: 10px 14px; border-radius: 8px; color: #aaa; font-size: 14px; cursor: pointer; margin-bottom: 4px; }
-    .nav-item:hover, .nav-item.active { background: #2a2a4a; color: #fff; }
-    .nav-label { font-size: 11px; color: #555; text-transform: uppercase; letter-spacing: 1px; margin: 1.2rem 0 0.5rem 14px; }
-    .logout-btn { position: absolute; bottom: 1.5rem; left: 1rem; right: 1rem; padding: 9px; background: transparent; border: 1px solid #333; border-radius: 8px; color: #aaa; font-size: 13px; cursor: pointer; }
-    .logout-btn:hover { background: #2a2a4a; color: #fff; }
-    .main { margin-left: 220px; padding: 2rem; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
-    .page-title { font-size: 20px; font-weight: 600; }
-    .welcome-text { font-size: 13px; color: #888; margin-top: 2px; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #639922; display: inline-block; margin-right: 6px; }
-    .btn { padding: 9px 18px; border-radius: 8px; font-size: 13px; cursor: pointer; border: none; }
-    .btn-primary { background: #534AB7; color: #fff; }
-    .btn-primary:hover { background: #3C3489; }
-    .metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 2rem; }
-    .metric { background: #fff; border-radius: 10px; padding: 1.2rem; border: 1px solid #eee; }
-    .metric-label { font-size: 12px; color: #888; margin-bottom: 8px; }
-    .metric-value { font-size: 28px; font-weight: 600; color: #1a1a1a; }
-    .metric-sub { font-size: 11px; color: #639922; margin-top: 4px; }
-    .panels { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-    .card { background: #fff; border-radius: 10px; padding: 1.25rem; border: 1px solid #eee; }
-    .card-title { font-size: 15px; font-weight: 600; margin-bottom: 1rem; }
-    .wf-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f0f0f0; }
-    .wf-row:last-child { border-bottom: none; }
-    .wf-name { font-size: 13px; font-weight: 500; }
-    .wf-steps { font-size: 11px; color: #888; margin-top: 2px; }
-    .badge { font-size: 11px; padding: 3px 10px; border-radius: 20px; }
-    .badge-active { background: #EAF3DE; color: #3B6D11; }
-    .badge-idle { background: #f0f0f0; color: #888; }
-    .log-row { display: flex; gap: 10px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; align-items: center; }
-    .log-row:last-child { border-bottom: none; }
-    .log-time { color: #aaa; min-width: 50px; }
-    .log-msg { color: #333; flex: 1; }
-    .tag { font-size: 10px; padding: 2px 7px; border-radius: 10px; }
-    .tag-gmail { background: #FAECE7; color: #993C1D; }
-    .tag-sheets { background: #EAF3DE; color: #3B6D11; }
-    .tag-wf { background: #EEEDFE; color: #534AB7; }
-    .endpoint-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2rem; }
-    .ep-row { display: flex; align-items: center; gap: 8px; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 12px; }
-    .ep-row:last-child { border-bottom: none; }
-    .method { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; min-width: 38px; text-align: center; }
-    .get { background: #E6F1FB; color: #185FA5; }
-    .post { background: #EAF3DE; color: #3B6D11; }
-    .ep-path { font-family: monospace; color: #333; }
-    .ep-desc { color: #aaa; margin-left: auto; }
-    .new-wf-btn { width: 100%; margin-top: 1rem; padding: 9px; border: 1.5px dashed #ccc; border-radius: 8px; background: transparent; color: #888; font-size: 13px; cursor: pointer; }
-    .new-wf-btn:hover { background: #f9f9f9; border-color: #534AB7; color: #534AB7; }
-    .full-width { grid-column: span 2; }
+    .dashboard{display:none}
+    .layout{display:flex;height:100vh}
+
+    /* SIDEBAR */
+    .sidebar{width:200px;background:rgba(255,255,255,0.07);border-right:1px solid rgba(255,255,255,0.12);display:flex;flex-direction:column;flex-shrink:0}
+    .sb-top{padding:20px 14px;border-bottom:1px solid rgba(255,255,255,0.1)}
+    .sb-logo{font-size:20px;font-weight:700;color:#fff}
+    .sb-logo span{color:#AFA9EC}
+    .sb-tagline{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px}
+    .sb-nav{padding:10px 8px;flex:1}
+    .sb-section{font-size:9px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;padding:10px 8px 5px}
+    .sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;color:rgba(255,255,255,0.55);font-size:11px;cursor:pointer;margin-bottom:2px}
+    .sb-item:hover,.sb-item.active{background:rgba(255,255,255,0.14);color:#fff}
+    .sb-icon{width:28px;height:28px;border-radius:8px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .sb-icon.active{background:rgba(255,255,255,0.22)}
+    .sb-badge{margin-left:auto;font-size:9px;padding:2px 6px;border-radius:10px;background:rgba(93,202,165,0.2);color:#5DCAA5}
+    .sb-bottom{padding:12px 8px;border-top:1px solid rgba(255,255,255,0.1)}
+    .sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.1);cursor:pointer}
+    .sb-avatar{width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+    .sb-uname{font-size:11px;color:#fff;font-weight:500}
+    .sb-plan{font-size:9px;color:rgba(255,255,255,0.45)}
+    .logout-btn{width:100%;margin-top:6px;padding:7px;background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:8px;color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer}
+    .logout-btn:hover{background:rgba(255,255,255,0.1);color:#fff}
+
+    /* MAIN */
+    .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+    .topbar{padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.04);flex-shrink:0}
+    .tb-title{font-size:16px;font-weight:700;color:#fff}
+    .tb-sub{font-size:10px;color:rgba(255,255,255,0.45);margin-top:1px}
+    .tb-right{display:flex;align-items:center;gap:10px}
+    .tb-status{display:flex;align-items:center;gap:5px;font-size:10px;color:#5DCAA5;background:rgba(93,202,165,0.12);padding:4px 12px;border-radius:20px;border:1px solid rgba(93,202,165,0.25)}
+    .tb-dot{width:5px;height:5px;border-radius:50%;background:#5DCAA5}
+    .tb-btn{background:rgba(255,255,255,0.9);color:#26215C;border:none;padding:8px 16px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer}
+    .tb-btn:hover{background:#fff}
+
+    /* CONTENT */
+    .content{flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
+    .cards-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;flex-shrink:0}
+    .glass-card{background:rgba(255,255,255,0.11);border:1px solid rgba(255,255,255,0.18);border-radius:14px;padding:14px}
+    .gc-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+    .gc-icon{width:32px;height:32px;border-radius:10px;background:rgba(255,255,255,0.13);display:flex;align-items:center;justify-content:center}
+    .gc-trend{font-size:9px;color:#5DCAA5;background:rgba(93,202,165,0.12);padding:2px 7px;border-radius:10px}
+    .gc-num{font-size:24px;font-weight:700;color:#fff}
+    .gc-label{font-size:10px;color:rgba(255,255,255,0.55);margin-top:3px}
+
+    .bottom-row{display:grid;grid-template-columns:1fr 1.1fr 1.2fr;gap:14px;flex:1;min-height:0}
+    .panel{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
+    .panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0}
+    .panel-title{font-size:12px;font-weight:600;color:#fff}
+    .panel-action{font-size:10px;color:rgba(255,255,255,0.45);cursor:pointer;background:rgba(255,255,255,0.08);padding:3px 9px;border-radius:10px}
+
+    .wf-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,0.06);margin-bottom:6px;cursor:pointer}
+    .wf-item:hover{background:rgba(255,255,255,0.11)}
+    .wf-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .wf-name{font-size:11px;color:#fff;font-weight:500}
+    .wf-desc{font-size:9px;color:rgba(255,255,255,0.45);margin-top:1px}
+    .wf-badge{font-size:9px;padding:2px 8px;border-radius:10px;margin-left:auto;flex-shrink:0}
+    .badge-on{background:rgba(93,202,165,0.18);color:#5DCAA5;border:1px solid rgba(93,202,165,0.25)}
+    .badge-off{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.35)}
+    .new-wf{width:100%;margin-top:8px;padding:8px;background:transparent;border:1px dashed rgba(255,255,255,0.2);border-radius:10px;color:rgba(255,255,255,0.4);font-size:11px;cursor:pointer}
+    .new-wf:hover{border-color:rgba(255,255,255,0.4);color:#fff}
+
+    .history-item{display:flex;align-items:center;gap:8px;padding:7px 0;border-bottom:1px solid rgba(255,255,255,0.07)}
+    .history-item:last-child{border-bottom:none}
+    .h-icon{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    .h-action{font-size:10px;color:rgba(255,255,255,0.85);flex:1}
+    .h-service{font-size:9px;padding:2px 7px;border-radius:8px;flex-shrink:0}
+    .h-time{font-size:9px;color:rgba(255,255,255,0.35);min-width:36px;text-align:right}
+    .h-gmail{background:rgba(234,67,53,0.2);color:#ff8a7a}
+    .h-wa{background:rgba(37,211,102,0.2);color:#5DCAA5}
+    .h-tg{background:rgba(42,171,238,0.2);color:#7dd3fc}
+    .h-sh{background:rgba(52,168,83,0.2);color:#86efac}
+    .h-wf{background:rgba(175,169,236,0.2);color:#c4b5fd}
+
+    .chat-panel{background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.14);border-radius:14px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
+    .chat-msgs{flex:1;overflow-y:auto;margin-bottom:10px}
+    .chat-msgs::-webkit-scrollbar{width:3px}
+    .chat-msgs::-webkit-scrollbar-track{background:transparent}
+    .chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.2);border-radius:10px}
+    .chat-msg{margin-bottom:8px;clear:both}
+    .bubble-bot{background:rgba(255,255,255,0.13);border-radius:4px 12px 12px 12px;padding:8px 11px;font-size:10px;color:#fff;display:inline-block;max-width:90%;line-height:1.5}
+    .bubble-user{background:rgba(255,255,255,0.9);border-radius:12px 12px 4px 12px;padding:8px 11px;font-size:10px;color:#26215C;display:inline-block;max-width:90%;float:right;line-height:1.5;font-weight:500}
+    .chat-input-row{display:flex;gap:6px;flex-shrink:0}
+    .chat-input{flex:1;background:rgba(255,255,255,0.09);border:1px solid rgba(255,255,255,0.18);border-radius:20px;padding:8px 14px;font-size:11px;color:#fff;outline:none}
+    .chat-input::placeholder{color:rgba(255,255,255,0.3)}
+    .chat-input:focus{border-color:rgba(255,255,255,0.35)}
+    .chat-send{background:rgba(255,255,255,0.9);color:#26215C;border:none;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer}
+    .chat-send:hover{background:#fff}
   </style>
 </head>
 <body>
@@ -87,42 +125,21 @@
   <div class="auth-box">
     <div class="auth-logo">Ne<span>rum</span></div>
     <div class="auth-sub">AI workflow automation platform</div>
-
     <div class="auth-tabs">
       <button class="auth-tab active" onclick="switchTab('login')">Login</button>
       <button class="auth-tab" onclick="switchTab('signup')">Sign up</button>
     </div>
-
     <div id="auth-error" class="auth-error"></div>
     <div id="auth-success" class="auth-success"></div>
-
-    <!-- LOGIN FORM -->
     <div id="login-form">
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="login-email" placeholder="you@example.com" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="login-password" placeholder="••••••••" />
-      </div>
+      <div class="form-group"><label>Email</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="login-password" placeholder="••••••••"/></div>
       <button class="auth-btn" onclick="doLogin()">Login to Nerum</button>
     </div>
-
-    <!-- SIGNUP FORM -->
-    <div id="signup-form" style="display:none;">
-      <div class="form-group">
-        <label>Full name</label>
-        <input type="text" id="signup-name" placeholder="Your name" />
-      </div>
-      <div class="form-group">
-        <label>Email</label>
-        <input type="email" id="signup-email" placeholder="you@example.com" />
-      </div>
-      <div class="form-group">
-        <label>Password</label>
-        <input type="password" id="signup-password" placeholder="Min 6 characters" />
-      </div>
+    <div id="signup-form" style="display:none">
+      <div class="form-group"><label>Full name</label><input type="text" id="signup-name" placeholder="Your name"/></div>
+      <div class="form-group"><label>Email</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
+      <div class="form-group"><label>Password</label><input type="password" id="signup-password" placeholder="Min 6 characters"/></div>
       <button class="auth-btn" onclick="doSignup()">Create account</button>
     </div>
   </div>
@@ -130,86 +147,164 @@
 
 <!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
-  <div class="sidebar">
-    <div class="logo">Ne<span>rum</span></div>
-    <span class="nav-label">Main</span>
-    <div class="nav-item active">Dashboard</div>
-    <div class="nav-item">Workflows</div>
-    <div class="nav-item">Activity</div>
-    <span class="nav-label">Integrations</span>
-    <div class="nav-item">Gmail</div>
-    <div class="nav-item">Google Sheets</div>
-    <span class="nav-label">Settings</span>
-    <div class="nav-item">API Keys</div>
-    <div class="nav-item">Account</div>
-    <button class="logout-btn" onclick="doLogout()">Logout</button>
-  </div>
-
-  <div class="main">
-    <div class="topbar">
-      <div>
-        <div class="page-title">Dashboard</div>
-        <div class="welcome-text">Welcome back, <span id="user-name">—</span></div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sb-top">
+        <div class="sb-logo">Ne<span>rum</span></div>
+        <div class="sb-tagline">AI Workflow Platform</div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px;">
-        <span><span class="status-dot"></span><span style="font-size:13px;color:#555;">nerum.onrender.com — live</span></span>
-        <button class="btn btn-primary" onclick="createWorkflow()">+ New Workflow</button>
-      </div>
-    </div>
-
-    <div class="metrics">
-      <div class="metric">
-        <div class="metric-label">Workflows</div>
-        <div class="metric-value" id="wf-count">—</div>
-        <div class="metric-sub">active automations</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Emails sent</div>
-        <div class="metric-value">12</div>
-        <div class="metric-sub">via Gmail</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">Sheets updated</div>
-        <div class="metric-value">8</div>
-        <div class="metric-sub">rows appended</div>
-      </div>
-      <div class="metric">
-        <div class="metric-label">API status</div>
-        <div class="metric-value" style="font-size:16px;padding-top:6px;"><span class="status-dot"></span>Live</div>
-        <div class="metric-sub">v0.1 — Render free</div>
-      </div>
-    </div>
-
-    <div class="panels">
-      <div class="card">
-        <div class="card-title">Workflows</div>
-        <div id="workflow-list">
-          <div class="wf-row"><div class="wf-name" style="color:#aaa;">Loading...</div></div>
+      <div class="sb-nav">
+        <div class="sb-section">Main</div>
+        <div class="sb-item active" onclick="setActive(this)">
+          <div class="sb-icon active">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="#fff"/><rect x="8" y="1" width="5" height="5" rx="1" fill="#fff"/><rect x="1" y="8" width="5" height="5" rx="1" fill="#fff"/><rect x="8" y="8" width="5" height="5" rx="1" fill="rgba(255,255,255,0.35)"/></svg>
+          </div>Dashboard
         </div>
-        <button class="new-wf-btn" onclick="createWorkflow()">+ Create new workflow</button>
+        <div class="sb-item" onclick="setActive(this)">
+          <div class="sb-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 3l4 4-4 4" stroke="rgba(255,255,255,0.6)" stroke-width="1.5" stroke-linecap="round"/></svg>
+          </div>Workflows
+          <span class="sb-badge" id="wf-count-badge">3</span>
+        </div>
+        <div class="sb-item" onclick="setActive(this)">
+          <div class="sb-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="rgba(255,255,255,0.6)" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>Service History
+        </div>
+        <div class="sb-section">Account</div>
+        <div class="sb-item" onclick="setActive(this)">
+          <div class="sb-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="8" rx="1" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/><path d="M4 4V3a3 3 0 016 0v1" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/></svg>
+          </div>Billing
+        </div>
+        <div class="sb-item" onclick="setActive(this)">
+          <div class="sb-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/><path d="M2 12c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="rgba(255,255,255,0.6)" stroke-width="1.3"/></svg>
+          </div>Settings
+        </div>
+      </div>
+      <div class="sb-bottom">
+        <div class="sb-user">
+          <div class="sb-avatar" id="user-initials">SR</div>
+          <div><div class="sb-uname" id="user-name-display">Srihari</div><div class="sb-plan">Free plan</div></div>
+        </div>
+        <button class="logout-btn" onclick="doLogout()">Logout</button>
+      </div>
+    </div>
+
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="tb-title">Dashboard</div>
+          <div class="tb-sub">Welcome back, <span id="welcome-name">Srihari</span></div>
+        </div>
+        <div class="tb-right">
+          <div class="tb-status"><span class="tb-dot"></span>nerum.onrender.com — live</div>
+          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
+        </div>
       </div>
 
-      <div class="card">
-        <div class="card-title">Recent activity</div>
-        <div class="log-row"><span class="log-time">06:18</span><span class="log-msg">Dashboard deployed</span><span class="tag tag-wf">Workflow</span></div>
-        <div class="log-row"><span class="log-time">05:54</span><span class="log-msg">Email sent to user@gmail.com</span><span class="tag tag-gmail">Gmail</span></div>
-        <div class="log-row"><span class="log-time">05:53</span><span class="log-msg">Row appended to Sheet</span><span class="tag tag-sheets">Sheets</span></div>
-        <div class="log-row"><span class="log-time">05:52</span><span class="log-msg">Lead capture triggered</span><span class="tag tag-wf">Workflow</span></div>
-        <div class="log-row"><span class="log-time">05:48</span><span class="log-msg">3 rows appended to Sheet</span><span class="tag tag-sheets">Sheets</span></div>
-      </div>
-
-      <div class="card full-width">
-        <div class="card-title">API endpoints</div>
-        <div class="endpoint-grid">
-          <div>
-            <div class="ep-row"><span class="method get">GET</span><span class="ep-path">/workflow/all</span><span class="ep-desc">List workflows</span></div>
-            <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/workflow/create/{name}</span><span class="ep-desc">Create workflow</span></div>
-            <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/auth/signup</span><span class="ep-desc">Create account</span></div>
+      <div class="content">
+        <div class="cards-row">
+          <div class="glass-card">
+            <div class="gc-top">
+              <div class="gc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="1" y="1" width="6" height="6" rx="1" fill="#fff"/><rect x="9" y="1" width="6" height="6" rx="1" fill="#fff"/><rect x="1" y="9" width="6" height="6" rx="1" fill="#fff"/><rect x="9" y="9" width="6" height="6" rx="1" fill="rgba(255,255,255,0.35)"/></svg></div>
+              <span class="gc-trend">active</span>
+            </div>
+            <div class="gc-num" id="metric-wf">—</div>
+            <div class="gc-label">Workflows</div>
           </div>
-          <div>
-            <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/gmail/send</span><span class="ep-desc">Send email</span></div>
-            <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/sheets/append</span><span class="ep-desc">Append to sheet</span></div>
-            <div class="ep-row"><span class="method post">POST</span><span class="ep-path">/auth/login</span><span class="ep-desc">Login</span></div>
+          <div class="glass-card">
+            <div class="gc-top">
+              <div class="gc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8H2z" fill="rgba(255,255,255,0.7)"/><path d="M2 4l6 5 6-5" stroke="#26215C" stroke-width="1.2"/></svg></div>
+              <span class="gc-trend">Gmail</span>
+            </div>
+            <div class="gc-num">12</div>
+            <div class="gc-label">Emails sent</div>
+          </div>
+          <div class="glass-card">
+            <div class="gc-top">
+              <div class="gc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="rgba(255,255,255,0.7)"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#26215C" stroke-width="1.2"/></svg></div>
+              <span class="gc-trend">Sheets</span>
+            </div>
+            <div class="gc-num">8</div>
+            <div class="gc-label">Rows appended</div>
+          </div>
+          <div class="glass-card">
+            <div class="gc-top">
+              <div class="gc-icon"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" fill="rgba(93,202,165,0.5)"/><path d="M5.5 8l2 2 3-3" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+              <span class="gc-trend">live</span>
+            </div>
+            <div class="gc-num" style="font-size:15px;padding-top:4px">● Online</div>
+            <div class="gc-label">API status</div>
+          </div>
+        </div>
+
+        <div class="bottom-row">
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Workflows</span>
+              <span class="panel-action" onclick="createWorkflow()">+ Add</span>
+            </div>
+            <div id="workflow-list"></div>
+            <button class="new-wf" onclick="createWorkflow()">+ Create new workflow</button>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <span class="panel-title">Service history</span>
+              <span class="panel-action">See all</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(37,211,102,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#25D366"/></svg></div>
+              <span class="h-action">WhatsApp sent to +91999...</span>
+              <span class="h-service h-wa">WA</span>
+              <span class="h-time">9:33</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(234,67,53,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 2h10v8H1z" fill="#EA4335"/><path d="M1 2l5 4 5-4" stroke="#fff" stroke-width="1"/></svg></div>
+              <span class="h-action">Email sent to user@gmail.com</span>
+              <span class="h-service h-gmail">Gmail</span>
+              <span class="h-time">9:12</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(52,168,83,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="1" width="10" height="10" rx="1" fill="#34A853"/><path d="M3 6h6M3 4h6M3 8h4" stroke="#fff" stroke-width="1"/></svg></div>
+              <span class="h-action">Row appended to Sheet</span>
+              <span class="h-service h-sh">Sheets</span>
+              <span class="h-time">8:55</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(42,171,238,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#2AABEE"/><path d="M2 6l8-3-3 8-2-3-3-2z" fill="#fff"/></svg></div>
+              <span class="h-action">Telegram message sent</span>
+              <span class="h-service h-tg">TG</span>
+              <span class="h-time">8:48</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(175,169,236,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 2l4 4-4 4" stroke="#AFA9EC" stroke-width="1.2"/></svg></div>
+              <span class="h-action">Workflow triggered</span>
+              <span class="h-service h-wf">WF</span>
+              <span class="h-time">8:30</span>
+            </div>
+            <div class="history-item">
+              <div class="h-icon" style="background:rgba(234,67,53,0.15)"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 2h10v8H1z" fill="#EA4335"/><path d="M1 2l5 4 5-4" stroke="#fff" stroke-width="1"/></svg></div>
+              <span class="h-action">3 emails sent in bulk</span>
+              <span class="h-service h-gmail">Gmail</span>
+              <span class="h-time">8:10</span>
+            </div>
+          </div>
+
+          <div class="chat-panel">
+            <div class="panel-header">
+              <span class="panel-title">AI Workflow Builder</span>
+              <span class="panel-action">Tamil / English</span>
+            </div>
+            <div class="chat-msgs" id="chat-msgs">
+              <div class="chat-msg"><div class="bubble-bot">Hi! என்ன workflow வேணும்? Tell me in Tamil or English!</div></div>
+            </div>
+            <div class="chat-input-row">
+              <input class="chat-input" id="chat-input" placeholder="Workflow சொல்லுங்க..." onkeydown="if(event.key==='Enter')sendChat()"/>
+              <button class="chat-send" onclick="sendChat()">Send</button>
+            </div>
           </div>
         </div>
       </div>
@@ -218,123 +313,119 @@
 </div>
 
 <script>
-  function switchTab(tab) {
-    document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
-    document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
-    document.querySelectorAll('.auth-tab').forEach((t, i) => {
-      t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1));
-    });
-    hideMessages();
-  }
+function switchTab(tab){
+  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
+  document.getElementById('signup-form').style.display=tab==='signup'?'block':'none';
+  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
+  hideMessages();
+}
+function showError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';document.getElementById('auth-success').style.display='none';}
+function showSuccess(msg){const el=document.getElementById('auth-success');el.textContent=msg;el.style.display='block';document.getElementById('auth-error').style.display='none';}
+function hideMessages(){document.getElementById('auth-error').style.display='none';document.getElementById('auth-success').style.display='none';}
 
-  function showError(msg) {
-    const el = document.getElementById('auth-error');
-    el.textContent = msg; el.style.display = 'block';
-    document.getElementById('auth-success').style.display = 'none';
-  }
+async function doLogin(){
+  const email=document.getElementById('login-email').value.trim();
+  const password=document.getElementById('login-password').value;
+  if(!email||!password)return showError('Please fill in all fields');
+  try{
+    const res=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
+    const data=await res.json();
+    if(!res.ok)return showError(data.detail||'Login failed');
+    localStorage.setItem('nerum_token',data.token);
+    localStorage.setItem('nerum_name',data.name);
+    showDashboard(data.name);
+  }catch(e){showError('Server error. Try again.');}
+}
 
-  function showSuccess(msg) {
-    const el = document.getElementById('auth-success');
-    el.textContent = msg; el.style.display = 'block';
-    document.getElementById('auth-error').style.display = 'none';
-  }
+async function doSignup(){
+  const name=document.getElementById('signup-name').value.trim();
+  const email=document.getElementById('signup-email').value.trim();
+  const password=document.getElementById('signup-password').value;
+  if(!name||!email||!password)return showError('Please fill in all fields');
+  if(password.length<6)return showError('Password must be at least 6 characters');
+  try{
+    const res=await fetch('/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
+    const data=await res.json();
+    if(!res.ok)return showError(data.detail||'Signup failed');
+    localStorage.setItem('nerum_token',data.token);
+    localStorage.setItem('nerum_name',data.name);
+    showDashboard(data.name);
+  }catch(e){showError('Server error. Try again.');}
+}
 
-  function hideMessages() {
-    document.getElementById('auth-error').style.display = 'none';
-    document.getElementById('auth-success').style.display = 'none';
-  }
+function doLogout(){
+  localStorage.removeItem('nerum_token');
+  localStorage.removeItem('nerum_name');
+  document.getElementById('dashboard').style.display='none';
+  document.getElementById('auth-page').style.display='flex';
+}
 
-  async function doLogin() {
-    const email = document.getElementById('login-email').value.trim();
-    const password = document.getElementById('login-password').value;
-    if (!email || !password) return showError('Please fill in all fields');
-    try {
-      const res = await fetch('/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) return showError(data.detail || 'Login failed');
-      localStorage.setItem('nerum_token', data.token);
-      localStorage.setItem('nerum_name', data.name);
-      showDashboard(data.name);
-    } catch(e) { showError('Server error. Try again.'); }
-  }
+function showDashboard(name){
+  document.getElementById('auth-page').style.display='none';
+  document.getElementById('dashboard').style.display='block';
+  document.getElementById('user-name-display').textContent=name;
+  document.getElementById('welcome-name').textContent=name;
+  const initials=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('user-initials').textContent=initials;
+  loadWorkflows();
+}
 
-  async function doSignup() {
-    const name = document.getElementById('signup-name').value.trim();
-    const email = document.getElementById('signup-email').value.trim();
-    const password = document.getElementById('signup-password').value;
-    if (!name || !email || !password) return showError('Please fill in all fields');
-    if (password.length < 6) return showError('Password must be at least 6 characters');
-    try {
-      const res = await fetch('/auth/signup', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
-      });
-      const data = await res.json();
-      if (!res.ok) return showError(data.detail || 'Signup failed');
-      localStorage.setItem('nerum_token', data.token);
-      localStorage.setItem('nerum_name', data.name);
-      showDashboard(data.name);
-    } catch(e) { showError('Server error. Try again.'); }
-  }
+async function loadWorkflows(){
+  try{
+    const token=localStorage.getItem('nerum_token');
+    const res=await fetch('/workflow/all',{headers:{'Authorization':`Bearer ${token}`}});
+    const data=await res.json();
+    const list=document.getElementById('workflow-list');
+    const badge=document.getElementById('wf-count-badge');
+    const metric=document.getElementById('metric-wf');
+    if(!data.workflows||data.workflows.length===0){
+      list.innerHTML='<div style="font-size:11px;color:rgba(255,255,255,0.4);text-align:center;padding:16px 0">No workflows yet</div>';
+      badge.textContent='0';metric.textContent='0';return;
+    }
+    badge.textContent=data.workflows.length;
+    metric.textContent=data.workflows.length;
+    const icons={'gmail':'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 2h10v8H1z" fill="#EA4335"/><path d="M1 2l5 4 5-4" stroke="#fff" stroke-width="1"/></svg>','whatsapp':'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#25D366"/></svg>','telegram':'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" fill="#2AABEE"/></svg>','default':'<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 6h10M6 2l4 4-4 4" stroke="#AFA9EC" stroke-width="1.2"/></svg>'};
+    list.innerHTML=data.workflows.map(wf=>`
+      <div class="wf-item">
+        <div class="wf-icon" style="background:rgba(175,169,236,0.2)">${icons.default}</div>
+        <div><div class="wf-name">${wf.name}</div><div class="wf-desc">Manual trigger</div></div>
+        <span class="wf-badge badge-on">Active</span>
+      </div>`).join('');
+  }catch(e){document.getElementById('metric-wf').textContent='—';}
+}
 
-  function doLogout() {
-    localStorage.removeItem('nerum_token');
-    localStorage.removeItem('nerum_name');
-    document.getElementById('dashboard').style.display = 'none';
-    document.getElementById('auth-page').style.display = 'flex';
-  }
+async function createWorkflow(){
+  const name=prompt('Workflow name:');
+  if(!name)return;
+  const token=localStorage.getItem('nerum_token');
+  await fetch(`/workflow/create/${encodeURIComponent(name)}`,{method:'POST',headers:{'Authorization':`Bearer ${token}`}});
+  loadWorkflows();
+}
 
-  function showDashboard(name) {
-    document.getElementById('auth-page').style.display = 'none';
-    document.getElementById('dashboard').style.display = 'block';
-    document.getElementById('user-name').textContent = name;
-    loadWorkflows();
-  }
+function setActive(el){
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
+  document.querySelectorAll('.sb-icon').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+  el.querySelector('.sb-icon').classList.add('active');
+}
 
-  async function loadWorkflows() {
-    try {
-      const token = localStorage.getItem('nerum_token');
-      const res = await fetch('/workflow/all', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
-      const data = await res.json();
-      const list = document.getElementById('workflow-list');
-      const count = document.getElementById('wf-count');
-      if (!data.workflows || data.workflows.length === 0) {
-        list.innerHTML = '<div class="wf-row"><div class="wf-name" style="color:#aaa;">No workflows yet</div></div>';
-        count.textContent = '0'; return;
-      }
-      count.textContent = data.workflows.length;
-      list.innerHTML = data.workflows.map(wf => `
-        <div class="wf-row">
-          <div><div class="wf-name">${wf.name}</div><div class="wf-steps">Manual trigger</div></div>
-          <span class="badge badge-active">Active</span>
-        </div>`).join('');
-    } catch(e) { document.getElementById('wf-count').textContent = '—'; }
-  }
+function sendChat(){
+  const input=document.getElementById('chat-input');
+  const msg=input.value.trim();
+  if(!msg)return;
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML+=`<div class="chat-msg" style="text-align:right"><div class="bubble-user">${msg}</div></div>`;
+  input.value='';
+  msgs.scrollTop=msgs.scrollHeight;
+  setTimeout(()=>{
+    msgs.innerHTML+=`<div class="chat-msg"><div class="bubble-bot">Got it! I'll build that workflow for you. Working on it... 🚀</div></div>`;
+    msgs.scrollTop=msgs.scrollHeight;
+  },800);
+}
 
-  async function createWorkflow() {
-    const name = prompt('Workflow name:');
-    if (!name) return;
-    const token = localStorage.getItem('nerum_token');
-    await fetch(`/workflow/create/${encodeURIComponent(name)}`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    loadWorkflows();
-  }
-
-  // Check if already logged in
-  const savedToken = localStorage.getItem('nerum_token');
-  const savedName = localStorage.getItem('nerum_name');
-  if (savedToken && savedName) {
-    showDashboard(savedName);
-  }
+const savedToken=localStorage.getItem('nerum_token');
+const savedName=localStorage.getItem('nerum_name');
+if(savedToken&&savedName)showDashboard(savedName);
 </script>
 </body>
 </html>
