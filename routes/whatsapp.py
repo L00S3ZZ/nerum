@@ -14,6 +14,6 @@ def send_whatsapp(to: str, message: str):
     msg = client.messages.create(
         from_=TWILIO_WHATSAPP_FROM,
         body=message,
-        to=f"whatsapp:+{to}"
+        to=f"whatsapp:+{to.lstrip('+')}"
     )
     return {"message": f"WhatsApp sent to {to}!", "sid": msg.sid}
