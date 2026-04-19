@@ -567,3 +567,9 @@ body.light .edit-profile-form{background:#fff;border:1px solid #e2e8f0}
 .settings-cancel-btn{padding:11px 20px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
 body.dark .settings-cancel-btn{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1)}
 body.light .settings-cancel-btn{background:#f8fafc;color:#64748b;border:1px solid #e2e8f0}
+
+/* PROFILE POPUP */
+body.dark #profile-popup{background:#1a1535;border:1px solid rgba(129,140,248,0.2)}
+body.light #profile-popup{background:#fff;border:1px solid #e2e8f0}
+body.dark #popup-title{color:#fff}
+body.light #popup-title{color:#1e293b}

@@ -393,35 +393,36 @@
     </div>
   </div>
 
-  <!-- EDIT PROFILE FORM (hidden by default) -->
-  <div class="edit-profile-form" id="edit-profile-form" style="display:none">
-    <div class="settings-section-title">Edit Profile</div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label>FULL NAME</label>
-        <input class="settings-input" id="settings-name" placeholder="Your name"/>
-      </div>
-      <div class="settings-field">
-        <label>EMAIL</label>
-        <input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/>
-      </div>
+ <!-- EDIT PROFILE POPUP -->
+<div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
+  <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:15px;font-weight:700" id="popup-title">Edit Profile</div>
+      <button onclick="closeProfilePopup()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;padding:4px 8px">✕</button>
     </div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label>NEW PASSWORD</label>
-        <input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/>
-      </div>
-      <div class="settings-field">
-        <label>CONFIRM PASSWORD</label>
-        <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/>
-      </div>
+    <div class="settings-field" style="margin-bottom:14px">
+      <label>FULL NAME</label>
+      <input class="settings-input" id="settings-name" placeholder="Your name"/>
     </div>
-    <div style="display:flex;gap:10px;margin-top:4px">
-      <button class="settings-save-btn" onclick="saveSettings()">Save Changes</button>
-      <button class="settings-cancel-btn" onclick="toggleProfileEdit()">Cancel</button>
+    <div class="settings-field" style="margin-bottom:14px">
+      <label>EMAIL</label>
+      <input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/>
     </div>
-    <div class="settings-success" id="settings-success">✓ Settings saved successfully!</div>
+    <div class="settings-field" style="margin-bottom:14px">
+      <label>NEW PASSWORD</label>
+      <input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/>
+    </div>
+    <div class="settings-field" style="margin-bottom:20px">
+      <label>CONFIRM PASSWORD</label>
+      <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button class="settings-save-btn" onclick="saveSettings()" style="flex:1">Save Changes</button>
+      <button class="settings-cancel-btn" onclick="closeProfilePopup()">Cancel</button>
+    </div>
+    <div class="settings-success" id="settings-success">✓ Saved successfully!</div>
   </div>
+</div>
 
   <!-- PREFERENCES -->
   <div class="settings-section">

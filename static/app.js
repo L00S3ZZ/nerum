@@ -358,12 +358,20 @@ if (googleToken && googleName) {
 
 // SETTINGS
 function toggleProfileEdit() {
-  const form = document.getElementById('edit-profile-form');
-  const isVisible = form.style.display !== 'none';
-  form.style.display = isVisible ? 'none' : 'block';
-  document.getElementById('edit-profile-form').scrollIntoView({ behavior: 'smooth' });
+  const overlay = document.getElementById('profile-popup-overlay');
+  overlay.style.display = 'flex';
+  document.getElementById('settings-name').value = currentUser;
 }
 
+function closeProfilePopup() {
+  document.getElementById('profile-popup-overlay').style.display = 'none';
+  document.getElementById('settings-success').style.display = 'none';
+}
+
+// Close popup when clicking outside
+document.getElementById('profile-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeProfilePopup();
+});
 function saveSettings() {
   const name = document.getElementById('settings-name').value.trim();
   const theme = document.getElementById('settings-theme').value;
@@ -380,6 +388,11 @@ function saveSettings() {
     document.getElementById('sb-initials').textContent = initials;
     document.getElementById('settings-avatar-big').textContent = initials;
   }
+  document.getElementById('settings-success').style.display = 'block';
+setTimeout(() => {
+  document.getElementById('settings-success').style.display = 'none';
+  closeProfilePopup();
+}, 2000);
   applyTheme(theme);
   applyLang(lang);
   if (newPass) {
