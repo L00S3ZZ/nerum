@@ -4,378 +4,25 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Nerum</title>
+<link rel="stylesheet" href="/static/style.css"/>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
-
-/* THEMES */
-body.dark{background:#0d0d1a;color:#fff}
-body.light{background:#f0f4f8;color:#1e293b}
-
-body.dark .plan-card{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);color:#fff}
-body.light .plan-card{background:#fff;border-color:#e2e8f0;color:#1e293b}
-body.dark .plan-current-btn{color:rgba(255,255,255,0.4)}
-body.light .plan-current-btn{color:#64748b;border-color:#e2e8f0}
-body.dark #billing-title{color:#fff}
-body.light #billing-title{color:#1e293b}
-body.dark #billing-sub{color:rgba(255,255,255,0.4)}
-body.light #billing-sub{color:#94a3b8}
-
-/* AUTH PAGE */
-.auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh}
-body.dark .auth-page{background:#0d0d1a}
-body.light .auth-page{background:#f0f4f8}
-.auth-box{border-radius:20px;padding:2.5rem;width:100%;max-width:420px;border:1px solid}
-body.dark .auth-box{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1)}
-body.light .auth-box{background:#fff;border-color:#e2e8f0}
-.auth-logo{font-size:28px;font-weight:800;text-align:center;margin-bottom:4px}
-body.dark .auth-logo .a{color:#818cf8}
-body.dark .auth-logo .b{color:#34d399}
-body.light .auth-logo .a{color:#0ea5e9}
-body.light .auth-logo .b{color:#38bdf8}
-.auth-sub{font-size:12px;text-align:center;margin-bottom:28px}
-body.dark .auth-sub{color:rgba(255,255,255,0.4)}
-body.light .auth-sub{color:#94a3b8}
-.google-btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:13px;border-radius:12px;font-size:13px;font-weight:500;text-decoration:none;margin-bottom:18px;cursor:pointer;border:1px solid;transition:all 0.2s}
-body.dark .google-btn{background:rgba(255,255,255,0.06);border-color:rgba(255,255,255,0.15);color:#fff}
-body.dark .google-btn:hover{background:rgba(255,255,255,0.1)}
-body.light .google-btn{background:#fff;border-color:#e2e8f0;color:#1e293b}
-body.light .google-btn:hover{background:#f8fafc}
-.auth-divider{display:flex;align-items:center;gap:12px;margin-bottom:18px}
-.div-line{flex:1;height:1px}
-body.dark .div-line{background:rgba(255,255,255,0.08)}
-body.light .div-line{background:#e2e8f0}
-.div-text{font-size:11px}
-body.dark .div-text{color:rgba(255,255,255,0.3)}
-body.light .div-text{color:#94a3b8}
-.auth-tabs{display:flex;border-radius:10px;padding:3px;margin-bottom:18px}
-body.dark .auth-tabs{background:rgba(255,255,255,0.05)}
-body.light .auth-tabs{background:#f1f5f9}
-.auth-tab{flex:1;padding:8px;text-align:center;font-size:12px;cursor:pointer;border-radius:8px;border:none;background:transparent;font-family:inherit;transition:all 0.2s}
-body.dark .auth-tab{color:rgba(255,255,255,0.4)}
-body.light .auth-tab{color:#64748b}
-body.dark .auth-tab.active{background:rgba(129,140,248,0.2);color:#818cf8}
-body.light .auth-tab.active{background:#fff;color:#0ea5e9}
-.form-group{margin-bottom:14px}
-.form-group label{font-size:11px;display:block;margin-bottom:5px;letter-spacing:0.3px}
-body.dark .form-group label{color:rgba(255,255,255,0.5)}
-body.light .form-group label{color:#64748b}
-.form-group input{width:100%;padding:12px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;transition:all 0.2s;font-family:inherit}
-body.dark .form-group input{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff}
-body.dark .form-group input:focus{border-color:rgba(129,140,248,0.5);background:rgba(129,140,248,0.05)}
-body.dark .form-group input::placeholder{color:rgba(255,255,255,0.2)}
-body.light .form-group input{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
-body.light .form-group input:focus{border-color:#7dd3fc}
-body.light .form-group input::placeholder{color:#94a3b8}
-.auth-btn{width:100%;padding:13px;border-radius:12px;font-size:13px;font-weight:600;cursor:pointer;border:none;font-family:inherit;margin-top:4px}
-body.dark .auth-btn{background:linear-gradient(135deg,#818cf8,#34d399);color:#fff}
-body.light .auth-btn{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
-.auth-error{font-size:12px;padding:10px 14px;border-radius:10px;margin-bottom:14px;display:none}
-body.dark .auth-error{color:#ff8a7a;background:rgba(255,80,80,0.12);border:1px solid rgba(255,80,80,0.2)}
-body.light .auth-error{color:#dc2626;background:#fef2f2;border:1px solid #fecaca}
-.auth-switch{font-size:11px;text-align:center;margin-top:14px;cursor:pointer}
-body.dark .auth-switch{color:rgba(255,255,255,0.35)}
-body.light .auth-switch{color:#94a3b8}
-body.dark .auth-switch span{color:#818cf8}
-body.light .auth-switch span{color:#0ea5e9}
-
-/* ONBOARDING */
-.onboarding{display:none;align-items:center;justify-content:center;min-height:100vh}
-body.dark .onboarding{background:#0d0d1a}
-body.light .onboarding{background:#f0f4f8}
-.ob-box{width:100%;max-width:480px;padding:20px}
-.ob-logo{font-size:22px;font-weight:800;text-align:center;margin-bottom:6px}
-.ob-welcome{font-size:17px;font-weight:700;text-align:center;margin-bottom:6px}
-body.dark .ob-welcome{color:#fff}
-body.light .ob-welcome{color:#1e293b}
-.ob-sub{font-size:11px;text-align:center;margin-bottom:24px}
-body.dark .ob-sub{color:rgba(255,255,255,0.4)}
-body.light .ob-sub{color:#94a3b8}
-.progress{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:28px}
-.prog-dot{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;transition:all 0.2s}
-body.dark .prog-dot{border:2px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.3)}
-body.light .prog-dot{border:2px solid #e2e8f0;color:#94a3b8}
-.prog-dot.done{background:linear-gradient(135deg,#818cf8,#34d399);border-color:transparent;color:#fff}
-body.dark .prog-dot.current{border-color:#818cf8;color:#818cf8;background:rgba(129,140,248,0.1)}
-body.light .prog-dot.current{border-color:#0ea5e9;color:#0ea5e9;background:rgba(14,165,233,0.1)}
-.prog-line{width:40px;height:1px}
-body.dark .prog-line{background:rgba(255,255,255,0.08)}
-body.light .prog-line{background:#e2e8f0}
-.prog-line.done{background:linear-gradient(90deg,#818cf8,#34d399)}
-.prog-label{font-size:9px}
-body.dark .prog-label{color:rgba(255,255,255,0.25)}
-body.light .prog-label{color:#94a3b8}
-body.dark .prog-label.current{color:#818cf8}
-body.light .prog-label.current{color:#0ea5e9}
-.prog-label.done{color:#34d399}
-.ob-section{font-size:11px;font-weight:600;text-align:center;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px}
-body.dark .ob-section{color:rgba(255,255,255,0.4)}
-body.light .ob-section{color:#94a3b8}
-.ob-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px}
-.ob-card{border-radius:16px;padding:18px;cursor:pointer;text-align:center;transition:all 0.2s;border:2px solid}
-body.dark .ob-card{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08)}
-body.light .ob-card{background:#fff;border-color:#e2e8f0}
-body.dark .ob-card:hover{background:rgba(255,255,255,0.06);border-color:rgba(129,140,248,0.3)}
-body.light .ob-card:hover{border-color:#7dd3fc}
-body.dark .ob-card.selected{background:rgba(129,140,248,0.1);border-color:#818cf8}
-body.light .ob-card.selected{background:#f0f9ff;border-color:#0ea5e9}
-.ob-preview{width:100%;height:70px;border-radius:10px;margin-bottom:12px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
-.preview-dark-wrap{background:#0d0d1a;display:flex;height:100%;padding:5px;gap:4px}
-.pd-sb{width:22px;background:rgba(129,140,248,0.15);border-radius:3px}
-.pd-main{flex:1;display:flex;flex-direction:column;gap:3px}
-.pd-top{height:8px;background:rgba(129,140,248,0.2);border-radius:2px}
-.pd-card{height:16px;background:rgba(129,140,248,0.12);border-radius:3px}
-.pd-bottom{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1}
-.pd-p{background:rgba(129,140,248,0.08);border-radius:2px}
-.preview-light-wrap{background:#f0f4f8;display:flex;height:100%;padding:5px;gap:4px}
-.pl-sb{width:22px;background:#fff;border-radius:3px;border:1px solid #e2e8f0}
-.pl-main{flex:1;display:flex;flex-direction:column;gap:3px}
-.pl-top{height:8px;background:#fff;border-radius:2px;border:1px solid #e2e8f0}
-.pl-card{height:16px;background:#e0f2fe;border-radius:3px}
-.pl-bottom{display:grid;grid-template-columns:1fr 1fr;gap:2px;flex:1}
-.pl-p{background:#fff;border-radius:2px;border:1px solid #e2e8f0}
-.ob-name{font-size:13px;font-weight:700;margin-bottom:3px}
-body.dark .ob-name{color:#fff}
-body.light .ob-name{color:#1e293b}
-.ob-desc{font-size:10px}
-body.dark .ob-desc{color:rgba(255,255,255,0.4)}
-body.light .ob-desc{color:#94a3b8}
-.ob-check{width:18px;height:18px;border-radius:50%;margin:8px auto 0;display:flex;align-items:center;justify-content:center}
-body.dark .ob-check{border:2px solid rgba(255,255,255,0.15)}
-body.light .ob-check{border:2px solid #e2e8f0}
-body.dark .ob-card.selected .ob-check{background:linear-gradient(135deg,#818cf8,#34d399);border-color:transparent}
-body.light .ob-card.selected .ob-check{background:linear-gradient(135deg,#0ea5e9,#38bdf8);border-color:transparent}
-.lang-flag{font-size:28px;margin-bottom:8px}
-.lang-native{font-size:11px;margin-bottom:6px}
-body.dark .lang-native{color:rgba(255,255,255,0.5)}
-body.light .lang-native{color:#64748b}
-.lang-sample{font-size:9px;padding:3px 8px;border-radius:10px;display:inline-block}
-body.dark .lang-sample{color:#818cf8;background:rgba(129,140,248,0.1)}
-body.light .lang-sample{color:#0ea5e9;background:#f0f9ff}
-.ob-summary{border-radius:16px;padding:20px;margin-bottom:20px}
-body.dark .ob-summary{background:rgba(255,255,255,0.03);border:1px solid rgba(129,140,248,0.15)}
-body.light .ob-summary{background:#fff;border:1px solid #e2e8f0}
-.ob-sum-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid}
-body.dark .ob-sum-row{border-color:rgba(255,255,255,0.06)}
-body.light .ob-sum-row{border-color:#f1f5f9}
-.ob-sum-row:last-child{border-bottom:none}
-.ob-sum-key{font-size:11px}
-body.dark .ob-sum-key{color:rgba(255,255,255,0.4)}
-body.light .ob-sum-key{color:#94a3b8}
-.ob-sum-val{font-size:11px;font-weight:600}
-body.dark .ob-sum-val{color:#818cf8}
-body.light .ob-sum-val{color:#0ea5e9}
-.ob-hint{font-size:10px;text-align:center;margin-bottom:16px}
-body.dark .ob-hint{color:rgba(255,255,255,0.25)}
-body.light .ob-hint{color:#94a3b8}
-.ob-btn-row{display:flex;justify-content:space-between;align-items:center}
-.ob-btn-back{background:transparent;padding:10px 20px;border-radius:20px;font-size:11px;cursor:pointer;font-family:inherit}
-body.dark .ob-btn-back{border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.5)}
-body.light .ob-btn-back{border:1px solid #e2e8f0;color:#64748b}
-.ob-btn-next{border:none;padding:11px 26px;border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
-body.dark .ob-btn-next{background:linear-gradient(135deg,#818cf8,#34d399);color:#fff}
-body.light .ob-btn-next{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
-
-/* DASHBOARD */
-.dashboard{display:none}
-.layout{display:flex;height:100vh}
-.sidebar{width:200px;display:flex;flex-direction:column;flex-shrink:0}
-body.dark .sidebar{background:rgba(255,255,255,0.03);border-right:1px solid rgba(129,140,248,0.1)}
-body.light .sidebar{background:#fff;border-right:1px solid #e2e8f0}
-.sb-top{padding:20px 14px 16px;border-bottom:1px solid}
-body.dark .sb-top{border-color:rgba(255,255,255,0.07)}
-body.light .sb-top{border-color:#f1f5f9}
-.sb-logo{font-size:20px;font-weight:800}
-body.dark .sb-logo .a{color:#818cf8}
-body.dark .sb-logo .b{color:#34d399}
-body.light .sb-logo .a{color:#0ea5e9}
-body.light .sb-logo .b{color:#38bdf8}
-.sb-tagline{font-size:9px;margin-top:2px;letter-spacing:0.3px}
-body.dark .sb-tagline{color:rgba(255,255,255,0.25)}
-body.light .sb-tagline{color:#94a3b8}
-.sb-nav{padding:10px 8px;flex:1}
-.sb-section{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;padding:10px 10px 5px}
-body.dark .sb-section{color:rgba(255,255,255,0.2)}
-body.light .sb-section{color:#94a3b8}
-.sb-item{display:flex;align-items:center;gap:9px;padding:9px 10px;border-radius:10px;font-size:11px;cursor:pointer;margin-bottom:2px;transition:all 0.15s}
-body.dark .sb-item{color:rgba(255,255,255,0.4)}
-body.light .sb-item{color:#64748b}
-body.dark .sb-item:hover{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8)}
-body.light .sb-item:hover{background:#f8fafc;color:#1e293b}
-body.dark .sb-item.active{background:rgba(129,140,248,0.12);color:#818cf8;border-left:2px solid #818cf8}
-body.light .sb-item.active{background:#f0f9ff;color:#0ea5e9;border-left:2px solid #0ea5e9}
-.sb-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-body.dark .sb-icon{background:rgba(255,255,255,0.05)}
-body.light .sb-icon{background:#f8fafc;border:1px solid #e2e8f0}
-body.dark .sb-item.active .sb-icon{background:rgba(129,140,248,0.15)}
-body.light .sb-item.active .sb-icon{background:#e0f2fe}
-.sb-badge{margin-left:auto;font-size:9px;padding:2px 7px;border-radius:20px}
-body.dark .sb-badge{background:rgba(129,140,248,0.15);color:#818cf8}
-body.light .sb-badge{background:#f0f9ff;color:#0ea5e9;border:1px solid #bae6fd}
-.sb-bottom{padding:12px 10px;border-top:1px solid}
-body.dark .sb-bottom{border-color:rgba(255,255,255,0.07)}
-body.light .sb-bottom{border-color:#f1f5f9}
-.sb-user{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;margin-bottom:8px}
-body.dark .sb-user{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07)}
-body.light .sb-user{background:#f8fafc;border:1px solid #e2e8f0}
-.sb-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
-body.dark .sb-avatar{background:linear-gradient(135deg,#818cf8,#34d399)}
-body.light .sb-avatar{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
-.sb-uname{font-size:11px;font-weight:600}
-body.dark .sb-uname{color:#fff}
-body.light .sb-uname{color:#1e293b}
-.sb-plan{font-size:9px}
-body.dark .sb-plan{color:rgba(255,255,255,0.3)}
-body.light .sb-plan{color:#94a3b8}
-.sb-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
-.sb-stat{border-radius:8px;padding:7px;text-align:center}
-body.dark .sb-stat{background:rgba(255,255,255,0.03);border:1px solid rgba(129,140,248,0.1)}
-body.light .sb-stat{background:#f8fafc;border:1px solid #e2e8f0}
-.sb-stat-val{font-size:11px;font-weight:600}
-body.dark .sb-stat-val{color:#818cf8}
-body.light .sb-stat-val{color:#0ea5e9}
-.sb-stat-label{font-size:8px;margin-top:1px}
-body.dark .sb-stat-label{color:rgba(255,255,255,0.25)}
-body.light .sb-stat-label{color:#94a3b8}
-.sb-logout{width:100%;padding:7px;border-radius:8px;font-size:11px;cursor:pointer;font-family:inherit;background:transparent}
-body.dark .sb-logout{border:1px solid rgba(255,255,255,0.08);color:rgba(255,255,255,0.35)}
-body.dark .sb-logout:hover{background:rgba(255,255,255,0.05);color:#fff}
-body.light .sb-logout{border:1px solid #e2e8f0;color:#94a3b8}
-body.light .sb-logout:hover{background:#f8fafc;color:#1e293b}
-
-/* MAIN */
-.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
-.topbar{padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid}
-body.dark .topbar{background:rgba(255,255,255,0.02);border-color:rgba(129,140,248,0.08)}
-body.light .topbar{background:#fff;border-color:#e2e8f0}
-.tb-title{font-size:13px;font-weight:500;opacity:0.5}
-body.dark .tb-title{color:#fff}
-body.light .tb-title{color:#1e293b}
-.tb-sub{font-size:18px;font-weight:700;margin-top:1px}
-body.dark .tb-sub{color:rgba(255,255,255,0.35)}
-body.light .tb-sub{color:#94a3b8}
-.tb-right{display:flex;align-items:center;gap:8px}
-.theme-switch{display:flex;align-items:center;gap:5px;padding:5px 12px;border-radius:20px;font-size:10px;cursor:pointer;border:1px solid}
-body.dark .theme-switch{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:rgba(255,255,255,0.5)}
-body.light .theme-switch{background:#f8fafc;border-color:#e2e8f0;color:#64748b}
-body.dark .theme-switch:hover{color:#fff}
-body.light .theme-switch:hover{color:#1e293b}
-.tb-btn{border:none;padding:8px 16px;border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit}
-body.dark .tb-btn{background:linear-gradient(135deg,#818cf8,#34d399);color:#fff}
-body.light .tb-btn{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
-
-/* CONTENT */
-.content{flex:1;padding:16px 20px;display:flex;flex-direction:column;gap:14px;overflow:hidden}
-.wf-card{border-radius:16px;padding:16px 20px;display:flex;align-items:center;gap:16px;flex-shrink:0}
-body.dark .wf-card{background:linear-gradient(135deg,rgba(129,140,248,0.1),rgba(52,211,153,0.06));border:1px solid rgba(129,140,248,0.15)}
-body.light .wf-card{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd}
-.wf-icon{width:48px;height:48px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-body.dark .wf-icon{background:linear-gradient(135deg,rgba(129,140,248,0.2),rgba(52,211,153,0.15));border:1px solid rgba(129,140,248,0.2)}
-body.light .wf-icon{background:linear-gradient(135deg,#bae6fd,#7dd3fc);border:1px solid #7dd3fc}
-.wf-num{font-size:32px;font-weight:800}
-body.dark .wf-num{color:#fff}
-body.light .wf-num{color:#1e293b}
-.wf-label{font-size:10px;margin-top:2px}
-body.dark .wf-label{color:rgba(255,255,255,0.4)}
-body.light .wf-label{color:#64748b}
-.wf-trend{font-size:9px;margin-top:4px;display:flex;align-items:center;gap:4px}
-body.dark .wf-trend{color:#34d399}
-body.light .wf-trend{color:#0ea5e9}
-.wf-pills{margin-left:auto;display:flex;gap:6px;flex-wrap:wrap}
-.wf-pill{font-size:9px;padding:3px 10px;border-radius:20px}
-body.dark .wf-pill{background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)}
-body.light .wf-pill{background:#f0f9ff;color:#0ea5e9;border:1px solid #bae6fd}
-body.dark .wf-pill.green{background:rgba(52,211,153,0.1);color:#34d399;border-color:rgba(52,211,153,0.2)}
-body.light .wf-pill.green{background:#f0fdf4;color:#16a34a;border-color:#bbf7d0}
-
-.bottom-row{display:grid;grid-template-columns:1.35fr 1fr;gap:14px;flex:1;min-height:0}
-.panel{border-radius:16px;padding:14px;display:flex;flex-direction:column;overflow:hidden}
-body.dark .panel{background:rgba(255,255,255,0.02);border:1px solid rgba(129,140,248,0.08)}
-body.light .panel{background:#fff;border:1px solid #e2e8f0}
-.panel-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-shrink:0}
-.panel-title{font-size:12px;font-weight:600}
-body.dark .panel-title{color:#fff}
-body.light .panel-title{color:#1e293b}
-.panel-pill{font-size:9px;padding:3px 10px;border-radius:20px}
-body.dark .panel-pill{color:#818cf8;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.15)}
-body.light .panel-pill{color:#0ea5e9;background:#f0f9ff;border:1px solid #bae6fd}
-
-/* CHAT */
-.chat-msgs{flex:1;overflow-y:auto;margin-bottom:10px;display:flex;flex-direction:column;gap:8px}
-.chat-msgs::-webkit-scrollbar{width:3px}
-.chat-msgs::-webkit-scrollbar-thumb{border-radius:10px}
-body.dark .chat-msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1)}
-body.light .chat-msgs::-webkit-scrollbar-thumb{background:#e2e8f0}
-.chat-msg{clear:both}
-.bubble-bot{border-radius:4px 12px 12px 12px;padding:8px 11px;font-size:10px;display:inline-block;max-width:88%;line-height:1.6}
-body.dark .bubble-bot{background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.12);color:rgba(255,255,255,0.85)}
-body.light .bubble-bot{background:#f0f9ff;border:1px solid #bae6fd;color:#1e293b}
-.bubble-user{border-radius:12px 12px 4px 12px;padding:8px 11px;font-size:10px;display:inline-block;max-width:88%;float:right;line-height:1.6;font-weight:500;color:#fff}
-body.dark .bubble-user{background:linear-gradient(135deg,rgba(129,140,248,0.3),rgba(52,211,153,0.2));border:1px solid rgba(129,140,248,0.2)}
-body.light .bubble-user{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
-.chat-input-row{display:flex;gap:6px;flex-shrink:0}
-.chat-input{flex:1;border-radius:20px;padding:9px 14px;font-size:10px;outline:none;border:1px solid;font-family:inherit}
-body.dark .chat-input{background:rgba(255,255,255,0.04);border-color:rgba(255,255,255,0.1);color:#fff}
-body.dark .chat-input:focus{border-color:rgba(129,140,248,0.4)}
-body.dark .chat-input::placeholder{color:rgba(255,255,255,0.2)}
-body.light .chat-input{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
-body.light .chat-input:focus{border-color:#7dd3fc}
-body.light .chat-input::placeholder{color:#94a3b8}
-.chat-send{border:none;padding:9px 16px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;font-family:inherit}
-body.dark .chat-send{background:linear-gradient(135deg,#818cf8,#34d399);color:#fff}
-body.light .chat-send{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
-
-/* SERVICES */
-.svc-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:11px;margin-bottom:7px;cursor:pointer;border:1px solid;transition:all 0.15s}
-body.dark .svc-item{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.06)}
-body.light .svc-item{background:#f8fafc;border-color:#e2e8f0}
-body.dark .svc-item:hover{background:rgba(255,255,255,0.06);border-color:rgba(129,140,248,0.2)}
-body.light .svc-item:hover{background:#f0f9ff;border-color:#bae6fd}
-body.dark .svc-item.expanded{background:rgba(129,140,248,0.08);border-color:rgba(129,140,248,0.2)}
-body.light .svc-item.expanded{background:#f0f9ff;border-color:#0ea5e9}
-.svc-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.svc-name{font-size:11px;font-weight:500}
-body.dark .svc-name{color:#fff}
-body.light .svc-name{color:#1e293b}
-.svc-desc{font-size:9px;margin-top:1px}
-body.dark .svc-desc{color:rgba(255,255,255,0.35)}
-body.light .svc-desc{color:#94a3b8}
-.svc-status{margin-left:auto;display:flex;align-items:center;gap:4px;font-size:9px;padding:3px 8px;border-radius:20px}
-body.dark .svc-status{color:#34d399;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.15)}
-body.light .svc-status{color:#16a34a;background:#f0fdf4;border:1px solid #bbf7d0}
-.svc-dot{width:5px;height:5px;border-radius:50%}
-body.dark .svc-dot{background:#34d399}
-body.light .svc-dot{background:#16a34a}
-.svc-detail{border-radius:10px;padding:10px 12px;margin-top:-4px;margin-bottom:7px;font-size:9px;line-height:1.8;display:none}
-body.dark .svc-detail{background:rgba(129,140,248,0.06);border:1px solid rgba(129,140,248,0.12)}
-body.light .svc-detail{background:#f0f9ff;border:1px solid #bae6fd}
-.svc-detail.show{display:block}
-.svc-dr{display:flex;justify-content:space-between;padding:1px 0}
-.svc-dk{opacity:0.5}
-body.dark .svc-dv{color:#818cf8;font-weight:500}
-body.light .svc-dv{color:#0ea5e9;font-weight:500}
-</style>
 </head>
 <body class="dark">
 
 <!-- LOADING SCREEN -->
-<div id="loading-screen" style="position:fixed;top:0;left:0;width:100%;height:100%;background:#0d0d1a;display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:20px">
-  <div style="font-size:32px;font-weight:800"><span style="color:#818cf8">Ne</span><span style="color:#34d399">rum</span></div>
-  <div style="font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px">AI WORKFLOW PLATFORM</div>
-  <div style="display:flex;gap:8px;margin-top:8px" id="dots">
-    <div style="width:8px;height:8px;border-radius:50%;background:#818cf8;animation:pulse 1.2s ease-in-out infinite"></div>
-    <div style="width:8px;height:8px;border-radius:50%;background:#818cf8;animation:pulse 1.2s ease-in-out 0.4s infinite"></div>
-    <div style="width:8px;height:8px;border-radius:50%;background:#34d399;animation:pulse 1.2s ease-in-out 0.8s infinite"></div>
+<div id="loading-screen">
+  <div class="load-logo"><span class="a">Ne</span><span class="b">rum</span></div>
+  <div class="load-tag">AI WORKFLOW PLATFORM</div>
+  <div class="load-dots">
+    <div class="load-dot"></div>
+    <div class="load-dot"></div>
+    <div class="load-dot"></div>
   </div>
-  <div style="font-size:10px;color:rgba(255,255,255,0.25);margin-top:4px" id="loading-text">Starting up...</div>
+  <div class="load-text" id="loading-text">Starting up...</div>
 </div>
-<style>
-@keyframes pulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1.1)}}
-</style>
 
 <!-- AUTH PAGE -->
-<div class="auth-page" id="auth-page">
+<div class="auth-page" id="auth-page" style="display:none">
   <div class="auth-box">
     <div class="auth-logo"><span class="a">Ne</span><span class="b">rum</span></div>
     <div class="auth-sub">AI workflow automation platform</div>
@@ -409,78 +56,54 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
 <div class="onboarding" id="onboarding">
   <div class="ob-box">
     <div class="ob-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-
-    <!-- STEP 1 - THEME -->
+    <!-- STEP 1 -->
     <div id="ob-step1">
       <div class="ob-welcome" id="ob-welcome-name">Welcome! 👋</div>
       <div class="ob-sub">Let's set up Nerum just for you</div>
       <div class="progress">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot current">1</div>
-          <span class="prog-label current">Theme</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot current">1</div><span class="prog-label current">Theme</span></div>
         <div class="prog-line"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot">2</div>
-          <span class="prog-label">Language</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot">2</div><span class="prog-label">Language</span></div>
         <div class="prog-line"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot">3</div>
-          <span class="prog-label">Ready</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot">3</div><span class="prog-label">Ready</span></div>
       </div>
       <div class="ob-section">Choose your theme</div>
       <div class="ob-grid">
         <div class="ob-card selected" id="ob-dark" onclick="selectTheme('dark')">
           <div class="ob-preview"><div class="preview-dark-wrap"><div class="pd-sb"></div><div class="pd-main"><div class="pd-top"></div><div class="pd-card"></div><div class="pd-bottom"><div class="pd-p"></div><div class="pd-p"></div></div></div></div></div>
-          <div class="ob-name">Dark</div>
-          <div class="ob-desc">Aurora — Purple & Green</div>
+          <div class="ob-name">Dark</div><div class="ob-desc">Aurora — Purple & Green</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
         <div class="ob-card" id="ob-light" onclick="selectTheme('light')">
           <div class="ob-preview"><div class="preview-light-wrap"><div class="pl-sb"></div><div class="pl-main"><div class="pl-top"></div><div class="pl-card"></div><div class="pl-bottom"><div class="pl-p"></div><div class="pl-p"></div></div></div></div></div>
-          <div class="ob-name">Light</div>
-          <div class="ob-desc">Arctic Ice — Blue & White</div>
+          <div class="ob-name">Light</div><div class="ob-desc">Arctic Ice — Blue & White</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
       </div>
       <div class="ob-btn-row"><div></div><button class="ob-btn-next" onclick="obStep(2)">Next →</button></div>
     </div>
-
-    <!-- STEP 2 - LANGUAGE -->
+    <!-- STEP 2 -->
     <div id="ob-step2" style="display:none">
       <div class="ob-welcome">Choose your language</div>
       <div class="ob-sub">Nerum speaks Tamil and English</div>
       <div class="progress">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="prog-label done">Theme</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Theme</span></div>
         <div class="prog-line done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot current">2</div>
-          <span class="prog-label current">Language</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot current">2</div><span class="prog-label current">Language</span></div>
         <div class="prog-line"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot">3</div>
-          <span class="prog-label">Ready</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot">3</div><span class="prog-label">Ready</span></div>
       </div>
       <div class="ob-section">Choose your language</div>
       <div class="ob-grid">
         <div class="ob-card selected" id="ob-en" onclick="selectLang('english')">
           <div class="lang-flag">🇬🇧</div>
-          <div class="ob-name">English</div>
-          <div class="lang-native">English</div>
+          <div class="ob-name">English</div><div class="lang-native">English</div>
           <div class="lang-sample">"Send WhatsApp on form submit"</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
         <div class="ob-card" id="ob-ta" onclick="selectLang('tamil')">
           <div class="lang-flag">🇮🇳</div>
-          <div class="ob-name">Tamil</div>
-          <div class="lang-native">தமிழ்</div>
+          <div class="ob-name">Tamil</div><div class="lang-native">தமிழ்</div>
           <div class="lang-sample">"Form submit ஆனா WhatsApp அனுப்பு"</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
@@ -490,42 +113,32 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
         <button class="ob-btn-next" onclick="obStep(3)">Next →</button>
       </div>
     </div>
-
-    <!-- STEP 3 - SUMMARY -->
+    <!-- STEP 3 -->
     <div id="ob-step3" style="display:none">
       <div class="ob-welcome">You're all set! 🎉</div>
       <div class="ob-sub">Here's your Nerum setup</div>
       <div class="progress">
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="prog-label done">Theme</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Theme</span></div>
         <div class="prog-line done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          <span class="prog-label done">Language</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Language</span></div>
         <div class="prog-line done"></div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px">
-          <div class="prog-dot current">3</div>
-          <span class="prog-label current">Ready</span>
-        </div>
+        <div class="prog-step"><div class="prog-dot current">3</div><span class="prog-label current">Ready</span></div>
       </div>
       <div class="ob-summary">
         <div class="ob-sum-row">
-  <span class="ob-sum-key">Name</span>
-  <div style="display:flex;align-items:center;gap:8px">
-    <span class="ob-sum-val" id="sum-name">—</span>
-    <span id="name-edit-btn" onclick="editName()" style="font-size:9px;cursor:pointer;padding:2px 8px;border-radius:10px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)">Edit</span>
-  </div>
-</div>
-<div id="name-edit-row" style="display:none;padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
-  <input id="name-edit-input" style="width:100%;padding:8px 12px;border-radius:10px;background:#f8fafc;border:1px solid #bae6fd;color:#1e293b;font-size:12px;outline:none;font-family:inherit" placeholder="Enter your name"/>
-  <div style="display:flex;gap:8px;margin-top:8px">
-    <button onclick="saveName()" style="flex:1;padding:7px;border-radius:10px;background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;border:none;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Save</button>
-    <button onclick="cancelEdit()" style="flex:1;padding:7px;border-radius:10px;background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1);font-size:11px;cursor:pointer;font-family:inherit">Cancel</button>
-  </div>
-</div>
+          <span class="ob-sum-key">Name</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <span class="ob-sum-val" id="sum-name">—</span>
+            <span id="name-edit-btn" onclick="editName()" style="font-size:9px;cursor:pointer;padding:2px 8px;border-radius:10px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)">Edit</span>
+          </div>
+        </div>
+        <div id="name-edit-row" style="display:none;padding:8px 0">
+          <input id="name-edit-input" class="name-edit-input" placeholder="Enter your name"/>
+          <div class="name-edit-btns">
+            <button class="name-save-btn" onclick="saveName()">Save</button>
+            <button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button>
+          </div>
+        </div>
         <div class="ob-sum-row"><span class="ob-sum-key">Theme</span><span class="ob-sum-val" id="sum-theme">Dark — Aurora</span></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Language</span><span class="ob-sum-val" id="sum-lang">English</span></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Plan</span><span class="ob-sum-val">Free</span></div>
@@ -551,26 +164,21 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
       <div class="sb-nav">
         <div class="sb-section">Main</div>
         <div class="sb-item active" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity="0.8"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" opacity="0.4"/></svg></div>
-          Dashboard
+          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity="0.8"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" opacity="0.4"/></svg></div>Dashboard
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-          Workflows
+          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Workflows
           <span class="sb-badge" id="wf-badge">0</span>
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>
-          Service History
+          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>Service History
         </div>
         <div class="sb-section">Account</div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg></div>
-          Billing
+          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg></div>Billing
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 12c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.3"/></svg></div>
-          Settings
+          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 12c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.3"/></svg></div>Settings
         </div>
       </div>
       <div class="sb-bottom">
@@ -580,7 +188,7 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
         </div>
         <div class="sb-stats">
           <div class="sb-stat"><div class="sb-stat-val">1,240</div><div class="sb-stat-label">Tokens used</div></div>
-          <div class="sb-stat"><div class="sb-stat-val" style="color:#34d399" id="api-status">● Live</div><div class="sb-stat-label">API status</div></div>
+          <div class="sb-stat"><div class="sb-stat-val" style="color:#34d399">● Live</div><div class="sb-stat-label">API status</div></div>
         </div>
         <button class="sb-logout" onclick="doLogout()">Logout</button>
       </div>
@@ -590,14 +198,12 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
       <div class="topbar">
         <div><div class="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
         <div class="tb-right">
-          <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2.5" fill="currentColor"/><path d="M6 1v1M6 10v1M1 6h1M10 6h1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg>
-            Switch to Light
-          </div>
+          <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">Switch to Light</div>
           <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
         </div>
       </div>
 
+      <!-- MAIN CONTENT -->
       <div class="content" id="main-content">
         <div class="wf-card">
           <div class="wf-icon">
@@ -623,10 +229,10 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
               <span class="panel-pill" id="lang-pill">Tamil / English</span>
             </div>
             <div class="chat-msgs" id="chat-msgs">
-              <div class="chat-msg"><div class="bubble-bot" id="chat-greeting">Hi! என்ன automate பண்றீங்க? Tell me!</div></div>
+              <div class="chat-msg"><div class="bubble-bot" id="chat-greeting">Hi! What do you want to automate today?</div></div>
             </div>
             <div class="chat-input-row">
-              <input class="chat-input" id="chat-input" placeholder="Workflow சொல்லுங்க..." onkeydown="if(event.key==='Enter')sendChat()"/>
+              <input class="chat-input" id="chat-input" placeholder="Tell me what to automate..." onkeydown="if(event.key==='Enter')sendChat()"/>
               <button class="chat-send" onclick="sendChat()">Send</button>
             </div>
           </div>
@@ -675,388 +281,75 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
               <div class="svc-dr"><span class="svc-dk">Rows appended</span><span class="svc-dv">8 rows</span></div>
               <div class="svc-dr"><span class="svc-dk">Last updated</span><span class="svc-dv">Today 8:55 AM</span></div>
               <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/sheets/append</span></div>
-              <!-- BILLING PAGE -->
-<div id="billing-content" style="display:none;flex:1;padding:20px;flex-direction:column;gap:16px;overflow-y:auto">
-  <div style="font-size:18px;font-weight:700;margin-bottom:4px" id="billing-title">Choose your plan</div>
-  <div style="font-size:11px;margin-bottom:16px" id="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
-
-    <!-- FREE -->
-    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
-      <div style="font-size:11px;font-weight:600;opacity:0.5">FREE</div>
-      <div style="font-size:28px;font-weight:800">₹0<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
-      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">Perfect to get started</div>
-      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
-        <div>✓ 3 Workflows</div>
-        <div>✓ 10,000 AI tokens</div>
-        <div>✓ Gmail, WhatsApp, Telegram</div>
-        <div>✓ Google Sheets</div>
-        <div style="opacity:0.35">✗ Priority support</div>
-      </div>
-      <button style="margin-top:auto;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;font-size:11px;cursor:pointer;font-family:inherit" class="plan-current-btn">Current Plan</button>
-    </div>
-
-    <!-- STARTER -->
-    <div style="border-radius:16px;padding:20px;border:2px solid #818cf8;display:flex;flex-direction:column;gap:10px;position:relative" class="plan-card">
-      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:9px;padding:3px 12px;border-radius:20px;background:#818cf8;color:#fff;font-weight:600;white-space:nowrap">MOST POPULAR</div>
-      <div style="font-size:11px;font-weight:600;color:#818cf8">STARTER</div>
-      <div style="font-size:28px;font-weight:800">₹799<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
-      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For growing businesses</div>
-      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
-        <div>✓ 10 Workflows</div>
-        <div>✓ 1,00,000 AI tokens</div>
-        <div>✓ All integrations</div>
-        <div>✓ Tamil + English AI</div>
-        <div>✓ Email support</div>
-      </div>
-      <button onclick="startPayment('starter',79900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Starter</button>
-    </div>
-
-    <!-- PRO -->
-    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
-      <div style="font-size:11px;font-weight:600;color:#34d399">PRO</div>
-      <div style="font-size:28px;font-weight:800">₹1,399<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
-      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For power users</div>
-      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
-        <div>✓ 50 Workflows</div>
-        <div>✓ 5,00,000 AI tokens</div>
-        <div>✓ All integrations</div>
-        <div>✓ Priority support</div>
-        <div>✓ Advanced analytics</div>
-      </div>
-      <button onclick="startPayment('pro',139900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Pro</button>
-    </div>
-
-    <!-- BUSINESS -->
-    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
-      <div style="font-size:11px;font-weight:600;color:#fbbf24">BUSINESS</div>
-      <div style="font-size:28px;font-weight:800">₹3,499<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
-      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For teams & agencies</div>
-      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
-        <div>✓ Unlimited Workflows</div>
-        <div>✓ Unlimited AI tokens</div>
-        <div>✓ All integrations</div>
-        <div>✓ Dedicated support</div>
-        <div>✓ Custom integrations</div>
-      </div>
-      <button onclick="startPayment('business',349900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f0a00;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Business</button>
-    </div>
-
-  </div>
-</div>
             </div>
           </div>
         </div>
       </div>
+
+      <!-- BILLING CONTENT -->
+      <div class="billing-content" id="billing-content">
+        <div class="billing-title">Choose your plan</div>
+        <div class="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
+        <div class="plans-grid">
+          <div class="plan-card">
+            <div class="plan-name" style="opacity:0.5">FREE</div>
+            <div class="plan-price">₹0<span>/mo</span></div>
+            <div class="plan-desc">Perfect to get started</div>
+            <div class="plan-features">
+              <div>✓ 3 Workflows</div>
+              <div>✓ 10,000 AI tokens</div>
+              <div>✓ All integrations</div>
+              <div style="opacity:0.35">✗ Priority support</div>
+            </div>
+            <button class="plan-btn plan-btn-free">Current Plan</button>
+          </div>
+          <div class="plan-card popular">
+            <div class="plan-popular-badge">MOST POPULAR</div>
+            <div class="plan-name" style="color:#818cf8">STARTER</div>
+            <div class="plan-price">₹799<span>/mo</span></div>
+            <div class="plan-desc">For growing businesses</div>
+            <div class="plan-features">
+              <div>✓ 10 Workflows</div>
+              <div>✓ 1,00,000 AI tokens</div>
+              <div>✓ All integrations</div>
+              <div>✓ Tamil + English AI</div>
+              <div>✓ Email support</div>
+            </div>
+            <button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name" style="color:#34d399">PRO</div>
+            <div class="plan-price">₹1,399<span>/mo</span></div>
+            <div class="plan-desc">For power users</div>
+            <div class="plan-features">
+              <div>✓ 50 Workflows</div>
+              <div>✓ 5,00,000 AI tokens</div>
+              <div>✓ All integrations</div>
+              <div>✓ Priority support</div>
+              <div>✓ Advanced analytics</div>
+            </div>
+            <button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name" style="color:#fbbf24">BUSINESS</div>
+            <div class="plan-price">₹3,499<span>/mo</span></div>
+            <div class="plan-desc">For teams & agencies</div>
+            <div class="plan-features">
+              <div>✓ Unlimited Workflows</div>
+              <div>✓ Unlimited AI tokens</div>
+              <div>✓ All integrations</div>
+              <div>✓ Dedicated support</div>
+              <div>✓ Custom integrations</div>
+            </div>
+            <button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </div>
 
-<script>
-let selectedTheme='dark';
-let selectedLang='english';
-let currentUser='';
-
-// Loading screen
-const messages = [
-  'Starting up...',
-  'Waking up servers...',
-  'Almost ready...',
-  'Connecting to Nerum...',
-  'Loading your workspace...'
-];
-let msgIndex = 0;
-const loadingText = document.getElementById('loading-text');
-const msgInterval = setInterval(() => {
-  msgIndex = (msgIndex + 1) % messages.length;
-  if(loadingText) loadingText.textContent = messages[msgIndex];
-}, 3000);
-
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    const ls = document.getElementById('loading-screen');
-    if(ls){
-      ls.style.opacity = '0';
-      ls.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => { ls.style.display = 'none'; clearInterval(msgInterval); }, 500);
-    }
-  }, 1500);
-});
-
-async function startPayment(plan, amount){
-  const token = localStorage.getItem('nerum_token');
-  try {
-    const res = await fetch(`/payment/create-order/${plan}?token=${token}`, {method:'POST'});
-    const data = await res.json();
-    const options = {
-      key: data.key_id,
-      amount: data.amount,
-      currency: 'INR',
-      name: 'Nerum',
-      description: `${data.plan_name} Plan`,
-      order_id: data.order_id,
-      handler: async function(response){
-        const verify = await fetch('/payment/verify', {
-          method: 'POST',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            plan: plan,
-            token: token
-          })
-        });
-        const result = await verify.json();
-        if(result.success){
-          alert(`🎉 Upgraded to ${result.plan} plan successfully!`);
-          document.querySelector('.sb-plan').textContent = result.plan + ' plan';
-        }
-      },
-      prefill: { name: currentUser },
-      theme: { color: '#818cf8' }
-    };
-    const rzp = new Razorpay(options);
-    rzp.open();
-  } catch(e) {
-    alert('Payment failed. Try again!');
-  }
-}
-
-function editName(){
-  document.getElementById('name-edit-row').style.display='block';
-  document.getElementById('name-edit-input').value=currentUser;
-  document.getElementById('name-edit-btn').style.display='none';
-}
-
-function saveName(){
-  const newName=document.getElementById('name-edit-input').value.trim();
-  if(!newName)return;
-  currentUser=newName;
-  document.getElementById('sum-name').textContent=newName;
-  localStorage.setItem('nerum_name',newName);
-  document.getElementById('name-edit-row').style.display='none';
-  document.getElementById('name-edit-btn').style.display='inline';
-}
-
-function cancelEdit(){
-  document.getElementById('name-edit-row').style.display='none';
-  document.getElementById('name-edit-btn').style.display='inline';
-}
-
-function applyTheme(t){
-  document.body.className=t;
-  selectedTheme=t;
-  const btn=document.getElementById('theme-switch-btn');
-  if(btn)btn.innerHTML=t==='dark'?
-    '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2.5" fill="currentColor"/><path d="M6 1v1M6 10v1M1 6h1M10 6h1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg> Switch to Light':
-    '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1a5 5 0 100 10A5 5 0 006 1z" fill="currentColor" opacity="0.3"/><path d="M8.5 6a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" fill="currentColor"/></svg> Switch to Dark';
-  localStorage.setItem('nerum_theme',t);
-}
-
-function toggleTheme(){
-  applyTheme(selectedTheme==='dark'?'light':'dark');
-}
-
-function applyLang(l){
-  selectedLang=l;
-  localStorage.setItem('nerum_lang',l);
-  const greeting=document.getElementById('chat-greeting');
-  const pill=document.getElementById('lang-pill');
-  const input=document.getElementById('chat-input');
-  if(l==='tamil'){
-    if(greeting)greeting.textContent='வணக்கம்! என்ன automate பண்றீங்க?';
-    if(pill)pill.textContent='தமிழ் / English';
-    if(input)input.placeholder='Workflow சொல்லுங்க...';
-  } else {
-    if(greeting)greeting.textContent='Hi! What do you want to automate today?';
-    if(pill)pill.textContent='Tamil / English';
-    if(input)input.placeholder='Tell me what to automate...';
-  }
-}
-
-function selectTheme(t){
-  selectedTheme=t;
-  applyTheme(t);
-  document.getElementById('ob-dark').className='ob-card'+(t==='dark'?' selected':'');
-  document.getElementById('ob-light').className='ob-card'+(t==='light'?' selected':'');
-}
-
-function selectLang(l){
-  selectedLang=l;
-  document.getElementById('ob-en').className='ob-card'+(l==='english'?' selected':'');
-  document.getElementById('ob-ta').className='ob-card'+(l==='tamil'?' selected':'');
-}
-
-function obStep(n){
-  document.getElementById('ob-step1').style.display=n===1?'block':'none';
-  document.getElementById('ob-step2').style.display=n===2?'block':'none';
-  document.getElementById('ob-step3').style.display=n===3?'block':'none';
-  if(n===3){
-    document.getElementById('sum-name').textContent=currentUser;
-    document.getElementById('sum-theme').textContent=selectedTheme==='dark'?'Dark — Aurora':'Light — Arctic Ice';
-    document.getElementById('sum-lang').textContent=selectedLang==='english'?'English 🇬🇧':'Tamil — தமிழ் 🇮🇳';
-  }
-}
-
-function startDashboard(){
-  localStorage.setItem('nerum_onboarded','true');
-  applyLang(selectedLang);
-  document.getElementById('onboarding').style.display='none';
-  showDashboard(currentUser);
-}
-
-function switchTab(tab){
-  document.getElementById('login-form').style.display=tab==='login'?'block':'none';
-  document.getElementById('signup-form').style.display=tab==='signup'?'block':'none';
-  document.querySelectorAll('.auth-tab').forEach((t,i)=>t.classList.toggle('active',(tab==='login'&&i===0)||(tab==='signup'&&i===1)));
-  document.getElementById('auth-error').style.display='none';
-}
-
-function showError(msg){const el=document.getElementById('auth-error');el.textContent=msg;el.style.display='block';}
-
-async function doLogin(){
-  const email=document.getElementById('login-email').value.trim();
-  const password=document.getElementById('login-password').value;
-  if(!email||!password)return showError('Please fill in all fields');
-  try{
-    const res=await fetch('/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password})});
-    const data=await res.json();
-    if(!res.ok)return showError(data.detail||'Login failed');
-    localStorage.setItem('nerum_token',data.token);
-    localStorage.setItem('nerum_name',data.name);
-    afterLogin(data.name);
-  }catch(e){showError('Server error. Try again.');}
-}
-
-async function doSignup(){
-  const name=document.getElementById('signup-name').value.trim();
-  const email=document.getElementById('signup-email').value.trim();
-  const password=document.getElementById('signup-password').value;
-  if(!name||!email||!password)return showError('Please fill in all fields');
-  if(password.length<6)return showError('Password must be at least 6 characters');
-  try{
-    const res=await fetch('/auth/signup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name,email,password})});
-    const data=await res.json();
-    if(!res.ok)return showError(data.detail||'Signup failed');
-    localStorage.setItem('nerum_token',data.token);
-    localStorage.setItem('nerum_name',data.name);
-    afterLogin(data.name);
-  }catch(e){showError('Server error. Try again.');}
-}
-
-function afterLogin(name){
-  currentUser=name;
-  document.getElementById('auth-page').style.display='none';
-  const onboarded=localStorage.getItem('nerum_onboarded');
-  if(!onboarded){
-    document.getElementById('ob-welcome-name').textContent=`Welcome, ${name}! 👋`;
-    document.getElementById('onboarding').style.display='flex';
-  } else {
-    const savedTheme=localStorage.getItem('nerum_theme')||'dark';
-    const savedLang=localStorage.getItem('nerum_lang')||'english';
-    applyTheme(savedTheme);
-    applyLang(savedLang);
-    showDashboard(name);
-  }
-}
-
-function doLogout(){
-  localStorage.removeItem('nerum_token');
-  localStorage.removeItem('nerum_name');
-  document.getElementById('dashboard').style.display='none';
-  document.getElementById('auth-page').style.display='flex';
-}
-
-function showDashboard(name){
-  document.getElementById('dashboard').style.display='block';
-  document.getElementById('tb-name').textContent=name;
-  document.getElementById('sb-name').textContent=name;
-  const initials=name.split(' ').map(n=>n[0]).join('').toUpperCase().slice(0,2);
-  document.getElementById('sb-initials').textContent=initials;
-  loadWorkflows();
-}
-
-async function loadWorkflows(){
-  try{
-    const token=localStorage.getItem('nerum_token');
-    const res=await fetch('/workflow/all',{headers:{'Authorization':`Bearer ${token}`}});
-    const data=await res.json();
-    const count=data.workflows?data.workflows.length:0;
-    document.getElementById('wf-num').textContent=count;
-    document.getElementById('wf-badge').textContent=count;
-  }catch(e){}
-}
-
-async function createWorkflow(){
-  const name=prompt('Workflow name:');
-  if(!name)return;
-  const token=localStorage.getItem('nerum_token');
-  await fetch(`/workflow/create/${encodeURIComponent(name)}`,{method:'POST',headers:{'Authorization':`Bearer ${token}`}});
-  loadWorkflows();
-}
-
-function setActive(el){
-  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
-  el.classList.add('active');
-  const text=el.textContent.trim();
-  if(text==='Billing') showBilling();
-  else hideBilling();
-}
-
-function showBilling(){
-  document.getElementById('main-content').style.display='none';
-  document.getElementById('billing-content').style.display='flex';
-}
-
-function hideBilling(){
-  document.getElementById('main-content').style.display='flex';
-  document.getElementById('billing-content').style.display='none';
-}
-
-function toggleSvc(id){
-  const el=document.getElementById(id);
-  const isOpen=el.classList.contains('show');
-  document.querySelectorAll('.svc-detail').forEach(d=>d.classList.remove('show'));
-  document.querySelectorAll('.svc-item').forEach(d=>d.classList.remove('expanded'));
-  if(!isOpen){el.classList.add('show');el.previousElementSibling.classList.add('expanded');}
-}
-
-function sendChat(){
-  const input=document.getElementById('chat-input');
-  const msg=input.value.trim();
-  if(!msg)return;
-  const msgs=document.getElementById('chat-msgs');
-  msgs.innerHTML+=`<div class="chat-msg" style="text-align:right"><div class="bubble-user">${msg}</div></div>`;
-  input.value='';
-  msgs.scrollTop=msgs.scrollHeight;
-  setTimeout(()=>{
-    const reply=selectedLang==='tamil'?'புரிஞ்சுச்சு! Workflow build பண்றேன்... 🚀':'Got it! Building your workflow now... 🚀';
-    msgs.innerHTML+=`<div class="chat-msg"><div class="bubble-bot">${reply}</div></div>`;
-    msgs.scrollTop=msgs.scrollHeight;
-  },800);
-}
-
-const urlParams=new URLSearchParams(window.location.search);
-const googleToken=urlParams.get('token');
-const googleName=urlParams.get('name');
-if(googleToken&&googleName){
-  localStorage.setItem('nerum_token',googleToken);
-  localStorage.setItem('nerum_name',googleName);
-  window.history.replaceState({},document.title,'/');
-  afterLogin(googleName);
-} else {
-  const savedToken=localStorage.getItem('nerum_token');
-  const savedName=localStorage.getItem('nerum_name');
-  if(savedToken&&savedName){
-    const savedTheme=localStorage.getItem('nerum_theme')||'dark';
-    const savedLang=localStorage.getItem('nerum_lang')||'english';
-    applyTheme(savedTheme);
-    applyLang(savedLang);
-    currentUser=savedName;
-    showDashboard(savedName);
-  }
-}
-</script>
+<script src="/static/app.js"></script>
 </body>
 </html>

@@ -1,0 +1,320 @@
+let selectedTheme = 'dark';
+let selectedLang = 'english';
+let currentUser = '';
+
+// LOADING SCREEN
+const loadMessages = ['Starting up...','Waking up servers...','Almost ready...','Connecting to Nerum...','Loading your workspace...'];
+let msgIndex = 0;
+const loadingText = document.getElementById('loading-text');
+const msgInterval = setInterval(() => {
+  msgIndex = (msgIndex + 1) % loadMessages.length;
+  if (loadingText) loadingText.textContent = loadMessages[msgIndex];
+}, 3000);
+
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const ls = document.getElementById('loading-screen');
+    if (ls) {
+      ls.style.opacity = '0';
+      ls.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => { ls.style.display = 'none'; clearInterval(msgInterval); }, 500);
+    }
+  }, 1500);
+});
+
+// THEME
+function applyTheme(t) {
+  document.body.className = t;
+  selectedTheme = t;
+  const btn = document.getElementById('theme-switch-btn');
+  if (btn) btn.innerHTML = t === 'dark' ?
+    '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="2.5" fill="currentColor"/><path d="M6 1v1M6 10v1M1 6h1M10 6h1" stroke="currentColor" stroke-width="1" stroke-linecap="round"/></svg> Switch to Light' :
+    '<svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1a5 5 0 100 10A5 5 0 006 1z" fill="currentColor" opacity="0.3"/><path d="M8.5 6a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z" fill="currentColor"/></svg> Switch to Dark';
+  localStorage.setItem('nerum_theme', t);
+}
+
+function toggleTheme() {
+  applyTheme(selectedTheme === 'dark' ? 'light' : 'dark');
+}
+
+// LANGUAGE
+function applyLang(l) {
+  selectedLang = l;
+  localStorage.setItem('nerum_lang', l);
+  const greeting = document.getElementById('chat-greeting');
+  const pill = document.getElementById('lang-pill');
+  const input = document.getElementById('chat-input');
+  if (l === 'tamil') {
+    if (greeting) greeting.textContent = 'வணக்கம்! என்ன automate பண்றீங்க?';
+    if (pill) pill.textContent = 'தமிழ் / English';
+    if (input) input.placeholder = 'Workflow சொல்லுங்க...';
+  } else {
+    if (greeting) greeting.textContent = 'Hi! What do you want to automate today?';
+    if (pill) pill.textContent = 'Tamil / English';
+    if (input) input.placeholder = 'Tell me what to automate...';
+  }
+}
+
+// ONBOARDING
+function selectTheme(t) {
+  selectedTheme = t;
+  applyTheme(t);
+  document.getElementById('ob-dark').className = 'ob-card' + (t === 'dark' ? ' selected' : '');
+  document.getElementById('ob-light').className = 'ob-card' + (t === 'light' ? ' selected' : '');
+}
+
+function selectLang(l) {
+  selectedLang = l;
+  document.getElementById('ob-en').className = 'ob-card' + (l === 'english' ? ' selected' : '');
+  document.getElementById('ob-ta').className = 'ob-card' + (l === 'tamil' ? ' selected' : '');
+}
+
+function obStep(n) {
+  document.getElementById('ob-step1').style.display = n === 1 ? 'block' : 'none';
+  document.getElementById('ob-step2').style.display = n === 2 ? 'block' : 'none';
+  document.getElementById('ob-step3').style.display = n === 3 ? 'block' : 'none';
+  if (n === 3) {
+    document.getElementById('sum-name').textContent = currentUser;
+    document.getElementById('sum-theme').textContent = selectedTheme === 'dark' ? 'Dark — Aurora' : 'Light — Arctic Ice';
+    document.getElementById('sum-lang').textContent = selectedLang === 'english' ? 'English 🇬🇧' : 'Tamil — தமிழ் 🇮🇳';
+  }
+}
+
+function startDashboard() {
+  localStorage.setItem('nerum_onboarded', 'true');
+  applyLang(selectedLang);
+  document.getElementById('onboarding').style.display = 'none';
+  showDashboard(currentUser);
+}
+
+// NAME EDIT
+function editName() {
+  document.getElementById('name-edit-row').style.display = 'block';
+  document.getElementById('name-edit-input').value = currentUser;
+  document.getElementById('name-edit-btn').style.display = 'none';
+}
+
+function saveName() {
+  const newName = document.getElementById('name-edit-input').value.trim();
+  if (!newName) return;
+  currentUser = newName;
+  document.getElementById('sum-name').textContent = newName;
+  localStorage.setItem('nerum_name', newName);
+  document.getElementById('name-edit-row').style.display = 'none';
+  document.getElementById('name-edit-btn').style.display = 'inline';
+}
+
+function cancelEdit() {
+  document.getElementById('name-edit-row').style.display = 'none';
+  document.getElementById('name-edit-btn').style.display = 'inline';
+}
+
+// AUTH
+function switchTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((t, i) => t.classList.toggle('active', (tab === 'login' && i === 0) || (tab === 'signup' && i === 1)));
+  document.getElementById('auth-error').style.display = 'none';
+}
+
+function showError(msg) {
+  const el = document.getElementById('auth-error');
+  el.textContent = msg;
+  el.style.display = 'block';
+}
+
+async function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showError('Please fill in all fields');
+  try {
+    const res = await fetch('/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const data = await res.json();
+    if (!res.ok) return showError(data.detail || 'Login failed');
+    localStorage.setItem('nerum_token', data.token);
+    localStorage.setItem('nerum_name', data.name);
+    afterLogin(data.name);
+  } catch (e) { showError('Server error. Try again.'); }
+}
+
+async function doSignup() {
+  const name = document.getElementById('signup-name').value.trim();
+  const email = document.getElementById('signup-email').value.trim();
+  const password = document.getElementById('signup-password').value;
+  if (!name || !email || !password) return showError('Please fill in all fields');
+  if (password.length < 6) return showError('Password must be at least 6 characters');
+  try {
+    const res = await fetch('/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) });
+    const data = await res.json();
+    if (!res.ok) return showError(data.detail || 'Signup failed');
+    localStorage.setItem('nerum_token', data.token);
+    localStorage.setItem('nerum_name', data.name);
+    afterLogin(data.name);
+  } catch (e) { showError('Server error. Try again.'); }
+}
+
+function afterLogin(name) {
+  currentUser = name;
+  document.getElementById('auth-page').style.display = 'none';
+  const onboarded = localStorage.getItem('nerum_onboarded');
+  if (!onboarded) {
+    document.getElementById('ob-welcome-name').textContent = `Welcome, ${name}! 👋`;
+    document.getElementById('onboarding').style.display = 'flex';
+  } else {
+    const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
+    const savedLang = localStorage.getItem('nerum_lang') || 'english';
+    applyTheme(savedTheme);
+    applyLang(savedLang);
+    showDashboard(name);
+  }
+}
+
+function doLogout() {
+  localStorage.removeItem('nerum_token');
+  localStorage.removeItem('nerum_name');
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+}
+
+// DASHBOARD
+function showDashboard(name) {
+  document.getElementById('dashboard').style.display = 'block';
+  document.getElementById('tb-name').textContent = name;
+  document.getElementById('sb-name').textContent = name;
+  const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+  document.getElementById('sb-initials').textContent = initials;
+  loadWorkflows();
+}
+
+async function loadWorkflows() {
+  try {
+    const token = localStorage.getItem('nerum_token');
+    const res = await fetch('/workflow/all', { headers: { 'Authorization': `Bearer ${token}` } });
+    const data = await res.json();
+    const count = data.workflows ? data.workflows.length : 0;
+    document.getElementById('wf-num').textContent = count;
+    document.getElementById('wf-badge').textContent = count;
+  } catch (e) {}
+}
+
+async function createWorkflow() {
+  const name = prompt('Workflow name:');
+  if (!name) return;
+  const token = localStorage.getItem('nerum_token');
+  await fetch(`/workflow/create/${encodeURIComponent(name)}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+  loadWorkflows();
+}
+
+// SIDEBAR NAVIGATION
+function setActive(el) {
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  const text = el.textContent.trim();
+  if (text === 'Billing') {
+    showBilling();
+  } else {
+    hideBilling();
+  }
+}
+
+function showBilling() {
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('billing-content').style.display = 'flex';
+  document.getElementById('billing-content').style.flexDirection = 'column';
+}
+
+function hideBilling() {
+  document.getElementById('main-content').style.display = 'flex';
+  document.getElementById('billing-content').style.display = 'none';
+}
+
+// SERVICES
+function toggleSvc(id) {
+  const el = document.getElementById(id);
+  const isOpen = el.classList.contains('show');
+  document.querySelectorAll('.svc-detail').forEach(d => d.classList.remove('show'));
+  document.querySelectorAll('.svc-item').forEach(d => d.classList.remove('expanded'));
+  if (!isOpen) {
+    el.classList.add('show');
+    el.previousElementSibling.classList.add('expanded');
+  }
+}
+
+// CHAT
+function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msg = input.value.trim();
+  if (!msg) return;
+  const msgs = document.getElementById('chat-msgs');
+  msgs.innerHTML += `<div class="chat-msg" style="text-align:right"><div class="bubble-user">${msg}</div></div>`;
+  input.value = '';
+  msgs.scrollTop = msgs.scrollHeight;
+  setTimeout(() => {
+    const reply = selectedLang === 'tamil' ? 'புரிஞ்சுச்சு! Workflow build பண்றேன்... 🚀' : 'Got it! Building your workflow now... 🚀';
+    msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${reply}</div></div>`;
+    msgs.scrollTop = msgs.scrollHeight;
+  }, 800);
+}
+
+// RAZORPAY
+async function startPayment(plan, amount) {
+  const token = localStorage.getItem('nerum_token');
+  try {
+    const res = await fetch(`/payment/create-order/${plan}?token=${token}`, { method: 'POST' });
+    const data = await res.json();
+    const options = {
+      key: data.key_id,
+      amount: data.amount,
+      currency: 'INR',
+      name: 'Nerum',
+      description: `${data.plan_name} Plan`,
+      order_id: data.order_id,
+      handler: async function (response) {
+        const verify = await fetch('/payment/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            plan: plan,
+            token: token
+          })
+        });
+        const result = await verify.json();
+        if (result.success) {
+          alert(`🎉 Upgraded to ${result.plan} plan!`);
+          document.querySelector('.sb-plan').textContent = result.plan + ' plan';
+        }
+      },
+      prefill: { name: currentUser },
+      theme: { color: '#818cf8' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  } catch (e) {
+    alert('Payment failed. Try again!');
+  }
+}
+
+// INIT — check Google callback or saved session
+const urlParams = new URLSearchParams(window.location.search);
+const googleToken = urlParams.get('token');
+const googleName = urlParams.get('name');
+if (googleToken && googleName) {
+  localStorage.setItem('nerum_token', googleToken);
+  localStorage.setItem('nerum_name', googleName);
+  window.history.replaceState({}, document.title, '/');
+  afterLogin(googleName);
+} else {
+  const savedToken = localStorage.getItem('nerum_token');
+  const savedName = localStorage.getItem('nerum_name');
+  if (savedToken && savedName) {
+    const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
+    const savedLang = localStorage.getItem('nerum_lang') || 'english';
+    applyTheme(savedTheme);
+    applyLang(savedLang);
+    currentUser = savedName;
+    showDashboard(savedName);
+  }
+}
