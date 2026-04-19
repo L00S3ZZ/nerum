@@ -505,3 +505,65 @@ body.light .danger-row-desc{color:#94a3b8}
 .danger-btn-warn{background:rgba(255,140,0,0.15);color:#ff8c00;border:1px solid rgba(255,140,0,0.25) !important}
 .danger-btn-red{background:rgba(255,80,80,0.15);color:#ff5050;border:1px solid rgba(255,80,80,0.25) !important}
 .danger-btn:hover{opacity:0.8}
+
+/* PROFILE HEADER */
+.profile-header{display:flex;align-items:center;gap:20px;padding:20px;border-radius:16px;margin-bottom:14px}
+body.dark .profile-header{background:linear-gradient(135deg,rgba(129,140,248,0.1),rgba(52,211,153,0.06));border:1px solid rgba(129,140,248,0.15)}
+body.light .profile-header{background:linear-gradient(135deg,#f0f9ff,#e0f2fe);border:1px solid #bae6fd}
+.profile-avatar-big{width:64px;height:64px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;color:#fff;flex-shrink:0}
+body.dark .profile-avatar-big{background:linear-gradient(135deg,#818cf8,#34d399)}
+body.light .profile-avatar-big{background:linear-gradient(135deg,#0ea5e9,#38bdf8)}
+.profile-info{flex:1}
+.profile-name-row{display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.profile-name-display{font-size:20px;font-weight:700}
+body.dark .profile-name-display{color:#fff}
+body.light .profile-name-display{color:#1e293b}
+.profile-edit-btn{font-size:10px;padding:4px 12px;border-radius:20px;cursor:pointer;font-family:inherit;font-weight:500}
+body.dark .profile-edit-btn{background:rgba(129,140,248,0.15);color:#818cf8;border:1px solid rgba(129,140,248,0.25)}
+body.light .profile-edit-btn{background:#f0f9ff;color:#0ea5e9;border:1px solid #bae6fd}
+.profile-email-display{font-size:12px;margin-bottom:8px}
+body.dark .profile-email-display{color:rgba(255,255,255,0.45)}
+body.light .profile-email-display{color:#64748b}
+.profile-plan-badge{display:inline-block;font-size:10px;padding:3px 12px;border-radius:20px;font-weight:600}
+body.dark .profile-plan-badge{background:rgba(129,140,248,0.15);color:#818cf8;border:1px solid rgba(129,140,248,0.25)}
+body.light .profile-plan-badge{background:#f0f9ff;color:#0ea5e9;border:1px solid #bae6fd}
+.profile-token-box{display:flex;align-items:center;gap:0;border-radius:14px;overflow:hidden;flex-shrink:0}
+body.dark .profile-token-box{background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08)}
+body.light .profile-token-box{background:#fff;border:1px solid #e2e8f0}
+.ptb-item{padding:12px 18px;text-align:center}
+.ptb-val{font-size:18px;font-weight:700}
+body.dark .ptb-val{color:#818cf8}
+body.light .ptb-val{color:#0ea5e9}
+.ptb-label{font-size:9px;margin-top:2px}
+body.dark .ptb-label{color:rgba(255,255,255,0.35)}
+body.light .ptb-label{color:#94a3b8}
+.ptb-divider{width:1px;height:40px;flex-shrink:0}
+body.dark .ptb-divider{background:rgba(255,255,255,0.08)}
+body.light .ptb-divider{background:#e2e8f0}
+
+/* TOKEN PROGRESS */
+.token-progress-wrap{padding:16px 20px;border-radius:14px;margin-bottom:14px}
+body.dark .token-progress-wrap{background:rgba(255,255,255,0.03);border:1px solid rgba(129,140,248,0.1)}
+body.light .token-progress-wrap{background:#fff;border:1px solid #e2e8f0}
+.token-progress-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.token-progress-label{font-size:11px;font-weight:500}
+body.dark .token-progress-label{color:rgba(255,255,255,0.7)}
+body.light .token-progress-label{color:#1e293b}
+.token-progress-pct{font-size:11px;font-weight:600}
+body.dark .token-progress-pct{color:#818cf8}
+body.light .token-progress-pct{color:#0ea5e9}
+.token-progress-bar{width:100%;height:8px;border-radius:20px;overflow:hidden;margin-bottom:8px}
+body.dark .token-progress-bar{background:rgba(255,255,255,0.08)}
+body.light .token-progress-bar{background:#f1f5f9}
+.token-progress-fill{height:100%;border-radius:20px;background:linear-gradient(90deg,#818cf8,#34d399);transition:width 0.5s ease}
+.token-progress-footer{display:flex;justify-content:space-between;font-size:9px}
+body.dark .token-progress-footer{color:rgba(255,255,255,0.3)}
+body.light .token-progress-footer{color:#94a3b8}
+
+/* EDIT PROFILE FORM */
+.edit-profile-form{padding:20px;border-radius:16px;margin-bottom:14px}
+body.dark .edit-profile-form{background:rgba(255,255,255,0.03);border:1px solid rgba(129,140,248,0.15)}
+body.light .edit-profile-form{background:#fff;border:1px solid #e2e8f0}
+.settings-cancel-btn{padding:11px 20px;border-radius:12px;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit}
+body.dark .settings-cancel-btn{background:rgba(255,255,255,0.05);color:rgba(255,255,255,0.5);border:1px solid rgba(255,255,255,0.1)}
+body.light .settings-cancel-btn{background:#f8fafc;color:#64748b;border:1px solid #e2e8f0}

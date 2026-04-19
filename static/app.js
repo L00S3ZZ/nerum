@@ -184,9 +184,11 @@ function showDashboard(name) {
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   document.getElementById('sb-initials').textContent = initials;
   document.getElementById('settings-name').value = name;
+  document.getElementById('profile-name-display').textContent = name;
+  document.getElementById('settings-avatar-big').textContent = initials;
   const email = localStorage.getItem('nerum_email') || '';
   document.getElementById('settings-email').value = email;
-  document.getElementById('settings-info-email').textContent = email || '—';
+  document.getElementById('profile-email-display').textContent = email || 'No email set';
   document.getElementById('settings-theme').value = localStorage.getItem('nerum_theme') || 'dark';
   document.getElementById('settings-lang').value = localStorage.getItem('nerum_lang') || 'english';
   loadToggles();
@@ -355,40 +357,40 @@ if (googleToken && googleName) {
 }
 
 // SETTINGS
+function toggleProfileEdit() {
+  const form = document.getElementById('edit-profile-form');
+  const isVisible = form.style.display !== 'none';
+  form.style.display = isVisible ? 'none' : 'block';
+  document.getElementById('edit-profile-form').scrollIntoView({ behavior: 'smooth' });
+}
+
 function saveSettings() {
   const name = document.getElementById('settings-name').value.trim();
   const theme = document.getElementById('settings-theme').value;
   const lang = document.getElementById('settings-lang').value;
   const newPass = document.getElementById('settings-newpass').value;
   const confirmPass = document.getElementById('settings-confirmpass').value;
-
   if (name) {
     currentUser = name;
     localStorage.setItem('nerum_name', name);
     document.getElementById('tb-name').textContent = name;
     document.getElementById('sb-name').textContent = name;
+    document.getElementById('profile-name-display').textContent = name;
     const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     document.getElementById('sb-initials').textContent = initials;
+    document.getElementById('settings-avatar-big').textContent = initials;
   }
-
   applyTheme(theme);
   applyLang(lang);
-
   if (newPass) {
-    if (newPass !== confirmPass) {
-      alert('Passwords do not match!');
-      return;
-    }
-    if (newPass.length < 6) {
-      alert('Password must be at least 6 characters!');
-      return;
-    }
+    if (newPass !== confirmPass) { alert('Passwords do not match!'); return; }
+    if (newPass.length < 6) { alert('Min 6 characters!'); return; }
   }
-
   document.getElementById('settings-success').style.display = 'block';
   setTimeout(() => {
     document.getElementById('settings-success').style.display = 'none';
-  }, 3000);
+    document.getElementById('edit-profile-form').style.display = 'none';
+  }, 2000);
 }
 
 // HISTORY

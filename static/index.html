@@ -346,10 +346,56 @@
         </div>
       </div>
 
-      <!-- SETTINGS CONTENT -->
+    <!-- SETTINGS CONTENT -->
 <div class="settings-content" id="settings-content">
-  <div class="settings-section">
-    <div class="settings-section-title">Profile</div>
+  
+  <!-- PROFILE HEADER -->
+  <div class="profile-header">
+    <div class="profile-avatar-big" id="settings-avatar-big">SR</div>
+    <div class="profile-info">
+      <div class="profile-name-row">
+        <span class="profile-name-display" id="profile-name-display">Srihari</span>
+        <button class="profile-edit-btn" onclick="toggleProfileEdit()">Edit Profile</button>
+      </div>
+      <div class="profile-email-display" id="profile-email-display">srihari@gmail.com</div>
+      <div class="profile-plan-badge" id="profile-plan-badge">Free Plan</div>
+    </div>
+    <div class="profile-token-box">
+      <div class="ptb-item">
+        <div class="ptb-val" id="ptb-tokens">1,240</div>
+        <div class="ptb-label">Tokens used</div>
+      </div>
+      <div class="ptb-divider"></div>
+      <div class="ptb-item">
+        <div class="ptb-val">10,000</div>
+        <div class="ptb-label">Token limit</div>
+      </div>
+      <div class="ptb-divider"></div>
+      <div class="ptb-item">
+        <div class="ptb-val" id="ptb-wf">0</div>
+        <div class="ptb-label">Workflows</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TOKEN PROGRESS BAR -->
+  <div class="token-progress-wrap">
+    <div class="token-progress-header">
+      <span class="token-progress-label">Token usage this month</span>
+      <span class="token-progress-pct" id="token-pct">12.4%</span>
+    </div>
+    <div class="token-progress-bar">
+      <div class="token-progress-fill" id="token-fill" style="width:12.4%"></div>
+    </div>
+    <div class="token-progress-footer">
+      <span id="token-used-label">1,240 used</span>
+      <span id="token-limit-label">10,000 limit</span>
+    </div>
+  </div>
+
+  <!-- EDIT PROFILE FORM (hidden by default) -->
+  <div class="edit-profile-form" id="edit-profile-form" style="display:none">
+    <div class="settings-section-title">Edit Profile</div>
     <div class="settings-row">
       <div class="settings-field">
         <label>FULL NAME</label>
@@ -360,21 +406,37 @@
         <input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/>
       </div>
     </div>
+    <div class="settings-row">
+      <div class="settings-field">
+        <label>NEW PASSWORD</label>
+        <input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/>
+      </div>
+      <div class="settings-field">
+        <label>CONFIRM PASSWORD</label>
+        <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:4px">
+      <button class="settings-save-btn" onclick="saveSettings()">Save Changes</button>
+      <button class="settings-cancel-btn" onclick="toggleProfileEdit()">Cancel</button>
+    </div>
+    <div class="settings-success" id="settings-success">✓ Settings saved successfully!</div>
   </div>
 
+  <!-- PREFERENCES -->
   <div class="settings-section">
     <div class="settings-section-title">Preferences</div>
     <div class="settings-row">
       <div class="settings-field">
         <label>THEME</label>
-        <select class="settings-select" id="settings-theme">
+        <select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)">
           <option value="dark">Dark — Aurora</option>
           <option value="light">Light — Arctic Ice</option>
         </select>
       </div>
       <div class="settings-field">
         <label>LANGUAGE</label>
-        <select class="settings-select" id="settings-lang">
+        <select class="settings-select" id="settings-lang" onchange="applyLang(this.value)">
           <option value="english">English 🇬🇧</option>
           <option value="tamil">Tamil — தமிழ் 🇮🇳</option>
         </select>
@@ -382,135 +444,61 @@
     </div>
   </div>
 
-  <div class="settings-section">
-    <div class="settings-section-title">Change Password</div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label>NEW PASSWORD</label>
-        <input class="settings-input" id="settings-newpass" type="password" placeholder="Min 6 characters"/>
-      </div>
-      <div class="settings-field">
-        <label>CONFIRM PASSWORD</label>
-        <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat password"/>
-      </div>
-    </div>
-  </div>
-
-  <div class="settings-section">
-    <div class="settings-section-title">Account Info</div>
-    <div class="settings-info-row"><span class="settings-info-key">Email</span><span class="settings-info-val" id="settings-info-email">—</span></div>
-    <div class="settings-info-row"><span class="settings-info-key">Plan</span><span class="settings-info-val">Free</span></div>
-    <div class="settings-info-row"><span class="settings-info-key">AI Builder</span><span class="settings-info-val">Tamil + English ✓</span></div>
-    <div class="settings-info-row"><span class="settings-info-key">Platform</span><span class="settings-info-val">nerum.onrender.com</span></div>
-  </div>
-
   <!-- NOTIFICATIONS -->
-<div class="settings-section">
-  <div class="settings-section-title">Notifications</div>
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Email notifications</div>
-      <div class="toggle-desc">Get notified when workflows run</div>
+  <div class="settings-section">
+    <div class="settings-section-title">Notifications</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label>
     </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/>
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Telegram notifications</div>
-      <div class="toggle-desc">Get alerts via Telegram bot</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label>
     </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/>
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Weekly report</div>
-      <div class="toggle-desc">Summary email every Monday</div>
+    <div class="toggle-row">
+      <div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div>
+      <label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label>
     </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/>
-      <span class="toggle-slider"></span>
-    </label>
   </div>
-</div>
 
-<!-- INTEGRATIONS -->
-<div class="settings-section">
-  <div class="settings-section-title">Connected integrations</div>
-  <div class="integration-item">
-    <div class="integration-icon" style="background:rgba(234,67,53,0.15)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg>
+  <!-- INTEGRATIONS -->
+  <div class="settings-section">
+    <div class="settings-section-title">Connected integrations</div>
+    <div class="integration-item">
+      <div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div>
+      <div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div>
+      <span class="integration-badge badge-connected">Active</span>
     </div>
-    <div>
-      <div class="integration-name">Gmail</div>
-      <div class="integration-status connected">● Connected</div>
+    <div class="integration-item">
+      <div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div>
+      <div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div>
+      <span class="integration-badge badge-connected">Active</span>
     </div>
-    <span class="integration-badge badge-connected">Active</span>
+    <div class="integration-item">
+      <div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div>
+      <div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div>
+      <span class="integration-badge badge-connected">Active</span>
+    </div>
+    <div class="integration-item">
+      <div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div>
+      <div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div>
+      <span class="integration-badge badge-connected">Active</span>
+    </div>
   </div>
-  <div class="integration-item">
-    <div class="integration-icon" style="background:rgba(52,168,83,0.15)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg>
-    </div>
-    <div>
-      <div class="integration-name">Google Sheets</div>
-      <div class="integration-status connected">● Connected</div>
-    </div>
-    <span class="integration-badge badge-connected">Active</span>
-  </div>
-  <div class="integration-item">
-    <div class="integration-icon" style="background:rgba(42,171,238,0.15)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg>
-    </div>
-    <div>
-      <div class="integration-name">Telegram</div>
-      <div class="integration-status connected">● Connected</div>
-    </div>
-    <span class="integration-badge badge-connected">Active</span>
-  </div>
-  <div class="integration-item">
-    <div class="integration-icon" style="background:rgba(37,211,102,0.15)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg>
-    </div>
-    <div>
-      <div class="integration-name">WhatsApp</div>
-      <div class="integration-status connected">● Connected via Twilio</div>
-    </div>
-    <span class="integration-badge badge-connected">Active</span>
-  </div>
-  <div class="integration-item">
-    <div class="integration-icon" style="background:rgba(129,140,248,0.15)">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M9 1a8 8 0 100 16A8 8 0 009 1z" fill="#fff"/><path fill-rule="evenodd" clip-rule="evenodd" d="M9 1C4.58 1 1 4.58 1 9c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0017 9c0-4.42-3.58-8-8-8z" fill="#333"/></svg>
-    </div>
-    <div>
-      <div class="integration-name">GitHub</div>
-      <div class="integration-status disconnected">● Not connected</div>
-    </div>
-    <span class="integration-badge badge-disconnected">Connect</span>
-  </div>
-</div>
 
-<!-- DANGER ZONE -->
-<div class="danger-section">
-  <div class="danger-title">⚠️ Danger Zone</div>
-  <div class="danger-row">
-    <div>
-      <div class="danger-row-label">Delete all workflows</div>
-      <div class="danger-row-desc">Permanently removes all your workflows</div>
+  <!-- DANGER ZONE -->
+  <div class="danger-section">
+    <div class="danger-title">⚠️ Danger Zone</div>
+    <div class="danger-row">
+      <div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div>
+      <button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button>
     </div>
-    <button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button>
-  </div>
-  <div class="danger-row">
-    <div>
-      <div class="danger-row-label">Delete account</div>
-      <div class="danger-row-desc">Permanently delete your Nerum account</div>
+    <div class="danger-row">
+      <div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div>
+      <button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button>
     </div>
-    <button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button>
   </div>
+
 </div>
 
   <div>
