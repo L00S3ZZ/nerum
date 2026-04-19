@@ -183,9 +183,15 @@ function showDashboard(name) {
   document.getElementById('sb-name').textContent = name;
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   document.getElementById('sb-initials').textContent = initials;
+  // Populate settings
+  document.getElementById('settings-name').value = name;
+  const email = localStorage.getItem('nerum_email') || '';
+  document.getElementById('settings-email').value = email;
+  document.getElementById('settings-info-email').textContent = email || '—';
+  document.getElementById('settings-theme').value = localStorage.getItem('nerum_theme') || 'dark';
+  document.getElementById('settings-lang').value = localStorage.getItem('nerum_lang') || 'english';
   loadWorkflows();
 }
-
 async function loadWorkflows() {
   try {
     const token = localStorage.getItem('nerum_token');
@@ -211,9 +217,38 @@ function setActive(el) {
   el.classList.add('active');
   const text = el.textContent.trim();
   if (text === 'Billing') {
-    showBilling();
+    showPage('billing');
+  } else if (text === 'Settings') {
+    showPage('settings');
+  } else if (text === 'Service History') {
+    showPage('history');
   } else {
-    hideBilling();
+    showPage('dashboard');
+  }
+}
+
+function showPage(page) {
+  document.getElementById('main-content').style.display = 'none';
+  document.getElementById('billing-content').style.display = 'none';
+  document.getElementById('settings-content').style.display = 'none';
+  document.getElementById('history-content').style.display = 'none';
+  if (page === 'billing') {
+    document.getElementById('billing-content').style.display = 'flex';
+    document.getElementById('billing-content').style.flexDirection = 'column';
+    document.getElementById('tb-title').textContent = 'Billing';
+  } else if (page === 'settings') {
+    document.getElementById('settings-content').style.display = 'flex';
+    document.getElementById('settings-content').style.flexDirection = 'column';
+    document.getElementById('tb-title').textContent = 'Settings';
+  } else if (page === 'history') {
+    document.getElementById('history-content').style.display = 'flex';
+    document.getElementById('history-content').style.flexDirection = 'column';
+    document.getElementById('tb-title').textContent = 'Service History';
+    loadHistory();
+  } else {
+    document.getElementById('main-content').style.display = 'flex';
+    document.getElementById('main-content').style.flexDirection = 'column';
+    document.getElementById('tb-title').textContent = 'Dashboard';
   }
 }
 
@@ -317,4 +352,73 @@ if (googleToken && googleName) {
     currentUser = savedName;
     showDashboard(savedName);
   }
+}
+
+// SETTINGS
+function saveSettings() {
+  const name = document.getElementById('settings-name').value.trim();
+  const theme = document.getElementById('settings-theme').value;
+  const lang = document.getElementById('settings-lang').value;
+  const newPass = document.getElementById('settings-newpass').value;
+  const confirmPass = document.getElementById('settings-confirmpass').value;
+
+  if (name) {
+    currentUser = name;
+    localStorage.setItem('nerum_name', name);
+    document.getElementById('tb-name').textContent = name;
+    document.getElementById('sb-name').textContent = name;
+    const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    document.getElementById('sb-initials').textContent = initials;
+  }
+
+  applyTheme(theme);
+  applyLang(lang);
+
+  if (newPass) {
+    if (newPass !== confirmPass) {
+      alert('Passwords do not match!');
+      return;
+    }
+    if (newPass.length < 6) {
+      alert('Password must be at least 6 characters!');
+      return;
+    }
+  }
+
+  document.getElementById('settings-success').style.display = 'block';
+  setTimeout(() => {
+    document.getElementById('settings-success').style.display = 'none';
+  }, 3000);
+}
+
+// HISTORY
+async function loadHistory() {
+  const token = localStorage.getItem('nerum_token');
+  const container = document.getElementById('history-list');
+  container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Loading history...</div>';
+  // For now show mock data — real data comes when we build service logs in DB
+  setTimeout(() => {
+    container.innerHTML = `
+      <div class="history-item">
+        <div class="h-icon" style="background:rgba(234,67,53,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3h12v8H1z" fill="#EA4335"/><path d="M1 3l6 4 6-4" stroke="#fff" stroke-width="1"/></svg></div>
+        <div class="h-info"><div class="h-action">Email sent to user@gmail.com</div><div class="h-time">Today 9:12 AM</div></div>
+        <span class="h-badge h-gmail">Gmail</span>
+      </div>
+      <div class="history-item">
+        <div class="h-icon" style="background:rgba(37,211,102,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" fill="#25D366"/></svg></div>
+        <div class="h-info"><div class="h-action">WhatsApp sent to +91999...</div><div class="h-time">Today 9:33 AM</div></div>
+        <span class="h-badge h-wa">WhatsApp</span>
+      </div>
+      <div class="history-item">
+        <div class="h-icon" style="background:rgba(42,171,238,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" fill="#2AABEE"/></svg></div>
+        <div class="h-info"><div class="h-action">Telegram message sent</div><div class="h-time">Today 8:48 AM</div></div>
+        <span class="h-badge h-tg">Telegram</span>
+      </div>
+      <div class="history-item">
+        <div class="h-icon" style="background:rgba(52,168,83,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" fill="#34A853"/></svg></div>
+        <div class="h-info"><div class="h-action">Row appended to Sheet</div><div class="h-time">Today 8:55 AM</div></div>
+        <span class="h-badge h-sh">Sheets</span>
+      </div>
+    `;
+  }, 500);
 }

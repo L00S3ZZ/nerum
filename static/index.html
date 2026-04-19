@@ -346,6 +346,77 @@
         </div>
       </div>
 
+      <!-- SETTINGS CONTENT -->
+<div class="settings-content" id="settings-content">
+  <div class="settings-section">
+    <div class="settings-section-title">Profile</div>
+    <div class="settings-row">
+      <div class="settings-field">
+        <label>FULL NAME</label>
+        <input class="settings-input" id="settings-name" placeholder="Your name"/>
+      </div>
+      <div class="settings-field">
+        <label>EMAIL</label>
+        <input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Preferences</div>
+    <div class="settings-row">
+      <div class="settings-field">
+        <label>THEME</label>
+        <select class="settings-select" id="settings-theme">
+          <option value="dark">Dark — Aurora</option>
+          <option value="light">Light — Arctic Ice</option>
+        </select>
+      </div>
+      <div class="settings-field">
+        <label>LANGUAGE</label>
+        <select class="settings-select" id="settings-lang">
+          <option value="english">English 🇬🇧</option>
+          <option value="tamil">Tamil — தமிழ் 🇮🇳</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Change Password</div>
+    <div class="settings-row">
+      <div class="settings-field">
+        <label>NEW PASSWORD</label>
+        <input class="settings-input" id="settings-newpass" type="password" placeholder="Min 6 characters"/>
+      </div>
+      <div class="settings-field">
+        <label>CONFIRM PASSWORD</label>
+        <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat password"/>
+      </div>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-section-title">Account Info</div>
+    <div class="settings-info-row"><span class="settings-info-key">Email</span><span class="settings-info-val" id="settings-info-email">—</span></div>
+    <div class="settings-info-row"><span class="settings-info-key">Plan</span><span class="settings-info-val">Free</span></div>
+    <div class="settings-info-row"><span class="settings-info-key">AI Builder</span><span class="settings-info-val">Tamil + English ✓</span></div>
+    <div class="settings-info-row"><span class="settings-info-key">Platform</span><span class="settings-info-val">nerum.onrender.com</span></div>
+  </div>
+
+  <div>
+    <button class="settings-save-btn" onclick="saveSettings()">Save Changes</button>
+    <div class="settings-success" id="settings-success">✓ Settings saved successfully!</div>
+  </div>
+</div>
+
+<!-- HISTORY CONTENT -->
+<div class="history-content" id="history-content">
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px" id="history-title">Service History</div>
+  <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
+  <div id="history-list"></div>
+</div>
+
     </div>
   </div>
 </div>
