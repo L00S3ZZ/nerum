@@ -4,6 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Nerum</title>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
@@ -11,6 +12,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-heig
 /* THEMES */
 body.dark{background:#0d0d1a;color:#fff}
 body.light{background:#f0f4f8;color:#1e293b}
+
+body.dark .plan-card{background:rgba(255,255,255,0.03);border-color:rgba(255,255,255,0.08);color:#fff}
+body.light .plan-card{background:#fff;border-color:#e2e8f0;color:#1e293b}
+body.dark .plan-current-btn{color:rgba(255,255,255,0.4)}
+body.light .plan-current-btn{color:#64748b;border-color:#e2e8f0}
+body.dark #billing-title{color:#fff}
+body.light #billing-title{color:#1e293b}
+body.dark #billing-sub{color:rgba(255,255,255,0.4)}
+body.light #billing-sub{color:#94a3b8}
 
 /* AUTH PAGE */
 .auth-page{display:flex;align-items:center;justify-content:center;min-height:100vh}
@@ -588,7 +598,7 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
         </div>
       </div>
 
-      <div class="content">
+      <div class="content" id="main-content">
         <div class="wf-card">
           <div class="wf-icon">
             <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="12" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="2" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="12" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.3"/></svg>
@@ -665,6 +675,75 @@ body.light .svc-dv{color:#0ea5e9;font-weight:500}
               <div class="svc-dr"><span class="svc-dk">Rows appended</span><span class="svc-dv">8 rows</span></div>
               <div class="svc-dr"><span class="svc-dk">Last updated</span><span class="svc-dv">Today 8:55 AM</span></div>
               <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/sheets/append</span></div>
+              <!-- BILLING PAGE -->
+<div id="billing-content" style="display:none;flex:1;padding:20px;flex-direction:column;gap:16px;overflow-y:auto">
+  <div style="font-size:18px;font-weight:700;margin-bottom:4px" id="billing-title">Choose your plan</div>
+  <div style="font-size:11px;margin-bottom:16px" id="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px">
+
+    <!-- FREE -->
+    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
+      <div style="font-size:11px;font-weight:600;opacity:0.5">FREE</div>
+      <div style="font-size:28px;font-weight:800">₹0<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
+      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">Perfect to get started</div>
+      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
+        <div>✓ 3 Workflows</div>
+        <div>✓ 10,000 AI tokens</div>
+        <div>✓ Gmail, WhatsApp, Telegram</div>
+        <div>✓ Google Sheets</div>
+        <div style="opacity:0.35">✗ Priority support</div>
+      </div>
+      <button style="margin-top:auto;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:transparent;font-size:11px;cursor:pointer;font-family:inherit" class="plan-current-btn">Current Plan</button>
+    </div>
+
+    <!-- STARTER -->
+    <div style="border-radius:16px;padding:20px;border:2px solid #818cf8;display:flex;flex-direction:column;gap:10px;position:relative" class="plan-card">
+      <div style="position:absolute;top:-10px;left:50%;transform:translateX(-50%);font-size:9px;padding:3px 12px;border-radius:20px;background:#818cf8;color:#fff;font-weight:600;white-space:nowrap">MOST POPULAR</div>
+      <div style="font-size:11px;font-weight:600;color:#818cf8">STARTER</div>
+      <div style="font-size:28px;font-weight:800">₹799<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
+      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For growing businesses</div>
+      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
+        <div>✓ 10 Workflows</div>
+        <div>✓ 1,00,000 AI tokens</div>
+        <div>✓ All integrations</div>
+        <div>✓ Tamil + English AI</div>
+        <div>✓ Email support</div>
+      </div>
+      <button onclick="startPayment('starter',79900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Starter</button>
+    </div>
+
+    <!-- PRO -->
+    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
+      <div style="font-size:11px;font-weight:600;color:#34d399">PRO</div>
+      <div style="font-size:28px;font-weight:800">₹1,399<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
+      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For power users</div>
+      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
+        <div>✓ 50 Workflows</div>
+        <div>✓ 5,00,000 AI tokens</div>
+        <div>✓ All integrations</div>
+        <div>✓ Priority support</div>
+        <div>✓ Advanced analytics</div>
+      </div>
+      <button onclick="startPayment('pro',139900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#34d399,#059669);color:#fff;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Pro</button>
+    </div>
+
+    <!-- BUSINESS -->
+    <div style="border-radius:16px;padding:20px;border:1px solid;display:flex;flex-direction:column;gap:10px" class="plan-card">
+      <div style="font-size:11px;font-weight:600;color:#fbbf24">BUSINESS</div>
+      <div style="font-size:28px;font-weight:800">₹3,499<span style="font-size:12px;font-weight:400;opacity:0.5">/mo</span></div>
+      <div style="font-size:10px;opacity:0.5;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,0.08)">For teams & agencies</div>
+      <div style="font-size:10px;display:flex;flex-direction:column;gap:7px">
+        <div>✓ Unlimited Workflows</div>
+        <div>✓ Unlimited AI tokens</div>
+        <div>✓ All integrations</div>
+        <div>✓ Dedicated support</div>
+        <div>✓ Custom integrations</div>
+      </div>
+      <button onclick="startPayment('business',349900)" style="margin-top:auto;padding:10px;border-radius:10px;border:none;background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f0a00;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit">Upgrade to Business</button>
+    </div>
+
+  </div>
+</div>
             </div>
           </div>
         </div>
@@ -703,6 +782,46 @@ window.addEventListener('load', () => {
     }
   }, 1500);
 });
+
+async function startPayment(plan, amount){
+  const token = localStorage.getItem('nerum_token');
+  try {
+    const res = await fetch(`/payment/create-order/${plan}?token=${token}`, {method:'POST'});
+    const data = await res.json();
+    const options = {
+      key: data.key_id,
+      amount: data.amount,
+      currency: 'INR',
+      name: 'Nerum',
+      description: `${data.plan_name} Plan`,
+      order_id: data.order_id,
+      handler: async function(response){
+        const verify = await fetch('/payment/verify', {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+            plan: plan,
+            token: token
+          })
+        });
+        const result = await verify.json();
+        if(result.success){
+          alert(`🎉 Upgraded to ${result.plan} plan successfully!`);
+          document.querySelector('.sb-plan').textContent = result.plan + ' plan';
+        }
+      },
+      prefill: { name: currentUser },
+      theme: { color: '#818cf8' }
+    };
+    const rzp = new Razorpay(options);
+    rzp.open();
+  } catch(e) {
+    alert('Payment failed. Try again!');
+  }
+}
 
 function editName(){
   document.getElementById('name-edit-row').style.display='block';
@@ -880,6 +999,19 @@ async function createWorkflow(){
 function setActive(el){
   document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('active'));
   el.classList.add('active');
+  const text=el.textContent.trim();
+  if(text==='Billing') showBilling();
+  else hideBilling();
+}
+
+function showBilling(){
+  document.getElementById('main-content').style.display='none';
+  document.getElementById('billing-content').style.display='flex';
+}
+
+function hideBilling(){
+  document.getElementById('main-content').style.display='flex';
+  document.getElementById('billing-content').style.display='none';
 }
 
 function toggleSvc(id){
