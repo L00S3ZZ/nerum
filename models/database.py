@@ -22,5 +22,8 @@ class User(Base):
     name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
     hashed_password = Column(String, nullable=False)
+    plan = Column(String, default="Free")
+    token_limit = Column(Integer, default=10000)
+    tokens_used = Column(Integer, default=0)
 
 Base.metadata.create_all(bind=engine)
