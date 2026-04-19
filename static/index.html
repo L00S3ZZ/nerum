@@ -9,6 +9,252 @@
 </head>
 <body class="dark">
 
+<!-- LANDING PAGE -->
+<div id="landing-page">
+
+  <!-- NAVBAR -->
+  <nav class="nav">
+    <div class="nav-logo"><span class="a">Ne</span><span class="b">rum</span></div>
+    <div class="nav-links">
+      <a class="nav-link" href="#features">Features</a>
+      <a class="nav-link" href="#pricing">Pricing</a>
+      <a class="nav-link" href="#about">About</a>
+    </div>
+    <div class="nav-btns">
+      <button class="nav-login-btn" onclick="showAuthPopup()">Login</button>
+      <button class="nav-signup-btn" onclick="showAuthPopup()">Get Started Free →</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-badge">🇮🇳 Built in Chennai, Tamil Nadu</div>
+    <h1 class="hero-title">Automate your business<br/><span class="hero-gradient">with AI workflows</span></h1>
+    <p class="hero-sub">Connect Gmail, WhatsApp, Telegram and Google Sheets.<br/>Type what you want in Tamil or English — Nerum builds it for you.</p>
+    <div class="hero-btns">
+      <button class="hero-cta" onclick="showAuthPopup()">Start for free →</button>
+      <button class="hero-demo-btn" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">Watch demo ↓</button>
+    </div>
+    <div class="hero-pills">
+      <span class="hero-pill">✓ No credit card required</span>
+      <span class="hero-pill">✓ Free forever plan</span>
+      <span class="hero-pill">✓ Tamil + English AI</span>
+      <span class="hero-pill">✓ 5 min setup</span>
+    </div>
+  </section>
+
+  <!-- DEMO VIDEO -->
+  <section class="demo-section" id="demo-section">
+    <div class="section-label">See it in action</div>
+    <h2 class="section-title">Watch how Nerum works</h2>
+    <div class="video-wrap">
+      <div class="video-placeholder" id="video-placeholder">
+        <div class="vp-inner">
+          <div class="vp-play" onclick="loadVideo()">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg>
+          </div>
+          <div class="vp-title">Nerum Demo</div>
+          <div class="vp-sub">See how to automate WhatsApp, Gmail & more in 2 minutes</div>
+        </div>
+      </div>
+      <iframe id="demo-video" style="display:none;width:100%;height:100%;border-radius:16px;border:none" allowfullscreen></iframe>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="features-section" id="features">
+    <div class="section-label">Integrations</div>
+    <h2 class="section-title">Everything connected in one place</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="fc-icon" style="background:rgba(234,67,53,0.15)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M2 7h24v14H2z" fill="#EA4335"/><path d="M2 7l12 9 12-9" stroke="#fff" stroke-width="1.5"/></svg>
+        </div>
+        <div class="fc-name">Gmail</div>
+        <div class="fc-desc">Send automated emails to customers, leads and team members instantly</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon" style="background:rgba(37,211,102,0.15)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#25D366"/><path d="M9 15l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fc-name">WhatsApp</div>
+        <div class="fc-desc">Send WhatsApp messages automatically to any number via Twilio</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon" style="background:rgba(42,171,238,0.15)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#2AABEE"/><path d="M5 14l16-6-6 16-3.5-5L5 14z" fill="#fff"/></svg>
+        </div>
+        <div class="fc-name">Telegram</div>
+        <div class="fc-desc">Send instant Telegram notifications via your own Nerum bot</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon" style="background:rgba(52,168,83,0.15)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" fill="#34A853"/><path d="M8 14h12M8 9h12M8 19h8" stroke="#fff" stroke-width="1.5"/></svg>
+        </div>
+        <div class="fc-name">Google Sheets</div>
+        <div class="fc-desc">Automatically append data rows to any Google Sheet in real time</div>
+      </div>
+      <div class="feature-card">
+        <div class="fc-icon" style="background:rgba(129,140,248,0.15)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="rgba(129,140,248,0.8)"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fc-name">AI Builder</div>
+        <div class="fc-desc">Type workflows in Tamil or English — AI understands and builds them</div>
+      </div>
+      <div class="feature-card fc-coming">
+        <div class="fc-icon" style="background:rgba(255,255,255,0.08)">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="fc-name" style="opacity:0.4">More coming</div>
+        <div class="fc-desc" style="opacity:0.3">Instagram, LinkedIn, Facebook and more integrations on the way!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section class="how-section">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">3 steps to automate anything</h2>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-num">01</div>
+        <div class="step-title">Sign up free</div>
+        <div class="step-desc">Create your account in seconds with Google or email. No credit card needed.</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <div class="step-num">02</div>
+        <div class="step-title">Tell the AI</div>
+        <div class="step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div>
+      </div>
+      <div class="step-arrow">→</div>
+      <div class="step-card">
+        <div class="step-num">03</div>
+        <div class="step-title">It runs itself</div>
+        <div class="step-desc">Your workflow runs automatically. Get notified when it executes!</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section class="pricing-section" id="pricing">
+    <div class="section-label">Pricing</div>
+    <h2 class="section-title">Simple, honest pricing</h2>
+    <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    <div class="lp-plans-grid">
+      <div class="lp-plan-card">
+        <div class="lp-plan-name">Free</div>
+        <div class="lp-plan-price">₹0<span>/month</span></div>
+        <div class="lp-plan-desc">Perfect to get started</div>
+        <div class="lp-plan-features">
+          <div class="lp-feat">✓ 3 Workflows</div>
+          <div class="lp-feat">✓ 10,000 AI tokens</div>
+          <div class="lp-feat">✓ All integrations</div>
+          <div class="lp-feat lp-feat-no">✗ Priority support</div>
+        </div>
+        <button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button>
+      </div>
+      <div class="lp-plan-card lp-popular">
+        <div class="lp-popular-badge">MOST POPULAR</div>
+        <div class="lp-plan-name" style="color:#818cf8">Starter</div>
+        <div class="lp-plan-price">₹799<span>/month</span></div>
+        <div class="lp-plan-desc">For growing businesses</div>
+        <div class="lp-plan-features">
+          <div class="lp-feat">✓ 10 Workflows</div>
+          <div class="lp-feat">✓ 1,00,000 AI tokens</div>
+          <div class="lp-feat">✓ All integrations</div>
+          <div class="lp-feat">✓ Email support</div>
+        </div>
+        <button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button>
+      </div>
+      <div class="lp-plan-card">
+        <div class="lp-plan-name" style="color:#34d399">Pro</div>
+        <div class="lp-plan-price">₹1,399<span>/month</span></div>
+        <div class="lp-plan-desc">For power users</div>
+        <div class="lp-plan-features">
+          <div class="lp-feat">✓ 50 Workflows</div>
+          <div class="lp-feat">✓ 5,00,000 AI tokens</div>
+          <div class="lp-feat">✓ All integrations</div>
+          <div class="lp-feat">✓ Priority support</div>
+        </div>
+        <button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button>
+      </div>
+      <div class="lp-plan-card">
+        <div class="lp-plan-name" style="color:#fbbf24">Business</div>
+        <div class="lp-plan-price">₹3,499<span>/month</span></div>
+        <div class="lp-plan-desc">For teams & agencies</div>
+        <div class="lp-plan-features">
+          <div class="lp-feat">✓ Unlimited Workflows</div>
+          <div class="lp-feat">✓ Unlimited tokens</div>
+          <div class="lp-feat">✓ All integrations</div>
+          <div class="lp-feat">✓ Dedicated support</div>
+        </div>
+        <button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ABOUT -->
+  <section class="about-section" id="about">
+    <div class="about-card">
+      <div class="about-emoji">🇮🇳</div>
+      <h2 class="about-title">Built in Chennai, Tamil Nadu</h2>
+      <p class="about-desc">Nerum is an AI workflow automation platform built for Indian businesses and creators. We speak Tamil and English because that's how we think. Automate your work, focus on what matters.</p>
+      <button class="hero-cta" onclick="showAuthPopup()">Join Nerum for free →</button>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="footer-logo"><span class="a">Ne</span><span class="b">rum</span></div>
+    <div class="footer-tagline">AI Workflow Automation · Built in Chennai 🇮🇳</div>
+    <div class="footer-links">
+      <a class="footer-link" href="#features">Features</a>
+      <a class="footer-link" href="#pricing">Pricing</a>
+      <a class="footer-link" href="#about">About</a>
+      <a class="footer-link" onclick="showAuthPopup()">Login</a>
+    </div>
+    <div class="footer-copy">© 2026 Nerum. Made with ❤️ in Chennai.</div>
+  </footer>
+
+</div>
+
+<!-- AUTH POPUP OVERLAY -->
+<div id="auth-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="width:100%;max-width:420px;margin:20px;animation:slideUp 0.3s ease">
+    <div id="auth-popup-box">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <div class="auth-logo"><span class="a">Ne</span><span class="b">rum</span></div>
+        <button onclick="hideAuthPopup()" style="background:transparent;border:none;cursor:pointer;font-size:20px;opacity:0.5;color:inherit">✕</button>
+      </div>
+      <div class="auth-sub">AI workflow automation platform</div>
+      <a href="/auth/google" class="google-btn">
+        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>
+        Continue with Google
+      </a>
+      <div class="auth-divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" onclick="switchTab('login')">Login</button>
+        <button class="auth-tab" onclick="switchTab('signup')">Sign up</button>
+      </div>
+      <div id="auth-error" class="auth-error"></div>
+      <div id="login-form">
+        <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
+        <div class="form-group"><label>PASSWORD</label><input type="password" id="login-password" placeholder="••••••••"/></div>
+        <button class="auth-btn" onclick="doLogin()">Login to Nerum</button>
+        <div class="auth-switch">Don't have an account? <span onclick="switchTab('signup')">Sign up free</span></div>
+      </div>
+      <div id="signup-form" style="display:none">
+        <div class="form-group"><label>FULL NAME</label><input type="text" id="signup-name" placeholder="Your name"/></div>
+        <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
+        <div class="form-group"><label>PASSWORD</label><input type="password" id="signup-password" placeholder="Min 6 characters"/></div>
+        <button class="auth-btn" onclick="doSignup()">Create account</button>
+        <div class="auth-switch">Already have an account? <span onclick="switchTab('login')">Login</span></div>
+      </div>
+    </div>
+  </div>
+</div>  
+
 <!-- LOADING SCREEN -->
 <div id="loading-screen">
   <div class="load-logo"><span class="a">Ne</span><span class="b">rum</span></div>

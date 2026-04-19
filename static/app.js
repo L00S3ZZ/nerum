@@ -155,7 +155,8 @@ async function doSignup() {
 
 function afterLogin(name) {
   currentUser = name;
-  document.getElementById('auth-page').style.display = 'none';
+  hideAuthPopup();
+  document.getElementById('landing-page').style.display = 'none';
   const onboarded = localStorage.getItem('nerum_onboarded');
   if (!onboarded) {
     document.getElementById('ob-welcome-name').textContent = `Welcome, ${name}! 👋`;
@@ -342,11 +343,13 @@ if (googleToken && googleName) {
   localStorage.setItem('nerum_token', googleToken);
   localStorage.setItem('nerum_name', googleName);
   window.history.replaceState({}, document.title, '/');
+  document.getElementById('landing-page').style.display = 'none';
   afterLogin(googleName);
 } else {
   const savedToken = localStorage.getItem('nerum_token');
   const savedName = localStorage.getItem('nerum_name');
   if (savedToken && savedName) {
+    document.getElementById('landing-page').style.display = 'none';
     const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
     const savedLang = localStorage.getItem('nerum_lang') || 'english';
     applyTheme(savedTheme);
@@ -404,6 +407,24 @@ setTimeout(() => {
     document.getElementById('settings-success').style.display = 'none';
     document.getElementById('edit-profile-form').style.display = 'none';
   }, 2000);
+}
+
+// LANDING PAGE
+function showAuthPopup() {
+  document.getElementById('auth-popup-overlay').style.display = 'flex';
+}
+
+function hideAuthPopup() {
+  document.getElementById('auth-popup-overlay').style.display = 'none';
+}
+
+// Close popup when clicking outside
+document.getElementById('auth-popup-overlay').addEventListener('click', function(e) {
+  if (e.target === this) hideAuthPopup();
+});
+
+function loadVideo() {
+  alert('Demo video coming soon! 🎬\nRecord a quick screen recording of Nerum and we will embed it here!');
 }
 
 // HISTORY
