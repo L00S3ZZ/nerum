@@ -493,3 +493,154 @@ function deleteAccount() {
   document.getElementById('auth-page').style.display = 'flex';
   alert('Account deleted. Sorry to see you go!');
 }
+
+// ========== NEBULA BACKGROUND ==========
+(function() {
+  const canvas = document.getElementById('nebula-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, pts = [], t = 0, animId = null;
+
+  const themes = {
+    dark: {
+      base: '#06000f',
+      clouds: [
+        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},
+        {x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
+        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},
+        {x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
+        {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
+      ],
+      stars: [
+        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},
+        {x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
+        {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
+      ],
+      ptCols: ['232,121,249','129,140,248'],
+      gridCol: 'rgba(232,121,249,0.05)',
+    },
+    light: {
+      base: '#ddc6ff',
+      clouds: [
+        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},
+        {x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
+        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},
+        {x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
+        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},
+        {x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
+      ],
+      stars: [
+        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},
+        {x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
+        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},
+        {x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
+      ],
+      ptCols: ['91,33,182','67,56,202','109,40,217'],
+      gridCol: 'rgba(76,29,149,0.12)',
+    }
+  };
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function makePts(cols) {
+    pts = Array.from({length: 120}, () => ({
+      x: Math.random() * W, y: Math.random() * H,
+      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
+      r: Math.random() * 1.8 + .3, a: Math.random() * .5 + .1,
+      col: cols[Math.floor(Math.random() * cols.length)]
+    }));
+  }
+
+  function draw() {
+    const isDark = document.body.classList.contains('dark');
+    const th = isDark ? themes.dark : themes.light;
+
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = th.base;
+    ctx.fillRect(0, 0, W, H);
+
+    // Aurora clouds
+    th.clouds.forEach((c, i) => {
+      const ox = Math.sin(t * .18 + i * 1.3) * 60;
+      const oy = Math.cos(t * .14 + i * 1.1) * 50;
+      const g = ctx.createRadialGradient(c.x*W+ox, c.y*H+oy, 0, c.x*W+ox, c.y*H+oy, c.r);
+      g.addColorStop(0, c.col);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+
+    // Glowing stars
+    th.stars.forEach((s, i) => {
+      const px = s.x*W + Math.sin(t*.2+i)*40;
+      const py = s.y*H + Math.cos(t*.15+i)*30;
+      const pulse = .8 + Math.sin(t*1.5+i) * .2;
+      const g = ctx.createRadialGradient(px, py, 0, px, py, s.r*pulse);
+      g.addColorStop(0, s.col);
+      g.addColorStop(1, 'transparent');
+      ctx.fillStyle = g;
+      ctx.fillRect(0, 0, W, H);
+    });
+
+    // Grid
+    for (let x = 0; x < W; x += 65) {
+      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H);
+      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
+    }
+    for (let y = 0; y < H; y += 65) {
+      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
+      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
+    }
+
+    // Particles
+    pts.forEach(p => {
+      p.x += p.vx; p.y += p.vy;
+      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
+      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(${p.col},${p.a})`; ctx.fill();
+    });
+
+    // Particle connections
+    for (let i = 0; i < pts.length; i++) {
+      for (let j = i+1; j < pts.length; j++) {
+        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
+        const d = Math.sqrt(dx*dx+dy*dy);
+        if (d < 100) {
+          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
+          ctx.strokeStyle = `rgba(${pts[i].col},${.07*(1-d/100)})`;
+          ctx.lineWidth = .4; ctx.stroke();
+        }
+      }
+    }
+
+    t += .006;
+    animId = requestAnimationFrame(draw);
+  }
+
+  function init() {
+    resize();
+    const isDark = document.body.classList.contains('dark');
+    makePts((isDark ? themes.dark : themes.light).ptCols);
+    if (animId) cancelAnimationFrame(animId);
+    draw();
+  }
+
+  window.addEventListener('resize', () => { resize(); });
+
+  // Re-init when theme switches
+  const origToggle = window.toggleTheme;
+  window.toggleTheme = function() {
+    if (origToggle) origToggle();
+    setTimeout(() => {
+      const isDark = document.body.classList.contains('dark');
+      makePts((isDark ? themes.dark : themes.light).ptCols);
+    }, 50);
+  };
+
+  init();
+})();
+// ========== END NEBULA BACKGROUND ==========
