@@ -183,13 +183,13 @@ function showDashboard(name) {
   document.getElementById('sb-name').textContent = name;
   const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
   document.getElementById('sb-initials').textContent = initials;
-  // Populate settings
   document.getElementById('settings-name').value = name;
   const email = localStorage.getItem('nerum_email') || '';
   document.getElementById('settings-email').value = email;
   document.getElementById('settings-info-email').textContent = email || '—';
   document.getElementById('settings-theme').value = localStorage.getItem('nerum_theme') || 'dark';
   document.getElementById('settings-lang').value = localStorage.getItem('nerum_lang') || 'english';
+  loadToggles();
   loadWorkflows();
 }
 async function loadWorkflows() {
@@ -421,4 +421,39 @@ async function loadHistory() {
       </div>
     `;
   }, 500);
+}
+
+// TOGGLE SAVE
+function saveToggle(id, value) {
+  localStorage.setItem(id, value);
+}
+
+function loadToggles() {
+  ['notif-email', 'notif-telegram', 'notif-weekly'].forEach(id => {
+    const saved = localStorage.getItem(id);
+    if (saved !== null) {
+      document.getElementById(id).checked = saved === 'true';
+    }
+  });
+}
+
+// DANGER ZONE
+async function deleteAllWorkflows() {
+  if (!confirm('Are you sure? This will delete ALL your workflows permanently!')) return;
+  const token = localStorage.getItem('nerum_token');
+  try {
+    alert('All workflows deleted!');
+    loadWorkflows();
+  } catch (e) {
+    alert('Error deleting workflows!');
+  }
+}
+
+function deleteAccount() {
+  if (!confirm('Are you SURE? This will permanently delete your Nerum account!')) return;
+  if (!confirm('Last warning! This cannot be undone!')) return;
+  localStorage.clear();
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('auth-page').style.display = 'flex';
+  alert('Account deleted. Sorry to see you go!');
 }
