@@ -405,12 +405,16 @@ body.dark .settings-field label{color:rgba(255,255,255,0.45)}
 body.light .settings-field label{color:#64748b}
 .settings-input{width:100%;padding:10px 14px;border-radius:10px;font-size:12px;outline:none;border:1px solid;font-family:inherit}
 body.dark .settings-input{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff}
+body.dark .settings-input:disabled{opacity:0.4;cursor:not-allowed}
+body.light .settings-input:disabled{opacity:0.4;cursor:not-allowed}
 body.dark .settings-input:focus{border-color:rgba(129,140,248,0.4)}
 body.light .settings-input{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
 body.light .settings-input:focus{border-color:#7dd3fc}
 .settings-select{width:100%;padding:10px 14px;border-radius:10px;font-size:12px;outline:none;border:1px solid;font-family:inherit;cursor:pointer}
 body.dark .settings-select{background:rgba(255,255,255,0.05);border-color:rgba(255,255,255,0.1);color:#fff}
 body.light .settings-select{background:#f8fafc;border-color:#e2e8f0;color:#1e293b}
+body.light .settings-select option{background:#fff;color:#1e293b}
+body.dark .settings-select option{background:#1a1535;color:#fff}
 .settings-save-btn{padding:11px 28px;border-radius:12px;border:none;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
 body.dark .settings-save-btn{background:linear-gradient(135deg,#818cf8,#34d399);color:#fff}
 body.light .settings-save-btn{background:linear-gradient(135deg,#0ea5e9,#38bdf8);color:#fff}
