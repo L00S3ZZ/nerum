@@ -1,6 +1,40 @@
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;min-height:100vh}
 
+/* ===== MORE TRANSPARENT PANELS ===== */
+body.dark .panel,
+body.dark .wf-card,
+body.dark .sidebar,
+body.dark .topbar,
+body.dark .plan-card,
+body.dark .settings-section,
+body.dark .profile-header,
+body.dark .token-progress-wrap,
+body.dark .danger-section,
+body.dark .svc-item,
+body.dark .integration-item,
+body.dark .history-item,
+body.dark .ob-card,
+body.dark .ob-summary,
+body.dark .feature-card,
+body.dark .step-card,
+body.dark .lp-plan-card,
+body.dark #auth-popup-box,
+body.dark .auth-box,
+body.dark .ob-box {
+  background: rgba(255,255,255,0.02) !important;
+  backdrop-filter: blur(8px) !important;
+}
+body.dark .nav {
+  background: rgba(6,0,15,0.5) !important;
+  backdrop-filter: blur(20px) !important;
+}
+body.dark .sb-user,
+body.dark .sb-stat {
+  background: rgba(255,255,255,0.02) !important;
+}
+/* ===== END TRANSPARENT ===== */
+
 /* ========== NEBULA BACKGROUND ========== */
 body.dark{background:#06000f;color:#fff}
 body.light{background:#ddc6ff;color:#1e293b}
