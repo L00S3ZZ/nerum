@@ -9,6 +9,7 @@ from routes.auth import router as auth_router
 from routes.telegram import router as telegram_router
 from routes.whatsapp import router as whatsapp_router
 from routes import payment
+from routes.password_reset import router as reset_router
 
 app = FastAPI(title="Nerum", version="0.1")
 
@@ -26,7 +27,7 @@ app.include_router(auth_router, prefix="/auth")
 app.include_router(telegram_router, prefix="/telegram")
 app.include_router(whatsapp_router, prefix="/whatsapp")
 app.include_router(payment.router, prefix="/payment")
-
+app.include_router(reset_router, prefix="/auth")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
