@@ -207,6 +207,8 @@ function afterLogin(name) {
 function doLogout() {
   localStorage.removeItem('nerum_token');
   localStorage.removeItem('nerum_name');
+  localStorage.removeItem('nerum_onboarded');
+  localStorage.removeItem('nerum_email');
   document.getElementById('dashboard').style.display = 'none';
   document.getElementById('landing-page').style.display = 'block';
 }
@@ -228,6 +230,7 @@ function showDashboard(name) {
   document.getElementById('settings-lang').value = localStorage.getItem('nerum_lang') || 'english';
   loadToggles();
   loadWorkflows();
+  showPage('dashboard');
 }
 
 // WORKFLOWS
