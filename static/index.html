@@ -8,12 +8,10 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 </head>
 <body class="dark">
-  <canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
+<canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
 
 <!-- LANDING PAGE -->
-<div id="landing-page">  
-
-  <!-- NAVBAR -->
+<div id="landing-page">
   <nav class="nav">
     <div class="nav-logo"><span class="a">Ne</span><span class="b">rum</span></div>
     <div class="nav-links">
@@ -26,7 +24,6 @@
     </div>
   </nav>
 
-  <!-- HERO -->
   <section class="hero">
     <h1 class="hero-title">Automate your business<br/><span class="hero-gradient">with AI workflows</span></h1>
     <p class="hero-sub">Connect Gmail, WhatsApp, Telegram and Google Sheets.<br/>Type what you want in Tamil or English — Nerum builds it for you.</p>
@@ -42,16 +39,13 @@
     </div>
   </section>
 
-  <!-- DEMO VIDEO -->
   <section class="demo-section" id="demo-section">
     <div class="section-label">See it in action</div>
     <h2 class="section-title">Watch how Nerum works</h2>
     <div class="video-wrap">
       <div class="video-placeholder" id="video-placeholder">
         <div class="vp-inner">
-          <div class="vp-play" onclick="loadVideo()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg>
-          </div>
+          <div class="vp-play" onclick="loadVideo()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg></div>
           <div class="vp-title">Nerum Demo</div>
           <div class="vp-sub">See how to automate WhatsApp, Gmail & more in 2 minutes</div>
         </div>
@@ -60,140 +54,43 @@
     </div>
   </section>
 
-  <!-- FEATURES -->
   <section class="features-section" id="features">
     <div class="section-label">Integrations</div>
     <h2 class="section-title">Everything connected in one place</h2>
     <div class="features-grid">
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(234,67,53,0.15)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M2 7h24v14H2z" fill="#EA4335"/><path d="M2 7l12 9 12-9" stroke="#fff" stroke-width="1.5"/></svg>
-        </div>
-        <div class="fc-name">Gmail</div>
-        <div class="fc-desc">Send automated emails to customers, leads and team members instantly</div>
-      </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(37,211,102,0.15)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#25D366"/><path d="M9 15l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-        </div>
-        <div class="fc-name">WhatsApp</div>
-        <div class="fc-desc">Send WhatsApp messages automatically to any number via Twilio</div>
-      </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(42,171,238,0.15)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#2AABEE"/><path d="M5 14l16-6-6 16-3.5-5L5 14z" fill="#fff"/></svg>
-        </div>
-        <div class="fc-name">Telegram</div>
-        <div class="fc-desc">Send instant Telegram notifications via your own Nerum bot</div>
-      </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(52,168,83,0.15)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" fill="#34A853"/><path d="M8 14h12M8 9h12M8 19h8" stroke="#fff" stroke-width="1.5"/></svg>
-        </div>
-        <div class="fc-name">Google Sheets</div>
-        <div class="fc-desc">Automatically append data rows to any Google Sheet in real time</div>
-      </div>
-      <div class="feature-card">
-        <div class="fc-icon" style="background:rgba(129,140,248,0.15)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="rgba(129,140,248,0.8)"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
-        </div>
-        <div class="fc-name">AI Builder</div>
-        <div class="fc-desc">Type workflows in Tamil or English — AI understands and builds them</div>
-      </div>
-      <div class="feature-card fc-coming">
-        <div class="fc-icon" style="background:rgba(255,255,255,0.08)">
-          <svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg>
-        </div>
-        <div class="fc-name" style="opacity:0.4">More coming</div>
-        <div class="fc-desc" style="opacity:0.3">Instagram, LinkedIn, Facebook and more integrations on the way!</div>
-      </div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(234,67,53,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M2 7h24v14H2z" fill="#EA4335"/><path d="M2 7l12 9 12-9" stroke="#fff" stroke-width="1.5"/></svg></div><div class="fc-name">Gmail</div><div class="fc-desc">Send automated emails to customers, leads and team members instantly</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(37,211,102,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#25D366"/><path d="M9 15l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div><div class="fc-name">WhatsApp</div><div class="fc-desc">Send WhatsApp messages automatically to any number via Twilio</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(42,171,238,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#2AABEE"/><path d="M5 14l16-6-6 16-3.5-5L5 14z" fill="#fff"/></svg></div><div class="fc-name">Telegram</div><div class="fc-desc">Send instant Telegram notifications via your own Nerum bot</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(52,168,83,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" fill="#34A853"/><path d="M8 14h12M8 9h12M8 19h8" stroke="#fff" stroke-width="1.5"/></svg></div><div class="fc-name">Google Sheets</div><div class="fc-desc">Automatically append data rows to any Google Sheet in real time</div></div>
+      <div class="feature-card"><div class="fc-icon" style="background:rgba(129,140,248,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="rgba(129,140,248,0.8)"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div><div class="fc-name">AI Builder</div><div class="fc-desc">Type workflows in Tamil or English — AI understands and builds them</div></div>
+      <div class="feature-card fc-coming"><div class="fc-icon" style="background:rgba(255,255,255,0.08)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="fc-name" style="opacity:0.4">More coming</div><div class="fc-desc" style="opacity:0.3">Instagram, LinkedIn, Facebook and more integrations on the way!</div></div>
     </div>
   </section>
 
-  <!-- HOW IT WORKS -->
   <section class="how-section">
     <div class="section-label">How it works</div>
     <h2 class="section-title">3 steps to automate anything</h2>
     <div class="steps-grid">
-      <div class="step-card">
-        <div class="step-num">01</div>
-        <div class="step-title">Sign up free</div>
-        <div class="step-desc">Create your account in seconds with Google or email. No credit card needed.</div>
-      </div>
+      <div class="step-card"><div class="step-num">01</div><div class="step-title">Sign up free</div><div class="step-desc">Create your account in seconds with Google or email. No credit card needed.</div></div>
       <div class="step-arrow">→</div>
-      <div class="step-card">
-        <div class="step-num">02</div>
-        <div class="step-title">Tell the AI</div>
-        <div class="step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div>
-      </div>
+      <div class="step-card"><div class="step-num">02</div><div class="step-title">Tell the AI</div><div class="step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div></div>
       <div class="step-arrow">→</div>
-      <div class="step-card">
-        <div class="step-num">03</div>
-        <div class="step-title">It runs itself</div>
-        <div class="step-desc">Your workflow runs automatically. Get notified when it executes!</div>
-      </div>
+      <div class="step-card"><div class="step-num">03</div><div class="step-title">It runs itself</div><div class="step-desc">Your workflow runs automatically. Get notified when it executes!</div></div>
     </div>
   </section>
 
-  <!-- PRICING -->
   <section class="pricing-section" id="pricing">
     <div class="section-label">Pricing</div>
     <h2 class="section-title">Simple, honest pricing</h2>
     <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
     <div class="lp-plans-grid">
-      <div class="lp-plan-card">
-        <div class="lp-plan-name">Free</div>
-        <div class="lp-plan-price">₹0<span>/month</span></div>
-        <div class="lp-plan-desc">Perfect to get started</div>
-        <div class="lp-plan-features">
-          <div class="lp-feat">✓ 3 Workflows</div>
-          <div class="lp-feat">✓ 10,000 AI tokens</div>
-          <div class="lp-feat">✓ All integrations</div>
-          <div class="lp-feat lp-feat-no">✗ Priority support</div>
-        </div>
-        <button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button>
-      </div>
-      <div class="lp-plan-card lp-popular">
-        <div class="lp-popular-badge">MOST POPULAR</div>
-        <div class="lp-plan-name" style="color:#818cf8">Starter</div>
-        <div class="lp-plan-price">₹799<span>/month</span></div>
-        <div class="lp-plan-desc">For growing businesses</div>
-        <div class="lp-plan-features">
-          <div class="lp-feat">✓ 10 Workflows</div>
-          <div class="lp-feat">✓ 1,00,000 AI tokens</div>
-          <div class="lp-feat">✓ All integrations</div>
-          <div class="lp-feat">✓ Email support</div>
-        </div>
-        <button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button>
-      </div>
-      <div class="lp-plan-card">
-        <div class="lp-plan-name" style="color:#34d399">Pro</div>
-        <div class="lp-plan-price">₹1,399<span>/month</span></div>
-        <div class="lp-plan-desc">For power users</div>
-        <div class="lp-plan-features">
-          <div class="lp-feat">✓ 50 Workflows</div>
-          <div class="lp-feat">✓ 5,00,000 AI tokens</div>
-          <div class="lp-feat">✓ All integrations</div>
-          <div class="lp-feat">✓ Priority support</div>
-        </div>
-        <button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button>
-      </div>
-      <div class="lp-plan-card">
-        <div class="lp-plan-name" style="color:#fbbf24">Business</div>
-        <div class="lp-plan-price">₹3,499<span>/month</span></div>
-        <div class="lp-plan-desc">For teams & agencies</div>
-        <div class="lp-plan-features">
-          <div class="lp-feat">✓ Unlimited Workflows</div>
-          <div class="lp-feat">✓ Unlimited tokens</div>
-          <div class="lp-feat">✓ All integrations</div>
-          <div class="lp-feat">✓ Dedicated support</div>
-        </div>
-        <button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button>
-      </div>
+      <div class="lp-plan-card"><div class="lp-plan-name">Free</div><div class="lp-plan-price">₹0<span>/month</span></div><div class="lp-plan-desc">Perfect to get started</div><div class="lp-plan-features"><div class="lp-feat">✓ 3 Workflows</div><div class="lp-feat">✓ 10,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat lp-feat-no">✗ Priority support</div></div><button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button></div>
+      <div class="lp-plan-card lp-popular"><div class="lp-popular-badge">MOST POPULAR</div><div class="lp-plan-name" style="color:#818cf8">Starter</div><div class="lp-plan-price">₹799<span>/month</span></div><div class="lp-plan-desc">For growing businesses</div><div class="lp-plan-features"><div class="lp-feat">✓ 10 Workflows</div><div class="lp-feat">✓ 1,00,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Email support</div></div><button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button></div>
+      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#34d399">Pro</div><div class="lp-plan-price">₹1,399<span>/month</span></div><div class="lp-plan-desc">For power users</div><div class="lp-plan-features"><div class="lp-feat">✓ 50 Workflows</div><div class="lp-feat">✓ 5,00,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Priority support</div></div><button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button></div>
+      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#fbbf24">Business</div><div class="lp-plan-price">₹3,499<span>/month</span></div><div class="lp-plan-desc">For teams & agencies</div><div class="lp-plan-features"><div class="lp-feat">✓ Unlimited Workflows</div><div class="lp-feat">✓ Unlimited tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Dedicated support</div></div><button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button></div>
     </div>
   </section>
 
-  <!-- FOOTER -->
   <footer class="footer">
     <div class="footer-logo"><span class="a">Ne</span><span class="b">rum</span></div>
     <div class="footer-tagline">AI Workflow Automation</div>
@@ -204,10 +101,9 @@
     </div>
     <div class="footer-copy">© 2026 Nerum.</div>
   </footer>
-
 </div>
 
-<!-- AUTH POPUP OVERLAY -->
+<!-- AUTH POPUP -->
 <div id="auth-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div style="width:100%;max-width:420px;margin:20px;animation:slideUp 0.3s ease">
     <div id="auth-popup-box">
@@ -216,15 +112,9 @@
         <button onclick="hideAuthPopup()" style="background:transparent;border:none;cursor:pointer;font-size:20px;opacity:0.5;color:inherit">✕</button>
       </div>
       <div class="auth-sub">AI workflow automation platform</div>
-      <a href="/auth/google" class="google-btn">
-        <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>
-        Continue with Google
-      </a>
+      <a href="/auth/google" class="google-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>Continue with Google</a>
       <div class="auth-divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
-      <div class="auth-tabs">
-        <button class="auth-tab active" onclick="switchTab('login')">Login</button>
-        <button class="auth-tab" onclick="switchTab('signup')">Sign up</button>
-      </div>
+      <div class="auth-tabs"><button class="auth-tab active" onclick="switchTab('login')">Login</button><button class="auth-tab" onclick="switchTab('signup')">Sign up</button></div>
       <div id="auth-error" class="auth-error"></div>
       <div id="login-form">
         <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
@@ -241,17 +131,13 @@
       </div>
     </div>
   </div>
-</div>  
+</div>
 
 <!-- LOADING SCREEN -->
 <div id="loading-screen">
   <div class="load-logo"><span class="a">Ne</span><span class="b">rum</span></div>
   <div class="load-tag">AI WORKFLOW PLATFORM</div>
-  <div class="load-dots">
-    <div class="load-dot"></div>
-    <div class="load-dot"></div>
-    <div class="load-dot"></div>
-  </div>
+  <div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div>
   <div class="load-text" id="loading-text">Starting up...</div>
 </div>
 
@@ -260,15 +146,9 @@
   <div class="auth-box">
     <div class="auth-logo"><span class="a">Ne</span><span class="b">rum</span></div>
     <div class="auth-sub">AI workflow automation platform</div>
-    <a href="/auth/google" class="google-btn">
-      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>
-      Continue with Google
-    </a>
+    <a href="/auth/google" class="google-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>Continue with Google</a>
     <div class="auth-divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" onclick="switchTab('login')">Login</button>
-      <button class="auth-tab" onclick="switchTab('signup')">Sign up</button>
-    </div>
+    <div class="auth-tabs"><button class="auth-tab active" onclick="switchTab('login')">Login</button><button class="auth-tab" onclick="switchTab('signup')">Sign up</button></div>
     <div id="auth-error" class="auth-error"></div>
     <div id="login-form">
       <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
@@ -290,7 +170,6 @@
 <div class="onboarding" id="onboarding">
   <div class="ob-box">
     <div class="ob-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-    <!-- STEP 1 -->
     <div id="ob-step1">
       <div class="ob-welcome" id="ob-welcome-name">Welcome! 👋</div>
       <div class="ob-sub">Let's set up Nerum just for you</div>
@@ -316,7 +195,6 @@
       </div>
       <div class="ob-btn-row"><div></div><button class="ob-btn-next" onclick="obStep(2)">Next →</button></div>
     </div>
-    <!-- STEP 2 -->
     <div id="ob-step2" style="display:none">
       <div class="ob-welcome">Choose your language</div>
       <div class="ob-sub">Nerum speaks Tamil and English</div>
@@ -330,14 +208,12 @@
       <div class="ob-section">Choose your language</div>
       <div class="ob-grid">
         <div class="ob-card selected" id="ob-en" onclick="selectLang('english')">
-          <div class="lang-flag">🇬🇧</div>
-          <div class="ob-name">English</div><div class="lang-native">English</div>
+          <div class="lang-flag">🇬🇧</div><div class="ob-name">English</div><div class="lang-native">English</div>
           <div class="lang-sample">"Send WhatsApp on form submit"</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
         <div class="ob-card" id="ob-ta" onclick="selectLang('tamil')">
-          <div class="lang-flag">🇮🇳</div>
-          <div class="ob-name">Tamil</div><div class="lang-native">தமிழ்</div>
+          <div class="lang-flag">🇮🇳</div><div class="ob-name">Tamil</div><div class="lang-native">தமிழ்</div>
           <div class="lang-sample">"Form submit ஆனா WhatsApp அனுப்பு"</div>
           <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
         </div>
@@ -347,7 +223,6 @@
         <button class="ob-btn-next" onclick="obStep(3)">Next →</button>
       </div>
     </div>
-    <!-- STEP 3 -->
     <div id="ob-step3" style="display:none">
       <div class="ob-welcome">You're all set! 🎉</div>
       <div class="ob-sub">Here's your Nerum setup</div>
@@ -368,10 +243,7 @@
         </div>
         <div id="name-edit-row" style="display:none;padding:8px 0">
           <input id="name-edit-input" class="name-edit-input" placeholder="Enter your name"/>
-          <div class="name-edit-btns">
-            <button class="name-save-btn" onclick="saveName()">Save</button>
-            <button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button>
-          </div>
+          <div class="name-edit-btns"><button class="name-save-btn" onclick="saveName()">Save</button><button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button></div>
         </div>
         <div class="ob-sum-row"><span class="ob-sum-key">Theme</span><span class="ob-sum-val" id="sum-theme">Dark — Aurora</span></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Language</span><span class="ob-sum-val" id="sum-lang">English</span></div>
@@ -437,12 +309,10 @@
         </div>
       </div>
 
-      <!-- MAIN CONTENT -->
-      <div class="content" id="main-content">
+      <!-- ✅ KEY FIX: display:flex by default so dashboard shows on load -->
+      <div class="content" id="main-content" style="display:flex;flex-direction:column">
         <div class="wf-card">
-          <div class="wf-icon">
-            <svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="12" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="2" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="12" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.3"/></svg>
-          </div>
+          <div class="wf-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="12" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="2" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="12" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.3"/></svg></div>
           <div>
             <div class="wf-num" id="wf-num">0</div>
             <div class="wf-label">Active workflows</div>
@@ -455,304 +325,117 @@
             <span class="wf-pill green">Sheets ✓</span>
           </div>
         </div>
-
         <div class="bottom-row">
           <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">AI Workflow Builder</span>
-              <span class="panel-pill" id="lang-pill">Tamil / English</span>
-            </div>
-            <div class="chat-msgs" id="chat-msgs">
-              <div class="chat-msg"><div class="bubble-bot" id="chat-greeting">Hi! What do you want to automate today?</div></div>
-            </div>
+            <div class="panel-header"><span class="panel-title">AI Workflow Builder</span><span class="panel-pill" id="lang-pill">Tamil / English</span></div>
+            <div class="chat-msgs" id="chat-msgs"><div class="chat-msg"><div class="bubble-bot" id="chat-greeting">Hi! What do you want to automate today?</div></div></div>
             <div class="chat-input-row">
               <input class="chat-input" id="chat-input" placeholder="Tell me what to automate..." onkeydown="if(event.key==='Enter')sendChat()"/>
               <button class="chat-send" onclick="sendChat()">Send</button>
             </div>
           </div>
-
           <div class="panel">
-            <div class="panel-header">
-              <span class="panel-title">Active services</span>
-              <span class="panel-pill">Click to expand</span>
-            </div>
-            <div class="svc-item" onclick="toggleSvc('s1')">
-              <div class="svc-icon" style="background:rgba(234,67,53,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8H2z" fill="#EA4335"/><path d="M2 4l6 5 6-5" stroke="#fff" stroke-width="1.2"/></svg></div>
-              <div><div class="svc-name">Gmail</div><div class="svc-desc">Send email</div></div>
-              <div class="svc-status"><span class="svc-dot"></span>Active</div>
-            </div>
-            <div class="svc-detail" id="s1">
-              <div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:12 AM</span></div>
-              <div class="svc-dr"><span class="svc-dk">Total sent</span><span class="svc-dv">12 emails</span></div>
-              <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/gmail/send</span></div>
-            </div>
-            <div class="svc-item" onclick="toggleSvc('s2')">
-              <div class="svc-icon" style="background:rgba(37,211,102,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#25D366"/><path d="M5 8.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-              <div><div class="svc-name">WhatsApp</div><div class="svc-desc">Twilio sandbox</div></div>
-              <div class="svc-status"><span class="svc-dot"></span>Active</div>
-            </div>
-            <div class="svc-detail" id="s2">
-              <div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:33 AM</span></div>
-              <div class="svc-dr"><span class="svc-dk">From</span><span class="svc-dv">+14155238886</span></div>
-              <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/whatsapp/send</span></div>
-            </div>
-            <div class="svc-item" onclick="toggleSvc('s3')">
-              <div class="svc-icon" style="background:rgba(42,171,238,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#2AABEE"/><path d="M3 8l9-3.5-3.5 9-2-3-3.5-2.5z" fill="#fff"/></svg></div>
-              <div><div class="svc-name">Telegram</div><div class="svc-desc">Nerum bot</div></div>
-              <div class="svc-status"><span class="svc-dot"></span>Active</div>
-            </div>
-            <div class="svc-detail" id="s3">
-              <div class="svc-dr"><span class="svc-dk">Bot</span><span class="svc-dv">@nerum_bot</span></div>
-              <div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 8:48 AM</span></div>
-              <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/telegram/send</span></div>
-            </div>
-            <div class="svc-item" onclick="toggleSvc('s4')">
-              <div class="svc-icon" style="background:rgba(52,168,83,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="#34A853"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#fff" stroke-width="1.2"/></svg></div>
-              <div><div class="svc-name">Google Sheets</div><div class="svc-desc">Append rows</div></div>
-              <div class="svc-status"><span class="svc-dot"></span>Active</div>
-            </div>
-            <div class="svc-detail" id="s4">
-              <div class="svc-dr"><span class="svc-dk">Rows appended</span><span class="svc-dv">8 rows</span></div>
-              <div class="svc-dr"><span class="svc-dk">Last updated</span><span class="svc-dv">Today 8:55 AM</span></div>
-              <div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/sheets/append</span></div>
-            </div>
+            <div class="panel-header"><span class="panel-title">Active services</span><span class="panel-pill">Click to expand</span></div>
+            <div class="svc-item" onclick="toggleSvc('s1')"><div class="svc-icon" style="background:rgba(234,67,53,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8H2z" fill="#EA4335"/><path d="M2 4l6 5 6-5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="svc-name">Gmail</div><div class="svc-desc">Send email</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
+            <div class="svc-detail" id="s1"><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:12 AM</span></div><div class="svc-dr"><span class="svc-dk">Total sent</span><span class="svc-dv">12 emails</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/gmail/send</span></div></div>
+            <div class="svc-item" onclick="toggleSvc('s2')"><div class="svc-icon" style="background:rgba(37,211,102,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#25D366"/><path d="M5 8.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="svc-name">WhatsApp</div><div class="svc-desc">Twilio sandbox</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
+            <div class="svc-detail" id="s2"><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:33 AM</span></div><div class="svc-dr"><span class="svc-dk">From</span><span class="svc-dv">+14155238886</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/whatsapp/send</span></div></div>
+            <div class="svc-item" onclick="toggleSvc('s3')"><div class="svc-icon" style="background:rgba(42,171,238,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#2AABEE"/><path d="M3 8l9-3.5-3.5 9-2-3-3.5-2.5z" fill="#fff"/></svg></div><div><div class="svc-name">Telegram</div><div class="svc-desc">Nerum bot</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
+            <div class="svc-detail" id="s3"><div class="svc-dr"><span class="svc-dk">Bot</span><span class="svc-dv">@nerum_bot</span></div><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 8:48 AM</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/telegram/send</span></div></div>
+            <div class="svc-item" onclick="toggleSvc('s4')"><div class="svc-icon" style="background:rgba(52,168,83,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="#34A853"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="svc-name">Google Sheets</div><div class="svc-desc">Append rows</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
+            <div class="svc-detail" id="s4"><div class="svc-dr"><span class="svc-dk">Rows appended</span><span class="svc-dv">8 rows</span></div><div class="svc-dr"><span class="svc-dk">Last updated</span><span class="svc-dv">Today 8:55 AM</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/sheets/append</span></div></div>
           </div>
         </div>
       </div>
 
-      <!-- BILLING CONTENT -->
-      <div class="billing-content" id="billing-content">
+      <!-- BILLING — hidden by default -->
+      <div class="billing-content" id="billing-content" style="display:none">
         <div class="billing-title">Choose your plan</div>
         <div class="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
         <div class="plans-grid">
-          <div class="plan-card">
-            <div class="plan-name" style="opacity:0.5">FREE</div>
-            <div class="plan-price">₹0<span>/mo</span></div>
-            <div class="plan-desc">Perfect to get started</div>
-            <div class="plan-features">
-              <div>✓ 3 Workflows</div>
-              <div>✓ 10,000 AI tokens</div>
-              <div>✓ All integrations</div>
-              <div style="opacity:0.35">✗ Priority support</div>
-            </div>
-            <button class="plan-btn plan-btn-free">Current Plan</button>
-          </div>
-          <div class="plan-card popular">
-            <div class="plan-popular-badge">MOST POPULAR</div>
-            <div class="plan-name" style="color:#818cf8">STARTER</div>
-            <div class="plan-price">₹799<span>/mo</span></div>
-            <div class="plan-desc">For growing businesses</div>
-            <div class="plan-features">
-              <div>✓ 10 Workflows</div>
-              <div>✓ 1,00,000 AI tokens</div>
-              <div>✓ All integrations</div>
-              <div>✓ Tamil + English AI</div>
-              <div>✓ Email support</div>
-            </div>
-            <button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button>
-          </div>
-          <div class="plan-card">
-            <div class="plan-name" style="color:#34d399">PRO</div>
-            <div class="plan-price">₹1,399<span>/mo</span></div>
-            <div class="plan-desc">For power users</div>
-            <div class="plan-features">
-              <div>✓ 50 Workflows</div>
-              <div>✓ 5,00,000 AI tokens</div>
-              <div>✓ All integrations</div>
-              <div>✓ Priority support</div>
-              <div>✓ Advanced analytics</div>
-            </div>
-            <button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button>
-          </div>
-          <div class="plan-card">
-            <div class="plan-name" style="color:#fbbf24">BUSINESS</div>
-            <div class="plan-price">₹3,499<span>/mo</span></div>
-            <div class="plan-desc">For teams & agencies</div>
-            <div class="plan-features">
-              <div>✓ Unlimited Workflows</div>
-              <div>✓ Unlimited AI tokens</div>
-              <div>✓ All integrations</div>
-              <div>✓ Dedicated support</div>
-              <div>✓ Custom integrations</div>
-            </div>
-            <button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button>
-          </div>
+          <div class="plan-card"><div class="plan-name" style="opacity:0.5">FREE</div><div class="plan-price">₹0<span>/mo</span></div><div class="plan-desc">Perfect to get started</div><div class="plan-features"><div>✓ 3 Workflows</div><div>✓ 10,000 AI tokens</div><div>✓ All integrations</div><div style="opacity:0.35">✗ Priority support</div></div><button class="plan-btn plan-btn-free">Current Plan</button></div>
+          <div class="plan-card popular"><div class="plan-popular-badge">MOST POPULAR</div><div class="plan-name" style="color:#818cf8">STARTER</div><div class="plan-price">₹799<span>/mo</span></div><div class="plan-desc">For growing businesses</div><div class="plan-features"><div>✓ 10 Workflows</div><div>✓ 1,00,000 AI tokens</div><div>✓ All integrations</div><div>✓ Tamil + English AI</div><div>✓ Email support</div></div><button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button></div>
+          <div class="plan-card"><div class="plan-name" style="color:#34d399">PRO</div><div class="plan-price">₹1,399<span>/mo</span></div><div class="plan-desc">For power users</div><div class="plan-features"><div>✓ 50 Workflows</div><div>✓ 5,00,000 AI tokens</div><div>✓ All integrations</div><div>✓ Priority support</div><div>✓ Advanced analytics</div></div><button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button></div>
+          <div class="plan-card"><div class="plan-name" style="color:#fbbf24">BUSINESS</div><div class="plan-price">₹3,499<span>/mo</span></div><div class="plan-desc">For teams & agencies</div><div class="plan-features"><div>✓ Unlimited Workflows</div><div>✓ Unlimited AI tokens</div><div>✓ All integrations</div><div>✓ Dedicated support</div><div>✓ Custom integrations</div></div><button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button></div>
         </div>
       </div>
 
-<!-- WORKFLOWS CONTENT -->
-<div class="billing-content" id="workflows-content" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-    <div class="billing-title">My Workflows</div>
-    <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
-  </div>
-  <div class="billing-sub">All your automation workflows in one place</div>
-  <div id="workflow-list-container"></div>
-</div>
-
-    <!-- SETTINGS CONTENT -->
-<div class="settings-content" id="settings-content">
-  
-  <!-- PROFILE HEADER -->
-  <div class="profile-header">
-    <div class="profile-avatar-big" id="settings-avatar-big">SR</div>
-    <div class="profile-info">
-      <div class="profile-name-row">
-        <span class="profile-name-display" id="profile-name-display">Srihari</span>
-        <button class="profile-edit-btn" onclick="toggleProfileEdit()">Edit Profile</button>
+      <!-- WORKFLOWS — hidden by default -->
+      <div class="billing-content" id="workflows-content" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+          <div class="billing-title">My Workflows</div>
+          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
+        </div>
+        <div class="billing-sub">All your automation workflows in one place</div>
+        <div id="workflow-list-container"></div>
       </div>
-      <div class="profile-email-display" id="profile-email-display">srihari@gmail.com</div>
-      <div class="profile-plan-badge" id="profile-plan-badge">Free Plan</div>
-    </div>
-    <div class="profile-token-box">
-      <div class="ptb-item">
-        <div class="ptb-val" id="ptb-tokens">1,240</div>
-        <div class="ptb-label">Tokens used</div>
+
+      <!-- SETTINGS — hidden by default -->
+      <div class="settings-content" id="settings-content" style="display:none">
+        <div class="profile-header">
+          <div class="profile-avatar-big" id="settings-avatar-big">SR</div>
+          <div class="profile-info">
+            <div class="profile-name-row"><span class="profile-name-display" id="profile-name-display">Srihari</span><button class="profile-edit-btn" onclick="toggleProfileEdit()">Edit Profile</button></div>
+            <div class="profile-email-display" id="profile-email-display">srihari@gmail.com</div>
+            <div class="profile-plan-badge" id="profile-plan-badge">Free Plan</div>
+          </div>
+          <div class="profile-token-box">
+            <div class="ptb-item"><div class="ptb-val" id="ptb-tokens">1,240</div><div class="ptb-label">Tokens used</div></div>
+            <div class="ptb-divider"></div>
+            <div class="ptb-item"><div class="ptb-val">10,000</div><div class="ptb-label">Token limit</div></div>
+            <div class="ptb-divider"></div>
+            <div class="ptb-item"><div class="ptb-val" id="ptb-wf">0</div><div class="ptb-label">Workflows</div></div>
+          </div>
+        </div>
+        <div class="token-progress-wrap">
+          <div class="token-progress-header"><span class="token-progress-label">Token usage this month</span><span class="token-progress-pct" id="token-pct">12.4%</span></div>
+          <div class="token-progress-bar"><div class="token-progress-fill" id="token-fill" style="width:12.4%"></div></div>
+          <div class="token-progress-footer"><span id="token-used-label">1,240 used</span><span id="token-limit-label">10,000 limit</span></div>
+        </div>
+        <div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
+          <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><div style="font-size:15px;font-weight:700" id="popup-title">Edit Profile</div><button onclick="closeProfilePopup()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;padding:4px 8px">✕</button></div>
+            <div class="settings-field" style="margin-bottom:14px"><label>FULL NAME</label><input class="settings-input" id="settings-name" placeholder="Your name"/></div>
+            <div class="settings-field" style="margin-bottom:14px"><label>EMAIL</label><input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/></div>
+            <div class="settings-field" style="margin-bottom:14px"><label>NEW PASSWORD</label><input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/></div>
+            <div class="settings-field" style="margin-bottom:20px"><label>CONFIRM PASSWORD</label><input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/></div>
+            <div style="display:flex;gap:10px"><button class="settings-save-btn" onclick="saveSettings()" style="flex:1">Save Changes</button><button class="settings-cancel-btn" onclick="closeProfilePopup()">Cancel</button></div>
+            <div class="settings-success" id="settings-success">✓ Saved successfully!</div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Preferences</div>
+          <div class="settings-row">
+            <div class="settings-field"><label>THEME</label><select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)"><option value="dark">Dark — Aurora</option><option value="light">Light — Arctic Ice</option></select></div>
+            <div class="settings-field"><label>LANGUAGE</label><select class="settings-select" id="settings-lang" onchange="applyLang(this.value)"><option value="english">English 🇬🇧</option><option value="tamil">Tamil — தமிழ் 🇮🇳</option></select></div>
+          </div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Notifications</div>
+          <div class="toggle-row"><div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div><label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div><label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label></div>
+          <div class="toggle-row"><div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div><label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label></div>
+        </div>
+        <div class="settings-section">
+          <div class="settings-section-title">Connected integrations</div>
+          <div class="integration-item"><div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
+          <div class="integration-item"><div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
+          <div class="integration-item"><div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div><div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
+          <div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div>
+        </div>
+        <div class="danger-section">
+          <div class="danger-title">⚠️ Danger Zone</div>
+          <div class="danger-row"><div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div><button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button></div>
+          <div class="danger-row"><div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div><button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button></div>
+        </div>
       </div>
-      <div class="ptb-divider"></div>
-      <div class="ptb-item">
-        <div class="ptb-val">10,000</div>
-        <div class="ptb-label">Token limit</div>
+
+      <!-- HISTORY — hidden by default -->
+      <div class="history-content" id="history-content" style="display:none">
+        <div style="font-size:18px;font-weight:700;margin-bottom:4px">Service History</div>
+        <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
+        <div id="history-list"></div>
       </div>
-      <div class="ptb-divider"></div>
-      <div class="ptb-item">
-        <div class="ptb-val" id="ptb-wf">0</div>
-        <div class="ptb-label">Workflows</div>
-      </div>
-    </div>
-  </div>
-
-  <!-- TOKEN PROGRESS BAR -->
-  <div class="token-progress-wrap">
-    <div class="token-progress-header">
-      <span class="token-progress-label">Token usage this month</span>
-      <span class="token-progress-pct" id="token-pct">12.4%</span>
-    </div>
-    <div class="token-progress-bar">
-      <div class="token-progress-fill" id="token-fill" style="width:12.4%"></div>
-    </div>
-    <div class="token-progress-footer">
-      <span id="token-used-label">1,240 used</span>
-      <span id="token-limit-label">10,000 limit</span>
-    </div>
-  </div>
-
- <!-- EDIT PROFILE POPUP -->
-<div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
-  <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-size:15px;font-weight:700" id="popup-title">Edit Profile</div>
-      <button onclick="closeProfilePopup()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;padding:4px 8px">✕</button>
-    </div>
-    <div class="settings-field" style="margin-bottom:14px">
-      <label>FULL NAME</label>
-      <input class="settings-input" id="settings-name" placeholder="Your name"/>
-    </div>
-    <div class="settings-field" style="margin-bottom:14px">
-      <label>EMAIL</label>
-      <input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/>
-    </div>
-    <div class="settings-field" style="margin-bottom:14px">
-      <label>NEW PASSWORD</label>
-      <input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/>
-    </div>
-    <div class="settings-field" style="margin-bottom:20px">
-      <label>CONFIRM PASSWORD</label>
-      <input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button class="settings-save-btn" onclick="saveSettings()" style="flex:1">Save Changes</button>
-      <button class="settings-cancel-btn" onclick="closeProfilePopup()">Cancel</button>
-    </div>
-    <div class="settings-success" id="settings-success">✓ Saved successfully!</div>
-  </div>
-</div>
-
-  <!-- PREFERENCES -->
-  <div class="settings-section">
-    <div class="settings-section-title">Preferences</div>
-    <div class="settings-row">
-      <div class="settings-field">
-        <label>THEME</label>
-        <select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)">
-          <option value="dark">Dark — Aurora</option>
-          <option value="light">Light — Arctic Ice</option>
-        </select>
-      </div>
-      <div class="settings-field">
-        <label>LANGUAGE</label>
-        <select class="settings-select" id="settings-lang" onchange="applyLang(this.value)">
-          <option value="english">English 🇬🇧</option>
-          <option value="tamil">Tamil — தமிழ் 🇮🇳</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- NOTIFICATIONS -->
-  <div class="settings-section">
-    <div class="settings-section-title">Notifications</div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div>
-      <label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label>
-    </div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div>
-      <label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label>
-    </div>
-    <div class="toggle-row">
-      <div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div>
-      <label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label>
-    </div>
-  </div>
-
-  <!-- INTEGRATIONS -->
-  <div class="settings-section">
-    <div class="settings-section-title">Connected integrations</div>
-    <div class="integration-item">
-      <div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div>
-      <div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div>
-      <span class="integration-badge badge-connected">Active</span>
-    </div>
-    <div class="integration-item">
-      <div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div>
-      <div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div>
-      <span class="integration-badge badge-connected">Active</span>
-    </div>
-    <div class="integration-item">
-      <div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div>
-      <div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div>
-      <span class="integration-badge badge-connected">Active</span>
-    </div>
-    <div class="integration-item">
-      <div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div>
-      <div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div>
-      <span class="integration-badge badge-connected">Active</span>
-    </div>
-  </div>
-
-  <!-- DANGER ZONE -->
-  <div class="danger-section">
-    <div class="danger-title">⚠️ Danger Zone</div>
-    <div class="danger-row">
-      <div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div>
-      <button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button>
-    </div>
-    <div class="danger-row">
-      <div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div>
-      <button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button>
-    </div>
-  </div>
-
-</div>
-</div>
-
-<!-- HISTORY CONTENT -->
-<div class="history-content" id="history-content">
-  <div style="font-size:18px;font-weight:700;margin-bottom:4px" id="history-title">Service History</div>
-  <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
-  <div id="history-list"></div>
-</div>
 
     </div>
   </div>
@@ -764,7 +447,7 @@
 <div id="wf-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div id="wf-modal" style="width:100%;max-width:440px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
     <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-size:16px;font-weight:700" id="wf-modal-title">New Workflow</div>
+      <div style="font-size:16px;font-weight:700">New Workflow</div>
       <button onclick="closeWfModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
     </div>
     <div style="margin-bottom:14px">
@@ -782,5 +465,6 @@
     <div id="wf-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
   </div>
 </div>
+
 </body>
 </html>
