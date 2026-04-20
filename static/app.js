@@ -198,21 +198,207 @@ function showDashboard(name) {
 async function loadWorkflows() {
   try {
     const token = localStorage.getItem('nerum_token');
-    const res = await fetch('/workflow/all', { headers: { 'Authorization': `Bearer ${token}` } });
+    const res = await fetch('/workflow/list', { 
+      headers: { 'Authorization': `Bearer ${token}` } 
+    });
     const data = await res.json();
-    const count = data.workflows ? data.workflows.length : 0;
+    const workflows = data.workflows || [];
+    const count = workflows.length;
+    const activeCount = workflows.filter(w => w.is_active).length;
+
+    // Update counts
     document.getElementById('wf-num').textContent = count;
     document.getElementById('wf-badge').textContent = count;
+
+    // Update trend text
+    const trendEl = document.getElementById('wf-trend') || document.querySelector('.wf-trend');
+    if (trendEl) trendEl.textContent = `↑ ${activeCount} running automations`;
+
+    // Render workflow list if on Workflows page
+    renderWorkflowList(workflows);
+
   } catch (e) {}
 }
 
-async function createWorkflow() {
-  const name = prompt('Workflow name:');
-  if (!name) return;
-  const token = localStorage.getItem('nerum_token');
-  await fetch(`/workflow/create/${encodeURIComponent(name)}`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
-  loadWorkflows();
+function renderWorkflowList(workflows) {
+  const container = document.getElementById('workflow-list-container');
+  if (!container) return;
+
+  const isDark = document.body.classList.contains('dark');
+
+  if (workflows.length === 0) {
+    container.innerHTML = `
+      <div style="text-align:center;padding:60px 20px;opacity:0.4">
+        <div style="font-size:32px;margin-bottom:12px">⚡</div>
+        <div style="font-size:14px;font-weight:600">No workflows yet</div>
+        <div style="font-size:12px;margin-top:6px">Click "+ New Workflow" to create your first one</div>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = workflows.map(w => `
+    <div style="
+      border-radius:14px;
+      padding:16px 18px;
+      margin-bottom:10px;
+      display:flex;
+      align-items:center;
+      gap:14px;
+      border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(109,40,217,0.15)'};
+      background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)'}
+    ">
+      <!-- Status dot -->
+      <div style="
+        width:10px;height:10px;border-radius:50%;flex-shrink:0;
+        background:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.2)'}
+      "></div>
+
+      <!-- Info -->
+      <div style="flex:1;min-width:0">
+        <div style="font-size:13px;font-weight:600;color:${isDark ? '#fff' : '#1a0533'};margin-bottom:3px">${w.name}</div>
+        <div style="font-size:10px;color:${isDark ? 'rgba(255,255,255,0.35)' : '#6d28d9'}">
+          ${w.description || 'No description'} &nbsp;·&nbsp; ${w.runs} runs
+          ${w.last_run ? `&nbsp;·&nbsp; Last run: ${new Date(w.last_run).toLocaleDateString()}` : ''}
+        </div>
+      </div>
+
+      <!-- Action buttons -->
+      <div style="display:flex;gap:8px;flex-shrink:0">
+        <button onclick="toggleWorkflow(${w.id}, this)" style="
+          padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;font-family:inherit;
+          background:${w.is_active ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)'};
+          color:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.4)'};
+          border-color:${w.is_active ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)'}
+        ">${w.is_active ? '● Active' : '○ Paused'}</button>
+
+        <button onclick="deleteWorkflow(${w.id}, this)" style="
+          padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;
+          background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit
+        ">Delete</button>
+      </div>
+    </div>
+  `).join('');
 }
+
+async function toggleWorkflow(id, btn) {
+  try {
+    const token = localStorage.getItem('nerum_token');
+    const res = await fetch(`/workflow/${id}/toggle`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    loadWorkflows();
+  } catch(e) {}
+}
+
+async function deleteWorkflow(id, btn) {
+  if (!confirm('Delete this workflow?')) return;
+  try {
+    const token = localStorage.getItem('nerum_token');
+    await fetch(`/workflow/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    loadWorkflows();
+  } catch(e) {}
+}
+
+function createWorkflow() {
+  const modal = document.getElementById('wf-modal-overlay');
+  const box = document.getElementById('wf-modal');
+  const isDark = document.body.classList.contains('dark');
+  
+  // Style modal based on theme
+  box.style.background = isDark ? '#0d0020' : 'rgba(255,255,255,0.95)';
+  box.style.border = isDark ? '1px solid rgba(232,121,249,0.2)' : '1px solid rgba(109,40,217,0.2)';
+  box.style.color = isDark ? '#fff' : '#1a0533';
+
+  // Style inputs
+  ['wf-name-input','wf-desc-input'].forEach(id => {
+    const el = document.getElementById(id);
+    el.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)';
+    el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(109,40,217,0.2)';
+    el.style.color = isDark ? '#fff' : '#1a0533';
+  });
+
+  // Style cancel button
+  const cancelBtn = box.querySelectorAll('button')[1];
+  cancelBtn.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(109,40,217,0.08)';
+  cancelBtn.style.border = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(109,40,217,0.2)';
+  cancelBtn.style.color = isDark ? 'rgba(255,255,255,0.6)' : '#6d28d9';
+
+  // Clear fields
+  document.getElementById('wf-name-input').value = '';
+  document.getElementById('wf-desc-input').value = '';
+  document.getElementById('wf-modal-error').style.display = 'none';
+
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('wf-name-input').focus(), 100);
+}
+
+function closeWfModal() {
+  document.getElementById('wf-modal-overlay').style.display = 'none';
+}
+
+async function saveWfModal() {
+  const name = document.getElementById('wf-name-input').value.trim();
+  const desc = document.getElementById('wf-desc-input').value.trim();
+  const errEl = document.getElementById('wf-modal-error');
+  const btn = document.getElementById('wf-save-btn');
+  const isDark = document.body.classList.contains('dark');
+
+  if (!name) {
+    errEl.textContent = 'Please enter a workflow name';
+    errEl.style.display = 'block';
+    errEl.style.background = isDark ? 'rgba(255,80,80,0.12)' : '#fef2f2';
+    errEl.style.color = isDark ? '#ff8a7a' : '#dc2626';
+    errEl.style.border = isDark ? '1px solid rgba(255,80,80,0.2)' : '1px solid #fecaca';
+    return;
+  }
+
+  btn.textContent = 'Creating...';
+  btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('nerum_token');
+    const res = await fetch('/workflow/create', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ name, description: desc })
+    });
+
+    const data = await res.json();
+
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'Failed to create workflow';
+      errEl.style.display = 'block';
+      errEl.style.background = isDark ? 'rgba(255,80,80,0.12)' : '#fef2f2';
+      errEl.style.color = isDark ? '#ff8a7a' : '#dc2626';
+      errEl.style.border = isDark ? '1px solid rgba(255,80,80,0.2)' : '1px solid #fecaca';
+      btn.textContent = 'Create Workflow';
+      btn.disabled = false;
+      return;
+    }
+
+    closeWfModal();
+    loadWorkflows();
+
+  } catch (e) {
+    errEl.textContent = 'Something went wrong. Try again.';
+    errEl.style.display = 'block';
+    btn.textContent = 'Create Workflow';
+    btn.disabled = false;
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('wf-modal-overlay').addEventListener('click', function(e) {
+  if (e.target === this) closeWfModal();
+});
 
 // SIDEBAR NAVIGATION
 function setActive(el) {

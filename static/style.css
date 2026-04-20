@@ -386,6 +386,37 @@ body.dark .sb-logout:hover{background:rgba(255,255,255,0.05);color:#fff}
 body.light .sb-logout{border:1px solid rgba(109,40,217,0.25);color:#4c1d95}
 body.light .sb-logout:hover{background:rgba(255,255,255,0.5);color:#1a0533}
 
+/* Workflow Modal Input Placeholders */
+body.dark #wf-name-input::placeholder,
+body.dark #wf-desc-input::placeholder {
+  color: rgba(255,255,255,0.25) !important;
+}
+
+body.light #wf-name-input::placeholder,
+body.light #wf-desc-input::placeholder {
+  color: rgba(109,40,217,0.4) !important;
+}
+
+/* Modal title and label text */
+body.dark #wf-modal {
+  color: #fff !important;
+}
+
+body.light #wf-modal {
+  color: #1a0533 !important;
+}
+
+/* Input focus */
+body.dark #wf-name-input:focus,
+body.dark #wf-desc-input:focus {
+  border-color: rgba(232,121,249,0.5) !important;
+}
+
+body.light #wf-name-input:focus,
+body.light #wf-desc-input:focus {
+  border-color: #7c3aed !important;
+}
+
 /* MAIN */
 .main{flex:1;display:flex;flex-direction:column;overflow:hidden}
 .topbar{padding:13px 20px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;border-bottom:1px solid}
