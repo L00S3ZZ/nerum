@@ -12,12 +12,46 @@ const msgInterval = setInterval(() => {
 }, 3000);
 
 window.addEventListener('load', () => {
+  // Check Google OAuth token FIRST before hiding loading screen
+  const urlParams = new URLSearchParams(window.location.search);
+  const googleToken = urlParams.get('token');
+  const googleName = urlParams.get('name');
+
+  if (googleToken && googleName) {
+    localStorage.setItem('nerum_token', googleToken);
+    localStorage.setItem('nerum_name', googleName);
+    window.history.replaceState({}, document.title, '/');
+    currentUser = decodeURIComponent(googleName);
+    localStorage.setItem('nerum_name', currentUser);
+  }
+
   setTimeout(() => {
     const ls = document.getElementById('loading-screen');
     if (ls) {
       ls.style.opacity = '0';
       ls.style.transition = 'opacity 0.5s ease';
-      setTimeout(() => { ls.style.display = 'none'; clearInterval(msgInterval); }, 500);
+      setTimeout(() => {
+        ls.style.display = 'none';
+        clearInterval(msgInterval);
+
+        // Now handle routing after loading screen is gone
+        if (googleToken && googleName) {
+          document.getElementById('landing-page').style.display = 'none';
+          afterLogin(currentUser);
+        } else {
+          const savedToken = localStorage.getItem('nerum_token');
+          const savedName = localStorage.getItem('nerum_name');
+          if (savedToken && savedName) {
+            document.getElementById('landing-page').style.display = 'none';
+            const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
+            const savedLang = localStorage.getItem('nerum_lang') || 'english';
+            applyTheme(savedTheme);
+            applyLang(savedLang);
+            currentUser = savedName;
+            showDashboard(savedName);
+          }
+        }
+      }, 500);
     }
   }, 1500);
 });
@@ -174,7 +208,7 @@ function doLogout() {
   localStorage.removeItem('nerum_token');
   localStorage.removeItem('nerum_name');
   document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('auth-page').style.display = 'flex';
+  document.getElementById('landing-page').style.display = 'block';
 }
 
 // DASHBOARD
@@ -195,37 +229,32 @@ function showDashboard(name) {
   loadToggles();
   loadWorkflows();
 }
+
+// WORKFLOWS
 async function loadWorkflows() {
   try {
     const token = localStorage.getItem('nerum_token');
-    const res = await fetch('/workflow/list', { 
-      headers: { 'Authorization': `Bearer ${token}` } 
+    const res = await fetch('/workflow/list', {
+      headers: { 'Authorization': `Bearer ${token}` }
     });
     const data = await res.json();
     const workflows = data.workflows || [];
     const count = workflows.length;
     const activeCount = workflows.filter(w => w.is_active).length;
-
-    // Update counts
     document.getElementById('wf-num').textContent = count;
     document.getElementById('wf-badge').textContent = count;
-
-    // Update trend text
-    const trendEl = document.getElementById('wf-trend') || document.querySelector('.wf-trend');
+    const trendEl = document.querySelector('.wf-trend');
     if (trendEl) trendEl.textContent = `↑ ${activeCount} running automations`;
-
-    // Render workflow list if on Workflows page
     renderWorkflowList(workflows);
-
+    const ptbWf = document.getElementById('ptb-wf');
+    if (ptbWf) ptbWf.textContent = count;
   } catch (e) {}
 }
 
 function renderWorkflowList(workflows) {
   const container = document.getElementById('workflow-list-container');
   if (!container) return;
-
   const isDark = document.body.classList.contains('dark');
-
   if (workflows.length === 0) {
     container.innerHTML = `
       <div style="text-align:center;padding:60px 20px;opacity:0.4">
@@ -235,71 +264,45 @@ function renderWorkflowList(workflows) {
       </div>`;
     return;
   }
-
   container.innerHTML = workflows.map(w => `
-    <div style="
-      border-radius:14px;
-      padding:16px 18px;
-      margin-bottom:10px;
-      display:flex;
-      align-items:center;
-      gap:14px;
+    <div style="border-radius:14px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;
       border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(109,40,217,0.15)'};
-      background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)'}
-    ">
-      <!-- Status dot -->
-      <div style="
-        width:10px;height:10px;border-radius:50%;flex-shrink:0;
-        background:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.2)'}
-      "></div>
-
-      <!-- Info -->
+      background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)'}">
+      <div style="width:10px;height:10px;border-radius:50%;flex-shrink:0;background:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.2)'}"></div>
       <div style="flex:1;min-width:0">
         <div style="font-size:13px;font-weight:600;color:${isDark ? '#fff' : '#1a0533'};margin-bottom:3px">${w.name}</div>
         <div style="font-size:10px;color:${isDark ? 'rgba(255,255,255,0.35)' : '#6d28d9'}">
           ${w.description || 'No description'} &nbsp;·&nbsp; ${w.runs} runs
-          ${w.last_run ? `&nbsp;·&nbsp; Last run: ${new Date(w.last_run).toLocaleDateString()}` : ''}
+          ${w.last_run ? `&nbsp;·&nbsp; Last: ${new Date(w.last_run).toLocaleDateString()}` : ''}
         </div>
       </div>
-
-      <!-- Action buttons -->
       <div style="display:flex;gap:8px;flex-shrink:0">
-        <button onclick="toggleWorkflow(${w.id}, this)" style="
-          padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;font-family:inherit;
+        <button onclick="toggleWorkflow(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;font-family:inherit;
           background:${w.is_active ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)'};
           color:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.4)'};
-          border-color:${w.is_active ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)'}
-        ">${w.is_active ? '● Active' : '○ Paused'}</button>
-
-        <button onclick="deleteWorkflow(${w.id}, this)" style="
-          padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;
-          background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit
-        ">Delete</button>
+          border-color:${w.is_active ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)'}">
+          ${w.is_active ? '● Active' : '○ Paused'}
+        </button>
+        <button onclick="deleteWorkflow(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;
+          background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit">Delete</button>
       </div>
     </div>
   `).join('');
 }
 
-async function toggleWorkflow(id, btn) {
+async function toggleWorkflow(id) {
   try {
     const token = localStorage.getItem('nerum_token');
-    const res = await fetch(`/workflow/${id}/toggle`, {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
-    const data = await res.json();
+    await fetch(`/workflow/${id}/toggle`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
     loadWorkflows();
   } catch(e) {}
 }
 
-async function deleteWorkflow(id, btn) {
+async function deleteWorkflow(id) {
   if (!confirm('Delete this workflow?')) return;
   try {
     const token = localStorage.getItem('nerum_token');
-    await fetch(`/workflow/${id}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    await fetch(`/workflow/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
     loadWorkflows();
   } catch(e) {}
 }
@@ -308,31 +311,22 @@ function createWorkflow() {
   const modal = document.getElementById('wf-modal-overlay');
   const box = document.getElementById('wf-modal');
   const isDark = document.body.classList.contains('dark');
-  
-  // Style modal based on theme
   box.style.background = isDark ? '#0d0020' : 'rgba(255,255,255,0.95)';
   box.style.border = isDark ? '1px solid rgba(232,121,249,0.2)' : '1px solid rgba(109,40,217,0.2)';
   box.style.color = isDark ? '#fff' : '#1a0533';
-
-  // Style inputs
   ['wf-name-input','wf-desc-input'].forEach(id => {
     const el = document.getElementById(id);
     el.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)';
     el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(109,40,217,0.2)';
     el.style.color = isDark ? '#fff' : '#1a0533';
   });
-
-  // Style cancel button
   const cancelBtn = box.querySelectorAll('button')[1];
   cancelBtn.style.background = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(109,40,217,0.08)';
   cancelBtn.style.border = isDark ? '1px solid rgba(255,255,255,0.1)' : '1px solid rgba(109,40,217,0.2)';
   cancelBtn.style.color = isDark ? 'rgba(255,255,255,0.6)' : '#6d28d9';
-
-  // Clear fields
   document.getElementById('wf-name-input').value = '';
   document.getElementById('wf-desc-input').value = '';
   document.getElementById('wf-modal-error').style.display = 'none';
-
   modal.style.display = 'flex';
   setTimeout(() => document.getElementById('wf-name-input').focus(), 100);
 }
@@ -347,7 +341,6 @@ async function saveWfModal() {
   const errEl = document.getElementById('wf-modal-error');
   const btn = document.getElementById('wf-save-btn');
   const isDark = document.body.classList.contains('dark');
-
   if (!name) {
     errEl.textContent = 'Please enter a workflow name';
     errEl.style.display = 'block';
@@ -356,23 +349,16 @@ async function saveWfModal() {
     errEl.style.border = isDark ? '1px solid rgba(255,80,80,0.2)' : '1px solid #fecaca';
     return;
   }
-
   btn.textContent = 'Creating...';
   btn.disabled = true;
-
   try {
     const token = localStorage.getItem('nerum_token');
     const res = await fetch('/workflow/create', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, description: desc })
     });
-
     const data = await res.json();
-
     if (!res.ok) {
       errEl.textContent = data.detail || 'Failed to create workflow';
       errEl.style.display = 'block';
@@ -383,10 +369,13 @@ async function saveWfModal() {
       btn.disabled = false;
       return;
     }
-
     closeWfModal();
     loadWorkflows();
-
+    // Switch to workflows page to show the new one
+    document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+    const wfItem = [...document.querySelectorAll('.sb-item')].find(i => i.textContent.trim().startsWith('Workflows'));
+    if (wfItem) wfItem.classList.add('active');
+    showPage('workflows');
   } catch (e) {
     errEl.textContent = 'Something went wrong. Try again.';
     errEl.style.display = 'block';
@@ -395,7 +384,6 @@ async function saveWfModal() {
   }
 }
 
-// Close modal on overlay click
 document.getElementById('wf-modal-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeWfModal();
 });
@@ -405,51 +393,39 @@ function setActive(el) {
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
   const text = el.textContent.trim();
-  if (text === 'Billing') {
-    showPage('billing');
-  } else if (text === 'Settings') {
-    showPage('settings');
-  } else if (text === 'Service History') {
-    showPage('history');
-  } else {
-    showPage('dashboard');
-  }
+  if (text.startsWith('Billing')) showPage('billing');
+  else if (text.startsWith('Settings')) showPage('settings');
+  else if (text.startsWith('Service History')) showPage('history');
+  else if (text.startsWith('Workflows')) showPage('workflows');
+  else showPage('dashboard');
 }
 
 function showPage(page) {
-  document.getElementById('main-content').style.display = 'none';
-  document.getElementById('billing-content').style.display = 'none';
-  document.getElementById('settings-content').style.display = 'none';
-  document.getElementById('history-content').style.display = 'none';
+  const pages = ['main-content','billing-content','settings-content','history-content','workflows-content'];
+  pages.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = 'none';
+  });
+  const titles = { billing:'Billing', settings:'Settings', history:'Service History', workflows:'Workflows', dashboard:'Dashboard' };
+  document.getElementById('tb-title').textContent = titles[page] || 'Dashboard';
   if (page === 'billing') {
-    document.getElementById('billing-content').style.display = 'flex';
-    document.getElementById('billing-content').style.flexDirection = 'column';
-    document.getElementById('tb-title').textContent = 'Billing';
+    const el = document.getElementById('billing-content');
+    el.style.display = 'flex'; el.style.flexDirection = 'column';
   } else if (page === 'settings') {
-    document.getElementById('settings-content').style.display = 'flex';
-    document.getElementById('settings-content').style.flexDirection = 'column';
-    document.getElementById('tb-title').textContent = 'Settings';
+    const el = document.getElementById('settings-content');
+    el.style.display = 'flex'; el.style.flexDirection = 'column';
   } else if (page === 'history') {
-    document.getElementById('history-content').style.display = 'flex';
-    document.getElementById('history-content').style.flexDirection = 'column';
-    document.getElementById('tb-title').textContent = 'Service History';
+    const el = document.getElementById('history-content');
+    el.style.display = 'flex'; el.style.flexDirection = 'column';
     loadHistory();
+  } else if (page === 'workflows') {
+    const el = document.getElementById('workflows-content');
+    if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; }
+    loadWorkflows();
   } else {
-    document.getElementById('main-content').style.display = 'flex';
-    document.getElementById('main-content').style.flexDirection = 'column';
-    document.getElementById('tb-title').textContent = 'Dashboard';
+    const el = document.getElementById('main-content');
+    el.style.display = 'flex'; el.style.flexDirection = 'column';
   }
-}
-
-function showBilling() {
-  document.getElementById('main-content').style.display = 'none';
-  document.getElementById('billing-content').style.display = 'flex';
-  document.getElementById('billing-content').style.flexDirection = 'column';
-}
-
-function hideBilling() {
-  document.getElementById('main-content').style.display = 'flex';
-  document.getElementById('billing-content').style.display = 'none';
 }
 
 // SERVICES
@@ -487,23 +463,12 @@ async function startPayment(plan, amount) {
     const res = await fetch(`/payment/create-order/${plan}?token=${token}`, { method: 'POST' });
     const data = await res.json();
     const options = {
-      key: data.key_id,
-      amount: data.amount,
-      currency: 'INR',
-      name: 'Nerum',
-      description: `${data.plan_name} Plan`,
-      order_id: data.order_id,
+      key: data.key_id, amount: data.amount, currency: 'INR',
+      name: 'Nerum', description: `${data.plan_name} Plan`, order_id: data.order_id,
       handler: async function (response) {
         const verify = await fetch('/payment/verify', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            razorpay_order_id: response.razorpay_order_id,
-            razorpay_payment_id: response.razorpay_payment_id,
-            razorpay_signature: response.razorpay_signature,
-            plan: plan,
-            token: token
-          })
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...response, plan, token })
         });
         const result = await verify.json();
         if (result.success) {
@@ -516,33 +481,7 @@ async function startPayment(plan, amount) {
     };
     const rzp = new Razorpay(options);
     rzp.open();
-  } catch (e) {
-    alert('Payment failed. Try again!');
-  }
-}
-
-// INIT — check Google callback or saved session
-const urlParams = new URLSearchParams(window.location.search);
-const googleToken = urlParams.get('token');
-const googleName = urlParams.get('name');
-if (googleToken && googleName) {
-  localStorage.setItem('nerum_token', googleToken);
-  localStorage.setItem('nerum_name', googleName);
-  window.history.replaceState({}, document.title, '/');
-  document.getElementById('landing-page').style.display = 'none';
-  afterLogin(googleName);
-} else {
-  const savedToken = localStorage.getItem('nerum_token');
-  const savedName = localStorage.getItem('nerum_name');
-  if (savedToken && savedName) {
-    document.getElementById('landing-page').style.display = 'none';
-    const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
-    const savedLang = localStorage.getItem('nerum_lang') || 'english';
-    applyTheme(savedTheme);
-    applyLang(savedLang);
-    currentUser = savedName;
-    showDashboard(savedName);
-  }
+  } catch (e) { alert('Payment failed. Try again!'); }
 }
 
 // SETTINGS
@@ -557,16 +496,18 @@ function closeProfilePopup() {
   document.getElementById('settings-success').style.display = 'none';
 }
 
-// Close popup when clicking outside
 document.getElementById('profile-popup-overlay').addEventListener('click', function(e) {
   if (e.target === this) closeProfilePopup();
 });
+
 function saveSettings() {
   const name = document.getElementById('settings-name').value.trim();
   const theme = document.getElementById('settings-theme').value;
   const lang = document.getElementById('settings-lang').value;
   const newPass = document.getElementById('settings-newpass').value;
   const confirmPass = document.getElementById('settings-confirmpass').value;
+  if (newPass && newPass !== confirmPass) { alert('Passwords do not match!'); return; }
+  if (newPass && newPass.length < 6) { alert('Min 6 characters!'); return; }
   if (name) {
     currentUser = name;
     localStorage.setItem('nerum_name', name);
@@ -577,21 +518,12 @@ function saveSettings() {
     document.getElementById('sb-initials').textContent = initials;
     document.getElementById('settings-avatar-big').textContent = initials;
   }
-  document.getElementById('settings-success').style.display = 'block';
-setTimeout(() => {
-  document.getElementById('settings-success').style.display = 'none';
-  closeProfilePopup();
-}, 2000);
   applyTheme(theme);
   applyLang(lang);
-  if (newPass) {
-    if (newPass !== confirmPass) { alert('Passwords do not match!'); return; }
-    if (newPass.length < 6) { alert('Min 6 characters!'); return; }
-  }
   document.getElementById('settings-success').style.display = 'block';
   setTimeout(() => {
     document.getElementById('settings-success').style.display = 'none';
-    document.getElementById('edit-profile-form').style.display = 'none';
+    closeProfilePopup();
   }, 2000);
 }
 
@@ -604,21 +536,18 @@ function hideAuthPopup() {
   document.getElementById('auth-popup-overlay').style.display = 'none';
 }
 
-// Close popup when clicking outside
 document.getElementById('auth-popup-overlay').addEventListener('click', function(e) {
   if (e.target === this) hideAuthPopup();
 });
 
 function loadVideo() {
-  alert('Demo video coming soon! 🎬\nRecord a quick screen recording of Nerum and we will embed it here!');
+  alert('Demo video coming soon! 🎬');
 }
 
 // HISTORY
 async function loadHistory() {
-  const token = localStorage.getItem('nerum_token');
   const container = document.getElementById('history-list');
   container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Loading history...</div>';
-  // For now show mock data — real data comes when we build service logs in DB
   setTimeout(() => {
     container.innerHTML = `
       <div class="history-item">
@@ -640,22 +569,17 @@ async function loadHistory() {
         <div class="h-icon" style="background:rgba(52,168,83,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" fill="#34A853"/></svg></div>
         <div class="h-info"><div class="h-action">Row appended to Sheet</div><div class="h-time">Today 8:55 AM</div></div>
         <span class="h-badge h-sh">Sheets</span>
-      </div>
-    `;
+      </div>`;
   }, 500);
 }
 
-// TOGGLE SAVE
-function saveToggle(id, value) {
-  localStorage.setItem(id, value);
-}
+// TOGGLES
+function saveToggle(id, value) { localStorage.setItem(id, value); }
 
 function loadToggles() {
   ['notif-email', 'notif-telegram', 'notif-weekly'].forEach(id => {
     const saved = localStorage.getItem(id);
-    if (saved !== null) {
-      document.getElementById(id).checked = saved === 'true';
-    }
+    if (saved !== null) document.getElementById(id).checked = saved === 'true';
   });
 }
 
@@ -664,11 +588,10 @@ async function deleteAllWorkflows() {
   if (!confirm('Are you sure? This will delete ALL your workflows permanently!')) return;
   const token = localStorage.getItem('nerum_token');
   try {
+    await fetch('/workflow/all/delete', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
     alert('All workflows deleted!');
     loadWorkflows();
-  } catch (e) {
-    alert('Error deleting workflows!');
-  }
+  } catch (e) { alert('Error deleting workflows!'); }
 }
 
 function deleteAccount() {
@@ -676,7 +599,7 @@ function deleteAccount() {
   if (!confirm('Last warning! This cannot be undone!')) return;
   localStorage.clear();
   document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('auth-page').style.display = 'flex';
+  document.getElementById('landing-page').style.display = 'block';
   alert('Account deleted. Sorry to see you go!');
 }
 
@@ -726,543 +649,62 @@ function deleteAccount() {
     }
   };
 
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
+  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
 
   function makePts(cols) {
     pts = Array.from({length: 120}, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.8 + .3, a: Math.random() * .5 + .1,
-      col: cols[Math.floor(Math.random() * cols.length)]
+      x: Math.random()*W, y: Math.random()*H,
+      vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35,
+      r: Math.random()*1.8+.3, a: Math.random()*.5+.1,
+      col: cols[Math.floor(Math.random()*cols.length)]
     }));
   }
 
   function draw() {
     const isDark = document.body.classList.contains('dark');
     const th = isDark ? themes.dark : themes.light;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = th.base;
-    ctx.fillRect(0, 0, W, H);
-
-    // Aurora clouds
-    th.clouds.forEach((c, i) => {
-      const ox = Math.sin(t * .18 + i * 1.3) * 60;
-      const oy = Math.cos(t * .14 + i * 1.1) * 50;
-      const g = ctx.createRadialGradient(c.x*W+ox, c.y*H+oy, 0, c.x*W+ox, c.y*H+oy, c.r);
-      g.addColorStop(0, c.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+    ctx.clearRect(0,0,W,H); ctx.fillStyle=th.base; ctx.fillRect(0,0,W,H);
+    th.clouds.forEach((c,i) => {
+      const ox=Math.sin(t*.18+i*1.3)*60, oy=Math.cos(t*.14+i*1.1)*50;
+      const g=ctx.createRadialGradient(c.x*W+ox,c.y*H+oy,0,c.x*W+ox,c.y*H+oy,c.r);
+      g.addColorStop(0,c.col); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
     });
-
-    // Glowing stars
-    th.stars.forEach((s, i) => {
-      const px = s.x*W + Math.sin(t*.2+i)*40;
-      const py = s.y*H + Math.cos(t*.15+i)*30;
-      const pulse = .8 + Math.sin(t*1.5+i) * .2;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, s.r*pulse);
-      g.addColorStop(0, s.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
+    th.stars.forEach((s,i) => {
+      const px=s.x*W+Math.sin(t*.2+i)*40, py=s.y*H+Math.cos(t*.15+i)*30;
+      const g=ctx.createRadialGradient(px,py,0,px,py,s.r*(.8+Math.sin(t*1.5+i)*.2));
+      g.addColorStop(0,s.col); g.addColorStop(1,'transparent');
+      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
     });
-
-    // Grid
-    for (let x = 0; x < W; x += 65) {
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 65) {
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-
-    // Particles
+    for(let x=0;x<W;x+=65){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.strokeStyle=th.gridCol;ctx.lineWidth=.5;ctx.stroke();}
+    for(let y=0;y<H;y+=65){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.strokeStyle=th.gridCol;ctx.lineWidth=.5;ctx.stroke();}
     pts.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},${p.a})`; ctx.fill();
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
+      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col},${p.a})`; ctx.fill();
     });
-
-    // Particle connections
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
-        const d = Math.sqrt(dx*dx+dy*dy);
-        if (d < 100) {
-          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle = `rgba(${pts[i].col},${.07*(1-d/100)})`;
-          ctx.lineWidth = .4; ctx.stroke();
-        }
-      }
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+      if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(${pts[i].col},${.07*(1-d/100)})`;ctx.lineWidth=.4;ctx.stroke();}
     }
-
-    t += .006;
-    animId = requestAnimationFrame(draw);
+    t+=.006; animId=requestAnimationFrame(draw);
   }
 
   function init() {
     resize();
-    const isDark = document.body.classList.contains('dark');
-    makePts((isDark ? themes.dark : themes.light).ptCols);
-    if (animId) cancelAnimationFrame(animId);
-    draw();
-  }
-
-  window.addEventListener('resize', () => { resize(); });
-
-  // Re-init when theme switches
-  const origToggle = window.toggleTheme;
-  window.toggleTheme = function() {
-    if (origToggle) origToggle();
-    setTimeout(() => {
-      const isDark = document.body.classList.contains('dark');
-      makePts((isDark ? themes.dark : themes.light).ptCols);
-    }, 50);
-  };
-
-  init();
-})();
-// ========== END NEBULA BACKGROUND ==========
-// ========== NEBULA BACKGROUND ==========
-(function() {
-  const canvas = document.getElementById('nebula-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, pts = [], t = 0, animId = null;
-
-  const themes = {
-    dark: {
-      base: '#06000f',
-      clouds: [
-        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},
-        {x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
-        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},
-        {x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
-        {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
-      ],
-      stars: [
-        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},
-        {x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
-        {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
-      ],
-      ptCols: ['232,121,249','129,140,248'],
-      gridCol: 'rgba(232,121,249,0.05)',
-    },
-    light: {
-      base: '#ddc6ff',
-      clouds: [
-        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},
-        {x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
-        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},
-        {x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
-        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},
-        {x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
-      ],
-      stars: [
-        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},
-        {x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
-        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},
-        {x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
-      ],
-      ptCols: ['91,33,182','67,56,202','109,40,217'],
-      gridCol: 'rgba(76,29,149,0.12)',
-    }
-  };
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function makePts(cols) {
-    pts = Array.from({length: 120}, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.8 + .3, a: Math.random() * .5 + .1,
-      col: cols[Math.floor(Math.random() * cols.length)]
-    }));
-  }
-
-  function draw() {
-    const isDark = document.body.classList.contains('dark');
-    const th = isDark ? themes.dark : themes.light;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = th.base;
-    ctx.fillRect(0, 0, W, H);
-
-    th.clouds.forEach((c, i) => {
-      const ox = Math.sin(t * .18 + i * 1.3) * 60;
-      const oy = Math.cos(t * .14 + i * 1.1) * 50;
-      const g = ctx.createRadialGradient(c.x*W+ox, c.y*H+oy, 0, c.x*W+ox, c.y*H+oy, c.r);
-      g.addColorStop(0, c.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    th.stars.forEach((s, i) => {
-      const px = s.x*W + Math.sin(t*.2+i)*40;
-      const py = s.y*H + Math.cos(t*.15+i)*30;
-      const pulse = .8 + Math.sin(t*1.5+i) * .2;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, s.r*pulse);
-      g.addColorStop(0, s.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    for (let x = 0; x < W; x += 65) {
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 65) {
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-
-    pts.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},${p.a})`; ctx.fill();
-    });
-
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
-        const d = Math.sqrt(dx*dx+dy*dy);
-        if (d < 100) {
-          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle = `rgba(${pts[i].col},${.07*(1-d/100)})`;
-          ctx.lineWidth = .4; ctx.stroke();
-        }
-      }
-    }
-
-    t += .006;
-    animId = requestAnimationFrame(draw);
-  }
-
-  function init() {
-    resize();
-    const isDark = document.body.classList.contains('dark');
-    makePts((isDark ? themes.dark : themes.light).ptCols);
-    if (animId) cancelAnimationFrame(animId);
+    makePts((document.body.classList.contains('dark') ? themes.dark : themes.light).ptCols);
+    if(animId) cancelAnimationFrame(animId);
     draw();
   }
 
   window.addEventListener('resize', resize);
-
-  // Hook into theme toggle
   const origToggle = window.toggleTheme;
   window.toggleTheme = function() {
-    if (origToggle) origToggle();
-    setTimeout(() => {
-      const isDark = document.body.classList.contains('dark');
-      makePts((isDark ? themes.dark : themes.light).ptCols);
-    }, 50);
+    if(origToggle) origToggle();
+    setTimeout(() => makePts((document.body.classList.contains('dark') ? themes.dark : themes.light).ptCols), 50);
   };
-
   init();
 })();
-// ========== END NEBULA BACKGROUND ==========
-// ========== NEBULA BACKGROUND ==========
-(function() {
-  const canvas = document.getElementById('nebula-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, pts = [], t = 0, animId = null;
-
-  const themes = {
-    dark: {
-      base: '#06000f',
-      clouds: [
-        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},
-        {x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
-        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},
-        {x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
-        {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
-      ],
-      stars: [
-        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},
-        {x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
-        {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
-      ],
-      ptCols: ['232,121,249','129,140,248'],
-      gridCol: 'rgba(232,121,249,0.05)',
-    },
-    light: {
-      base: '#ddc6ff',
-      clouds: [
-        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},
-        {x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
-        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},
-        {x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
-        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},
-        {x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
-      ],
-      stars: [
-        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},
-        {x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
-        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},
-        {x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
-      ],
-      ptCols: ['91,33,182','67,56,202','109,40,217'],
-      gridCol: 'rgba(76,29,149,0.12)',
-    }
-  };
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function makePts(cols) {
-    pts = Array.from({length: 120}, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.8 + .3, a: Math.random() * .5 + .1,
-      col: cols[Math.floor(Math.random() * cols.length)]
-    }));
-  }
-
-  function draw() {
-    const isDark = document.body.classList.contains('dark');
-    const th = isDark ? themes.dark : themes.light;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = th.base;
-    ctx.fillRect(0, 0, W, H);
-
-    th.clouds.forEach((c, i) => {
-      const ox = Math.sin(t * .18 + i * 1.3) * 60;
-      const oy = Math.cos(t * .14 + i * 1.1) * 50;
-      const g = ctx.createRadialGradient(c.x*W+ox, c.y*H+oy, 0, c.x*W+ox, c.y*H+oy, c.r);
-      g.addColorStop(0, c.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    th.stars.forEach((s, i) => {
-      const px = s.x*W + Math.sin(t*.2+i)*40;
-      const py = s.y*H + Math.cos(t*.15+i)*30;
-      const pulse = .8 + Math.sin(t*1.5+i) * .2;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, s.r*pulse);
-      g.addColorStop(0, s.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    for (let x = 0; x < W; x += 65) {
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 65) {
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-
-    pts.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},${p.a})`; ctx.fill();
-    });
-
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
-        const d = Math.sqrt(dx*dx+dy*dy);
-        if (d < 100) {
-          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle = `rgba(${pts[i].col},${.07*(1-d/100)})`;
-          ctx.lineWidth = .4; ctx.stroke();
-        }
-      }
-    }
-
-    t += .006;
-    animId = requestAnimationFrame(draw);
-  }
-
-  function init() {
-    resize();
-    const isDark = document.body.classList.contains('dark');
-    makePts((isDark ? themes.dark : themes.light).ptCols);
-    if (animId) cancelAnimationFrame(animId);
-    draw();
-  }
-
-  window.addEventListener('resize', resize);
-
-  // Hook into theme toggle
-  const origToggle = window.toggleTheme;
-  window.toggleTheme = function() {
-    if (origToggle) origToggle();
-    setTimeout(() => {
-      const isDark = document.body.classList.contains('dark');
-      makePts((isDark ? themes.dark : themes.light).ptCols);
-    }, 50);
-  };
-
-  init();
-})();
-
-// ========== NEBULA BACKGROUND ==========
-(function() {
-  const canvas = document.getElementById('nebula-canvas');
-  if (!canvas) return;
-  const ctx = canvas.getContext('2d');
-  let W, H, pts = [], t = 0, animId = null;
-
-  const themes = {
-    dark: {
-      base: '#06000f',
-      clouds: [
-        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},
-        {x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
-        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},
-        {x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
-        {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
-      ],
-      stars: [
-        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},
-        {x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
-        {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
-      ],
-      ptCols: ['232,121,249','129,140,248'],
-      gridCol: 'rgba(232,121,249,0.05)',
-    },
-    light: {
-      base: '#ddc6ff',
-      clouds: [
-        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},
-        {x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
-        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},
-        {x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
-        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},
-        {x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
-      ],
-      stars: [
-        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},
-        {x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
-        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},
-        {x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
-      ],
-      ptCols: ['91,33,182','67,56,202','109,40,217'],
-      gridCol: 'rgba(76,29,149,0.12)',
-    }
-  };
-
-  function resize() {
-    W = canvas.width = window.innerWidth;
-    H = canvas.height = window.innerHeight;
-  }
-
-  function makePts(cols) {
-    pts = Array.from({length: 120}, () => ({
-      x: Math.random() * W, y: Math.random() * H,
-      vx: (Math.random() - .5) * .35, vy: (Math.random() - .5) * .35,
-      r: Math.random() * 1.8 + .3, a: Math.random() * .5 + .1,
-      col: cols[Math.floor(Math.random() * cols.length)]
-    }));
-  }
-
-  function draw() {
-    const isDark = document.body.classList.contains('dark');
-    const th = isDark ? themes.dark : themes.light;
-
-    ctx.clearRect(0, 0, W, H);
-    ctx.fillStyle = th.base;
-    ctx.fillRect(0, 0, W, H);
-
-    th.clouds.forEach((c, i) => {
-      const ox = Math.sin(t * .18 + i * 1.3) * 60;
-      const oy = Math.cos(t * .14 + i * 1.1) * 50;
-      const g = ctx.createRadialGradient(c.x*W+ox, c.y*H+oy, 0, c.x*W+ox, c.y*H+oy, c.r);
-      g.addColorStop(0, c.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    th.stars.forEach((s, i) => {
-      const px = s.x*W + Math.sin(t*.2+i)*40;
-      const py = s.y*H + Math.cos(t*.15+i)*30;
-      const pulse = .8 + Math.sin(t*1.5+i) * .2;
-      const g = ctx.createRadialGradient(px, py, 0, px, py, s.r*pulse);
-      g.addColorStop(0, s.col);
-      g.addColorStop(1, 'transparent');
-      ctx.fillStyle = g;
-      ctx.fillRect(0, 0, W, H);
-    });
-
-    for (let x = 0; x < W; x += 65) {
-      ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-    for (let y = 0; y < H; y += 65) {
-      ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y);
-      ctx.strokeStyle = th.gridCol; ctx.lineWidth = .5; ctx.stroke();
-    }
-
-    pts.forEach(p => {
-      p.x += p.vx; p.y += p.vy;
-      if (p.x < 0) p.x = W; if (p.x > W) p.x = 0;
-      if (p.y < 0) p.y = H; if (p.y > H) p.y = 0;
-      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI*2);
-      ctx.fillStyle = `rgba(${p.col},${p.a})`; ctx.fill();
-    });
-
-    for (let i = 0; i < pts.length; i++) {
-      for (let j = i+1; j < pts.length; j++) {
-        const dx = pts[i].x-pts[j].x, dy = pts[i].y-pts[j].y;
-        const d = Math.sqrt(dx*dx+dy*dy);
-        if (d < 100) {
-          ctx.beginPath(); ctx.moveTo(pts[i].x,pts[i].y); ctx.lineTo(pts[j].x,pts[j].y);
-          ctx.strokeStyle = `rgba(${pts[i].col},${.07*(1-d/100)})`;
-          ctx.lineWidth = .4; ctx.stroke();
-        }
-      }
-    }
-
-    t += .006;
-    animId = requestAnimationFrame(draw);
-  }
-
-  function init() {
-    resize();
-    const isDark = document.body.classList.contains('dark');
-    makePts((isDark ? themes.dark : themes.light).ptCols);
-    if (animId) cancelAnimationFrame(animId);
-    draw();
-  }
-
-  window.addEventListener('resize', resize);
-
-  // Hook into theme toggle
-  const origToggle = window.toggleTheme;
-  window.toggleTheme = function() {
-    if (origToggle) origToggle();
-    setTimeout(() => {
-      const isDark = document.body.classList.contains('dark');
-      makePts((isDark ? themes.dark : themes.light).ptCols);
-    }, 50);
-  };
-
-  init();
-})();
-// ========== END NEBULA BACKGROUND ==========
 // ========== END NEBULA BACKGROUND ==========
