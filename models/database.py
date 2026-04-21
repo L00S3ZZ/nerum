@@ -2,9 +2,15 @@ from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
+import os
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./nerum.db"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./nerum.db")
+
+# Fix for SQLAlchemy + PostgreSQL
+if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
+    SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -24,11 +30,11 @@ class Workflow(Base):
     user_id = Column(Integer, index=True)
     name = Column(String, default="Untitled Workflow")
     description = Column(Text, default="")
-    trigger = Column(String, default="")        # e.g. "form_submit", "schedule", "manual"
-    action = Column(String, default="")         # e.g. "send_whatsapp", "send_gmail"
-    config = Column(Text, default="{}")         # JSON string — stores action config
+    trigger = Column(String, default="")
+    action = Column(String, default="")
+    config = Column(Text, default="{}")
     is_active = Column(Boolean, default=True)
-    runs = Column(Integer, default=0)           # how many times it has run
+    runs = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
     last_run = Column(DateTime, nullable=True)
 
