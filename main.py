@@ -10,12 +10,13 @@ from routes.telegram import router as telegram_router
 from routes.whatsapp import router as whatsapp_router
 from routes import payment
 from routes.password_reset import router as reset_router
+import os
 
 app = FastAPI(title="Nerum", version="0.1")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["https://nerum.onrender.com"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -28,12 +29,13 @@ app.include_router(telegram_router, prefix="/telegram")
 app.include_router(whatsapp_router, prefix="/whatsapp")
 app.include_router(payment.router, prefix="/payment")
 app.include_router(reset_router, prefix="/auth")
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
