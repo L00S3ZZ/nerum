@@ -1,5 +1,4 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 from models.database import SessionLocal, User
 from jose import jwt
@@ -18,9 +17,9 @@ ALGORITHM = "HS256"
 client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
 PLANS = {
-    "starter": {"amount": 79900, "name": "Starter", "tokens": 100000, "workflows": 10},
-    "pro":     {"amount": 139900, "name": "Pro", "tokens": 500000, "workflows": 50},
-    "business":{"amount": 349900, "name": "Business", "tokens": 9999999, "workflows": 9999},
+    "starter":  {"amount": 79900,  "name": "starter",  "tokens": 100000,  "workflows": 10},
+    "pro":      {"amount": 139900, "name": "pro",       "tokens": 500000,  "workflows": 50},
+    "business": {"amount": 349900, "name": "business",  "tokens": 9999999, "workflows": 9999},
 }
 
 def get_db():
@@ -46,12 +45,15 @@ def create_order(plan: str, token: str, db: Session = Depends(get_db)):
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
     plan_data = PLANS[plan]
-    order = client.order.create({
-        "amount": plan_data["amount"],
-        "currency": "INR",
-        "payment_capture": 1,
-        "notes": {"plan": plan, "user_email": user.email}
-    })
+    try:
+        order = client.order.create({
+            "amount": plan_data["amount"],
+            "currency": "INR",
+            "payment_capture": 1,
+            "notes": {"plan": plan, "user_email": user.email}
+        })
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Razorpay error: {str(e)}")
     return {
         "order_id": order["id"],
         "amount": plan_data["amount"],
@@ -63,22 +65,34 @@ def create_order(plan: str, token: str, db: Session = Depends(get_db)):
 @router.post("/verify")
 async def verify_payment(data: dict, db: Session = Depends(get_db)):
     try:
-        sig = hmac.new(
-            RAZORPAY_KEY_SECRET.encode(),
-            f"{data['razorpay_order_id']}|{data['razorpay_payment_id']}".encode(),
+        msg = f"{data['razorpay_order_id']}|{data['razorpay_payment_id']}"
+        generated_sig = hmac.new(
+            RAZORPAY_KEY_SECRET.encode("utf-8"),
+            msg.encode("utf-8"),
             hashlib.sha256
         ).hexdigest()
-        if sig != data['razorpay_signature']:
-            raise HTTPException(status_code=400, detail="Invalid signature")
+
+        if not hmac.compare_digest(generated_sig, data.get("razorpay_signature", "")):
+            raise HTTPException(status_code=400, detail="Invalid payment signature")
+
         plan = data.get("plan")
         token = data.get("token")
+
+        if plan not in PLANS:
+            raise HTTPException(status_code=400, detail="Invalid plan")
+
         user = get_current_user(token, db)
         if not user:
             raise HTTPException(status_code=401, detail="Unauthorized")
+
         plan_data = PLANS[plan]
         user.plan = plan_data["name"]
         user.token_limit = plan_data["tokens"]
         db.commit()
+
         return {"success": True, "plan": plan_data["name"]}
+
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
