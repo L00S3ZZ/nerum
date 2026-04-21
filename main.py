@@ -30,6 +30,10 @@ app.include_router(payment.router, prefix="/payment")
 app.include_router(reset_router, prefix="/auth")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
+
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
