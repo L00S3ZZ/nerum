@@ -237,15 +237,26 @@ function showDashboard(name) {
 async function loadWorkflows() {
   try {
     const token = localStorage.getItem('nerum_token');
+    if (!token) return;
     const res = await fetch('/workflow/list', {
       headers: { 'Authorization': `Bearer ${token}` }
     });
+    if (res.status === 401) {
+      // Token expired - clear and redirect to login
+      localStorage.removeItem('nerum_token');
+      localStorage.removeItem('nerum_name');
+      document.getElementById('dashboard').style.display = 'none';
+      document.getElementById('landing-page').style.display = 'block';
+      return;
+    }
     const data = await res.json();
     const workflows = data.workflows || [];
     const count = workflows.length;
     const activeCount = workflows.filter(w => w.is_active).length;
-    document.getElementById('wf-num').textContent = count;
-    document.getElementById('wf-badge').textContent = count;
+    const wfNum = document.getElementById('wf-num');
+    const wfBadge = document.getElementById('wf-badge');
+    if (wfNum) wfNum.textContent = count;
+    if (wfBadge) wfBadge.textContent = count;
     const trendEl = document.querySelector('.wf-trend');
     if (trendEl) trendEl.textContent = `↑ ${activeCount} running automations`;
     renderWorkflowList(workflows);
@@ -387,7 +398,8 @@ async function saveWfModal() {
   }
 }
 
-document.getElementById('wf-modal-overlay').addEventListener('click', function(e) {
+const _wfOverlay = document.getElementById('wf-modal-overlay');
+if (_wfOverlay) _wfOverlay.addEventListener('click', function(e) {
   if (e.target === this) closeWfModal();
 });
 
@@ -410,7 +422,8 @@ function showPage(page) {
     if (el) el.style.display = 'none';
   });
   const titles = { billing:'Billing', settings:'Settings', history:'Service History', workflows:'Workflows', dashboard:'Dashboard' };
-  document.getElementById('tb-title').textContent = titles[page] || 'Dashboard';
+  const titleEl = document.getElementById('tb-title');
+  if (titleEl) titleEl.textContent = titles[page] || 'Dashboard';
   if (page === 'billing') {
     const el = document.getElementById('billing-content');
     el.style.display = 'flex'; el.style.flexDirection = 'column';
@@ -499,7 +512,8 @@ function closeProfilePopup() {
   document.getElementById('settings-success').style.display = 'none';
 }
 
-document.getElementById('profile-popup-overlay').addEventListener('click', function(e) {
+const _profOverlay = document.getElementById('profile-popup-overlay');
+if (_profOverlay) _profOverlay.addEventListener('click', function(e) {
   if (e.target === this) closeProfilePopup();
 });
 
@@ -539,7 +553,8 @@ function hideAuthPopup() {
   document.getElementById('auth-popup-overlay').style.display = 'none';
 }
 
-document.getElementById('auth-popup-overlay').addEventListener('click', function(e) {
+const _authOverlay = document.getElementById('auth-popup-overlay');
+if (_authOverlay) _authOverlay.addEventListener('click', function(e) {
   if (e.target === this) hideAuthPopup();
 });
 
