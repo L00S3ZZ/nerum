@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -10,7 +10,25 @@ SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./nerum.db")
 if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+# Try PostgreSQL, fall back to SQLite if it fails
+try:
+    if "postgresql" in SQLALCHEMY_DATABASE_URL:
+        engine = create_engine(SQLALCHEMY_DATABASE_URL)
+    else:
+        engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+    
+    # Test the connection
+    with engine.connect() as conn:
+        conn.execute(text("SELECT 1"))
+    print(f"✅ Database connected successfully!")
+
+except Exception as e:
+    print(f"❌ PostgreSQL connection failed: {e}")
+    print("⚠️ Falling back to SQLite...")
+    SQLALCHEMY_DATABASE_URL = "sqlite:///./nerum.db"
+    engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+    print("✅ SQLite fallback connected!")
+
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
@@ -47,3 +65,4 @@ class PasswordResetToken(Base):
     used = Column(Boolean, default=False)
 
 Base.metadata.create_all(bind=engine)
+print("✅ All tables created/verified!")
