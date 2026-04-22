@@ -12,6 +12,9 @@ router = APIRouter()
 SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
 ALGORITHM = "HS256"
 
+# ✅ Tokens deducted per workflow run
+TOKENS_PER_RUN = 10
+
 def get_db():
     db = SessionLocal()
     try:
@@ -53,7 +56,7 @@ class WorkflowUpdate(BaseModel):
 # ─── CREATE WORKFLOW ───────────────────────────────────────────────────────────
 @router.post("/create")
 def create_workflow(req: WorkflowCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # Check plan limits
+    # ✅ Plan workflow limits
     plan_limits = {"free": 3, "starter": 10, "pro": 50, "business": 999999}
     limit = plan_limits.get(user.plan.lower(), 3)
     current_count = db.query(Workflow).filter(Workflow.user_id == user.id).count()
@@ -106,7 +109,10 @@ def list_workflows(user: User = Depends(get_current_user), db: Session = Depends
             }
             for w in workflows
         ],
-        "total": len(workflows)
+        "total": len(workflows),
+        "tokens_used": user.tokens_used,
+        "token_limit": user.token_limit,
+        "tokens_remaining": max(0, user.token_limit - user.tokens_used)
     }
 
 # ─── GET SINGLE WORKFLOW ───────────────────────────────────────────────────────
@@ -134,18 +140,12 @@ def update_workflow(workflow_id: int, req: WorkflowUpdate, user: User = Depends(
     workflow = db.query(Workflow).filter(Workflow.id == workflow_id, Workflow.user_id == user.id).first()
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    if req.name is not None:
-        workflow.name = req.name
-    if req.description is not None:
-        workflow.description = req.description
-    if req.trigger is not None:
-        workflow.trigger = req.trigger
-    if req.action is not None:
-        workflow.action = req.action
-    if req.config is not None:
-        workflow.config = json.dumps(req.config)
-    if req.is_active is not None:
-        workflow.is_active = req.is_active
+    if req.name is not None: workflow.name = req.name
+    if req.description is not None: workflow.description = req.description
+    if req.trigger is not None: workflow.trigger = req.trigger
+    if req.action is not None: workflow.action = req.action
+    if req.config is not None: workflow.config = json.dumps(req.config)
+    if req.is_active is not None: workflow.is_active = req.is_active
     db.commit()
     db.refresh(workflow)
     return {"message": "Workflow updated", "id": workflow.id}
@@ -186,7 +186,21 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
     if not workflow.is_active:
         raise HTTPException(status_code=400, detail="Workflow is not active")
 
-    # Update run count and last_run
+    # ✅ Check token limit before running
+    tokens_remaining = user.token_limit - user.tokens_used
+    if tokens_remaining <= 0:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Token limit reached. You have used all {user.token_limit} tokens. Upgrade your plan to continue."
+        )
+    if tokens_remaining < TOKENS_PER_RUN:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Not enough tokens. You have {tokens_remaining} tokens left but need {TOKENS_PER_RUN}. Upgrade your plan."
+        )
+
+    # ✅ Deduct tokens and update run stats
+    user.tokens_used += TOKENS_PER_RUN
     workflow.runs += 1
     workflow.last_run = datetime.utcnow()
     db.commit()
@@ -194,5 +208,7 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
     return {
         "message": f"Workflow '{workflow.name}' executed successfully",
         "runs": workflow.runs,
-        "last_run": workflow.last_run.isoformat()
+        "last_run": workflow.last_run.isoformat(),
+        "tokens_used": user.tokens_used,
+        "tokens_remaining": user.token_limit - user.tokens_used
     }

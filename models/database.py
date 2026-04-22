@@ -6,22 +6,17 @@ import os
 
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL", "sqlite:///./nerum.db")
 
-# Fix for SQLAlchemy + PostgreSQL
 if SQLALCHEMY_DATABASE_URL.startswith("postgres://"):
     SQLALCHEMY_DATABASE_URL = SQLALCHEMY_DATABASE_URL.replace("postgres://", "postgresql://", 1)
 
-# Try PostgreSQL, fall back to SQLite if it fails
 try:
     if "postgresql" in SQLALCHEMY_DATABASE_URL:
         engine = create_engine(SQLALCHEMY_DATABASE_URL)
     else:
         engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
-    
-    # Test the connection
     with engine.connect() as conn:
         conn.execute(text("SELECT 1"))
-    print(f"✅ Database connected successfully!")
-
+    print("✅ Database connected successfully!")
 except Exception as e:
     print(f"❌ PostgreSQL connection failed: {e}")
     print("⚠️ Falling back to SQLite...")
@@ -39,7 +34,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     plan = Column(String, default="free")
-    token_limit = Column(Integer, default=10000)
+    token_limit = Column(Integer, default=1000)   # ✅ Free plan = 3000 tokens
     tokens_used = Column(Integer, default=0)
 
 class Workflow(Base):

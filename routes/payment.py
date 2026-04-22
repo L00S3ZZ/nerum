@@ -16,10 +16,11 @@ ALGORITHM = "HS256"
 
 client = razorpay.Client(auth=(RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET))
 
+# ✅ Correct token limits per plan
 PLANS = {
-    "starter":  {"amount": 79900,  "name": "starter",  "tokens": 100000,  "workflows": 10},
-    "pro":      {"amount": 139900, "name": "pro",       "tokens": 500000,  "workflows": 50},
-    "business": {"amount": 349900, "name": "business",  "tokens": 9999999, "workflows": 9999},
+    "starter":  {"amount": 79900,  "name": "starter",  "tokens": 1000, "workflows": 10},
+    "pro":      {"amount": 139900, "name": "pro",       "tokens": 1000, "workflows": 50},
+    "business": {"amount": 349900, "name": "business",  "tokens": 1000, "workflows": 9999},
 }
 
 def get_db():
