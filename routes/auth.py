@@ -6,10 +6,13 @@ from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
 from models.database import SessionLocal, User
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 import os
 import httpx
 
 router = APIRouter()
+limiter = Limiter(key_func=get_remote_address)
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
 ALGORITHM = "HS256"
@@ -57,33 +60,21 @@ async def send_welcome_email(name: str, email: str):
     </head>
     <body style="margin:0;padding:0;background:#06000f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
       <div style="max-width:560px;margin:40px auto;padding:0 20px">
-
-        <!-- Logo -->
         <div style="text-align:center;margin-bottom:32px;padding-top:20px">
           <span style="font-size:28px;font-weight:800;color:#e879f9">Ne</span><span style="font-size:28px;font-weight:800;color:#818cf8">rum</span>
         </div>
-
-        <!-- Card -->
         <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:36px;text-align:center">
-
-          <!-- Greeting -->
           <div style="font-size:32px;margin-bottom:8px">🎉</div>
           <h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 8px">Welcome to Nerum, {first_name}!</h1>
           <p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.6;margin:0 0 28px">
             You're all set to automate your business with AI workflows.<br/>
             Connect Gmail, WhatsApp, Telegram and Google Sheets — all in one place.
           </p>
-
-          <!-- CTA Button -->
-          <a href="https://nerum.onrender.com" 
+          <a href="https://nerum.onrender.com"
              style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700;margin-bottom:28px">
             Go to Dashboard →
           </a>
-
-          <!-- Divider -->
           <div style="border-top:1px solid rgba(255,255,255,0.08);margin-bottom:24px"></div>
-
-          <!-- Steps -->
           <p style="color:rgba(255,255,255,0.4);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;font-weight:600">GET STARTED IN 3 STEPS</p>
           <div style="display:flex;flex-direction:column;gap:12px;text-align:left">
             <div style="display:flex;align-items:center;gap:12px">
@@ -109,15 +100,12 @@ async def send_welcome_email(name: str, email: str):
             </div>
           </div>
         </div>
-
-        <!-- Footer -->
         <div style="text-align:center;margin-top:24px;padding-bottom:40px">
           <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0">
             © 2026 Nerum · AI Workflow Automation<br/>
             <span style="color:rgba(255,255,255,0.15)">You received this because you signed up at nerum.onrender.com</span>
           </p>
         </div>
-
       </div>
     </body>
     </html>
@@ -138,10 +126,22 @@ async def send_welcome_email(name: str, email: str):
                 }
             )
     except Exception:
-        pass  # Never block signup if email fails
+        pass
 
+# ✅ Max 5 login attempts per minute per IP — blocks brute force
+@router.post("/login")
+@limiter.limit("5/minute")
+def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == req.email).first()
+    if not user or not pwd_context.verify(req.password, user.hashed_password):
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    token = create_token({"sub": user.email, "name": user.name})
+    return {"token": token, "name": user.name, "email": user.email}
+
+# ✅ Max 3 signups per minute per IP — blocks spam accounts
 @router.post("/signup")
-async def signup(req: SignupRequest, db: Session = Depends(get_db)):
+@limiter.limit("3/minute")
+async def signup(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == req.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
@@ -152,14 +152,6 @@ async def signup(req: SignupRequest, db: Session = Depends(get_db)):
     db.refresh(user)
     token = create_token({"sub": user.email, "name": user.name})
     await send_welcome_email(user.name, user.email)
-    return {"token": token, "name": user.name, "email": user.email}
-
-@router.post("/login")
-def login(req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == req.email).first()
-    if not user or not pwd_context.verify(req.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    token = create_token({"sub": user.email, "name": user.name})
     return {"token": token, "name": user.name, "email": user.email}
 
 @router.get("/google")
@@ -217,6 +209,4 @@ async def google_callback(code: str, db: Session = Depends(get_db)):
         await send_welcome_email(name, email)
 
     token = create_token({"sub": user.email, "name": user.name})
-    return RedirectResponse(
-        f"/?token={token}&name={name}"
-    )
+    return RedirectResponse(f"/?token={token}&name={name}")

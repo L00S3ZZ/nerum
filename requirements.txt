@@ -16,3 +16,4 @@ authlib
 httpx
 razorpay
 psycopg2-binary
+slowapi
