@@ -231,6 +231,7 @@ function showDashboard(name) {
   loadToggles();
   loadWorkflows();
   showPage('dashboard');
+  if (typeof initIcons === 'function') initIcons();
 }
 
 // WORKFLOWS

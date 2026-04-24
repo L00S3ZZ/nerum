@@ -3,9 +3,10 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Nerum</title>
-<link rel="stylesheet" href="/static/style.css"/>
+<title>Nerum — AI Workflow Automation</title>
+<link rel="stylesheet" href="/static/style.css?v=3"/>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
 <body class="dark">
 <canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
@@ -84,10 +85,10 @@
     <h2 class="section-title">Simple, honest pricing</h2>
     <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
     <div class="lp-plans-grid">
-      <div class="lp-plan-card"><div class="lp-plan-name">Free</div><div class="lp-plan-price">₹0<span>/month</span></div><div class="lp-plan-desc">Perfect to get started</div><div class="lp-plan-features"><div class="lp-feat">✓ 3 Workflows</div><div class="lp-feat">✓ 10,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat lp-feat-no">✗ Priority support</div></div><button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button></div>
-      <div class="lp-plan-card lp-popular"><div class="lp-popular-badge">MOST POPULAR</div><div class="lp-plan-name" style="color:#818cf8">Starter</div><div class="lp-plan-price">₹799<span>/month</span></div><div class="lp-plan-desc">For growing businesses</div><div class="lp-plan-features"><div class="lp-feat">✓ 10 Workflows</div><div class="lp-feat">✓ 1,00,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Email support</div></div><button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button></div>
-      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#34d399">Pro</div><div class="lp-plan-price">₹1,399<span>/month</span></div><div class="lp-plan-desc">For power users</div><div class="lp-plan-features"><div class="lp-feat">✓ 50 Workflows</div><div class="lp-feat">✓ 5,00,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Priority support</div></div><button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button></div>
-      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#fbbf24">Business</div><div class="lp-plan-price">₹3,499<span>/month</span></div><div class="lp-plan-desc">For teams & agencies</div><div class="lp-plan-features"><div class="lp-feat">✓ Unlimited Workflows</div><div class="lp-feat">✓ Unlimited tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Dedicated support</div></div><button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button></div>
+      <div class="lp-plan-card"><div class="lp-plan-name">Free</div><div class="lp-plan-price">₹0<span>/month</span></div><div class="lp-plan-desc">Perfect to get started</div><div class="lp-plan-features"><div class="lp-feat">✓ 3 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat lp-feat-no">✗ Priority support</div></div><button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button></div>
+      <div class="lp-plan-card lp-popular"><div class="lp-popular-badge">MOST POPULAR</div><div class="lp-plan-name" style="color:#818cf8">Starter</div><div class="lp-plan-price">₹799<span>/month</span></div><div class="lp-plan-desc">For growing businesses</div><div class="lp-plan-features"><div class="lp-feat">✓ 10 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Email support</div></div><button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button></div>
+      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#34d399">Pro</div><div class="lp-plan-price">₹1,399<span>/month</span></div><div class="lp-plan-desc">For power users</div><div class="lp-plan-features"><div class="lp-feat">✓ 50 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Priority support</div></div><button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button></div>
+      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#fbbf24">Business</div><div class="lp-plan-price">₹3,499<span>/month</span></div><div class="lp-plan-desc">For teams & agencies</div><div class="lp-plan-features"><div class="lp-feat">✓ Unlimited Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Dedicated support</div></div><button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button></div>
     </div>
   </section>
 
@@ -269,22 +270,25 @@
       </div>
       <div class="sb-nav">
         <div class="sb-section">Main</div>
+
+        <!-- ✅ LUCIDE ICONS -->
         <div class="sb-item active" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="5" height="5" rx="1" fill="currentColor" opacity="0.8"/><rect x="8" y="1" width="5" height="5" rx="1" fill="currentColor"/><rect x="1" y="8" width="5" height="5" rx="1" fill="currentColor"/><rect x="8" y="8" width="5" height="5" rx="1" fill="currentColor" opacity="0.4"/></svg></div>Dashboard
+          <div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 7h12M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>Workflows
+          <div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows
           <span class="sb-badge" id="wf-badge">0</span>
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.3"/><path d="M7 4v3l2 2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></div>Service History
+          <div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History
         </div>
+
         <div class="sb-section">Account</div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="4" width="12" height="8" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 4V3a3 3 0 016 0v1" stroke="currentColor" stroke-width="1.3"/></svg></div>Billing
+          <div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing
         </div>
         <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="5" r="2.5" stroke="currentColor" stroke-width="1.3"/><path d="M2 12c0-2.2 2.2-4 5-4s5 1.8 5 4" stroke="currentColor" stroke-width="1.3"/></svg></div>Settings
+          <div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings
         </div>
       </div>
       <div class="sb-bottom">
@@ -293,7 +297,7 @@
           <div><div class="sb-uname" id="sb-name">Srihari</div><div class="sb-plan">Free plan</div></div>
         </div>
         <div class="sb-stats">
-          <div class="sb-stat"><div class="sb-stat-val">1,240</div><div class="sb-stat-label">Tokens used</div></div>
+          <div class="sb-stat"><div class="sb-stat-val" id="sb-tokens-used">0</div><div class="sb-stat-label">Tokens used</div></div>
           <div class="sb-stat"><div class="sb-stat-val" style="color:#34d399">● Live</div><div class="sb-stat-label">API status</div></div>
         </div>
         <button class="sb-logout" onclick="doLogout()">Logout</button>
@@ -302,17 +306,17 @@
 
     <div class="main">
       <div class="topbar">
-        <div><div class="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
+        <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
         <div class="tb-right">
           <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">Switch to Light</div>
           <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
         </div>
       </div>
 
-      <!-- ✅ KEY FIX: display:flex by default so dashboard shows on load -->
+      <!-- MAIN CONTENT -->
       <div class="content" id="main-content" style="display:flex;flex-direction:column">
         <div class="wf-card">
-          <div class="wf-icon"><svg width="22" height="22" viewBox="0 0 22 22" fill="none"><rect x="2" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.9"/><rect x="12" y="2" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="2" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.6"/><rect x="12" y="12" width="8" height="8" rx="1.5" fill="currentColor" opacity="0.3"/></svg></div>
+          <div class="wf-icon"><i data-lucide="workflow" style="width:22px;height:22px"></i></div>
           <div>
             <div class="wf-num" id="wf-num">0</div>
             <div class="wf-label">Active workflows</div>
@@ -348,19 +352,19 @@
         </div>
       </div>
 
-      <!-- BILLING — hidden by default -->
+      <!-- BILLING -->
       <div class="billing-content" id="billing-content" style="display:none">
         <div class="billing-title">Choose your plan</div>
         <div class="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
         <div class="plans-grid">
-          <div class="plan-card"><div class="plan-name" style="opacity:0.5">FREE</div><div class="plan-price">₹0<span>/mo</span></div><div class="plan-desc">Perfect to get started</div><div class="plan-features"><div>✓ 3 Workflows</div><div>✓ 10,000 AI tokens</div><div>✓ All integrations</div><div style="opacity:0.35">✗ Priority support</div></div><button class="plan-btn plan-btn-free">Current Plan</button></div>
-          <div class="plan-card popular"><div class="plan-popular-badge">MOST POPULAR</div><div class="plan-name" style="color:#818cf8">STARTER</div><div class="plan-price">₹799<span>/mo</span></div><div class="plan-desc">For growing businesses</div><div class="plan-features"><div>✓ 10 Workflows</div><div>✓ 1,00,000 AI tokens</div><div>✓ All integrations</div><div>✓ Tamil + English AI</div><div>✓ Email support</div></div><button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button></div>
-          <div class="plan-card"><div class="plan-name" style="color:#34d399">PRO</div><div class="plan-price">₹1,399<span>/mo</span></div><div class="plan-desc">For power users</div><div class="plan-features"><div>✓ 50 Workflows</div><div>✓ 5,00,000 AI tokens</div><div>✓ All integrations</div><div>✓ Priority support</div><div>✓ Advanced analytics</div></div><button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button></div>
-          <div class="plan-card"><div class="plan-name" style="color:#fbbf24">BUSINESS</div><div class="plan-price">₹3,499<span>/mo</span></div><div class="plan-desc">For teams & agencies</div><div class="plan-features"><div>✓ Unlimited Workflows</div><div>✓ Unlimited AI tokens</div><div>✓ All integrations</div><div>✓ Dedicated support</div><div>✓ Custom integrations</div></div><button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button></div>
+          <div class="plan-card"><div class="plan-name" style="opacity:0.5">FREE</div><div class="plan-price">₹0<span>/mo</span></div><div class="plan-desc">Perfect to get started</div><div class="plan-features"><div>✓ 3 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div style="opacity:0.35">✗ Priority support</div></div><button class="plan-btn plan-btn-free">Current Plan</button></div>
+          <div class="plan-card popular"><div class="plan-popular-badge">MOST POPULAR</div><div class="plan-name" style="color:#818cf8">STARTER</div><div class="plan-price">₹799<span>/mo</span></div><div class="plan-desc">For growing businesses</div><div class="plan-features"><div>✓ 10 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Tamil + English AI</div><div>✓ Email support</div></div><button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button></div>
+          <div class="plan-card"><div class="plan-name" style="color:#34d399">PRO</div><div class="plan-price">₹1,399<span>/mo</span></div><div class="plan-desc">For power users</div><div class="plan-features"><div>✓ 50 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Priority support</div><div>✓ Advanced analytics</div></div><button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button></div>
+          <div class="plan-card"><div class="plan-name" style="color:#fbbf24">BUSINESS</div><div class="plan-price">₹3,499<span>/mo</span></div><div class="plan-desc">For teams & agencies</div><div class="plan-features"><div>✓ Unlimited Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Dedicated support</div><div>✓ Custom integrations</div></div><button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button></div>
         </div>
       </div>
 
-      <!-- WORKFLOWS — hidden by default -->
+      <!-- WORKFLOWS -->
       <div class="billing-content" id="workflows-content" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="billing-title">My Workflows</div>
@@ -370,7 +374,7 @@
         <div id="workflow-list-container"></div>
       </div>
 
-      <!-- SETTINGS — hidden by default -->
+      <!-- SETTINGS -->
       <div class="settings-content" id="settings-content" style="display:none">
         <div class="profile-header">
           <div class="profile-avatar-big" id="settings-avatar-big">SR</div>
@@ -380,17 +384,17 @@
             <div class="profile-plan-badge" id="profile-plan-badge">Free Plan</div>
           </div>
           <div class="profile-token-box">
-            <div class="ptb-item"><div class="ptb-val" id="ptb-tokens">1,240</div><div class="ptb-label">Tokens used</div></div>
+            <div class="ptb-item"><div class="ptb-val" id="ptb-tokens">0</div><div class="ptb-label">Tokens used</div></div>
             <div class="ptb-divider"></div>
-            <div class="ptb-item"><div class="ptb-val">10,000</div><div class="ptb-label">Token limit</div></div>
+            <div class="ptb-item"><div class="ptb-val" id="ptb-limit">1,000</div><div class="ptb-label">Token limit</div></div>
             <div class="ptb-divider"></div>
             <div class="ptb-item"><div class="ptb-val" id="ptb-wf">0</div><div class="ptb-label">Workflows</div></div>
           </div>
         </div>
         <div class="token-progress-wrap">
-          <div class="token-progress-header"><span class="token-progress-label">Token usage this month</span><span class="token-progress-pct" id="token-pct">12.4%</span></div>
-          <div class="token-progress-bar"><div class="token-progress-fill" id="token-fill" style="width:12.4%"></div></div>
-          <div class="token-progress-footer"><span id="token-used-label">1,240 used</span><span id="token-limit-label">10,000 limit</span></div>
+          <div class="token-progress-header"><span class="token-progress-label">Token usage this month</span><span class="token-progress-pct" id="token-pct">0%</span></div>
+          <div class="token-progress-bar"><div class="token-progress-fill" id="token-fill" style="width:0%"></div></div>
+          <div class="token-progress-footer"><span id="token-used-label">0 used</span><span id="token-limit-label">1,000 limit</span></div>
         </div>
         <div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
           <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
@@ -430,7 +434,7 @@
         </div>
       </div>
 
-      <!-- HISTORY — hidden by default -->
+      <!-- HISTORY -->
       <div class="history-content" id="history-content" style="display:none">
         <div style="font-size:18px;font-weight:700;margin-bottom:4px">Service History</div>
         <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
@@ -442,6 +446,17 @@
 </div>
 
 <script src="/static/app.js"></script>
+
+<!-- Init Lucide icons -->
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  });
+  // Re-render icons after dashboard shows
+  function initIcons() {
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+  }
+</script>
 
 <!-- NEW WORKFLOW MODAL -->
 <div id="wf-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
