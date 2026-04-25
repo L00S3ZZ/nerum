@@ -786,12 +786,21 @@ function toggleNotifPanel() {
   const panel = document.getElementById('notif-panel');
   if (!panel) return;
   const isOpen = panel.style.display === 'flex';
-  panel.style.display = isOpen ? 'none' : 'flex';
+  const isDark = document.body.classList.contains('dark');
+  
   if (!isOpen) {
+    // Set background directly via JS — no CSS override issues!
+    panel.style.background = isDark ? '#0d0020' : '#ffffff';
+    panel.style.border = isDark 
+      ? '1px solid rgba(232,121,249,0.25)' 
+      : '1px solid rgba(109,40,217,0.2)';
+    panel.style.display = 'flex';
     unreadCount = 0;
     updateBellBadge();
     notifications.forEach(n => n.read = true);
     renderNotifications();
+  } else {
+    panel.style.display = 'none';
   }
 }
 
