@@ -318,6 +318,7 @@ async function deleteWorkflow(id) {
   try {
     const token = localStorage.getItem('nerum_token');
     await fetch(`/workflow/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+    addNotification('Workflow Deleted', 'Workflow was removed', 'warning');
     loadWorkflows();
   } catch(e) {}
 }
@@ -385,6 +386,7 @@ async function saveWfModal() {
       return;
     }
     closeWfModal();
+    addNotification('Workflow Created! ⚡', `"${name}" was created successfully`, 'success');
     loadWorkflows();
     // Switch to workflows page to show the new one
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
@@ -726,4 +728,127 @@ function deleteAccount() {
   };
   init();
 })();
+// ========== NOTIFICATION SYSTEM ==========
+
+// Toast notifications
+function showToast(message, type = 'success') {
+  const colors = {
+    success: { bg: 'rgba(52,211,153,0.12)', border: 'rgba(52,211,153,0.25)', color: '#34d399', icon: '✅' },
+    error:   { bg: 'rgba(255,80,80,0.12)',  border: 'rgba(255,80,80,0.25)',  color: '#ff8a7a', icon: '❌' },
+    warning: { bg: 'rgba(251,191,36,0.12)', border: 'rgba(251,191,36,0.25)', color: '#fbbf24', icon: '⚠️' },
+    info:    { bg: 'rgba(129,140,248,0.12)',border: 'rgba(129,140,248,0.25)',color: '#818cf8', icon: 'ℹ️' }
+  };
+  const c = colors[type] || colors.info;
+  const toast = document.createElement('div');
+  toast.style.cssText = `
+    position:fixed;bottom:24px;left:24px;z-index:9999;
+    padding:12px 16px;border-radius:12px;font-size:12px;
+    font-family:-apple-system,sans-serif;font-weight:500;
+    display:flex;align-items:center;gap:10px;
+    background:${c.bg};border:1px solid ${c.border};color:${c.color};
+    backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.2);
+    animation:slideUp 0.3s ease;max-width:300px;
+    transition:opacity 0.3s ease;
+  `;
+  toast.innerHTML = `<span>${c.icon}</span><span>${message}</span>`;
+  document.body.appendChild(toast);
+  setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
+}
+
+// Notification store
+let notifications = [];
+let unreadCount = 0;
+
+function addNotification(title, message, type = 'info') {
+  const n = {
+    id: Date.now(),
+    title,
+    message,
+    type,
+    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
+    read: false
+  };
+  notifications.unshift(n);
+  if (notifications.length > 20) notifications.pop();
+  unreadCount++;
+  updateBellBadge();
+  showToast(message, type);
+}
+
+function updateBellBadge() {
+  const badge = document.getElementById('notif-badge-count');
+  const dot = document.getElementById('notif-dot');
+  if (badge) badge.textContent = unreadCount > 9 ? '9+' : unreadCount;
+  if (dot) dot.style.display = unreadCount > 0 ? 'flex' : 'none';
+}
+
+function toggleNotifPanel() {
+  const panel = document.getElementById('notif-panel');
+  if (!panel) return;
+  const isOpen = panel.style.display === 'flex';
+  panel.style.display = isOpen ? 'none' : 'flex';
+  if (!isOpen) {
+    unreadCount = 0;
+    updateBellBadge();
+    notifications.forEach(n => n.read = true);
+    renderNotifications();
+  }
+}
+
+function renderNotifications() {
+  const list = document.getElementById('notif-list');
+  if (!list) return;
+  if (notifications.length === 0) {
+    list.innerHTML = `
+      <div style="text-align:center;padding:32px 16px;opacity:0.4">
+        <div style="font-size:28px;margin-bottom:8px">🔔</div>
+        <div style="font-size:12px;font-weight:600">No notifications yet</div>
+        <div style="font-size:10px;margin-top:4px">Activity will appear here</div>
+      </div>`;
+    return;
+  }
+  const typeColors = {
+    success: '#34d399', error: '#ff8a7a',
+    warning: '#fbbf24', info: '#818cf8'
+  };
+  const typeIcons = {
+    success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️'
+  };
+  list.innerHTML = notifications.map(n => `
+    <div style="
+      padding:12px 14px;border-bottom:1px solid;
+      display:flex;gap:10px;align-items:flex-start;
+      ${document.body.classList.contains('dark')
+        ? 'border-color:rgba(255,255,255,0.06);' + (!n.read ? 'background:rgba(129,140,248,0.04);' : '')
+        : 'border-color:rgba(109,40,217,0.08);' + (!n.read ? 'background:rgba(109,40,217,0.03);' : '')
+      }
+    ">
+      <span style="font-size:14px;flex-shrink:0">${typeIcons[n.type] || 'ℹ️'}</span>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:600;margin-bottom:2px;color:${typeColors[n.type] || '#818cf8'}">${n.title}</div>
+        <div style="font-size:10px;opacity:0.6;line-height:1.5">${n.message}</div>
+        <div style="font-size:9px;opacity:0.35;margin-top:4px">${n.time}</div>
+      </div>
+      ${!n.read ? `<div style="width:7px;height:7px;border-radius:50%;background:#818cf8;flex-shrink:0;margin-top:3px"></div>` : ''}
+    </div>
+  `).join('');
+}
+
+function clearAllNotifications() {
+  notifications = [];
+  unreadCount = 0;
+  updateBellBadge();
+  renderNotifications();
+}
+
+// Close panel when clicking outside
+document.addEventListener('click', function(e) {
+  const panel = document.getElementById('notif-panel');
+  const btn = document.getElementById('notif-bell-btn');
+  if (panel && btn && !panel.contains(e.target) && !btn.contains(e.target)) {
+    panel.style.display = 'none';
+  }
+});
+
+// ========== END NOTIFICATION SYSTEM ==========
 // ========== END NEBULA BACKGROUND ==========
