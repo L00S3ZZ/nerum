@@ -230,6 +230,26 @@ body.dark .notif-clear-style:hover{color:#fff;background:rgba(255,255,255,0.06)!
 body.light .notif-clear-style{border:1px solid rgba(109,40,217,0.2);color:#6d28d9}
 body.light .notif-clear-style:hover{background:rgba(109,40,217,0.06)!important}
 
+/* Bell button fix */
+body.dark #notif-bell-btn {
+  border-color: rgba(255,255,255,0.1) !important;
+  color: rgba(255,255,255,0.6) !important;
+  background: rgba(255,255,255,0.05) !important;
+}
+body.dark #notif-bell-btn:hover {
+  color: #fff !important;
+  background: rgba(255,255,255,0.1) !important;
+}
+body.light #notif-bell-btn {
+  border-color: rgba(109,40,217,0.2) !important;
+  color: #6d28d9 !important;
+  background: rgba(255,255,255,0.5) !important;
+}
+body.light #notif-bell-btn:hover {
+  color: #4c1d95 !important;
+  background: rgba(255,255,255,0.8) !important;
+}
+
 /* ===== ONBOARDING ===== */
 .onboarding{display:none;align-items:center;justify-content:center;min-height:100vh}
 .ob-box{width:100%;max-width:480px;padding:20px;animation:popIn 0.4s ease}
