@@ -250,6 +250,15 @@ body.light #notif-bell-btn:hover {
   background: rgba(255,255,255,0.8) !important;
 }
 
+body.dark #notif-panel {
+  background: #0d0020 !important;
+  border: 1px solid rgba(232,121,249,0.2) !important;
+}
+body.light #notif-panel {
+  background: rgba(255,255,255,0.98) !important;
+  border: 1px solid rgba(109,40,217,0.2) !important;
+}
+
 /* ===== ONBOARDING ===== */
 .onboarding{display:none;align-items:center;justify-content:center;min-height:100vh}
 .ob-box{width:100%;max-width:480px;padding:20px;animation:popIn 0.4s ease}
@@ -967,8 +976,4 @@ body.dark ::-webkit-scrollbar-thumb:hover{background:rgba(255,255,255,0.2)}
 body.light ::-webkit-scrollbar-thumb:hover{background:rgba(109,40,217,0.4)}
 
 /* ===== FOCUS VISIBLE ===== */
-button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #818cf8;outline-offset:2px}
-
-/* ===== SELECTION ===== */
-body.dark ::selection{background:rgba(129,140,248,0.3);color:#fff}
-body.light ::selection{background:rgba(109,40,217,0.2);color:#1a0533}
+button:focus-visible,input
