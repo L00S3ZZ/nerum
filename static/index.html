@@ -336,12 +336,20 @@
 
     <!-- Notification panel -->
     <div id="notif-panel" style="
-      display:none;position:absolute;top:44px;right:0;
-      width:300px;border-radius:16px;z-index:9999;
-      flex-direction:column;overflow:hidden;
-      box-shadow:0 20px 60px rgba(0,0,0,0.3);
-      animation:slideUp 0.2s ease;
-    " class="notif-panel-style">
+  display:none;
+  position:fixed;
+  top:60px;
+  right:24px;
+  width:300px;
+  border-radius:16px;
+  z-index:99999;
+  flex-direction:column;
+  overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,0.5);
+  animation:slideUp 0.2s ease;
+  background:#0d0020;
+  border:1px solid rgba(232,121,249,0.2);
+" class="notif-panel-style">
       <!-- Panel header -->
       <div style="
         padding:14px 16px;display:flex;align-items:center;
