@@ -80,3 +80,13 @@ class LoginHistory(Base):
 
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")
+
+# ✅ Migration — add new columns if they don't exist
+try:
+    with engine.connect() as conn:
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS is_verified BOOLEAN DEFAULT TRUE"))
+        conn.execute(text("ALTER TABLE users ADD COLUMN IF NOT EXISTS created_at TIMESTAMP DEFAULT NOW()"))
+        conn.commit()
+        print("✅ Migration complete!")
+except Exception as e:
+    print(f"Migration note: {e}")
