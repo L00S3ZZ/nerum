@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Nerum Admin</title>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:#06000f;color:#fff;min-height:100vh}
+
+/* NEBULA BG */
+#nebula{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(ellipse at 15% 25%,rgba(232,121,249,0.15) 0%,transparent 60%),radial-gradient(ellipse at 80% 20%,rgba(129,140,248,0.15) 0%,transparent 60%),radial-gradient(ellipse at 50% 80%,rgba(167,139,250,0.1) 0%,transparent 60%)}
+body>*:not(#nebula){position:relative;z-index:1}
+
+/* LOGIN */
+#login-page{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:rgba(255,255,255,0.04);border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:36px;width:100%;max-width:380px;text-align:center;backdrop-filter:blur(16px)}
+.admin-logo{font-size:24px;font-weight:800;margin-bottom:4px}
+.admin-logo .a{color:#e879f9}
+.admin-logo .b{color:#818cf8}
+.admin-sub{font-size:11px;color:rgba(255,255,255,0.35);margin-bottom:28px;letter-spacing:1px;text-transform:uppercase}
+.login-input{width:100%;padding:12px 16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:#fff;font-size:13px;outline:none;margin-bottom:14px;font-family:inherit}
+.login-input:focus{border-color:rgba(232,121,249,0.5)}
+.login-input::placeholder{color:rgba(255,255,255,0.2)}
+.login-btn{width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.login-btn:hover{opacity:0.9;transform:translateY(-1px)}
+.login-error{font-size:11px;color:#ff8a7a;margin-top:10px;display:none}
+
+/* DASHBOARD */
+#admin-page{display:none}
+.admin-header{padding:16px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+.header-logo{font-size:18px;font-weight:800}
+.header-logo .a{color:#e879f9}
+.header-logo .b{color:#818cf8}
+.header-badge{font-size:9px;padding:3px 10px;border-radius:20px;background:rgba(232,121,249,0.15);color:#e879f9;border:1px solid rgba(232,121,249,0.2);margin-left:8px;vertical-align:middle}
+.logout-btn{padding:7px 16px;border-radius:20px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);font-size:11px;cursor:pointer;font-family:inherit;transition:all 0.2s}
+.logout-btn:hover{border-color:rgba(255,80,80,0.3);color:#ff8a7a}
+
+.admin-body{padding:24px 28px;max-width:1200px;margin:0 auto}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px}
+.stat-card{background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:20px;backdrop-filter:blur(10px);transition:all 0.2s}
+.stat-card:hover{transform:translateY(-2px);border-color:rgba(232,121,249,0.2)}
+.stat-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;margin-bottom:14px}
+.stat-val{font-size:28px;font-weight:800;margin-bottom:4px}
+.stat-label{font-size:10px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px}
+.stat-sub{font-size:10px;margin-top:6px;opacity:0.5}
+
+/* PLAN BREAKDOWN */
+.plans-row{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:24px}
+.plan-chip{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:12px;padding:14px;text-align:center}
+.plan-chip-name{font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px}
+.plan-chip-val{font-size:22px;font-weight:800}
+
+/* SECTION */
+.section{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:16px;padding:20px;margin-bottom:20px;backdrop-filter:blur(10px)}
+.section-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid rgba(255,255,255,0.07)}
+.section-title{font-size:13px;font-weight:700;color:#fff}
+.section-badge{font-size:9px;padding:3px 10px;border-radius:20px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)}
+
+/* TABLE */
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);padding:8px 12px;text-align:left;border-bottom:1px solid rgba(255,255,255,0.06)}
+.table td{padding:12px;font-size:11px;border-bottom:1px solid rgba(255,255,255,0.04);vertical-align:middle}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:rgba(255,255,255,0.02)}
+.plan-badge{font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600}
+.plan-free{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4)}
+.plan-starter{background:rgba(129,140,248,0.15);color:#818cf8;border:1px solid rgba(129,140,248,0.2)}
+.plan-pro{background:rgba(52,211,153,0.12);color:#34d399;border:1px solid rgba(52,211,153,0.2)}
+.plan-business{background:rgba(251,191,36,0.12);color:#fbbf24;border:1px solid rgba(251,191,36,0.2)}
+.view-btn{font-size:9px;padding:4px 12px;border-radius:20px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2);cursor:pointer;font-family:inherit;transition:all 0.2s}
+.view-btn:hover{background:rgba(129,140,248,0.2)}
+.token-bar{height:4px;border-radius:10px;background:rgba(255,255,255,0.08);margin-top:4px;overflow:hidden}
+.token-fill{height:100%;border-radius:10px;background:linear-gradient(90deg,#818cf8,#34d399)}
+
+/* USER MODAL */
+#user-modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:1000;align-items:center;justify-content:center;backdrop-filter:blur(4px)}
+.modal-box{background:#0d0020;border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:28px;width:100%;max-width:560px;margin:20px;max-height:80vh;overflow-y:auto;animation:slideUp 0.3s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.modal-title{font-size:15px;font-weight:700}
+.modal-close{background:transparent;border:none;color:rgba(255,255,255,0.4);font-size:20px;cursor:pointer;padding:4px 8px}
+.modal-close:hover{color:#fff}
+.user-info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px}
+.info-item{background:rgba(255,255,255,0.04);border-radius:10px;padding:12px}
+.info-label{font-size:9px;text-transform:uppercase;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:4px}
+.info-val{font-size:12px;font-weight:600;color:#fff}
+.wf-item{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.07);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px}
+.wf-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.wf-name{font-size:12px;font-weight:600;color:#fff}
+.wf-meta{font-size:10px;color:rgba(255,255,255,0.35);margin-top:2px}
+.wf-runs{margin-left:auto;font-size:10px;color:#818cf8;font-weight:600}
+
+/* LOADING */
+.loading{text-align:center;padding:40px;opacity:0.4;font-size:12px}
+
+/* REFRESH BTN */
+.refresh-btn{font-size:10px;padding:5px 14px;border-radius:20px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.5);cursor:pointer;font-family:inherit;transition:all 0.2s;display:flex;align-items:center;gap:6px}
+.refresh-btn:hover{background:rgba(255,255,255,0.08);color:#fff}
+
+/* SCROLLBAR */
+::-webkit-scrollbar{width:4px}
+::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.1);border-radius:10px}
+</style>
+</head>
+<body>
+<div id="nebula"></div>
+
+<!-- LOGIN PAGE -->
+<div id="login-page">
+  <div class="login-box">
+    <div class="admin-logo"><span class="a">Ne</span><span class="b">rum</span></div>
+    <div class="admin-sub">Admin Dashboard</div>
+    <input type="password" class="login-input" id="admin-secret" placeholder="Enter admin secret key" onkeydown="if(event.key==='Enter')doAdminLogin()"/>
+    <button class="login-btn" onclick="doAdminLogin()">Access Dashboard →</button>
+    <div class="login-error" id="login-error">Invalid secret key</div>
+  </div>
+</div>
+
+<!-- ADMIN DASHBOARD -->
+<div id="admin-page">
+  <!-- Header -->
+  <div class="admin-header">
+    <div>
+      <span class="header-logo"><span class="a">Ne</span><span class="b">rum</span></span>
+      <span class="header-badge">ADMIN</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px">
+      <button class="refresh-btn" onclick="loadDashboard()">
+        <i data-lucide="refresh-cw" style="width:12px;height:12px"></i> Refresh
+      </button>
+      <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="admin-body">
+
+    <!-- Stats -->
+    <div class="stats-grid" id="stats-grid">
+      <div class="loading">Loading stats...</div>
+    </div>
+
+    <!-- Plan Breakdown -->
+    <div class="plans-row" id="plans-row"></div>
+
+    <!-- Users Table -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">All Users</span>
+        <span class="section-badge" id="users-count">0 users</span>
+      </div>
+      <div id="users-table"><div class="loading">Loading users...</div></div>
+    </div>
+
+    <!-- Recent Signups -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">Recent Signups</span>
+        <span class="section-badge">Last 5</span>
+      </div>
+      <div id="recent-signups"><div class="loading">Loading...</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- USER WORKFLOWS MODAL -->
+<div id="user-modal" onclick="closeUserModal(event)">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title">User Workflows</div>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<script>
+let adminToken = localStorage.getItem('nerum_admin_token') || '';
+
+// Auto login if token exists
+window.addEventListener('load', () => {
+  lucide.createIcons();
+  if (adminToken) {
+    showAdminPage();
+    loadDashboard();
+  }
+});
+
+async function doAdminLogin() {
+  const secret = document.getElementById('admin-secret').value.trim();
+  if (!secret) return;
+  try {
+    const res = await fetch('/admin/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ secret })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      document.getElementById('login-error').style.display = 'block';
+      return;
+    }
+    adminToken = data.token;
+    localStorage.setItem('nerum_admin_token', adminToken);
+    showAdminPage();
+    loadDashboard();
+  } catch(e) {
+    document.getElementById('login-error').style.display = 'block';
+  }
+}
+
+function showAdminPage() {
+  document.getElementById('login-page').style.display = 'none';
+  document.getElementById('admin-page').style.display = 'block';
+}
+
+function adminLogout() {
+  localStorage.removeItem('nerum_admin_token');
+  adminToken = '';
+  document.getElementById('admin-page').style.display = 'none';
+  document.getElementById('login-page').style.display = 'flex';
+}
+
+async function loadDashboard() {
+  await Promise.all([loadStats(), loadUsers()]);
+  lucide.createIcons();
+}
+
+async function loadStats() {
+  try {
+    const res = await fetch('/admin/stats', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    if (res.status === 401) { adminLogout(); return; }
+    const data = await res.json();
+
+    // Stats grid
+    const planColors = { free: '#818cf8', starter: '#818cf8', pro: '#34d399', business: '#fbbf24' };
+    document.getElementById('stats-grid').innerHTML = `
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(232,121,249,0.15)">
+          <i data-lucide="users" style="width:18px;height:18px;color:#e879f9"></i>
+        </div>
+        <div class="stat-val" style="color:#e879f9">${data.total_users}</div>
+        <div class="stat-label">Total Users</div>
+        <div class="stat-sub">${data.plans.free} free · ${data.plans.starter} starter · ${data.plans.pro} pro</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(129,140,248,0.15)">
+          <i data-lucide="zap" style="width:18px;height:18px;color:#818cf8"></i>
+        </div>
+        <div class="stat-val" style="color:#818cf8">${data.total_workflows}</div>
+        <div class="stat-label">Total Workflows</div>
+        <div class="stat-sub">${data.active_workflows} active</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(52,211,153,0.15)">
+          <i data-lucide="indian-rupee" style="width:18px;height:18px;color:#34d399"></i>
+        </div>
+        <div class="stat-val" style="color:#34d399">₹${data.revenue_estimate.toLocaleString()}</div>
+        <div class="stat-label">Est. Monthly Revenue</div>
+        <div class="stat-sub">Based on paid plans</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon" style="background:rgba(251,191,36,0.15)">
+          <i data-lucide="crown" style="width:18px;height:18px;color:#fbbf24"></i>
+        </div>
+        <div class="stat-val" style="color:#fbbf24">${data.plans.starter + data.plans.pro + data.plans.business}</div>
+        <div class="stat-label">Paid Users</div>
+        <div class="stat-sub">${data.plans.business} business plan</div>
+      </div>
+    `;
+
+    // Plan breakdown
+    document.getElementById('plans-row').innerHTML = `
+      <div class="plan-chip">
+        <div class="plan-chip-name">Free</div>
+        <div class="plan-chip-val" style="color:rgba(255,255,255,0.5)">${data.plans.free}</div>
+      </div>
+      <div class="plan-chip">
+        <div class="plan-chip-name">Starter</div>
+        <div class="plan-chip-val" style="color:#818cf8">${data.plans.starter}</div>
+      </div>
+      <div class="plan-chip">
+        <div class="plan-chip-name">Pro</div>
+        <div class="plan-chip-val" style="color:#34d399">${data.plans.pro}</div>
+      </div>
+      <div class="plan-chip">
+        <div class="plan-chip-name">Business</div>
+        <div class="plan-chip-val" style="color:#fbbf24">${data.plans.business}</div>
+      </div>
+    `;
+
+    // Recent signups
+    document.getElementById('recent-signups').innerHTML = data.recent_signups.map(u => `
+      <div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.05)">
+        <div style="width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">
+          ${u.name.charAt(0).toUpperCase()}
+        </div>
+        <div style="flex:1">
+          <div style="font-size:12px;font-weight:600">${u.name}</div>
+          <div style="font-size:10px;opacity:0.4">${u.email}</div>
+        </div>
+        <span class="plan-badge plan-${u.plan}">${u.plan}</span>
+      </div>
+    `).join('');
+
+  } catch(e) { console.error(e); }
+}
+
+async function loadUsers() {
+  try {
+    const res = await fetch('/admin/users', {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    if (res.status === 401) { adminLogout(); return; }
+    const data = await res.json();
+    const users = data.users;
+    document.getElementById('users-count').textContent = `${users.length} users`;
+
+    if (users.length === 0) {
+      document.getElementById('users-table').innerHTML = '<div class="loading">No users yet</div>';
+      return;
+    }
+
+    document.getElementById('users-table').innerHTML = `
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th>
+            <th>Plan</th>
+            <th>Workflows</th>
+            <th>Token Usage</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${users.map(u => {
+            const pct = Math.min(100, Math.round((u.tokens_used / u.token_limit) * 100));
+            return `
+            <tr>
+              <td>
+                <div style="font-weight:600;color:#fff">${u.name}</div>
+                <div style="opacity:0.4;font-size:10px">${u.email}</div>
+              </td>
+              <td><span class="plan-badge plan-${u.plan}">${u.plan}</span></td>
+              <td style="color:#818cf8;font-weight:600">${u.workflow_count}</td>
+              <td>
+                <div style="font-size:10px;opacity:0.6">${u.tokens_used} / ${u.token_limit}</div>
+                <div class="token-bar"><div class="token-fill" style="width:${pct}%"></div></div>
+              </td>
+              <td>
+                <button class="view-btn" onclick="viewUserWorkflows('${u.email}', '${u.name}')">
+                  View Workflows
+                </button>
+              </td>
+            </tr>`;
+          }).join('')}
+        </tbody>
+      </table>
+    `;
+  } catch(e) { console.error(e); }
+}
+
+async function viewUserWorkflows(email, name) {
+  document.getElementById('modal-title').textContent = `${name}'s Workflows`;
+  document.getElementById('modal-content').innerHTML = '<div class="loading">Loading...</div>';
+  document.getElementById('user-modal').style.display = 'flex';
+
+  try {
+    const res = await fetch(`/admin/user-workflows?email=${encodeURIComponent(email)}`, {
+      headers: { 'Authorization': `Bearer ${adminToken}` }
+    });
+    const data = await res.json();
+    const u = data.user;
+    const workflows = data.workflows;
+
+    document.getElementById('modal-content').innerHTML = `
+      <div class="user-info-grid">
+        <div class="info-item">
+          <div class="info-label">Name</div>
+          <div class="info-val">${u.name}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Plan</div>
+          <div class="info-val"><span class="plan-badge plan-${u.plan}">${u.plan}</span></div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Tokens Used</div>
+          <div class="info-val">${u.tokens_used} / ${u.token_limit}</div>
+        </div>
+        <div class="info-item">
+          <div class="info-label">Total Workflows</div>
+          <div class="info-val">${workflows.length}</div>
+        </div>
+      </div>
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:12px">
+        Workflows
+      </div>
+      ${workflows.length === 0 
+        ? '<div class="loading">No workflows created yet</div>'
+        : workflows.map(w => `
+          <div class="wf-item">
+            <div class="wf-dot" style="background:${w.is_active ? '#34d399' : 'rgba(255,255,255,0.2)'}"></div>
+            <div style="flex:1">
+              <div class="wf-name">${w.name}</div>
+              <div class="wf-meta">
+                ${w.description || 'No description'} · 
+                Created ${w.created_at ? new Date(w.created_at).toLocaleDateString() : 'N/A'}
+                ${w.last_run ? `· Last run ${new Date(w.last_run).toLocaleDateString()}` : ''}
+              </div>
+            </div>
+            <div class="wf-runs">${w.runs} runs</div>
+          </div>
+        `).join('')
+      }
+    `;
+  } catch(e) {
+    document.getElementById('modal-content').innerHTML = '<div class="loading">Error loading workflows</div>';
+  }
+}
+
+function closeModal() {
+  document.getElementById('user-modal').style.display = 'none';
+}
+
+function closeUserModal(e) {
+  if (e.target === document.getElementById('user-modal')) closeModal();
+}
+</script>
+</body>
+</html>
