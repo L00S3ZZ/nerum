@@ -36,7 +36,6 @@ class User(Base):
     plan = Column(String, default="free")
     token_limit = Column(Integer, default=1000)
     tokens_used = Column(Integer, default=0)
-    # ✅ Email verification
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -62,7 +61,6 @@ class PasswordResetToken(Base):
     expires_at = Column(DateTime)
     used = Column(Boolean, default=False)
 
-# ✅ Email verification tokens table
 class EmailVerificationToken(Base):
     __tablename__ = "email_verification_tokens"
     id = Column(Integer, primary_key=True, index=True)
@@ -70,6 +68,15 @@ class EmailVerificationToken(Base):
     token = Column(String, unique=True, index=True)
     expires_at = Column(DateTime)
     used = Column(Boolean, default=False)
+
+class LoginHistory(Base):
+    __tablename__ = "login_history"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    email = Column(String, index=True)
+    ip_address = Column(String)
+    device = Column(String)
+    logged_in_at = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")

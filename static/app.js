@@ -12,7 +12,6 @@ const msgInterval = setInterval(() => {
 }, 3000);
 
 window.addEventListener('load', () => {
-  // Check Google OAuth token FIRST before hiding loading screen
   const urlParams = new URLSearchParams(window.location.search);
   const googleToken = urlParams.get('token');
   const googleName = urlParams.get('name');
@@ -33,8 +32,6 @@ window.addEventListener('load', () => {
       setTimeout(() => {
         ls.style.display = 'none';
         clearInterval(msgInterval);
-
-        // Now handle routing after loading screen is gone
         if (googleToken && googleName) {
           document.getElementById('landing-page').style.display = 'none';
           afterLogin(currentUser);
@@ -56,6 +53,7 @@ window.addEventListener('load', () => {
   }, 1500);
 });
 
+// ===== PASSWORD STRENGTH =====
 function checkPasswordStrength(val) {
   const wrap = document.getElementById('strength-bar-wrap');
   const bar = document.getElementById('strength-bar');
@@ -63,14 +61,12 @@ function checkPasswordStrength(val) {
   if (!wrap) return;
   if (!val) { wrap.style.display = 'none'; return; }
   wrap.style.display = 'block';
-
   let score = 0;
   if (val.length >= 6) score++;
   if (val.length >= 8) score++;
   if (/[0-9]/.test(val)) score++;
   if (/[A-Z]/.test(val)) score++;
   if (/[^A-Za-z0-9]/.test(val)) score++;
-
   const levels = [
     { pct: '20%', color: '#ff5050', label: '🔴 Very weak' },
     { pct: '40%', color: '#ff8a7a', label: '🟠 Weak' },
@@ -85,7 +81,7 @@ function checkPasswordStrength(val) {
   text.textContent = level.label;
 }
 
-// THEME
+// ===== THEME =====
 function applyTheme(t) {
   document.body.className = t;
   selectedTheme = t;
@@ -100,7 +96,7 @@ function toggleTheme() {
   applyTheme(selectedTheme === 'dark' ? 'light' : 'dark');
 }
 
-// LANGUAGE
+// ===== LANGUAGE =====
 function applyLang(l) {
   selectedLang = l;
   localStorage.setItem('nerum_lang', l);
@@ -118,7 +114,7 @@ function applyLang(l) {
   }
 }
 
-// ONBOARDING
+// ===== ONBOARDING =====
 function selectTheme(t) {
   selectedTheme = t;
   applyTheme(t);
@@ -150,7 +146,7 @@ function startDashboard() {
   showDashboard(currentUser);
 }
 
-// NAME EDIT
+// ===== NAME EDIT =====
 function editName() {
   document.getElementById('name-edit-row').style.display = 'block';
   document.getElementById('name-edit-input').value = currentUser;
@@ -172,7 +168,7 @@ function cancelEdit() {
   document.getElementById('name-edit-btn').style.display = 'inline';
 }
 
-// AUTH
+// ===== AUTH =====
 function switchTab(tab) {
   document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
   document.getElementById('signup-form').style.display = tab === 'signup' ? 'block' : 'none';
@@ -191,11 +187,16 @@ async function doLogin() {
   const password = document.getElementById('login-password').value;
   if (!email || !password) return showError('Please fill in all fields');
   try {
-    const res = await fetch('/auth/login', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
+    const res = await fetch('/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
     const data = await res.json();
     if (!res.ok) return showError(data.detail || 'Login failed');
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
+    if (data.email) localStorage.setItem('nerum_email', data.email);
     afterLogin(data.name);
   } catch (e) { showError('Server error. Try again.'); }
 }
@@ -207,12 +208,22 @@ async function doSignup() {
   if (!name || !email || !password) return showError('Please fill in all fields');
   if (password.length < 6) return showError('Password must be at least 6 characters');
   try {
-    const res = await fetch('/auth/signup', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ name, email, password }) });
+    const res = await fetch('/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
     const data = await res.json();
     if (!res.ok) return showError(data.detail || 'Signup failed');
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
-    afterLogin(data.name);
+    if (data.email) localStorage.setItem('nerum_email', data.email);
+    // Show verification notice
+    showError('✅ Account created! Check your email to verify your account.');
+    document.getElementById('auth-error').style.color = '#34d399';
+    document.getElementById('auth-error').style.background = 'rgba(52,211,153,0.1)';
+    document.getElementById('auth-error').style.borderColor = 'rgba(52,211,153,0.2)';
+    setTimeout(() => afterLogin(data.name), 2000);
   } catch (e) { showError('Server error. Try again.'); }
 }
 
@@ -242,7 +253,46 @@ function doLogout() {
   document.getElementById('landing-page').style.display = 'block';
 }
 
-// DASHBOARD
+// ===== LOGIN HISTORY =====
+async function loadLoginHistory() {
+  const token = localStorage.getItem('nerum_token');
+  if (!token) return;
+  try {
+    const res = await fetch('/auth/login-history', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const list = document.getElementById('login-history-list');
+    if (!list) return;
+    const isDark = document.body.classList.contains('dark');
+    if (!data.history || data.history.length === 0) {
+      list.innerHTML = '<div style="opacity:0.4;font-size:11px;padding:10px 0">No login history yet</div>';
+      return;
+    }
+    list.innerHTML = data.history.map(h => `
+      <div style="display:flex;align-items:center;justify-content:space-between;
+        padding:10px 0;border-bottom:1px solid ${isDark ? 'rgba(255,255,255,0.06)' : 'rgba(109,40,217,0.08)'}">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div style="width:32px;height:32px;border-radius:8px;
+            background:${isDark ? 'rgba(129,140,248,0.1)' : 'rgba(109,40,217,0.08)'};
+            display:flex;align-items:center;justify-content:center;font-size:14px">
+            ${h.device === 'Mobile' ? '📱' : '💻'}
+          </div>
+          <div>
+            <div style="font-size:11px;font-weight:600;color:${isDark ? '#fff' : '#1a0533'}">${h.device}</div>
+            <div style="font-size:10px;opacity:0.4">IP: ${h.ip_address}</div>
+          </div>
+        </div>
+        <div style="font-size:10px;opacity:0.4;text-align:right">
+          ${new Date(h.logged_in_at).toLocaleDateString()}<br/>
+          ${new Date(h.logged_in_at).toLocaleTimeString()}
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {}
+}
+
+// ===== DASHBOARD =====
 function showDashboard(name) {
   document.getElementById('dashboard').style.display = 'block';
   document.getElementById('tb-name').textContent = name;
@@ -259,11 +309,12 @@ function showDashboard(name) {
   document.getElementById('settings-lang').value = localStorage.getItem('nerum_lang') || 'english';
   loadToggles();
   loadWorkflows();
+  loadLoginHistory();
   showPage('dashboard');
   if (typeof initIcons === 'function') initIcons();
 }
 
-// WORKFLOWS
+// ===== WORKFLOWS =====
 async function loadWorkflows() {
   try {
     const token = localStorage.getItem('nerum_token');
@@ -272,7 +323,6 @@ async function loadWorkflows() {
       headers: { 'Authorization': `Bearer ${token}` }
     });
     if (res.status === 401) {
-      // Token expired - clear and redirect to login
       localStorage.removeItem('nerum_token');
       localStorage.removeItem('nerum_name');
       document.getElementById('dashboard').style.display = 'none';
@@ -292,6 +342,24 @@ async function loadWorkflows() {
     renderWorkflowList(workflows);
     const ptbWf = document.getElementById('ptb-wf');
     if (ptbWf) ptbWf.textContent = count;
+    // Update token stats
+    if (data.tokens_used !== undefined) {
+      const sbTokens = document.getElementById('sb-tokens-used');
+      if (sbTokens) sbTokens.textContent = data.tokens_used;
+      const ptbTokens = document.getElementById('ptb-tokens');
+      if (ptbTokens) ptbTokens.textContent = data.tokens_used;
+      const ptbLimit = document.getElementById('ptb-limit');
+      if (ptbLimit) ptbLimit.textContent = data.token_limit?.toLocaleString();
+      const pct = Math.min(100, Math.round((data.tokens_used / data.token_limit) * 100));
+      const tokenFill = document.getElementById('token-fill');
+      if (tokenFill) tokenFill.style.width = pct + '%';
+      const tokenPct = document.getElementById('token-pct');
+      if (tokenPct) tokenPct.textContent = pct + '%';
+      const tokenUsedLabel = document.getElementById('token-used-label');
+      if (tokenUsedLabel) tokenUsedLabel.textContent = `${data.tokens_used} used`;
+      const tokenLimitLabel = document.getElementById('token-limit-label');
+      if (tokenLimitLabel) tokenLimitLabel.textContent = `${data.token_limit?.toLocaleString()} limit`;
+    }
   } catch (e) {}
 }
 
@@ -417,7 +485,6 @@ async function saveWfModal() {
     closeWfModal();
     addNotification('Workflow Created! ⚡', `"${name}" was created successfully`, 'success');
     loadWorkflows();
-    // Switch to workflows page to show the new one
     document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
     const wfItem = [...document.querySelectorAll('.sb-item')].find(i => i.textContent.trim().startsWith('Workflows'));
     if (wfItem) wfItem.classList.add('active');
@@ -435,13 +502,13 @@ if (_wfOverlay) _wfOverlay.addEventListener('click', function(e) {
   if (e.target === this) closeWfModal();
 });
 
-// SIDEBAR NAVIGATION
+// ===== SIDEBAR NAVIGATION =====
 function setActive(el) {
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   el.classList.add('active');
   const text = el.textContent.trim();
   if (text.startsWith('Billing')) showPage('billing');
-  else if (text.startsWith('Settings')) showPage('settings');
+  else if (text.startsWith('Settings')) { showPage('settings'); loadLoginHistory(); }
   else if (text.startsWith('Service History')) showPage('history');
   else if (text.startsWith('Workflows')) showPage('workflows');
   else showPage('dashboard');
@@ -476,7 +543,7 @@ function showPage(page) {
   }
 }
 
-// SERVICES
+// ===== SERVICES =====
 function toggleSvc(id) {
   const el = document.getElementById(id);
   const isOpen = el.classList.contains('show');
@@ -488,7 +555,7 @@ function toggleSvc(id) {
   }
 }
 
-// CHAT
+// ===== CHAT =====
 function sendChat() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
@@ -504,7 +571,7 @@ function sendChat() {
   }, 800);
 }
 
-// RAZORPAY
+// ===== RAZORPAY =====
 async function startPayment(plan, amount) {
   const token = localStorage.getItem('nerum_token');
   try {
@@ -520,7 +587,7 @@ async function startPayment(plan, amount) {
         });
         const result = await verify.json();
         if (result.success) {
-          alert(`🎉 Upgraded to ${result.plan} plan!`);
+          addNotification('Plan Upgraded! 🎉', `Welcome to ${result.plan} plan!`, 'success');
           document.querySelector('.sb-plan').textContent = result.plan + ' plan';
         }
       },
@@ -532,7 +599,7 @@ async function startPayment(plan, amount) {
   } catch (e) { alert('Payment failed. Try again!'); }
 }
 
-// SETTINGS
+// ===== SETTINGS =====
 function toggleProfileEdit() {
   const overlay = document.getElementById('profile-popup-overlay');
   overlay.style.display = 'flex';
@@ -576,7 +643,7 @@ function saveSettings() {
   }, 2000);
 }
 
-// LANDING PAGE
+// ===== LANDING PAGE =====
 function showAuthPopup() {
   document.getElementById('auth-popup-overlay').style.display = 'flex';
 }
@@ -594,7 +661,7 @@ function loadVideo() {
   alert('Demo video coming soon! 🎬');
 }
 
-// HISTORY
+// ===== HISTORY =====
 async function loadHistory() {
   const container = document.getElementById('history-list');
   container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Loading history...</div>';
@@ -623,23 +690,24 @@ async function loadHistory() {
   }, 500);
 }
 
-// TOGGLES
+// ===== TOGGLES =====
 function saveToggle(id, value) { localStorage.setItem(id, value); }
 
 function loadToggles() {
   ['notif-email', 'notif-telegram', 'notif-weekly'].forEach(id => {
+    const el = document.getElementById(id);
     const saved = localStorage.getItem(id);
-    if (saved !== null) document.getElementById(id).checked = saved === 'true';
+    if (el && saved !== null) el.checked = saved === 'true';
   });
 }
 
-// DANGER ZONE
+// ===== DANGER ZONE =====
 async function deleteAllWorkflows() {
   if (!confirm('Are you sure? This will delete ALL your workflows permanently!')) return;
   const token = localStorage.getItem('nerum_token');
   try {
     await fetch('/workflow/all/delete', { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
-    alert('All workflows deleted!');
+    addNotification('All Workflows Deleted', 'All workflows removed', 'warning');
     loadWorkflows();
   } catch (e) { alert('Error deleting workflows!'); }
 }
@@ -757,9 +825,8 @@ function deleteAccount() {
   };
   init();
 })();
-// ========== NOTIFICATION SYSTEM ==========
 
-// Toast notifications
+// ========== NOTIFICATION SYSTEM ==========
 function showToast(message, type = 'success') {
   const colors = {
     success: { bg: 'rgba(52,211,153,0.12)', border: 'rgba(52,211,153,0.25)', color: '#34d399', icon: '✅' },
@@ -784,16 +851,12 @@ function showToast(message, type = 'success') {
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
 }
 
-// Notification store
 let notifications = [];
 let unreadCount = 0;
 
 function addNotification(title, message, type = 'info') {
   const n = {
-    id: Date.now(),
-    title,
-    message,
-    type,
+    id: Date.now(), title, message, type,
     time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
     read: false
   };
@@ -816,14 +879,13 @@ function toggleNotifPanel() {
   if (!panel) return;
   const isOpen = panel.style.display === 'flex';
   const isDark = document.body.classList.contains('dark');
-  
   if (!isOpen) {
-    // Set background directly via JS — no CSS override issues!
     panel.style.background = isDark ? '#0d0020' : '#ffffff';
-    panel.style.border = isDark 
-      ? '1px solid rgba(232,121,249,0.25)' 
-      : '1px solid rgba(109,40,217,0.2)';
+    panel.style.border = isDark ? '1px solid rgba(232,121,249,0.25)' : '1px solid rgba(109,40,217,0.2)';
     panel.style.display = 'flex';
+    // Also fix list background
+    const list = document.getElementById('notif-list');
+    if (list) list.style.background = isDark ? '#0d0020' : '#ffffff';
     unreadCount = 0;
     updateBellBadge();
     notifications.forEach(n => n.read = true);
@@ -836,6 +898,8 @@ function toggleNotifPanel() {
 function renderNotifications() {
   const list = document.getElementById('notif-list');
   if (!list) return;
+  const isDark = document.body.classList.contains('dark');
+  list.style.background = isDark ? '#0d0020' : '#ffffff';
   if (notifications.length === 0) {
     list.innerHTML = `
       <div style="text-align:center;padding:32px 16px;opacity:0.4">
@@ -845,18 +909,13 @@ function renderNotifications() {
       </div>`;
     return;
   }
-  const typeColors = {
-    success: '#34d399', error: '#ff8a7a',
-    warning: '#fbbf24', info: '#818cf8'
-  };
-  const typeIcons = {
-    success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️'
-  };
+  const typeColors = { success: '#34d399', error: '#ff8a7a', warning: '#fbbf24', info: '#818cf8' };
+  const typeIcons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
   list.innerHTML = notifications.map(n => `
     <div style="
       padding:12px 14px;border-bottom:1px solid;
       display:flex;gap:10px;align-items:flex-start;
-      ${document.body.classList.contains('dark')
+      ${isDark
         ? 'border-color:rgba(255,255,255,0.06);' + (!n.read ? 'background:rgba(129,140,248,0.04);' : '')
         : 'border-color:rgba(109,40,217,0.08);' + (!n.read ? 'background:rgba(109,40,217,0.03);' : '')
       }
@@ -864,8 +923,8 @@ function renderNotifications() {
       <span style="font-size:14px;flex-shrink:0">${typeIcons[n.type] || 'ℹ️'}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:600;margin-bottom:2px;color:${typeColors[n.type] || '#818cf8'}">${n.title}</div>
-        <div style="font-size:10px;opacity:0.6;line-height:1.5">${n.message}</div>
-        <div style="font-size:9px;opacity:0.35;margin-top:4px">${n.time}</div>
+        <div style="font-size:10px;opacity:0.6;line-height:1.5;color:${isDark ? '#fff' : '#1a0533'}">${n.message}</div>
+        <div style="font-size:9px;opacity:0.35;margin-top:4px;color:${isDark ? '#fff' : '#1a0533'}">${n.time}</div>
       </div>
       ${!n.read ? `<div style="width:7px;height:7px;border-radius:50%;background:#818cf8;flex-shrink:0;margin-top:3px"></div>` : ''}
     </div>
@@ -879,7 +938,6 @@ function clearAllNotifications() {
   renderNotifications();
 }
 
-// Close panel when clicking outside
 document.addEventListener('click', function(e) {
   const panel = document.getElementById('notif-panel');
   const btn = document.getElementById('notif-bell-btn');
@@ -887,6 +945,4 @@ document.addEventListener('click', function(e) {
     panel.style.display = 'none';
   }
 });
-
 // ========== END NOTIFICATION SYSTEM ==========
-// ========== END NEBULA BACKGROUND ==========

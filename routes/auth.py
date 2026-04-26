@@ -1,11 +1,11 @@
-from fastapi import APIRouter, HTTPException, Depends, Request
+from fastapi import APIRouter, HTTPException, Depends, Request, Header
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from passlib.context import CryptContext
-from jose import jwt
+from jose import jwt, JWTError
 from datetime import datetime, timedelta
-from models.database import SessionLocal, User, EmailVerificationToken
+from models.database import SessionLocal, User, EmailVerificationToken, LoginHistory
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from collections import defaultdict
@@ -182,10 +182,72 @@ async def send_verification_email(name: str, email: str, token: str):
     except Exception:
         pass
 
-# ===== LOGIN — with lockout =====
+# ===== SUSPICIOUS LOGIN ALERT EMAIL =====
+async def send_suspicious_login_alert(name: str, email: str, ip: str, device: str):
+    if not RESEND_API_KEY:
+        return
+    first_name = name.split()[0] if name else "there"
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": "Nerum <onboarding@resend.dev>",
+                    "to": [email],
+                    "subject": "⚠️ New login to your Nerum account",
+                    "html": f"""
+                    <div style="background:#06000f;padding:40px;font-family:sans-serif;max-width:560px;margin:0 auto">
+                        <div style="text-align:center;margin-bottom:24px">
+                            <span style="font-size:24px;font-weight:800;color:#e879f9">Ne</span>
+                            <span style="font-size:24px;font-weight:800;color:#818cf8">rum</span>
+                        </div>
+                        <div style="background:rgba(255,140,0,0.08);border:1px solid rgba(255,140,0,0.2);border-radius:20px;padding:32px;text-align:center">
+                            <div style="font-size:40px;margin-bottom:12px">⚠️</div>
+                            <h2 style="color:#fff;margin:0 0 8px;font-size:20px">New login detected, {first_name}!</h2>
+                            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 20px">
+                                Someone just logged into your Nerum account.
+                            </p>
+                            <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;text-align:left;margin-bottom:20px">
+                                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+                                    <span style="color:rgba(255,255,255,0.4);font-size:12px">Device</span>
+                                    <span style="color:#fff;font-size:12px;font-weight:600">{device}</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
+                                    <span style="color:rgba(255,255,255,0.4);font-size:12px">IP Address</span>
+                                    <span style="color:#fff;font-size:12px;font-weight:600">{ip}</span>
+                                </div>
+                                <div style="display:flex;justify-content:space-between;padding:6px 0">
+                                    <span style="color:rgba(255,255,255,0.4);font-size:12px">Time</span>
+                                    <span style="color:#fff;font-size:12px;font-weight:600">{datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</span>
+                                </div>
+                            </div>
+                            <p style="color:rgba(255,255,255,0.4);font-size:12px">
+                                If this was you, no action needed.<br/>
+                                If not, change your password immediately.
+                            </p>
+                            <a href="https://nerum.onrender.com"
+                               style="display:inline-block;margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700;font-size:13px">
+                                Go to Dashboard →
+                            </a>
+                        </div>
+                        <div style="text-align:center;margin-top:20px">
+                            <p style="color:rgba(255,255,255,0.15);font-size:11px">© 2026 Nerum · AI Workflow Automation</p>
+                        </div>
+                    </div>
+                    """
+                }
+            )
+    except Exception:
+        pass
+
+# ===== LOGIN =====
 @router.post("/login")
 @limiter.limit("5/minute")
-def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
+async def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
     email = req.email.lower().strip()
 
     # ✅ Check if account is locked
@@ -202,7 +264,6 @@ def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.email == email).first()
     if not user or not pwd_context.verify(req.password, user.hashed_password):
-        # ✅ Increment failed attempts
         failed_attempts[email]["count"] += 1
         count = failed_attempts[email]["count"]
         if count >= 5:
@@ -220,6 +281,23 @@ def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
     # ✅ Reset failed attempts on success
     failed_attempts[email] = {"count": 0, "locked_until": None}
 
+    # ✅ Save login history
+    user_agent = request.headers.get("user-agent", "Unknown")
+    device = "Mobile" if "Mobile" in user_agent else "Desktop"
+    ip = request.client.host if request.client else "Unknown"
+    history = LoginHistory(
+        user_id=user.id,
+        email=user.email,
+        ip_address=ip,
+        device=device,
+        logged_in_at=datetime.utcnow()
+    )
+    db.add(history)
+    db.commit()
+
+    # ✅ Send suspicious login alert
+    await send_suspicious_login_alert(user.name, user.email, ip, device)
+
     token = create_token({"sub": user.email, "name": user.name})
     return {
         "token": token,
@@ -228,7 +306,7 @@ def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
         "is_verified": getattr(user, 'is_verified', True)
     }
 
-# ===== SIGNUP — with email verification =====
+# ===== SIGNUP =====
 @router.post("/signup")
 @limiter.limit("3/minute")
 async def signup(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
@@ -257,7 +335,6 @@ async def signup(request: Request, req: SignupRequest, db: Session = Depends(get
     db.add(vtoken)
     db.commit()
 
-    # Send both emails
     await send_verification_email(user.name, user.email, vtoken_str)
     await send_welcome_email(user.name, user.email)
 
@@ -303,7 +380,6 @@ def verify_email(token: str, db: Session = Depends(get_db)):
             </div></body></html>
         """)
 
-    # ✅ Mark user as verified
     user = db.query(User).filter(User.email == vtoken.email).first()
     if user:
         user.is_verified = True
@@ -323,6 +399,34 @@ def verify_email(token: str, db: Session = Depends(get_db)):
             </a>
         </div></body></html>
     """)
+
+# ===== LOGIN HISTORY =====
+@router.get("/login-history")
+def get_login_history(authorization: str = Header(None), db: Session = Depends(get_db)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    token = authorization.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        history = db.query(LoginHistory).filter(
+            LoginHistory.user_id == user.id
+        ).order_by(LoginHistory.logged_in_at.desc()).limit(10).all()
+        return {
+            "history": [
+                {
+                    "ip_address": h.ip_address,
+                    "device": h.device,
+                    "logged_in_at": h.logged_in_at.isoformat()
+                }
+                for h in history
+            ]
+        }
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 # ===== GOOGLE OAUTH =====
 @router.get("/google")
