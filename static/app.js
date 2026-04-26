@@ -56,6 +56,35 @@ window.addEventListener('load', () => {
   }, 1500);
 });
 
+function checkPasswordStrength(val) {
+  const wrap = document.getElementById('strength-bar-wrap');
+  const bar = document.getElementById('strength-bar');
+  const text = document.getElementById('strength-text');
+  if (!wrap) return;
+  if (!val) { wrap.style.display = 'none'; return; }
+  wrap.style.display = 'block';
+
+  let score = 0;
+  if (val.length >= 6) score++;
+  if (val.length >= 8) score++;
+  if (/[0-9]/.test(val)) score++;
+  if (/[A-Z]/.test(val)) score++;
+  if (/[^A-Za-z0-9]/.test(val)) score++;
+
+  const levels = [
+    { pct: '20%', color: '#ff5050', label: '🔴 Very weak' },
+    { pct: '40%', color: '#ff8a7a', label: '🟠 Weak' },
+    { pct: '60%', color: '#fbbf24', label: '🟡 Medium' },
+    { pct: '80%', color: '#34d399', label: '🟢 Strong' },
+    { pct: '100%', color: '#10b981', label: '💪 Very strong' },
+  ];
+  const level = levels[Math.min(score, 4)];
+  bar.style.width = level.pct;
+  bar.style.background = level.color;
+  text.style.color = level.color;
+  text.textContent = level.label;
+}
+
 // THEME
 function applyTheme(t) {
   document.body.className = t;

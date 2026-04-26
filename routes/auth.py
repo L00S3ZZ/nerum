@@ -1,15 +1,17 @@
 from fastapi import APIRouter, HTTPException, Depends, Request
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from passlib.context import CryptContext
 from jose import jwt
 from datetime import datetime, timedelta
-from models.database import SessionLocal, User
+from models.database import SessionLocal, User, EmailVerificationToken
 from slowapi import Limiter
 from slowapi.util import get_remote_address
+from collections import defaultdict
 import os
 import httpx
+import secrets
 
 router = APIRouter()
 limiter = Limiter(key_func=get_remote_address)
@@ -24,6 +26,9 @@ GOOGLE_REDIRECT_URI = "https://nerum.onrender.com/auth/google/callback"
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+# ✅ Failed login tracker — blocks brute force
+failed_attempts = defaultdict(lambda: {"count": 0, "locked_until": None})
 
 def get_db():
     db = SessionLocal()
@@ -47,6 +52,7 @@ def create_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+# ===== WELCOME EMAIL =====
 async def send_welcome_email(name: str, email: str):
     if not RESEND_API_KEY:
         return
@@ -128,17 +134,101 @@ async def send_welcome_email(name: str, email: str):
     except Exception:
         pass
 
-# ✅ Max 5 login attempts per minute per IP — blocks brute force
+# ===== VERIFICATION EMAIL =====
+async def send_verification_email(name: str, email: str, token: str):
+    if not RESEND_API_KEY:
+        return
+    first_name = name.split()[0] if name else "there"
+    verify_url = f"https://nerum.onrender.com/auth/verify-email?token={token}"
+    try:
+        async with httpx.AsyncClient() as client:
+            await client.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json"
+                },
+                json={
+                    "from": "Nerum <onboarding@resend.dev>",
+                    "to": [email],
+                    "subject": "Verify your Nerum email ✉️",
+                    "html": f"""
+                    <div style="background:#06000f;padding:40px;font-family:sans-serif;max-width:560px;margin:0 auto">
+                        <div style="text-align:center;margin-bottom:24px">
+                            <span style="font-size:24px;font-weight:800;color:#e879f9">Ne</span>
+                            <span style="font-size:24px;font-weight:800;color:#818cf8">rum</span>
+                        </div>
+                        <div style="background:rgba(255,255,255,0.04);border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:32px;text-align:center">
+                            <div style="font-size:40px;margin-bottom:12px">✉️</div>
+                            <h2 style="color:#fff;margin:0 0 8px;font-size:20px">Verify your email, {first_name}!</h2>
+                            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 28px;line-height:1.6">
+                                Click the button below to verify your Nerum account.
+                            </p>
+                            <a href="{verify_url}"
+                               style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-weight:700;font-size:14px">
+                                Verify Email →
+                            </a>
+                            <p style="color:rgba(255,255,255,0.25);font-size:11px;margin-top:20px">
+                                Link expires in 24 hours. If you didn't sign up, ignore this email.
+                            </p>
+                        </div>
+                        <div style="text-align:center;margin-top:20px">
+                            <p style="color:rgba(255,255,255,0.15);font-size:11px">© 2026 Nerum · AI Workflow Automation</p>
+                        </div>
+                    </div>
+                    """
+                }
+            )
+    except Exception:
+        pass
+
+# ===== LOGIN — with lockout =====
 @router.post("/login")
 @limiter.limit("5/minute")
 def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == req.email).first()
-    if not user or not pwd_context.verify(req.password, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Invalid email or password")
-    token = create_token({"sub": user.email, "name": user.name})
-    return {"token": token, "name": user.name, "email": user.email}
+    email = req.email.lower().strip()
 
-# ✅ Max 3 signups per minute per IP — blocks spam accounts
+    # ✅ Check if account is locked
+    attempt_data = failed_attempts[email]
+    if attempt_data["locked_until"]:
+        if datetime.utcnow() < attempt_data["locked_until"]:
+            remaining = int((attempt_data["locked_until"] - datetime.utcnow()).total_seconds() / 60) + 1
+            raise HTTPException(
+                status_code=429,
+                detail=f"Account locked due to too many failed attempts. Try again in {remaining} minutes."
+            )
+        else:
+            failed_attempts[email] = {"count": 0, "locked_until": None}
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user or not pwd_context.verify(req.password, user.hashed_password):
+        # ✅ Increment failed attempts
+        failed_attempts[email]["count"] += 1
+        count = failed_attempts[email]["count"]
+        if count >= 5:
+            failed_attempts[email]["locked_until"] = datetime.utcnow() + timedelta(minutes=15)
+            raise HTTPException(
+                status_code=429,
+                detail="Too many failed attempts. Account locked for 15 minutes."
+            )
+        attempts_left = 5 - count
+        raise HTTPException(
+            status_code=401,
+            detail=f"Invalid email or password. {attempts_left} attempts remaining."
+        )
+
+    # ✅ Reset failed attempts on success
+    failed_attempts[email] = {"count": 0, "locked_until": None}
+
+    token = create_token({"sub": user.email, "name": user.name})
+    return {
+        "token": token,
+        "name": user.name,
+        "email": user.email,
+        "is_verified": getattr(user, 'is_verified', True)
+    }
+
+# ===== SIGNUP — with email verification =====
 @router.post("/signup")
 @limiter.limit("3/minute")
 async def signup(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
@@ -146,14 +236,95 @@ async def signup(request: Request, req: SignupRequest, db: Session = Depends(get
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
     hashed = pwd_context.hash(req.password)
-    user = User(name=req.name, email=req.email, hashed_password=hashed)
+    user = User(
+        name=req.name,
+        email=req.email,
+        hashed_password=hashed,
+        is_verified=False
+    )
     db.add(user)
     db.commit()
     db.refresh(user)
-    token = create_token({"sub": user.email, "name": user.name})
-    await send_welcome_email(user.name, user.email)
-    return {"token": token, "name": user.name, "email": user.email}
 
+    # ✅ Create verification token
+    vtoken_str = secrets.token_urlsafe(32)
+    vtoken = EmailVerificationToken(
+        email=req.email,
+        token=vtoken_str,
+        expires_at=datetime.utcnow() + timedelta(hours=24),
+        used=False
+    )
+    db.add(vtoken)
+    db.commit()
+
+    # Send both emails
+    await send_verification_email(user.name, user.email, vtoken_str)
+    await send_welcome_email(user.name, user.email)
+
+    jwt_token = create_token({"sub": user.email, "name": user.name})
+    return {
+        "token": jwt_token,
+        "name": user.name,
+        "email": user.email,
+        "is_verified": False
+    }
+
+# ===== VERIFY EMAIL =====
+@router.get("/verify-email")
+def verify_email(token: str, db: Session = Depends(get_db)):
+    vtoken = db.query(EmailVerificationToken).filter(
+        EmailVerificationToken.token == token,
+        EmailVerificationToken.used == False
+    ).first()
+
+    if not vtoken:
+        return HTMLResponse("""
+            <html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
+            <div style="text-align:center;color:#fff">
+                <div style="font-size:48px;margin-bottom:16px">❌</div>
+                <h2 style="color:#ff8a7a;margin-bottom:8px">Invalid or expired link!</h2>
+                <p style="color:rgba(255,255,255,0.4)">Please sign up again.</p>
+                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
+                    Go to Nerum →
+                </a>
+            </div></body></html>
+        """)
+
+    if datetime.utcnow() > vtoken.expires_at:
+        return HTMLResponse("""
+            <html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
+            <div style="text-align:center;color:#fff">
+                <div style="font-size:48px;margin-bottom:16px">⏰</div>
+                <h2 style="color:#fbbf24;margin-bottom:8px">Link expired!</h2>
+                <p style="color:rgba(255,255,255,0.4)">Please sign up again to get a new link.</p>
+                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
+                    Go to Nerum →
+                </a>
+            </div></body></html>
+        """)
+
+    # ✅ Mark user as verified
+    user = db.query(User).filter(User.email == vtoken.email).first()
+    if user:
+        user.is_verified = True
+        db.commit()
+
+    vtoken.used = True
+    db.commit()
+
+    return HTMLResponse("""
+        <html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
+        <div style="text-align:center;color:#fff">
+            <div style="font-size:48px;margin-bottom:16px">🎉</div>
+            <h2 style="color:#34d399;margin-bottom:8px">Email Verified!</h2>
+            <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Your Nerum account is now verified.</p>
+            <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
+                Go to Dashboard →
+            </a>
+        </div></body></html>
+    """)
+
+# ===== GOOGLE OAUTH =====
 @router.get("/google")
 def google_login():
     params = {
@@ -199,7 +370,8 @@ async def google_callback(code: str, db: Session = Depends(get_db)):
         user = User(
             name=name,
             email=email,
-            hashed_password=pwd_context.hash(os.urandom(32).hex())
+            hashed_password=pwd_context.hash(os.urandom(32).hex()),
+            is_verified=True  # ✅ Google users auto verified
         )
         db.add(user)
         db.commit()

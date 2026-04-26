@@ -34,8 +34,11 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     plan = Column(String, default="free")
-    token_limit = Column(Integer, default=1000)   # ✅ Free plan = 3000 tokens
+    token_limit = Column(Integer, default=1000)
     tokens_used = Column(Integer, default=0)
+    # ✅ Email verification
+    is_verified = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
 
 class Workflow(Base):
     __tablename__ = "workflows"
@@ -53,6 +56,15 @@ class Workflow(Base):
 
 class PasswordResetToken(Base):
     __tablename__ = "password_reset_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    token = Column(String, unique=True, index=True)
+    expires_at = Column(DateTime)
+    used = Column(Boolean, default=False)
+
+# ✅ Email verification tokens table
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, index=True)
     token = Column(String, unique=True, index=True)

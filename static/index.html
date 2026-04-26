@@ -128,7 +128,16 @@
       <div id="signup-form" style="display:none">
         <div class="form-group"><label>FULL NAME</label><input type="text" id="signup-name" placeholder="Your name"/></div>
         <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
-        <div class="form-group"><label>PASSWORD</label><input type="password" id="signup-password" placeholder="Min 6 characters"/></div>
+        <div class="form-group">
+  <label>PASSWORD</label>
+  <input type="password" id="signup-password" placeholder="Min 6 characters" oninput="checkPasswordStrength(this.value)"/>
+  <div id="strength-bar-wrap" style="margin-top:6px;display:none">
+    <div style="height:3px;border-radius:10px;background:rgba(255,255,255,0.08);overflow:hidden">
+      <div id="strength-bar" style="height:100%;border-radius:10px;transition:all 0.3s;width:0%"></div>
+    </div>
+    <div id="strength-text" style="font-size:10px;margin-top:4px"></div>
+  </div>
+</div>
         <button class="auth-btn" onclick="doSignup()">Create account</button>
         <div class="auth-switch">Already have an account? <span onclick="switchTab('login')">Login</span></div>
       </div>
