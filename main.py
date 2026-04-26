@@ -13,10 +13,9 @@ from routes.telegram import router as telegram_router
 from routes.whatsapp import router as whatsapp_router
 from routes import payment
 from routes.password_reset import router as reset_router
-import os
 from routes import admin
+import os
 
-# Rate limiter — 200 requests per minute per IP globally
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 app = FastAPI(title="Nerum", version="0.1")
@@ -41,18 +40,17 @@ app.include_router(payment.router, prefix="/payment")
 app.include_router(reset_router, prefix="/auth")
 app.include_router(admin.router, prefix="/admin")
 
-
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
 
+# ✅ Admin page route — correctly placed before if __name__
+@app.get("/admin-panel")
+def admin_page():
+    return FileResponse("static/admin.html")
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)))
-
-@app.get("/admin")
-def admin_page():
-    from fastapi.responses import FileResponse
-    return FileResponse("static/admin.html")
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), use_reloader=False)
