@@ -27,7 +27,7 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ✅ Failed login tracker — blocks brute force
+# ✅ Failed login tracker
 failed_attempts = defaultdict(lambda: {"count": 0, "locked_until": None})
 
 def get_db():
@@ -60,10 +60,7 @@ async def send_welcome_email(name: str, email: str):
     html = f"""
     <!DOCTYPE html>
     <html>
-    <head>
-      <meta charset="UTF-8"/>
-      <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    </head>
+    <head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/></head>
     <body style="margin:0;padding:0;background:#06000f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif">
       <div style="max-width:560px;margin:40px auto;padding:0 20px">
         <div style="text-align:center;margin-bottom:32px;padding-top:20px">
@@ -76,41 +73,12 @@ async def send_welcome_email(name: str, email: str):
             You're all set to automate your business with AI workflows.<br/>
             Connect Gmail, WhatsApp, Telegram and Google Sheets — all in one place.
           </p>
-          <a href="https://nerum.onrender.com"
-             style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700;margin-bottom:28px">
+          <a href="https://nerum.onrender.com" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700;margin-bottom:28px">
             Go to Dashboard →
           </a>
-          <div style="border-top:1px solid rgba(255,255,255,0.08);margin-bottom:24px"></div>
-          <p style="color:rgba(255,255,255,0.4);font-size:11px;text-transform:uppercase;letter-spacing:2px;margin:0 0 16px;font-weight:600">GET STARTED IN 3 STEPS</p>
-          <div style="display:flex;flex-direction:column;gap:12px;text-align:left">
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">1</div>
-              <div>
-                <div style="color:#fff;font-size:12px;font-weight:600">Connect your services</div>
-                <div style="color:rgba(255,255,255,0.4);font-size:11px">Link Gmail, WhatsApp, Telegram & Sheets</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">2</div>
-              <div>
-                <div style="color:#fff;font-size:12px;font-weight:600">Tell the AI what to automate</div>
-                <div style="color:rgba(255,255,255,0.4);font-size:11px">Type in Tamil or English — Nerum understands</div>
-              </div>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px">
-              <div style="width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#fff;flex-shrink:0">3</div>
-              <div>
-                <div style="color:#fff;font-size:12px;font-weight:600">Sit back and watch it run</div>
-                <div style="color:rgba(255,255,255,0.4);font-size:11px">Your workflow runs automatically 24/7</div>
-              </div>
-            </div>
-          </div>
         </div>
         <div style="text-align:center;margin-top:24px;padding-bottom:40px">
-          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0">
-            © 2026 Nerum · AI Workflow Automation<br/>
-            <span style="color:rgba(255,255,255,0.15)">You received this because you signed up at nerum.onrender.com</span>
-          </p>
+          <p style="color:rgba(255,255,255,0.2);font-size:11px;margin:0">© 2026 Nerum · AI Workflow Automation</p>
         </div>
       </div>
     </body>
@@ -120,16 +88,8 @@ async def send_welcome_email(name: str, email: str):
         async with httpx.AsyncClient() as client:
             await client.post(
                 "https://api.resend.com/emails",
-                headers={
-                    "Authorization": f"Bearer {RESEND_API_KEY}",
-                    "Content-Type": "application/json"
-                },
-                json={
-                    "from": "Nerum <onboarding@resend.dev>",
-                    "to": [email],
-                    "subject": f"Welcome to Nerum, {first_name}! 🚀",
-                    "html": html
-                }
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
+                json={"from": "Nerum <onboarding@resend.dev>", "to": [email], "subject": f"Welcome to Nerum, {first_name}! 🚀", "html": html}
             )
     except Exception:
         pass
@@ -144,10 +104,7 @@ async def send_verification_email(name: str, email: str, token: str):
         async with httpx.AsyncClient() as client:
             await client.post(
                 "https://api.resend.com/emails",
-                headers={
-                    "Authorization": f"Bearer {RESEND_API_KEY}",
-                    "Content-Type": "application/json"
-                },
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
                     "from": "Nerum <onboarding@resend.dev>",
                     "to": [email],
@@ -162,10 +119,10 @@ async def send_verification_email(name: str, email: str, token: str):
                             <div style="font-size:40px;margin-bottom:12px">✉️</div>
                             <h2 style="color:#fff;margin:0 0 8px;font-size:20px">Verify your email, {first_name}!</h2>
                             <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 28px;line-height:1.6">
-                                Click the button below to verify your Nerum account.
+                                Click the button below to verify your Nerum account.<br/>
+                                This is a one-time verification — you won't need to do it again!
                             </p>
-                            <a href="{verify_url}"
-                               style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-weight:700;font-size:14px">
+                            <a href="{verify_url}" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-weight:700;font-size:14px">
                                 Verify Email →
                             </a>
                             <p style="color:rgba(255,255,255,0.25);font-size:11px;margin-top:20px">
@@ -182,7 +139,7 @@ async def send_verification_email(name: str, email: str, token: str):
     except Exception:
         pass
 
-# ===== SUSPICIOUS LOGIN ALERT EMAIL =====
+# ===== SUSPICIOUS LOGIN ALERT =====
 async def send_suspicious_login_alert(name: str, email: str, ip: str, device: str):
     if not RESEND_API_KEY:
         return
@@ -191,10 +148,7 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
         async with httpx.AsyncClient() as client:
             await client.post(
                 "https://api.resend.com/emails",
-                headers={
-                    "Authorization": f"Bearer {RESEND_API_KEY}",
-                    "Content-Type": "application/json"
-                },
+                headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
                     "from": "Nerum <onboarding@resend.dev>",
                     "to": [email],
@@ -208,9 +162,7 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
                         <div style="background:rgba(255,140,0,0.08);border:1px solid rgba(255,140,0,0.2);border-radius:20px;padding:32px;text-align:center">
                             <div style="font-size:40px;margin-bottom:12px">⚠️</div>
                             <h2 style="color:#fff;margin:0 0 8px;font-size:20px">New login detected, {first_name}!</h2>
-                            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 20px">
-                                Someone just logged into your Nerum account.
-                            </p>
+                            <p style="color:rgba(255,255,255,0.5);font-size:13px;margin:0 0 20px">Someone just logged into your Nerum account.</p>
                             <div style="background:rgba(255,255,255,0.04);border-radius:12px;padding:16px;text-align:left;margin-bottom:20px">
                                 <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06)">
                                     <span style="color:rgba(255,255,255,0.4);font-size:12px">Device</span>
@@ -225,12 +177,8 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
                                     <span style="color:#fff;font-size:12px;font-weight:600">{datetime.utcnow().strftime('%Y-%m-%d %H:%M UTC')}</span>
                                 </div>
                             </div>
-                            <p style="color:rgba(255,255,255,0.4);font-size:12px">
-                                If this was you, no action needed.<br/>
-                                If not, change your password immediately.
-                            </p>
-                            <a href="https://nerum.onrender.com"
-                               style="display:inline-block;margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700;font-size:13px">
+                            <p style="color:rgba(255,255,255,0.4);font-size:12px">If this was you, no action needed.<br/>If not, change your password immediately.</p>
+                            <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:16px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700;font-size:13px">
                                 Go to Dashboard →
                             </a>
                         </div>
@@ -250,15 +198,12 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
 async def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
     email = req.email.lower().strip()
 
-    # ✅ Check if account is locked
+    # ✅ Check lockout
     attempt_data = failed_attempts[email]
     if attempt_data["locked_until"]:
         if datetime.utcnow() < attempt_data["locked_until"]:
             remaining = int((attempt_data["locked_until"] - datetime.utcnow()).total_seconds() / 60) + 1
-            raise HTTPException(
-                status_code=429,
-                detail=f"Account locked due to too many failed attempts. Try again in {remaining} minutes."
-            )
+            raise HTTPException(status_code=429, detail=f"Account locked. Try again in {remaining} minutes.")
         else:
             failed_attempts[email] = {"count": 0, "locked_until": None}
 
@@ -268,18 +213,20 @@ async def login(request: Request, req: LoginRequest, db: Session = Depends(get_d
         count = failed_attempts[email]["count"]
         if count >= 5:
             failed_attempts[email]["locked_until"] = datetime.utcnow() + timedelta(minutes=15)
-            raise HTTPException(
-                status_code=429,
-                detail="Too many failed attempts. Account locked for 15 minutes."
-            )
+            raise HTTPException(status_code=429, detail="Too many failed attempts. Account locked for 15 minutes.")
         attempts_left = 5 - count
-        raise HTTPException(
-            status_code=401,
-            detail=f"Invalid email or password. {attempts_left} attempts remaining."
-        )
+        raise HTTPException(status_code=401, detail=f"Invalid email or password. {attempts_left} attempts remaining.")
 
-    # ✅ Reset failed attempts on success
+    # ✅ Reset failed attempts
     failed_attempts[email] = {"count": 0, "locked_until": None}
+
+    # ✅ Check email verified
+    is_verified = getattr(user, 'is_verified', True)
+    if not is_verified:
+        raise HTTPException(
+            status_code=403,
+            detail="Please verify your email first. Check your inbox for the verification link!"
+        )
 
     # ✅ Save login history
     user_agent = request.headers.get("user-agent", "Unknown")
@@ -295,16 +242,11 @@ async def login(request: Request, req: LoginRequest, db: Session = Depends(get_d
     db.add(history)
     db.commit()
 
-    # ✅ Send suspicious login alert
+    # ✅ Send login alert
     await send_suspicious_login_alert(user.name, user.email, ip, device)
 
     token = create_token({"sub": user.email, "name": user.name})
-    return {
-        "token": token,
-        "name": user.name,
-        "email": user.email,
-        "is_verified": getattr(user, 'is_verified', True)
-    }
+    return {"token": token, "name": user.name, "email": user.email, "is_verified": True}
 
 # ===== SIGNUP =====
 @router.post("/signup")
@@ -313,13 +255,9 @@ async def signup(request: Request, req: SignupRequest, db: Session = Depends(get
     existing = db.query(User).filter(User.email == req.email).first()
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
+
     hashed = pwd_context.hash(req.password)
-    user = User(
-        name=req.name,
-        email=req.email,
-        hashed_password=hashed,
-        is_verified=False
-    )
+    user = User(name=req.name, email=req.email, hashed_password=hashed, is_verified=False)
     db.add(user)
     db.commit()
     db.refresh(user)
@@ -335,16 +273,12 @@ async def signup(request: Request, req: SignupRequest, db: Session = Depends(get
     db.add(vtoken)
     db.commit()
 
+    # Send emails
     await send_verification_email(user.name, user.email, vtoken_str)
     await send_welcome_email(user.name, user.email)
 
     jwt_token = create_token({"sub": user.email, "name": user.name})
-    return {
-        "token": jwt_token,
-        "name": user.name,
-        "email": user.email,
-        "is_verified": False
-    }
+    return {"token": jwt_token, "name": user.name, "email": user.email, "is_verified": False}
 
 # ===== VERIFY EMAIL =====
 @router.get("/verify-email")
@@ -361,9 +295,7 @@ def verify_email(token: str, db: Session = Depends(get_db)):
                 <div style="font-size:48px;margin-bottom:16px">❌</div>
                 <h2 style="color:#ff8a7a;margin-bottom:8px">Invalid or expired link!</h2>
                 <p style="color:rgba(255,255,255,0.4)">Please sign up again.</p>
-                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
-                    Go to Nerum →
-                </a>
+                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
             </div></body></html>
         """)
 
@@ -374,12 +306,11 @@ def verify_email(token: str, db: Session = Depends(get_db)):
                 <div style="font-size:48px;margin-bottom:16px">⏰</div>
                 <h2 style="color:#fbbf24;margin-bottom:8px">Link expired!</h2>
                 <p style="color:rgba(255,255,255,0.4)">Please sign up again to get a new link.</p>
-                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
-                    Go to Nerum →
-                </a>
+                <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
             </div></body></html>
         """)
 
+    # ✅ Mark verified
     user = db.query(User).filter(User.email == vtoken.email).first()
     if user:
         user.is_verified = True
@@ -393,12 +324,35 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         <div style="text-align:center;color:#fff">
             <div style="font-size:48px;margin-bottom:16px">🎉</div>
             <h2 style="color:#34d399;margin-bottom:8px">Email Verified!</h2>
-            <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Your Nerum account is now verified.</p>
+            <p style="color:rgba(255,255,255,0.5);margin-bottom:24px">Your Nerum account is now verified.<br/>You can now login freely anytime!</p>
             <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
                 Go to Dashboard →
             </a>
         </div></body></html>
     """)
+
+# ===== RESEND VERIFICATION EMAIL =====
+@router.post("/resend-verification")
+async def resend_verification(data: dict, db: Session = Depends(get_db)):
+    email = data.get("email", "").lower().strip()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="Email not found")
+    if getattr(user, 'is_verified', False):
+        raise HTTPException(status_code=400, detail="Email already verified")
+
+    # Create new token
+    vtoken_str = secrets.token_urlsafe(32)
+    vtoken = EmailVerificationToken(
+        email=email,
+        token=vtoken_str,
+        expires_at=datetime.utcnow() + timedelta(hours=24),
+        used=False
+    )
+    db.add(vtoken)
+    db.commit()
+    await send_verification_email(user.name, email, vtoken_str)
+    return {"message": "Verification email sent!"}
 
 # ===== LOGIN HISTORY =====
 @router.get("/login-history")
@@ -417,11 +371,7 @@ def get_login_history(authorization: str = Header(None), db: Session = Depends(g
         ).order_by(LoginHistory.logged_in_at.desc()).limit(10).all()
         return {
             "history": [
-                {
-                    "ip_address": h.ip_address,
-                    "device": h.device,
-                    "logged_in_at": h.logged_in_at.isoformat()
-                }
+                {"ip_address": h.ip_address, "device": h.device, "logged_in_at": h.logged_in_at.isoformat()}
                 for h in history
             ]
         }
@@ -457,7 +407,6 @@ async def google_callback(code: str, db: Session = Depends(get_db)):
         )
         token_data = token_res.json()
         access_token = token_data.get("access_token")
-
         user_res = await client.get(
             "https://www.googleapis.com/oauth2/v2/userinfo",
             headers={"Authorization": f"Bearer {access_token}"}
@@ -469,20 +418,51 @@ async def google_callback(code: str, db: Session = Depends(get_db)):
 
     user = db.query(User).filter(User.email == email).first()
     is_new_user = False
+
     if not user:
         is_new_user = True
         user = User(
             name=name,
             email=email,
             hashed_password=pwd_context.hash(os.urandom(32).hex()),
-            is_verified=True  # ✅ Google users auto verified
+            is_verified=False  # ✅ Must verify email even for Google users
         )
         db.add(user)
         db.commit()
         db.refresh(user)
 
-    if is_new_user:
+        # ✅ Send verification email — ONE TIME only for new users
+        vtoken_str = secrets.token_urlsafe(32)
+        vtoken = EmailVerificationToken(
+            email=email,
+            token=vtoken_str,
+            expires_at=datetime.utcnow() + timedelta(hours=24),
+            used=False
+        )
+        db.add(vtoken)
+        db.commit()
+        await send_verification_email(name, email, vtoken_str)
         await send_welcome_email(name, email)
 
+        # Redirect to verification pending page
+        return RedirectResponse(f"/?verify_pending=true&email={email}&name={name}")
+
+    # ✅ Existing user — check if verified
+    is_verified = getattr(user, 'is_verified', True)
+    if not is_verified:
+        # Still not verified — resend verification
+        vtoken_str = secrets.token_urlsafe(32)
+        vtoken = EmailVerificationToken(
+            email=email,
+            token=vtoken_str,
+            expires_at=datetime.utcnow() + timedelta(hours=24),
+            used=False
+        )
+        db.add(vtoken)
+        db.commit()
+        await send_verification_email(name, email, vtoken_str)
+        return RedirectResponse(f"/?verify_pending=true&email={email}&name={name}")
+
+    # ✅ Verified — login directly
     token = create_token({"sub": user.email, "name": user.name})
     return RedirectResponse(f"/?token={token}&name={name}")
