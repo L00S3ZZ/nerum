@@ -16,24 +16,6 @@ window.addEventListener('load', () => {
   const googleToken = urlParams.get('token');
   const googleName = urlParams.get('name');
 
-// ✅ Handle verification pending redirect
-const verifyPending = urlParams.get('verify_pending');
-const pendingEmail = urlParams.get('email');
-if (verifyPending && pendingEmail) {
-  window.history.replaceState({}, document.title, '/');
-  showAuthPopup();
-  setTimeout(() => {
-    const errEl = document.getElementById('auth-error');
-    if (errEl) {
-      errEl.textContent = `✅ Account created! Check ${pendingEmail} inbox to verify before logging in.`;
-      errEl.style.display = 'block';
-      errEl.style.color = '#34d399';
-      errEl.style.background = 'rgba(52,211,153,0.1)';
-      errEl.style.border = '1px solid rgba(52,211,153,0.2)';
-    }
-  }, 300);
-}  
-
   const verifyPending = urlParams.get('verify_pending');
 const pendingEmail = urlParams.get('email');
 const pendingName = urlParams.get('name');
