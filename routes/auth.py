@@ -9,6 +9,7 @@ from models.database import SessionLocal, User, EmailVerificationToken, LoginHis
 from slowapi import Limiter
 from slowapi.util import get_remote_address
 from collections import defaultdict
+from pydantic import Field, validator
 import os
 import httpx
 import secrets
@@ -38,13 +39,25 @@ def get_db():
         db.close()
 
 class SignupRequest(BaseModel):
-    name: str
-    email: str
-    password: str
+    name: str = Field(..., min_length=1, max_length=100)
+    email: str = Field(..., max_length=200)
+    password: str = Field(..., min_length=6, max_length=100)
+
+    @validator('name')
+    def name_no_scripts(cls, v):
+        if '<' in v or '>' in v or 'script' in v.lower():
+            raise ValueError('Invalid name')
+        return v.strip()
+
+    @validator('email')
+    def email_valid(cls, v):
+        if '@' not in v or '.' not in v:
+            raise ValueError('Invalid email')
+        return v.lower().strip()
 
 class LoginRequest(BaseModel):
-    email: str
-    password: str
+    email: str = Field(..., max_length=200)
+    password: str = Field(..., max_length=100)
 
 def create_token(data: dict):
     to_encode = data.copy()
