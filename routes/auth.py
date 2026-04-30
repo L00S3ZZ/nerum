@@ -438,7 +438,10 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         <div style="text-align:center;color:#fff"><div style="font-size:48px">🎉</div>
         <h2 style="color:#34d399">Email Verified!</h2>
         <p style="color:rgba(255,255,255,0.5);margin:8px 0 24px">Your account is verified. You can now login!</p>
-        <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Dashboard →</a>
+        <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
+                Go to Login →
+            </a>
+            <script>setTimeout(() => window.location.href = "https://nerum.onrender.com", 3000)</script>
         </div></body></html>""")
 
 # ===== RESEND VERIFICATION =====

@@ -40,7 +40,10 @@ def admin_login(data: dict):
 
 @router.get("/stats")
 def get_stats(admin=Depends(verify_admin), db: Session = Depends(get_db)):
-    total_users = db.query(User).count()
+    total_users = db.query(User).filter(
+    User.email != None,
+    User.name != None
+).count()
     total_workflows = db.query(Workflow).count()
     active_workflows = db.query(Workflow).filter(Workflow.is_active == True).count()
     
@@ -81,7 +84,10 @@ def get_stats(admin=Depends(verify_admin), db: Session = Depends(get_db)):
 
 @router.get("/users")
 def get_users(admin=Depends(verify_admin), db: Session = Depends(get_db)):
-    users = db.query(User).order_by(User.id.desc()).all()
+    users = db.query(User).filter(
+    User.email != None,
+    User.name != None
+).order_by(User.id.desc()).all()
     return {
         "users": [
             {
