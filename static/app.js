@@ -221,8 +221,6 @@ async function doLogin() {
   return;
 }
 
-let otpEmail = '';
-
 async function verifyOTP() {
   const otp = document.getElementById('otp-input').value.trim();
   const errEl = document.getElementById('otp-error');
