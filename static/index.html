@@ -447,6 +447,20 @@
         </div>
 
         <div class="settings-section">
+          <div class="settings-section-title">Security</div>
+          <div class="toggle-row">
+            <div>
+              <div class="toggle-label">Two-Factor Authentication (2FA)</div>
+              <div class="toggle-desc">Send OTP to email on every login</div>
+            </div>
+            <label class="toggle-switch">
+              <input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/>
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="settings-section">
           <div class="settings-section-title">Notifications</div>
           <div class="toggle-row"><div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div><label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label></div>
           <div class="toggle-row"><div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div><label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label></div>
@@ -460,6 +474,21 @@
           <div class="integration-item"><div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div><div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
           <div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div>
         </div>
+
+        <!-- Add inside settings-section Notifications div -->
+<div class="settings-section">
+  <div class="settings-section-title">Security</div>
+  <div class="toggle-row">
+    <div>
+      <div class="toggle-label">Two-Factor Authentication (2FA)</div>
+      <div class="toggle-desc">Send OTP to email on every login</div>
+    </div>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/>
+      <span class="toggle-slider"></span>
+    </label>
+  </div>
+</div>
 
         <!-- ✅ LOGIN HISTORY — correctly inside settings-content -->
         <div class="settings-section">
@@ -519,6 +548,19 @@
       <button onclick="closeWfModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button>
     </div>
     <div id="wf-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
+  </div>
+</div>
+
+<!-- OTP POPUP -->
+<div id="otp-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div style="width:100%;max-width:380px;margin:20px;background:#0d0020;border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:32px;text-align:center;animation:slideUp 0.3s ease">
+    <div style="font-size:36px;margin-bottom:12px">🔐</div>
+    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:8px">Enter OTP</div>
+    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px" id="otp-email-hint">Check your email for the 6-digit code</div>
+    <input id="otp-input" type="text" maxlength="6" placeholder="000000" style="width:100%;padding:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(232,121,249,0.3);color:#fff;font-size:28px;font-weight:700;letter-spacing:8px;text-align:center;outline:none;font-family:inherit;margin-bottom:14px" onkeydown="if(event.key==='Enter')verifyOTP()"/>
+    <div id="otp-error" style="display:none;font-size:11px;color:#ff8a7a;margin-bottom:12px"></div>
+    <button onclick="verifyOTP()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">Verify OTP →</button>
+    <button onclick="document.getElementById('otp-overlay').style.display='none'" style="width:100%;padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit">← Back to Login</button>
   </div>
 </div>
 

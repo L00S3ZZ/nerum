@@ -213,12 +213,76 @@ async function doLogin() {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
-    if (!res.ok) return showError(data.detail || 'Login failed');
+    if (data.two_fa_required) {
+  otpEmail = data.email;  // ← ADD THIS LINE
+  document.getElementById('otp-overlay').style.display = 'flex';
+  document.getElementById('otp-email-hint').textContent = `Code sent to ${data.email}`;
+  hideAuthPopup();
+  return;
+}
+
+let otpEmail = '';
+
+async function verifyOTP() {
+  const otp = document.getElementById('otp-input').value.trim();
+  const errEl = document.getElementById('otp-error');
+  if (otp.length !== 6) {
+    errEl.textContent = 'Enter the 6-digit code';
+    errEl.style.display = 'block';
+    return;
+  }
+  try {
+    const res = await fetch('/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: otpEmail, otp })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'Invalid OTP';
+      errEl.style.display = 'block';
+      return;
+    }
+    document.getElementById('otp-overlay').style.display = 'none';
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
-    if (data.email) localStorage.setItem('nerum_email', data.email);
     afterLogin(data.name);
-  } catch (e) { showError('Server error. Try again.'); }
+  } catch(e) {
+    errEl.textContent = 'Something went wrong';
+    errEl.style.display = 'block';
+  }
+}
+
+let otpEmail = '';
+
+async function verifyOTP() {
+  const otp = document.getElementById('otp-input').value.trim();
+  const errEl = document.getElementById('otp-error');
+  if (otp.length !== 6) {
+    errEl.textContent = 'Enter the 6-digit code';
+    errEl.style.display = 'block';
+    return;
+  }
+  try {
+    const res = await fetch('/auth/verify-otp', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: otpEmail, otp })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'Invalid OTP';
+      errEl.style.display = 'block';
+      return;
+    }
+    document.getElementById('otp-overlay').style.display = 'none';
+    localStorage.setItem('nerum_token', data.token);
+    localStorage.setItem('nerum_name', data.name);
+    afterLogin(data.name);
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Try again.';
+    errEl.style.display = 'block';
+  }
 }
 
 async function doSignup() {
