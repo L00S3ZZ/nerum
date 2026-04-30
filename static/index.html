@@ -101,6 +101,8 @@
       <a class="footer-link" href="#features">Features</a>
       <a class="footer-link" href="#pricing">Pricing</a>
       <a class="footer-link" onclick="showAuthPopup()">Login</a>
+      <a class="footer-link" href="/privacy">Privacy</a>
+      <a class="footer-link" href="/terms">Terms</a>
     </div>
     <div class="footer-copy">© 2026 Nerum.</div>
   </footer>
@@ -291,6 +293,10 @@
         <div class="sb-item" onclick="setActive(this)">
           <div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History
         </div>
+        <!-- ✅ SMART LISTS -->
+        <div class="sb-item" onclick="setActive(this)">
+          <div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists
+        </div>
         <div class="sb-section">Account</div>
         <div class="sb-item" onclick="setActive(this)">
           <div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing
@@ -328,7 +334,6 @@
                 <span id="notif-badge-count">0</span>
               </div>
             </button>
-            <!-- Notification panel -->
             <div id="notif-panel" style="display:none;position:fixed;top:62px;right:24px;width:300px;border-radius:16px;z-index:999999;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);animation:slideUp 0.2s ease;">
               <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid;" class="notif-header-style">
                 <div style="font-size:13px;font-weight:700" class="notif-title-style">Notifications</div>
@@ -337,6 +342,7 @@
               <div id="notif-list" style="max-height:320px;overflow-y:auto"></div>
             </div>
           </div>
+          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
         </div>
       </div>
 
@@ -395,7 +401,6 @@
       <div class="billing-content" id="workflows-content" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="billing-title">My Workflows</div>
-          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
         </div>
         <div class="billing-sub">All your automation workflows in one place</div>
         <div id="workflow-list-container"></div>
@@ -445,6 +450,7 @@
           </div>
         </div>
 
+        <!-- ✅ SECURITY — only once! -->
         <div class="settings-section">
           <div class="settings-section-title">Security</div>
           <div class="toggle-row">
@@ -474,22 +480,7 @@
           <div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div>
         </div>
 
-        <!-- Add inside settings-section Notifications div -->
-<div class="settings-section">
-  <div class="settings-section-title">Security</div>
-  <div class="toggle-row">
-    <div>
-      <div class="toggle-label">Two-Factor Authentication (2FA)</div>
-      <div class="toggle-desc">Send OTP to email on every login</div>
-    </div>
-    <label class="toggle-switch">
-      <input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/>
-      <span class="toggle-slider"></span>
-    </label>
-  </div>
-</div>
-
-        <!-- ✅ LOGIN HISTORY — correctly inside settings-content -->
+        <!-- ✅ LOGIN HISTORY -->
         <div class="settings-section">
           <div class="settings-section-title">🔐 Login History</div>
           <div id="login-history-list">
@@ -516,6 +507,7 @@
 </div>
 
 <script src="/static/app.js"></script>
+<script src="/static/smartlists.js"></script>
 
 <!-- Init Lucide icons -->
 <script>
@@ -562,7 +554,6 @@
     <button onclick="document.getElementById('otp-overlay').style.display='none'" style="width:100%;padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit">← Back to Login</button>
   </div>
 </div>
-<script src="/static/smartlists.js"></script>
 
 </body>
 </html>
