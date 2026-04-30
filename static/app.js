@@ -248,7 +248,7 @@ async function verifyOTP() {
     localStorage.setItem('nerum_name', data.name);
     afterLogin(data.name);
   } catch(e) {
-    errEl.textContent = 'Something went wrong. Try again.';
+    errEl.textContent = 'Something went wrong';
     errEl.style.display = 'block';
   }
 }
