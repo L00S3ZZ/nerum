@@ -38,7 +38,6 @@ class User(Base):
     tokens_used = Column(Integer, default=0)
     is_verified = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
-    # ✅ 2FA
     two_fa_enabled = Column(Boolean, default=False)
 
 class Workflow(Base):
@@ -80,7 +79,6 @@ class LoginHistory(Base):
     device = Column(String)
     logged_in_at = Column(DateTime, default=datetime.utcnow)
 
-# ✅ OTP table for 2FA
 class OTPCode(Base):
     __tablename__ = "otp_codes"
     id = Column(Integer, primary_key=True, index=True)
@@ -89,6 +87,18 @@ class OTPCode(Base):
     expires_at = Column(DateTime)
     used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+# ✅ Workflow run history
+class WorkflowRun(Base):
+    __tablename__ = "workflow_runs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    workflow_id = Column(Integer, index=True)
+    workflow_name = Column(String)
+    action = Column(String)  # gmail, whatsapp, telegram, sheets
+    status = Column(String, default="success")  # success, failed
+    details = Column(Text, default="")
+    ran_at = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")

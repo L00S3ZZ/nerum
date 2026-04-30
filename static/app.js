@@ -478,6 +478,7 @@ function renderWorkflowList(workflows) {
           border-color:${w.is_active ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)'}">
           ${w.is_active ? '● Active' : '○ Paused'}
         </button>
+        <button onclick="showWebhook(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2);font-family:inherit">🔗 Webhook</button>
         <button onclick="deleteWorkflow(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;
           background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit">Delete</button>
       </div>
@@ -501,6 +502,110 @@ async function deleteWorkflow(id) {
     addNotification('Workflow Deleted', 'Workflow was removed', 'warning');
     loadWorkflows();
   } catch(e) {}
+}
+
+async function showWebhook(workflowId) {
+  const token = localStorage.getItem('nerum_token');
+  try {
+    const res = await fetch(`/forms/webhook-url/${workflowId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const isDark = document.body.classList.contains('dark');
+
+    // Create modal
+    const modal = document.createElement('div');
+    modal.id = 'webhook-modal';
+    modal.style.cssText = `
+      position:fixed;inset:0;background:rgba(0,0,0,0.7);
+      z-index:5000;display:flex;align-items:center;
+      justify-content:center;backdrop-filter:blur(4px)
+    `;
+    modal.innerHTML = `
+      <div style="width:100%;max-width:540px;margin:20px;
+        background:${isDark ? '#0d0020' : '#fff'};
+        border:1px solid rgba(232,121,249,0.2);
+        border-radius:20px;padding:28px;
+        max-height:80vh;overflow-y:auto;
+        animation:slideUp 0.3s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div style="font-size:15px;font-weight:700;color:${isDark ? '#fff' : '#1a0533'}">🔗 Google Forms Webhook</div>
+          <button onclick="document.getElementById('webhook-modal').remove()"
+            style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
+        </div>
+
+        <!-- Webhook URL -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Webhook URL</div>
+          <div style="display:flex;gap:8px">
+            <input id="webhook-url-input" value="${data.webhook_url}" readonly
+              style="flex:1;padding:10px 12px;border-radius:10px;font-size:11px;
+              background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};
+              border:1px solid rgba(129,140,248,0.2);color:${isDark ? '#fff' : '#1a0533'};
+              outline:none;font-family:monospace"/>
+            <button onclick="copyWebhookUrl()"
+              style="padding:10px 16px;border-radius:10px;
+              background:linear-gradient(135deg,#e879f9,#818cf8);
+              border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">
+              Copy
+            </button>
+          </div>
+        </div>
+
+        <!-- Instructions -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:8px">How to set up</div>
+          ${data.instructions.map((step, i) => `
+            <div style="display:flex;gap:10px;padding:6px 0;font-size:12px;color:${isDark ? 'rgba(255,255,255,0.6)' : '#6d28d9'}">
+              <span style="width:20px;height:20px;border-radius:50%;
+                background:linear-gradient(135deg,#e879f9,#818cf8);
+                color:#fff;font-size:10px;font-weight:700;
+                display:flex;align-items:center;justify-content:center;flex-shrink:0">
+                ${i + 1}
+              </span>
+              ${step.substring(3)}
+            </div>
+          `).join('')}
+        </div>
+
+        <!-- Apps Script -->
+        <div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4">Google Apps Script Code</div>
+            <button onclick="copyScript()"
+              style="font-size:10px;padding:4px 12px;border-radius:20px;
+              background:rgba(129,140,248,0.1);color:#818cf8;
+              border:1px solid rgba(129,140,248,0.2);cursor:pointer;font-family:inherit">
+              Copy Code
+            </button>
+          </div>
+          <textarea id="apps-script-code" readonly rows="8"
+            style="width:100%;padding:12px;border-radius:10px;font-size:10px;
+            background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(109,40,217,0.03)'};
+            border:1px solid rgba(129,140,248,0.2);
+            color:${isDark ? 'rgba(255,255,255,0.7)' : '#6d28d9'};
+            outline:none;font-family:monospace;resize:none;line-height:1.5"
+          >${data.apps_script}</textarea>
+        </div>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
+  } catch(e) {
+    showToast('Error loading webhook URL', 'error');
+  }
+}
+
+function copyWebhookUrl() {
+  const input = document.getElementById('webhook-url-input');
+  navigator.clipboard.writeText(input.value);
+  showToast('Webhook URL copied! 🔗', 'success');
+}
+
+function copyScript() {
+  const textarea = document.getElementById('apps-script-code');
+  navigator.clipboard.writeText(textarea.value);
+  showToast('Apps Script code copied! 📋', 'success');
 }
 
 function createWorkflow() {
@@ -748,29 +853,46 @@ function loadVideo() {
 async function loadHistory() {
   const container = document.getElementById('history-list');
   container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Loading history...</div>';
-  setTimeout(() => {
-    container.innerHTML = `
+  const token = localStorage.getItem('nerum_token');
+  if (!token) return;
+  try {
+    const res = await fetch('/workflow/history/list', {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const history = data.history || [];
+    if (history.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:40px;opacity:0.4">
+          <div style="font-size:28px;margin-bottom:8px">📋</div>
+          <div style="font-size:13px;font-weight:600">No history yet</div>
+          <div style="font-size:11px;margin-top:4px">Run a workflow to see activity here</div>
+        </div>`;
+      return;
+    }
+    const icons = { gmail: '📧', whatsapp: '💬', telegram: '✈️', sheets: '📊', manual: '▶️', forms: '📋' };
+    const colors = { success: '#34d399', failed: '#ff8a7a' };
+    const isDark = document.body.classList.contains('dark');
+    container.innerHTML = history.map(h => `
       <div class="history-item">
-        <div class="h-icon" style="background:rgba(234,67,53,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M1 3h12v8H1z" fill="#EA4335"/><path d="M1 3l6 4 6-4" stroke="#fff" stroke-width="1"/></svg></div>
-        <div class="h-info"><div class="h-action">Email sent to user@gmail.com</div><div class="h-time">Today 9:12 AM</div></div>
-        <span class="h-badge h-gmail">Gmail</span>
+        <div class="h-icon" style="background:rgba(129,140,248,0.1);font-size:16px;display:flex;align-items:center;justify-content:center">
+          ${icons[h.action?.toLowerCase()] || '⚡'}
+        </div>
+        <div class="h-info">
+          <div class="h-action">${h.workflow_name} — ${h.details}</div>
+          <div class="h-time">${new Date(h.ran_at).toLocaleDateString()} ${new Date(h.ran_at).toLocaleTimeString()}</div>
+        </div>
+        <span style="font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;
+          background:${h.status === 'success' ? 'rgba(52,211,153,0.1)' : 'rgba(255,80,80,0.1)'};
+          color:${colors[h.status] || '#818cf8'};
+          border:1px solid ${h.status === 'success' ? 'rgba(52,211,153,0.2)' : 'rgba(255,80,80,0.2)'}">
+          ${h.status}
+        </span>
       </div>
-      <div class="history-item">
-        <div class="h-icon" style="background:rgba(37,211,102,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" fill="#25D366"/></svg></div>
-        <div class="h-info"><div class="h-action">WhatsApp sent to +91999...</div><div class="h-time">Today 9:33 AM</div></div>
-        <span class="h-badge h-wa">WhatsApp</span>
-      </div>
-      <div class="history-item">
-        <div class="h-icon" style="background:rgba(42,171,238,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="5" fill="#2AABEE"/></svg></div>
-        <div class="h-info"><div class="h-action">Telegram message sent</div><div class="h-time">Today 8:48 AM</div></div>
-        <span class="h-badge h-tg">Telegram</span>
-      </div>
-      <div class="history-item">
-        <div class="h-icon" style="background:rgba(52,168,83,0.15)"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><rect x="1" y="1" width="12" height="12" rx="1" fill="#34A853"/></svg></div>
-        <div class="h-info"><div class="h-action">Row appended to Sheet</div><div class="h-time">Today 8:55 AM</div></div>
-        <span class="h-badge h-sh">Sheets</span>
-      </div>`;
-  }, 500);
+    `).join('');
+  } catch(e) {
+    container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Error loading history</div>';
+  }
 }
 
 // ===== TOGGLES =====

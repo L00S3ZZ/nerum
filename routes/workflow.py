@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Header
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from models.database import SessionLocal, Workflow, User
+from models.database import SessionLocal, Workflow, User, WorkflowRun
 from jose import jwt, JWTError
 from datetime import datetime
 import os
@@ -11,8 +11,6 @@ router = APIRouter()
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
 ALGORITHM = "HS256"
-
-# ✅ Tokens deducted per workflow run
 TOKENS_PER_RUN = 10
 
 def get_db():
@@ -56,7 +54,6 @@ class WorkflowUpdate(BaseModel):
 # ─── CREATE WORKFLOW ───────────────────────────────────────────────────────────
 @router.post("/create")
 def create_workflow(req: WorkflowCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    # ✅ Plan workflow limits
     plan_limits = {"free": 3, "starter": 10, "pro": 50, "business": 999999}
     limit = plan_limits.get(user.plan.lower(), 3)
     current_count = db.query(Workflow).filter(Workflow.user_id == user.id).count()
@@ -177,7 +174,7 @@ def delete_all_workflows(user: User = Depends(get_current_user), db: Session = D
     db.commit()
     return {"message": "All workflows deleted"}
 
-# ─── RUN WORKFLOW MANUALLY ─────────────────────────────────────────────────────
+# ─── RUN WORKFLOW ──────────────────────────────────────────────────────────────
 @router.post("/{workflow_id}/run")
 def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     workflow = db.query(Workflow).filter(Workflow.id == workflow_id, Workflow.user_id == user.id).first()
@@ -186,23 +183,28 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
     if not workflow.is_active:
         raise HTTPException(status_code=400, detail="Workflow is not active")
 
-    # ✅ Check token limit before running
     tokens_remaining = user.token_limit - user.tokens_used
     if tokens_remaining <= 0:
-        raise HTTPException(
-            status_code=403,
-            detail=f"Token limit reached. You have used all {user.token_limit} tokens. Upgrade your plan to continue."
-        )
+        raise HTTPException(status_code=403, detail=f"Token limit reached. Upgrade your plan.")
     if tokens_remaining < TOKENS_PER_RUN:
-        raise HTTPException(
-            status_code=403,
-            detail=f"Not enough tokens. You have {tokens_remaining} tokens left but need {TOKENS_PER_RUN}. Upgrade your plan."
-        )
+        raise HTTPException(status_code=403, detail=f"Not enough tokens. {tokens_remaining} left but need {TOKENS_PER_RUN}.")
 
-    # ✅ Deduct tokens and update run stats
+    # ✅ Deduct tokens
     user.tokens_used += TOKENS_PER_RUN
     workflow.runs += 1
     workflow.last_run = datetime.utcnow()
+
+    # ✅ Save run history
+    run = WorkflowRun(
+        user_id=user.id,
+        workflow_id=workflow.id,
+        workflow_name=workflow.name,
+        action=workflow.action or "manual",
+        status="success",
+        details=f"Manually triggered by user",
+        ran_at=datetime.utcnow()
+    )
+    db.add(run)
     db.commit()
 
     return {
@@ -211,4 +213,25 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
         "last_run": workflow.last_run.isoformat(),
         "tokens_used": user.tokens_used,
         "tokens_remaining": user.token_limit - user.tokens_used
+    }
+
+# ─── GET HISTORY ───────────────────────────────────────────────────────────────
+@router.get("/history/list")
+def get_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    runs = db.query(WorkflowRun).filter(
+        WorkflowRun.user_id == user.id
+    ).order_by(WorkflowRun.ran_at.desc()).limit(50).all()
+
+    return {
+        "history": [
+            {
+                "id": r.id,
+                "workflow_name": r.workflow_name,
+                "action": r.action,
+                "status": r.status,
+                "details": r.details,
+                "ran_at": r.ran_at.isoformat() if r.ran_at else None
+            }
+            for r in runs
+        ]
     }
