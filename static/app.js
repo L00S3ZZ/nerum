@@ -1,6 +1,7 @@
 let selectedTheme = 'dark';
 let selectedLang = 'english';
 let currentUser = '';
+let otpEmail = '';
 
 // LOADING SCREEN
 const loadMessages = ['Starting up...','Waking up servers...','Almost ready...','Connecting to Nerum...','Loading your workspace...'];
@@ -15,26 +16,23 @@ window.addEventListener('load', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const googleToken = urlParams.get('token');
   const googleName = urlParams.get('name');
-
   const verifyPending = urlParams.get('verify_pending');
-const pendingEmail = urlParams.get('email');
-const pendingName = urlParams.get('name');
+  const pendingEmail = urlParams.get('email');
 
-if (verifyPending && pendingEmail) {
-  window.history.replaceState({}, document.title, '/');
-  // Show verification pending message in auth popup
-  showAuthPopup();
-  setTimeout(() => {
-    const errEl = document.getElementById('auth-error');
-    if (errEl) {
-      errEl.textContent = `✅ Account created! Check ${pendingEmail} to verify before logging in.`;
-      errEl.style.display = 'block';
-      errEl.style.color = '#34d399';
-      errEl.style.background = 'rgba(52,211,153,0.1)';
-      errEl.style.borderColor = 'rgba(52,211,153,0.2)';
-    }
-  }, 300);
-}
+  if (verifyPending && pendingEmail) {
+    window.history.replaceState({}, document.title, '/');
+    showAuthPopup();
+    setTimeout(() => {
+      const errEl = document.getElementById('auth-error');
+      if (errEl) {
+        errEl.textContent = `✅ Account created! Check ${pendingEmail} to verify before logging in.`;
+        errEl.style.display = 'block';
+        errEl.style.color = '#34d399';
+        errEl.style.background = 'rgba(52,211,153,0.1)';
+        errEl.style.borderColor = 'rgba(52,211,153,0.2)';
+      }
+    }, 300);
+  }
 
   if (googleToken && googleName) {
     localStorage.setItem('nerum_token', googleToken);
@@ -202,6 +200,7 @@ function showError(msg) {
   el.style.display = 'block';
 }
 
+// ===== LOGIN =====
 async function doLogin() {
   const email = document.getElementById('login-email').value.trim();
   const password = document.getElementById('login-password').value;
@@ -213,16 +212,25 @@ async function doLogin() {
       body: JSON.stringify({ email, password })
     });
     const data = await res.json();
+    if (!res.ok) return showError(data.detail || 'Login failed');
+
+    // ✅ 2FA required
     if (data.two_fa_required) {
-  otpEmail = data.email;  // ← ADD THIS LINE
-  document.getElementById('otp-overlay').style.display = 'flex';
-  document.getElementById('otp-email-hint').textContent = `Code sent to ${data.email}`;
-  hideAuthPopup();
-  return;
+      otpEmail = data.email;
+      document.getElementById('otp-overlay').style.display = 'flex';
+      document.getElementById('otp-email-hint').textContent = `Code sent to ${data.email}`;
+      hideAuthPopup();
+      return;
+    }
+
+    localStorage.setItem('nerum_token', data.token);
+    localStorage.setItem('nerum_name', data.name);
+    if (data.email) localStorage.setItem('nerum_email', data.email);
+    afterLogin(data.name);
+  } catch (e) { showError('Server error. Try again.'); }
 }
 
-let otpEmail = '';
-
+// ===== VERIFY OTP =====
 async function verifyOTP() {
   const otp = document.getElementById('otp-input').value.trim();
   const errEl = document.getElementById('otp-error');
@@ -246,13 +254,31 @@ async function verifyOTP() {
     document.getElementById('otp-overlay').style.display = 'none';
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
+    if (data.email) localStorage.setItem('nerum_email', data.email);
     afterLogin(data.name);
   } catch(e) {
-    errEl.textContent = 'Something went wrong';
+    errEl.textContent = 'Something went wrong. Try again.';
     errEl.style.display = 'block';
   }
 }
 
+// ===== TOGGLE 2FA =====
+async function toggle2FA(enable) {
+  const token = localStorage.getItem('nerum_token');
+  try {
+    const res = await fetch('/auth/toggle-2fa', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enable })
+    });
+    const data = await res.json();
+    if (res.ok) {
+      showToast(enable ? '2FA enabled! 🔐' : '2FA disabled', enable ? 'success' : 'warning');
+    }
+  } catch(e) {}
+}
+
+// ===== SIGNUP =====
 async function doSignup() {
   const name = document.getElementById('signup-name').value.trim();
   const email = document.getElementById('signup-email').value.trim();
@@ -270,7 +296,6 @@ async function doSignup() {
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
     if (data.email) localStorage.setItem('nerum_email', data.email);
-    // Show verification notice
     showError('✅ Account created! Check your email to verify your account.');
     document.getElementById('auth-error').style.color = '#34d399';
     document.getElementById('auth-error').style.background = 'rgba(52,211,153,0.1)';
@@ -316,6 +341,13 @@ async function loadLoginHistory() {
     const data = await res.json();
     const list = document.getElementById('login-history-list');
     if (!list) return;
+
+    // ✅ Load 2FA toggle state
+    const toggle2FAel = document.getElementById('toggle-2fa');
+    if (toggle2FAel && data.two_fa_enabled !== undefined) {
+      toggle2FAel.checked = data.two_fa_enabled;
+    }
+
     const isDark = document.body.classList.contains('dark');
     if (!data.history || data.history.length === 0) {
       list.innerHTML = '<div style="opacity:0.4;font-size:11px;padding:10px 0">No login history yet</div>';
@@ -394,7 +426,6 @@ async function loadWorkflows() {
     renderWorkflowList(workflows);
     const ptbWf = document.getElementById('ptb-wf');
     if (ptbWf) ptbWf.textContent = count;
-    // Update token stats
     if (data.tokens_used !== undefined) {
       const sbTokens = document.getElementById('sb-tokens-used');
       if (sbTokens) sbTokens.textContent = data.tokens_used;
@@ -779,20 +810,16 @@ function deleteAccount() {
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
   let W, H, pts = [], t = 0, animId = null;
-
   const themes = {
     dark: {
       base: '#06000f',
       clouds: [
-        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},
-        {x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
-        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},
-        {x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
+        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},{x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
+        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},{x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
         {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
       ],
       stars: [
-        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},
-        {x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
+        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},{x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
         {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
       ],
       ptCols: ['232,121,249','129,140,248'],
@@ -801,26 +828,19 @@ function deleteAccount() {
     light: {
       base: '#ddc6ff',
       clouds: [
-        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},
-        {x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
-        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},
-        {x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
-        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},
-        {x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
+        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},{x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
+        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},{x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
+        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},{x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
       ],
       stars: [
-        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},
-        {x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
-        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},
-        {x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
+        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},{x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
+        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},{x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
       ],
       ptCols: ['91,33,182','67,56,202','109,40,217'],
       gridCol: 'rgba(76,29,149,0.12)',
     }
   };
-
   function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-
   function makePts(cols) {
     pts = Array.from({length: 120}, () => ({
       x: Math.random()*W, y: Math.random()*H,
@@ -829,7 +849,6 @@ function deleteAccount() {
       col: cols[Math.floor(Math.random()*cols.length)]
     }));
   }
-
   function draw() {
     const isDark = document.body.classList.contains('dark');
     const th = isDark ? themes.dark : themes.light;
@@ -861,14 +880,12 @@ function deleteAccount() {
     }
     t+=.006; animId=requestAnimationFrame(draw);
   }
-
   function init() {
     resize();
     makePts((document.body.classList.contains('dark') ? themes.dark : themes.light).ptCols);
     if(animId) cancelAnimationFrame(animId);
     draw();
   }
-
   window.addEventListener('resize', resize);
   const origToggle = window.toggleTheme;
   window.toggleTheme = function() {
@@ -935,7 +952,6 @@ function toggleNotifPanel() {
     panel.style.background = isDark ? '#0d0020' : '#ffffff';
     panel.style.border = isDark ? '1px solid rgba(232,121,249,0.25)' : '1px solid rgba(109,40,217,0.2)';
     panel.style.display = 'flex';
-    // Also fix list background
     const list = document.getElementById('notif-list');
     if (list) list.style.background = isDark ? '#0d0020' : '#ffffff';
     unreadCount = 0;
@@ -964,14 +980,9 @@ function renderNotifications() {
   const typeColors = { success: '#34d399', error: '#ff8a7a', warning: '#fbbf24', info: '#818cf8' };
   const typeIcons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
   list.innerHTML = notifications.map(n => `
-    <div style="
-      padding:12px 14px;border-bottom:1px solid;
-      display:flex;gap:10px;align-items:flex-start;
-      ${isDark
-        ? 'border-color:rgba(255,255,255,0.06);' + (!n.read ? 'background:rgba(129,140,248,0.04);' : '')
-        : 'border-color:rgba(109,40,217,0.08);' + (!n.read ? 'background:rgba(109,40,217,0.03);' : '')
-      }
-    ">
+    <div style="padding:12px 14px;border-bottom:1px solid;display:flex;gap:10px;align-items:flex-start;
+      ${isDark ? 'border-color:rgba(255,255,255,0.06);' + (!n.read ? 'background:rgba(129,140,248,0.04);' : '')
+               : 'border-color:rgba(109,40,217,0.08);' + (!n.read ? 'background:rgba(109,40,217,0.03);' : '')}">
       <span style="font-size:14px;flex-shrink:0">${typeIcons[n.type] || 'ℹ️'}</span>
       <div style="flex:1;min-width:0">
         <div style="font-size:11px;font-weight:600;margin-bottom:2px;color:${typeColors[n.type] || '#818cf8'}">${n.title}</div>
