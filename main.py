@@ -17,6 +17,8 @@ from routes.password_reset import router as reset_router
 from routes import admin
 from routes import forms
 from routes import webhook
+from routes import dashboard
+from scheduler import start_scheduler
 import os
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
@@ -84,6 +86,7 @@ app.include_router(reset_router, prefix="/auth")
 app.include_router(admin.router, prefix="/admin")
 app.include_router(forms.router, prefix="/forms")
 app.include_router(webhook.router, prefix="/webhook")
+app.include_router(dashboard.router, prefix="/dashboard")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -96,6 +99,10 @@ def home():
 @limiter.limit("10/minute")
 def admin_page(request: Request):
     return FileResponse("static/admin.html")
+
+@app.on_event("startup")
+async def startup_event():
+    start_scheduler()
 
 if __name__ == "__main__":
     import uvicorn

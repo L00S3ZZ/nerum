@@ -1,4 +1,4 @@
-from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, text
+from sqlalchemy import create_engine, Column, Integer, String, Boolean, DateTime, Text, text, Float
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
@@ -88,17 +88,55 @@ class OTPCode(Base):
     used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
-# ✅ Workflow run history
 class WorkflowRun(Base):
     __tablename__ = "workflow_runs"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, index=True)
     workflow_id = Column(Integer, index=True)
     workflow_name = Column(String)
-    action = Column(String)  # gmail, whatsapp, telegram, sheets
-    status = Column(String, default="success")  # success, failed
+    action = Column(String)
+    status = Column(String, default="success")
     details = Column(Text, default="")
     ran_at = Column(DateTime, default=datetime.utcnow)
+
+# ✅ Smart Dashboard — contacts/records for scheduled messaging
+class DashboardList(Base):
+    __tablename__ = "dashboard_lists"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    workflow_id = Column(Integer, index=True)
+    name = Column(String)                    # List name e.g. "Class 8 Fees"
+    business_type = Column(String)           # school, clinic, shop etc
+    message_template = Column(Text)          # "Dear {name}, fee of {amount} is due"
+    condition_field = Column(String)         # Which field to check e.g. "status"
+    condition_value = Column(String)         # What value triggers e.g. "Unpaid"
+    schedule_time = Column(String)           # "17:00" = 5PM daily
+    schedule_type = Column(String, default="daily")  # daily, weekly, monthly
+    is_active = Column(Boolean, default=True)
+    whatsapp_enabled = Column(Boolean, default=True)
+    email_enabled = Column(Boolean, default=False)
+    telegram_enabled = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_run = Column(DateTime, nullable=True)
+
+# ✅ Individual records in each dashboard list
+class DashboardRecord(Base):
+    __tablename__ = "dashboard_records"
+    id = Column(Integer, primary_key=True, index=True)
+    list_id = Column(Integer, index=True)
+    user_id = Column(Integer, index=True)
+    # Core fields
+    name = Column(String)                    # Person name
+    phone = Column(String)                   # WhatsApp number
+    email = Column(String, nullable=True)    # Email (optional)
+    # Custom fields stored as JSON
+    fields = Column(Text, default="{}")      # {"fee_amount": "5000", "class": "8", "status": "Unpaid"}
+    # Status tracking
+    status = Column(String, default="pending")  # pending, done, skip
+    last_message_sent = Column(DateTime, nullable=True)
+    message_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")

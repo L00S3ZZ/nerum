@@ -797,6 +797,7 @@ function setActive(el) {
   else if (text.startsWith('Settings')) { showPage('settings'); loadLoginHistory(); }
   else if (text.startsWith('Service History')) showPage('history');
   else if (text.startsWith('Workflows')) showPage('workflows');
+  else if (text.startsWith('Smart Lists')) showSmartLists();
   else showPage('dashboard');
 }
 
