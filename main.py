@@ -16,6 +16,7 @@ from routes import payment
 from routes.password_reset import router as reset_router
 from routes import admin
 from routes import forms
+from routes import webhook
 import os
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
@@ -82,6 +83,7 @@ app.include_router(payment.router, prefix="/payment")
 app.include_router(reset_router, prefix="/auth")
 app.include_router(admin.router, prefix="/admin")
 app.include_router(forms.router, prefix="/forms")
+app.include_router(webhook.router, prefix="/webhook")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 

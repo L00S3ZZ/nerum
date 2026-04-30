@@ -479,6 +479,7 @@ function renderWorkflowList(workflows) {
           ${w.is_active ? '● Active' : '○ Paused'}
         </button>
         <button onclick="showWebhook(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2);font-family:inherit">🔗 Webhook</button>
+        <button onclick="showWebhookConfig(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(52,211,153,0.1);color:#34d399;border:1px solid rgba(52,211,153,0.2);font-family:inherit">⚙️ Configure</button>
         <button onclick="deleteWorkflow(${w.id})" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;
           background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit">Delete</button>
       </div>
@@ -606,6 +607,103 @@ function copyScript() {
   const textarea = document.getElementById('apps-script-code');
   navigator.clipboard.writeText(textarea.value);
   showToast('Apps Script code copied! 📋', 'success');
+}
+
+async function showWebhookConfig(workflowId) {
+  const token = localStorage.getItem('nerum_token');
+  try {
+    const res = await fetch(`/webhook/url/${workflowId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    const data = await res.json();
+    const isDark = document.body.classList.contains('dark');
+    const modal = document.createElement('div');
+    modal.id = 'config-modal';
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:5000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)`;
+    modal.innerHTML = `
+      <div style="width:100%;max-width:560px;margin:20px;background:${isDark ? '#0d0020' : '#fff'};border:1px solid rgba(52,211,153,0.2);border-radius:20px;padding:28px;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+          <div style="font-size:15px;font-weight:700;color:${isDark ? '#fff' : '#1a0533'}">⚙️ Configure Workflow</div>
+          <button onclick="document.getElementById('config-modal').remove()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
+        </div>
+
+        <!-- Webhook URL -->
+        <div style="margin-bottom:16px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Your Webhook URL</div>
+          <div style="display:flex;gap:8px">
+            <input value="${data.webhook_url}" readonly style="flex:1;padding:10px 12px;border-radius:10px;font-size:10px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(52,211,153,0.2);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:monospace" id="custom-webhook-url"/>
+            <button onclick="navigator.clipboard.writeText(document.getElementById('custom-webhook-url').value);showToast('Copied! 🔗','success')" style="padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#34d399,#818cf8);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>
+          </div>
+          <div style="font-size:10px;opacity:0.4;margin-top:6px">Paste this URL in Shopify, WooCommerce, IndiaMART or any service</div>
+        </div>
+
+        <!-- Actions -->
+        <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:10px">When triggered, send to:</div>
+
+        <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:16px">💬</span>
+            <input id="cfg-whatsapp" placeholder="WhatsApp number (+91...)" value="${data.integrations.whatsapp_to}"
+              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:16px">📧</span>
+            <input id="cfg-email" placeholder="Email address" value="${data.integrations.email_to}"
+              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:16px">✈️</span>
+            <input id="cfg-telegram" placeholder="Telegram Chat ID" value="${data.integrations.telegram_chat_id}"
+              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:16px">🔗</span>
+            <input id="cfg-forward" placeholder="Forward to URL (optional)" value="${data.integrations.forward_url}"
+              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
+          </div>
+        </div>
+
+        <!-- Message template -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Message Template</div>
+          <textarea id="cfg-template" rows="4" placeholder="Use {field_name} for dynamic data&#10;Example: New order from {name}! Phone: {phone}"
+            style="width:100%;padding:12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit;resize:none;line-height:1.5"
+          >${data.message_template}</textarea>
+          <div style="font-size:10px;opacity:0.35;margin-top:4px">Use {name}, {email}, {phone} etc to insert data from the webhook</div>
+        </div>
+
+        <button onclick="saveWebhookConfig(${workflowId})" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#34d399,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
+          Save Configuration ✓
+        </button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
+  } catch(e) { showToast('Error loading config', 'error'); }
+}
+
+async function saveWebhookConfig(workflowId) {
+  const token = localStorage.getItem('nerum_token');
+  const config = {
+    whatsapp_to: document.getElementById('cfg-whatsapp').value.trim(),
+    email_to: document.getElementById('cfg-email').value.trim(),
+    telegram_chat_id: document.getElementById('cfg-telegram').value.trim(),
+    forward_url: document.getElementById('cfg-forward').value.trim(),
+    message_template: document.getElementById('cfg-template').value.trim()
+  };
+  try {
+    const res = await fetch(`/webhook/config/${workflowId}`, {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(config)
+    });
+    if (res.ok) {
+      showToast('Configuration saved! ✅', 'success');
+      document.getElementById('config-modal').remove();
+    } else {
+      showToast('Error saving config', 'error');
+    }
+  } catch(e) { showToast('Error saving config', 'error'); }
 }
 
 function createWorkflow() {
