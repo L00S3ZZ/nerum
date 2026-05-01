@@ -842,20 +842,117 @@ function toggleSvc(id) {
   }
 }
 
-// ===== CHAT =====
-function sendChat() {
+// ===== CHAT — Powered by Claude AI =====
+let chatHistory = [];
+
+async function sendChat() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
   if (!msg) return;
+
   const msgs = document.getElementById('chat-msgs');
+
+  // Show user message
   msgs.innerHTML += `<div class="chat-msg" style="text-align:right"><div class="bubble-user">${msg}</div></div>`;
   input.value = '';
+  input.disabled = true;
   msgs.scrollTop = msgs.scrollHeight;
-  setTimeout(() => {
-    const reply = selectedLang === 'tamil' ? 'புரிஞ்சுச்சு! Workflow build பண்றேன்... 🚀' : 'Got it! Building your workflow now... 🚀';
-    msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${reply}</div></div>`;
-    msgs.scrollTop = msgs.scrollHeight;
-  }, 800);
+
+  // Show typing indicator
+  const typingId = 'typing-' + Date.now();
+  msgs.innerHTML += `<div class="chat-msg" id="${typingId}"><div class="bubble-bot" style="display:flex;gap:4px;align-items:center;padding:10px 14px">
+    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out infinite"></span>
+    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.4s infinite"></span>
+    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.8s infinite"></span>
+  </div></div>`;
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Add to history
+  chatHistory.push({ role: "user", content: msg });
+
+  try {
+    const response = await fetch("/neru/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-haiku-4-5-20251001",
+        max_tokens: 1000,
+        system: `You are an AI workflow automation assistant inside Nerum — a platform that helps Indian businesses automate WhatsApp, Gmail, Telegram and Google Sheets.
+
+Your job is to help users build and configure workflows by understanding what they want to automate.
+
+**Nerum's capabilities:**
+- Send WhatsApp messages (via Twilio)
+- Send Gmail/emails (via Resend)
+- Send Telegram notifications (via @nerum_bot)
+- Append rows to Google Sheets
+- Google Forms webhook trigger
+- Razorpay payment webhook trigger
+- Custom webhooks (Shopify, WooCommerce, IndiaMART etc)
+- Smart Lists — scheduled bulk messaging to contacts based on conditions
+- 8 business types: School, Clinic, Shop, Restaurant, Real Estate, Gym, Company, Custom
+
+**When a user describes what they want to automate:**
+1. Understand their use case
+2. Suggest which trigger and action to use
+3. Give clear step-by-step instructions
+4. Provide the exact message template they can use with {variables}
+5. Guide them to configure their workflow
+
+**Examples of what users might say:**
+- "Send WhatsApp when someone fills my Google Form"
+- "Notify me on Telegram when payment is received"
+- "Fee reminder to all unpaid students daily at 5PM"
+- "Auto email receipt when Razorpay payment is captured"
+
+**Response style:**
+- Concise and practical
+- Use bullet points for steps
+- Provide exact message templates when relevant
+- Support Tamil and English — respond in the same language as the user
+- Be direct — users are business owners, not developers
+- Maximum 200 words per response`,
+        messages: chatHistory
+      })
+    });
+
+    const data = await response.json();
+
+    // Remove typing indicator
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+
+    if (data.content && data.content[0]) {
+      const reply = data.content[0].text;
+      chatHistory.push({ role: "assistant", content: reply });
+
+      // Keep last 10 messages
+      if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
+
+      // Format reply — convert **bold** and newlines
+      const formatted = reply
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\n/g, '<br/>');
+
+      msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${formatted}</div></div>`;
+    } else {
+      throw new Error("No response");
+    }
+  } catch (error) {
+    console.error("Chat error:", error);
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+
+    const fallback = selectedLang === 'tamil'
+      ? 'மன்னிக்கவும், தற்போது AI unavailable. support@nerum.in-ல் தொடர்பு கொள்ளுங்கள்! 🙏'
+      : 'AI is temporarily unavailable. Please try again or email support@nerum.in 🙏';
+
+    msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${fallback}</div></div>`;
+  }
+
+  input.disabled = false;
+  input.focus();
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 // ===== RAZORPAY =====
