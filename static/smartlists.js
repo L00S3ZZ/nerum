@@ -114,7 +114,7 @@ async function showSmartLists() {
   const muted = isDark ? 'rgba(255,255,255,0.4)' : '#6d28d9';
 
   // Hide all pages
-  ['main-content','billing-content','settings-content','history-content','workflows-content'].forEach(id => {
+  ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content'].forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
   });
