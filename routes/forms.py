@@ -19,7 +19,7 @@ def get_db():
 
 # ─── GOOGLE FORMS WEBHOOK ──────────────────────────────────────────────────────
 # User adds this URL to Google Forms via Apps Script:
-# https://nerum.onrender.com/forms/webhook/{user_id}/{workflow_id}
+# https://nerum.in/forms/webhook/{user_id}/{workflow_id}
 
 @router.post("/webhook/{user_id}/{workflow_id}")
 async def forms_webhook(user_id: int, workflow_id: int, request: Request, db: Session = Depends(get_db)):
@@ -116,7 +116,7 @@ def get_webhook_url(workflow_id: int, authorization: str = None, db: Session = D
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")
 
-    webhook_url = f"https://nerum.onrender.com/forms/webhook/{user.id}/{workflow_id}"
+    webhook_url = f"https://nerum.in/forms/webhook/{user.id}/{workflow_id}"
     apps_script = f"""
 // Paste this in Google Apps Script (Tools → Script editor)
 function onFormSubmit(e) {{

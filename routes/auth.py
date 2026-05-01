@@ -23,7 +23,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-GOOGLE_REDIRECT_URI = "https://nerum.onrender.com/auth/google/callback"
+GOOGLE_REDIRECT_URI = "https://nerum.in/auth/google/callback"
 RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -143,7 +143,7 @@ async def send_welcome_email(name: str, email: str):
                                 You're all set to automate your business with AI workflows.<br/>
                                 Connect Gmail, WhatsApp, Telegram and Google Sheets.
                             </p>
-                            <a href="https://nerum.onrender.com" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700">
+                            <a href="https://nerum.in" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700">
                                 Go to Dashboard →
                             </a>
                         </div>
@@ -162,7 +162,7 @@ async def send_verification_email(name: str, email: str, token: str):
     if not RESEND_API_KEY:
         return
     first_name = name.split()[0] if name else "there"
-    verify_url = f"https://nerum.onrender.com/auth/verify-email?token={token}"
+    verify_url = f"https://nerum.in/auth/verify-email?token={token}"
     try:
         async with httpx.AsyncClient() as client:
             await client.post(
@@ -420,13 +420,13 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         return HTMLResponse("""<html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
             <div style="text-align:center;color:#fff"><div style="font-size:48px">❌</div>
             <h2 style="color:#ff8a7a">Invalid or expired link!</h2>
-            <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
+            <a href="https://nerum.in" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
             </div></body></html>""")
     if datetime.utcnow() > vtoken.expires_at:
         return HTMLResponse("""<html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
             <div style="text-align:center;color:#fff"><div style="font-size:48px">⏰</div>
             <h2 style="color:#fbbf24">Link expired!</h2>
-            <a href="https://nerum.onrender.com" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
+            <a href="https://nerum.in" style="display:inline-block;margin-top:20px;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Nerum →</a>
             </div></body></html>""")
     user = db.query(User).filter(User.email == vtoken.email).first()
     if user:
@@ -438,10 +438,10 @@ def verify_email(token: str, db: Session = Depends(get_db)):
         <div style="text-align:center;color:#fff"><div style="font-size:48px">🎉</div>
         <h2 style="color:#34d399">Email Verified!</h2>
         <p style="color:rgba(255,255,255,0.5);margin:8px 0 24px">Your account is verified. You can now login!</p>
-        <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
+        <a href="https://nerum.in" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
                 Go to Login →
             </a>
-            <script>setTimeout(() => window.location.href = "https://nerum.onrender.com", 3000)</script>
+            <script>setTimeout(() => window.location.href = "https://nerum.in", 3000)</script>
         </div></body></html>""")
 
 # ===== RESEND VERIFICATION =====

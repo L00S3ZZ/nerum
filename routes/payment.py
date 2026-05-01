@@ -104,7 +104,7 @@ async def verify_payment(data: dict, db: Session = Depends(get_db)):
 
 # ─── RAZORPAY WEBHOOK ──────────────────────────────────────────────────────────
 # Add this URL in Razorpay Dashboard → Settings → Webhooks:
-# https://nerum.onrender.com/payment/razorpay-webhook
+# https://nerum.in/payment/razorpay-webhook
 # Events to enable: payment.captured, payment.failed, order.paid
 
 @router.post("/razorpay-webhook")
@@ -224,7 +224,7 @@ async def handle_payment_failed(entity: dict, db: Session):
                                 <h2 style="color:#fff;margin:0 0 8px">Payment Failed</h2>
                                 <p style="color:rgba(255,255,255,0.5);margin:0 0 16px">Dear {name or user.name}, your payment of ₹{amount:.0f} could not be processed.</p>
                                 <p style="color:#ff8a7a;font-size:12px;margin:0 0 20px">Reason: {error}</p>
-                                <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Try Again →</a>
+                                <a href="https://nerum.in" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Try Again →</a>
                             </div>
                         </div>
                         """
@@ -283,7 +283,7 @@ async def send_payment_email(to: str, name: str, amount: float, payment_id: str,
                                     <span style="color:#818cf8;font-size:12px;font-weight:700">{plan.upper() if plan else 'Nerum'}</span>
                                 </div>
                             </div>
-                            <a href="https://nerum.onrender.com" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Dashboard →</a>
+                            <a href="https://nerum.in" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">Go to Dashboard →</a>
                         </div>
                         <p style="color:rgba(255,255,255,0.2);font-size:11px;text-align:center;margin-top:16px">© 2026 Nerum · AI Workflow Automation</p>
                     </div>

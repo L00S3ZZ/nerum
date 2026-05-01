@@ -38,7 +38,7 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 # ✅ CORS — only allow our domain
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://nerum.onrender.com"],
+    allow_origins=["https://nerum.in", "https://www.nerum.in", "https://nerum.onrender.com"],
     allow_methods=["GET", "POST", "PUT", "DELETE"],
     allow_headers=["Authorization", "Content-Type"],
     allow_credentials=False,

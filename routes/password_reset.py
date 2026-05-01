@@ -52,7 +52,7 @@ async def forgot_password(req: ForgotPasswordRequest, db: Session = Depends(get_
     db.commit()
 
     # Send email
-    reset_url = f"https://nerum.onrender.com/reset-password?token={token}"
+    reset_url = f"https://nerum.in/reset-password?token={token}"
     first_name = user.name.split()[0] if user.name else "there"
 
     html = f"""

@@ -36,7 +36,7 @@ def get_current_user(authorization: str = Header(None), db: Session = Depends(ge
 
 # ─── RECEIVE CUSTOM WEBHOOK ────────────────────────────────────────────────────
 # Any external service can POST to:
-# https://nerum.onrender.com/webhook/receive/{webhook_key}
+# https://nerum.in/webhook/receive/{webhook_key}
 
 @router.post("/receive/{webhook_key}")
 async def receive_webhook(webhook_key: str, request: Request, db: Session = Depends(get_db)):
@@ -151,7 +151,7 @@ def get_webhook_url(workflow_id: int, user: User = Depends(get_current_user), db
         workflow.config = json.dumps(config)
         db.commit()
 
-    webhook_url = f"https://nerum.onrender.com/webhook/receive/{config['webhook_key']}"
+    webhook_url = f"https://nerum.in/webhook/receive/{config['webhook_key']}"
 
     return {
         "webhook_url": webhook_url,
@@ -220,7 +220,7 @@ def regenerate_webhook_key(workflow_id: int, user: User = Depends(get_current_us
 
     return {
         "message": "Webhook key regenerated!",
-        "webhook_url": f"https://nerum.onrender.com/webhook/receive/{config['webhook_key']}"
+        "webhook_url": f"https://nerum.in/webhook/receive/{config['webhook_key']}"
     }
 
 # ─── HELPER FUNCTIONS ──────────────────────────────────────────────────────────
