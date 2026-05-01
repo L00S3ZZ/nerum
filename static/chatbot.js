@@ -1,99 +1,469 @@
-// ========== NERUM SUPPORT CHATBOT — Powered by Claude AI ==========
+// ========== NERUM SUPPORT CHATBOT — Pre-built Responses ==========
 
 (function() {
 
-  // ===== CONVERSATION HISTORY =====
-  let conversationHistory = [];
+  // ===== KNOWLEDGE BASE =====
+  const KB = {
+    greetings: ['hi', 'hello', 'hey', 'helo', 'vanakkam', 'வணக்கம்', 'good morning', 'good evening', 'good afternoon', 'sup', 'yo'],
 
-  // ===== CLAUDE AI RESPONSE via Backend =====
-  async function getClaudeResponse(userMessage) {
-    conversationHistory.push({
-      role: "user",
-      content: userMessage
-    });
+    topics: {
+      pricing: {
+        keywords: ['price', 'cost', 'plan', 'free', 'paid', 'rupee', 'money', 'charge', 'billing', 'upgrade', '₹', 'starter', 'pro', 'business', 'how much', 'subscription', 'monthly', 'annual'],
+        response: `Nerum Pricing Plans 💰
 
-    try {
-      const response = await fetch("/neru/message", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          model: "claude-haiku-4-5-20251001",
-          max_tokens: 500,
-          system: `You are Neru, the friendly AI support assistant for Nerum — an AI workflow automation platform built for Indian businesses.
+🆓 **Free** — ₹0/month
+• 3 Workflows
+• 1 Smart List (10 rows)
+• 1,000 AI tokens
+• All integrations included
 
-You help users with:
-- Understanding Nerum's features and how to use them
-- Pricing plans (Free: ₹0, Starter: ₹799/mo, Pro: ₹1,399/mo, Business: ₹3,499/mo)
-- Setting up integrations (Gmail, WhatsApp via Twilio, Telegram, Google Sheets)
-- Creating and managing workflows
-- Smart Lists — auto-send WhatsApp/email to lists of people based on conditions (school fees, clinic appointments, shop orders etc)
-- Account issues, billing, and general support
+⚡ **Starter** — ₹799/month
+• 10 Workflows
+• 5 Smart Lists (100 rows each)
+• Priority email support
 
-Key facts about Nerum:
-- Website: nerum.in
-- Support email: support@nerum.in
-- Built in Chennai, India
-- Supports Tamil and English
-- Free plan: 3 workflows, 1000 tokens
-- WhatsApp uses Twilio sandbox (+14155238886)
-- Telegram bot: @nerum_bot
-- Smart Lists: auto-send messages daily at set time. 8 business types: School, Clinic, Shop, Restaurant, Real Estate, Gym, Company, Custom
-- Custom webhooks let users connect any service (Shopify, WooCommerce, IndiaMART etc)
-- Google Forms webhook supported
-- Razorpay payment webhook supported
+🚀 **Pro** — ₹1,399/month
+• 50 Workflows
+• 20 Smart Lists (1,000 rows each)
+• Priority support
+• Advanced analytics
 
-Personality:
-- Friendly, helpful, concise
-- Use emojis naturally
-- Respond in the same language as the user (Tamil or English)
-- Keep responses short and clear — max 120 words
-- If you don't know something, say email support@nerum.in
-- Never make up features that don't exist`,
-          messages: conversationHistory
-        })
-      });
+👑 **Business** — ₹3,499/month
+• Unlimited Workflows
+• Unlimited Smart Lists
+• Dedicated support
+• Custom integrations
 
-      const data = await response.json();
+Upgrade anytime from the **Billing** page in your dashboard.`
+      },
 
-      if (data.content && data.content[0]) {
-        const assistantMessage = data.content[0].text;
-        conversationHistory.push({
-          role: "assistant",
-          content: assistantMessage
-        });
-        // Keep last 10 messages to save tokens
-        if (conversationHistory.length > 10) {
-          conversationHistory = conversationHistory.slice(-10);
-        }
-        return assistantMessage;
-      } else {
-        throw new Error("No response from Claude");
+      whatsapp: {
+        keywords: ['whatsapp', 'wp', 'wapp', 'whats app', 'twilio', 'sandbox', 'whatsapp message', 'send whatsapp'],
+        response: `WhatsApp Integration on Nerum 📱
+
+Nerum uses **Twilio** to send WhatsApp messages automatically.
+
+**Setup steps:**
+1. Sign up at **twilio.com** (free trial available)
+2. Navigate to Messaging → Try it out → WhatsApp
+3. Activate the **WhatsApp Sandbox**
+4. Note your **Account SID**, **Auth Token** and sandbox number
+5. Add these credentials to your workflow configuration
+
+**Sandbox number:** +14155238886
+
+Once configured, create a workflow → choose WhatsApp as your action → Nerum handles the rest automatically.
+
+Need help setting up? Email **support@nerum.in`
+      },
+
+      gmail: {
+        keywords: ['gmail', 'email', 'mail', 'google mail', 'send email', 'email notification', 'resend'],
+        response: `Gmail Integration on Nerum 📧
+
+Gmail is fully integrated and ready to use.
+
+**How to send automated emails:**
+1. Go to **Dashboard → + New Workflow**
+2. Select **Gmail** as your action
+3. Configure recipient, subject, and message template
+4. Use **{variables}** for dynamic content (e.g. {name}, {amount})
+5. Set your trigger and activate
+
+**Supported triggers:**
+• Google Form submission
+• Razorpay payment received
+• Custom webhook from any service
+• Manual trigger
+
+Emails are sent via Resend for high deliverability.
+Need help? Email **support@nerum.in**`
+      },
+
+      telegram: {
+        keywords: ['telegram', 'tg', 'bot', 'telegrambot', 'nerum bot', 'telegram notification'],
+        response: `Telegram Integration on Nerum ✈️
+
+Nerum has its own **@nerum_bot** on Telegram for instant notifications.
+
+**Setup steps:**
+1. Open Telegram → search **@nerum_bot**
+2. Send **/start** to the bot
+3. Bot will respond with your unique **Chat ID**
+4. Enter this Chat ID in your workflow configuration
+
+**Use cases:**
+• Instant alerts when workflows run
+• Payment notifications
+• Form submission alerts
+• Smart List daily reports
+
+Once configured, Nerum sends Telegram messages automatically based on your workflow triggers.`
+      },
+
+      sheets: {
+        keywords: ['sheets', 'google sheets', 'spreadsheet', 'excel', 'append', 'row', 'data', 'google sheet'],
+        response: `Google Sheets Integration on Nerum 📊
+
+Automatically append data rows to any Google Sheet when your workflow triggers.
+
+**Setup steps:**
+1. Go to **Dashboard → + New Workflow**
+2. Choose **Google Sheets** as your action
+3. Enter your **Spreadsheet ID** (from the Sheet URL)
+4. Specify the **Sheet name** (e.g. Sheet1)
+5. Map your data fields to columns
+
+**Spreadsheet ID location:**
+docs.google.com/spreadsheets/d/**[THIS PART]**/edit
+
+**Use cases:**
+• Log all form submissions automatically
+• Track payment records
+• Build lead databases
+• Record webhook data from any source`
+      },
+
+      smartlists: {
+        keywords: ['smart list', 'smartlist', 'smart lists', 'auto send', 'scheduled message', 'bulk message', 'auto message', 'daily message', 'fee reminder', 'appointment reminder'],
+        response: `Smart Lists — Nerum's Core Feature 📋
+
+Smart Lists enable automated, condition-based bulk messaging to your contacts.
+
+**How it works:**
+1. Create a list with your business type
+2. Add contacts with relevant data fields
+3. Set a condition (e.g. fee_status = Unpaid)
+4. Configure message template with variables
+5. Set daily send time (e.g. 5:00 PM)
+6. Nerum checks daily and messages only matching contacts
+
+**Supported business types:**
+🏫 School — fee reminders, exam results, attendance
+🏥 Clinic — appointment reminders, follow-ups
+🛒 Shop — payment reminders, order updates
+🍕 Restaurant — order status, reservations
+🏠 Real Estate — EMI reminders, site visits
+🏋️ Gym — membership expiry, class reminders
+💼 Company — task deadlines, announcements
+✨ Custom — any business type
+
+**Key features:**
+• No duplicate messages — tracks who received
+• Status-based filtering
+• Dynamic message templates using {variables}
+• WhatsApp, Email, and Telegram support
+• Manual "Send Now" option available`
+      },
+
+      workflow: {
+        keywords: ['workflow', 'automate', 'automation', 'how to', 'create workflow', 'build workflow', 'new workflow', 'setup workflow'],
+        response: `Creating Workflows on Nerum ⚡
+
+**Steps to create a workflow:**
+1. Click **"+ New Workflow"** in the top bar
+2. Enter a workflow name
+3. Click the **⚙️ Configure** button on your workflow card
+4. Enter your action details (WhatsApp number, email, message template)
+5. Set your **Webhook URL** as the trigger
+6. Activate your workflow
+
+**Available triggers:**
+• Google Forms webhook
+• Razorpay payment events
+• Custom webhook (Shopify, WooCommerce, IndiaMART, any service)
+• Manual trigger
+
+**Available actions:**
+• Send WhatsApp message
+• Send Gmail
+• Send Telegram notification
+• Forward to another URL
+
+**Message templates** support dynamic variables:
+Use {name}, {email}, {amount} etc. to personalize messages automatically.`
+      },
+
+      webhook: {
+        keywords: ['webhook', 'custom webhook', 'api', 'integrate', 'shopify', 'woocommerce', 'indiamart', 'connect service'],
+        response: `Custom Webhooks on Nerum 🔗
+
+Connect any external service to Nerum using webhooks.
+
+**How to get your webhook URL:**
+1. Go to **Workflows** page
+2. Click **🔗 Webhook** on your workflow card
+3. Copy the unique webhook URL
+4. Paste it in your external service
+
+**Compatible services:**
+• Shopify — order notifications
+• WooCommerce — payment events
+• IndiaMART — new lead alerts
+• Google Forms — form submissions
+• Razorpay — payment events
+• Any service that supports HTTP webhooks
+
+**Message templates:**
+Use {field_name} syntax to insert data from the webhook payload into your messages automatically.
+
+Each workflow has a unique, secure webhook key that can be regenerated if needed.`
+      },
+
+      password: {
+        keywords: ['password', 'forgot', 'reset', 'cant login', 'login issue', 'access', 'locked', 'account locked'],
+        response: `Account Access & Password Reset 🔑
+
+**Forgot your password:**
+1. Go to **nerum.in**
+2. Click **Login**
+3. Click **"Forgot Password?"**
+4. Enter your registered email
+5. Check inbox for reset link (check spam if not found)
+6. Click the link and set a new password
+
+**Account locked?**
+Accounts lock temporarily after 5 failed login attempts. Wait 15 minutes and try again.
+
+**2FA issues:**
+If you have 2FA enabled and aren't receiving OTP emails, check your spam folder or disable 2FA from **Settings → Security**.
+
+Still unable to access? Email **support@nerum.in** with your registered email address.`
+      },
+
+      contact: {
+        keywords: ['contact', 'support', 'help', 'issue', 'problem', 'bug', 'error', 'team', 'human', 'talk to', 'reach'],
+        response: `Contact Nerum Support 👋
+
+📧 **Email:** support@nerum.in
+🌐 **Website:** nerum.in
+⏰ **Response time:** Within 24 hours
+
+**When contacting support, include:**
+• Your registered account email
+• Description of the issue
+• Steps to reproduce (if applicable)
+• Screenshot if relevant
+
+**Common issues resolved quickly:**
+• Billing and plan upgrades
+• Integration setup assistance
+• Workflow configuration help
+• Account access issues
+
+We are a dedicated team based in Chennai, India 🇮🇳 and personally respond to every support request.`
+      },
+
+      integrations: {
+        keywords: ['integration', 'connect', 'service', 'app', 'supported', 'available', 'instagram', 'facebook', 'razorpay', 'payment', 'what can', 'features'],
+        response: `Nerum Integrations 🔌
+
+**Currently supported:**
+✅ Gmail — automated email sending
+✅ WhatsApp — via Twilio sandbox
+✅ Telegram — via @nerum_bot
+✅ Google Sheets — auto append rows
+✅ Google Forms — webhook trigger
+✅ Razorpay — payment webhooks
+✅ Custom Webhooks — connect any service
+✅ Smart Lists — scheduled bulk messaging
+
+**Coming soon:**
+🔜 WhatsApp Business API (direct)
+🔜 Instagram DM automation
+🔜 SMS via MSG91
+🔜 Google Calendar
+🔜 Shiprocket
+🔜 IndiaMART leads
+
+Have a specific integration request? Email **support@nerum.in** — we prioritize based on user demand.`
+      },
+
+      tokens: {
+        keywords: ['token', 'tokens', 'limit', 'usage', 'ran out', 'exceeded', 'used up', 'token limit', 'how many tokens'],
+        response: `AI Tokens on Nerum 🤖
+
+Tokens are consumed when the AI processes workflow requests.
+
+**Token allocation by plan:**
+• Free: 1,000 tokens
+• Starter: 1,000 tokens
+• Pro: 1,000 tokens
+• Business: Unlimited
+
+**Token consumption:**
+• Each workflow run: ~10 tokens
+• Smart List message: ~5 tokens per contact
+
+**Token limit reached?**
+→ Upgrade your plan from the **Billing** page
+→ Token usage resets monthly
+
+**Check your usage:**
+Go to **Settings** → view your token usage progress bar and remaining balance.`
+      },
+
+      tamil: {
+        keywords: ['tamil', 'தமிழ்', 'tamizh', 'tamil language', 'tamil support', 'language'],
+        response: `ஆம்! Nerum தமிழிலும் வேலை செய்யும்! 🇮🇳
+
+**Dashboard AI Builder-ல் தமிழில் டைப் செய்யலாம்:**
+
+உதாரணங்கள்:
+• "ஒவ்வொரு நாளும் காலை 9 மணிக்கு WhatsApp அனுப்பு"
+• "Form submit ஆனா Gmail அனுப்பு"
+• "Payment வந்தா customer-க்கு thanks message அனுப்பு"
+
+**Language மாற்ற:**
+Settings → Language → Tamil என்று select செய்யுங்கள்
+
+Nerum is proudly built in Chennai for Indian businesses 🔥`
+      },
+
+      about: {
+        keywords: ['what is nerum', 'about nerum', 'about', 'company', 'who built', 'founded', 'india', 'what does nerum do'],
+        response: `About Nerum 🚀
+
+**Nerum** is an AI-powered workflow automation platform purpose-built for Indian businesses.
+
+**What Nerum does:**
+Automates repetitive communication tasks so you focus on growing your business.
+
+**Core capabilities:**
+• Send automated WhatsApp, Gmail, Telegram messages
+• Smart Lists for scheduled bulk messaging
+• Custom webhooks to connect any external service
+• Google Forms, Razorpay payment automation
+• AI Workflow Builder in Tamil and English
+
+**Why Nerum:**
+✅ Built specifically for India 🇮🇳
+✅ Supports Tamil + English
+✅ Affordable — starts at ₹0
+✅ No coding required
+✅ Setup in under 5 minutes
+
+**Mission:** Make workflow automation accessible to every Indian business — not just enterprises.
+
+📍 Based in Chennai, Tamil Nadu`
+      },
+
+      razorpay: {
+        keywords: ['razorpay', 'payment', 'payment webhook', 'payment notification', 'payment received', 'order paid'],
+        response: `Razorpay Integration on Nerum 💰
+
+Automate actions when payments are received or failed.
+
+**Setup steps:**
+1. Go to **Razorpay Dashboard → Settings → Webhooks**
+2. Click **Add New Webhook**
+3. Enter URL: \`https://nerum.in/payment/razorpay-webhook\`
+4. Create a webhook secret and save it
+5. Enable events: payment.captured, payment.failed
+6. Add the secret to Nerum's environment
+
+**What happens automatically:**
+✅ Payment received → Confirmation email to customer
+✅ Payment received → WhatsApp thank you message
+✅ Payment failed → Failure notification email
+✅ All events logged in Service History
+
+Add **RAZORPAY_WEBHOOK_SECRET** to your Render environment variables.`
+      },
+
+      security: {
+        keywords: ['security', '2fa', 'two factor', 'otp', 'secure', 'safe', 'privacy', 'data'],
+        response: `Nerum Security Features 🔒
+
+**Account security:**
+• JWT-based authentication (7-day expiry)
+• bcrypt password hashing
+• Account lockout after 5 failed attempts
+• Email verification required on signup
+
+**Two-Factor Authentication (2FA):**
+1. Go to **Settings → Security**
+2. Enable 2FA toggle
+3. Every login will require an OTP sent to your email
+
+**Data security:**
+• All data stored in Supabase (Mumbai region)
+• HTTPS enforced on nerum.in
+• Security headers on all responses
+• Rate limiting: 200 requests/minute
+
+**Privacy:**
+Nerum never sells or shares your data. View our full Privacy Policy at nerum.in/privacy`
+      },
+
+      domain: {
+        keywords: ['domain', 'nerum.in', 'website', 'url', 'link', 'site'],
+        response: `Nerum is live at **nerum.in** 🌐
+
+**Access Nerum:**
+• Main app: nerum.in
+• Support: support@nerum.in
+
+**Old URL still works:**
+nerum.onrender.com redirects to nerum.in
+
+If you have any bookmarks or saved links, update them to **nerum.in** for the best experience.`
       }
-    } catch (error) {
-      console.error("Claude API error:", error);
-      return getSmartResponse(userMessage);
     }
-  }
+  };
 
-  // ===== FALLBACK (if API fails) =====
+  // ===== RESPONSE ENGINE =====
   function getSmartResponse(message) {
     const msg = message.toLowerCase().trim();
-    const greetings = ['hi', 'hello', 'hey', 'vanakkam', 'வணக்கம்'];
-    if (greetings.some(g => msg.includes(g))) {
-      return `Hi there! 👋 I'm **Neru**, Nerum's AI assistant!\n\nHow can I help you today?`;
+
+    // Greeting check
+    if (KB.greetings.some(g => msg.includes(g))) {
+      return `Hi there! 👋 Welcome to Nerum Support!
+
+I'm **Neru**, your support assistant. Here's what I can help with:
+
+💰 Pricing & plans
+📱 WhatsApp, Gmail, Telegram setup
+⚡ Creating & configuring workflows
+📋 Smart Lists feature
+🔗 Webhooks & integrations
+🔑 Account & login issues
+📞 Contacting our team
+
+What do you need help with today?`;
     }
-    if (msg.includes('price') || msg.includes('plan') || msg.includes('cost') || msg.includes('₹')) {
-      return `Nerum Plans 💰\n\n🆓 Free — ₹0/month (3 workflows)\n⚡ Starter — ₹799/month\n🚀 Pro — ₹1,399/month\n👑 Business — ₹3,499/month\n\nUpgrade anytime from Billing page!`;
+
+    // Thank you
+    if (msg.includes('thank') || msg.includes('thanks') || msg.includes('நன்றி')) {
+      return `You're welcome! 😊\n\nIf you have any other questions, feel free to ask anytime.\n\nFor further assistance: **support@nerum.in**`;
     }
-    if (msg.includes('whatsapp') || msg.includes('wp')) {
-      return `Nerum uses **Twilio** for WhatsApp 📱\n\n1. Sign up at twilio.com\n2. Get Account SID & Auth Token\n3. Activate WhatsApp Sandbox\n4. Add credentials in workflow config\n\nNeed help? Email support@nerum.in`;
+
+    // Bye
+    if (msg.includes('bye') || msg.includes('goodbye') || msg.includes('see you') || msg.includes('ok thanks')) {
+      return `Goodbye! 👋\n\nFeel free to return anytime you need help.\n\nHave a great day! 🚀`;
     }
-    if (msg.includes('smart list') || msg.includes('smartlist')) {
-      return `Smart Lists is Nerum's killer feature! 📋\n\nCreate a list of contacts (students, patients, customers etc) and Nerum will auto-send WhatsApp messages daily based on conditions!\n\nExample: School fee reminder → auto sends to unpaid students every day at 5PM! 🔥`;
+
+    // Topic matching
+    for (const [topic, data] of Object.entries(KB.topics)) {
+      if (data.keywords.some(k => msg.includes(k))) {
+        return data.response;
+      }
     }
-    return `I'm here to help! 🤔\n\nEmail us at **support@nerum.in** and we'll respond within 24 hours! 💪`;
+
+    // Default fallback
+    return `I didn't quite catch that. 🤔
+
+Here are topics I can help with:
+
+• **Pricing** — "What are Nerum's plans?"
+• **WhatsApp** — "How to connect WhatsApp?"
+• **Smart Lists** — "What is Smart Lists?"
+• **Workflows** — "How to create a workflow?"
+• **Webhooks** — "How to set up webhooks?"
+• **Security** — "What security features does Nerum have?"
+• **Support** — "I need to contact the team"
+
+Or email us directly: **support@nerum.in** 📧`;
   }
 
   // ===== BUILD WIDGET HTML =====
@@ -101,7 +471,7 @@ Personality:
     const widget = document.createElement('div');
     widget.id = 'neru-widget';
     widget.innerHTML = `
-      <div id="neru-btn" onclick="toggleNeru()" title="Chat with Neru">
+      <div id="neru-btn" onclick="toggleNeru()" title="Chat with Neru Support">
         <div id="neru-btn-icon">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
             <path d="M11 2C6.03 2 2 5.8 2 10.5c0 1.9.65 3.65 1.75 5.07L2.5 19.5l4.18-1.22A9.3 9.3 0 0011 19c4.97 0 9-3.8 9-8.5S15.97 2 11 2z" fill="white"/>
@@ -115,8 +485,8 @@ Personality:
           <div id="neru-header-info">
             <div id="neru-avatar">N</div>
             <div>
-              <div id="neru-name">Neru <span style="font-size:9px;background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:10px;margin-left:4px">AI</span></div>
-              <div id="neru-status"><span id="neru-dot"></span>Powered by Claude</div>
+              <div id="neru-name">Neru Support</div>
+              <div id="neru-status"><span id="neru-dot"></span>Always online</div>
             </div>
           </div>
           <button onclick="toggleNeru()" id="neru-close">✕</button>
@@ -125,10 +495,11 @@ Personality:
         <div id="neru-msgs"></div>
 
         <div id="neru-quick">
-          <button onclick="neruQuick('How much does Nerum cost?')">💰 Pricing</button>
+          <button onclick="neruQuick('What are Nerum pricing plans?')">💰 Pricing</button>
           <button onclick="neruQuick('How to connect WhatsApp?')">📱 WhatsApp</button>
-          <button onclick="neruQuick('How to create a workflow?')">⚡ Workflows</button>
           <button onclick="neruQuick('What is Smart Lists?')">📋 Smart Lists</button>
+          <button onclick="neruQuick('How to create a workflow?')">⚡ Workflows</button>
+          <button onclick="neruQuick('How to contact support?')">🆘 Contact</button>
         </div>
 
         <div id="neru-input-row">
@@ -158,7 +529,7 @@ Personality:
         transition: all 0.3s ease;
         animation: neruFloat 3s ease-in-out infinite;
       }
-      #neru-btn:hover { transform: scale(1.1); }
+      #neru-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(129,140,248,0.5); }
       @keyframes neruFloat {
         0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)}
       }
@@ -217,7 +588,7 @@ Personality:
       body.dark #neru-msgs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
       body.light #neru-msgs::-webkit-scrollbar-thumb { background: rgba(109,40,217,0.2); border-radius: 10px; }
       .neru-msg-bot, .neru-msg-user {
-        font-size: 12px; line-height: 1.7; padding: 9px 12px;
+        font-size: 11px; line-height: 1.7; padding: 9px 12px;
         border-radius: 12px; max-width: 88%; font-family: -apple-system, sans-serif;
         animation: slideUp 0.2s ease; white-space: pre-wrap;
       }
@@ -279,7 +650,6 @@ Personality:
       #neru-send:hover { transform: scale(1.1); opacity: 0.9; }
       .neru-msg-bot strong { font-weight: 700; color: #818cf8; }
       body.light .neru-msg-bot strong { color: #6d28d9; }
-      #neru-input:disabled { opacity: 0.5; cursor: not-allowed; }
     `;
     document.head.appendChild(style);
   }
@@ -297,7 +667,7 @@ Personality:
       notif.style.display = 'none';
       if (!neruGreeted) {
         neruGreeted = true;
-        setTimeout(() => addNeruMsg('bot', `Hi! 👋 I'm **Neru**, Nerum's AI assistant powered by Claude!\n\nI can answer any question about Nerum — pricing, features, Smart Lists, or anything else!\n\nHow can I help you? 🚀`), 400);
+        setTimeout(() => addNeruMsg('bot', `Hi! 👋 I'm **Neru**, Nerum's support assistant.\n\nI can help you with setup, integrations, pricing, and any questions about the platform.\n\nWhat do you need help with?`), 400);
       }
       setTimeout(() => {
         const input = document.getElementById('neru-input');
@@ -308,40 +678,26 @@ Personality:
     }
   };
 
-  window.sendNeru = async function() {
+  window.sendNeru = function() {
     const input = document.getElementById('neru-input');
     const msg = input.value.trim();
     if (!msg) return;
     addNeruMsg('user', msg);
     input.value = '';
-    input.disabled = true;
     const typing = showNeruTyping();
-    try {
-      const response = await getClaudeResponse(msg);
-      removeNeruTyping(typing);
-      addNeruMsg('bot', response);
-    } catch(e) {
+    setTimeout(() => {
       removeNeruTyping(typing);
       addNeruMsg('bot', getSmartResponse(msg));
-    }
-    input.disabled = false;
-    input.focus();
+    }, 600 + Math.random() * 400);
   };
 
-  window.neruQuick = async function(msg) {
+  window.neruQuick = function(msg) {
     addNeruMsg('user', msg);
-    const input = document.getElementById('neru-input');
-    if (input) input.disabled = true;
     const typing = showNeruTyping();
-    try {
-      const response = await getClaudeResponse(msg);
-      removeNeruTyping(typing);
-      addNeruMsg('bot', response);
-    } catch(e) {
+    setTimeout(() => {
       removeNeruTyping(typing);
       addNeruMsg('bot', getSmartResponse(msg));
-    }
-    if (input) input.disabled = false;
+    }, 500);
   };
 
   function addNeruMsg(type, text) {
