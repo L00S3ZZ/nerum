@@ -98,6 +98,10 @@ app.mount("/static", StaticFiles(directory="static"), name="static")
 @app.post("/neru/message")
 @limiter.limit("20/minute")
 async def ai_chat(request: Request, authorization: str = Header(None)):
+    return JSONResponse(
+        status_code=503,
+        content={"error": "AI service temporarily unavailable. Please try again later."}
+    )
     # ✅ Require authentication
     if not authorization or not authorization.startswith("Bearer "):
         raise HTTPException(status_code=401, detail="Authentication required")
