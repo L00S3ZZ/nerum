@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from models.database import SessionLocal, Workflow, User, WorkflowRun
 from jose import jwt, JWTError
 from datetime import datetime
+from security import check_tokens, deduct_tokens, token_error_message, get_workflow_limit, sanitize_input
 import os
 import json
 
@@ -11,7 +12,6 @@ router = APIRouter()
 
 SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
 ALGORITHM = "HS256"
-TOKENS_PER_RUN = 10
 
 def get_db():
     db = SessionLocal()
@@ -54,18 +54,18 @@ class WorkflowUpdate(BaseModel):
 # ─── CREATE WORKFLOW ───────────────────────────────────────────────────────────
 @router.post("/create")
 def create_workflow(req: WorkflowCreate, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    plan_limits = {"free": 3, "starter": 10, "pro": 50, "business": 999999}
-    limit = plan_limits.get(user.plan.lower(), 3)
+    # ✅ Plan workflow limits
+    limit = get_workflow_limit(user.plan)
     current_count = db.query(Workflow).filter(Workflow.user_id == user.id).count()
     if current_count >= limit:
-        raise HTTPException(status_code=403, detail=f"Workflow limit reached for {user.plan} plan. Upgrade to create more.")
+        raise HTTPException(status_code=403, detail=f"Workflow limit reached for {user.plan} plan ({limit} workflows). Upgrade at nerum.in to create more.")
 
     workflow = Workflow(
         user_id=user.id,
-        name=req.name,
-        description=req.description,
-        trigger=req.trigger,
-        action=req.action,
+        name=sanitize_input(req.name, 100),
+        description=sanitize_input(req.description, 500),
+        trigger=sanitize_input(req.trigger, 100),
+        action=sanitize_input(req.action, 100),
         config=json.dumps(req.config),
         is_active=True,
         runs=0,
@@ -89,7 +89,9 @@ def create_workflow(req: WorkflowCreate, user: User = Depends(get_current_user),
 # ─── LIST WORKFLOWS ────────────────────────────────────────────────────────────
 @router.get("/list")
 def list_workflows(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    from security import get_token_limit
     workflows = db.query(Workflow).filter(Workflow.user_id == user.id).order_by(Workflow.created_at.desc()).all()
+    token_limit = get_token_limit(user.plan)
     return {
         "workflows": [
             {
@@ -107,9 +109,9 @@ def list_workflows(user: User = Depends(get_current_user), db: Session = Depends
             for w in workflows
         ],
         "total": len(workflows),
-        "tokens_used": user.tokens_used,
-        "token_limit": user.token_limit,
-        "tokens_remaining": max(0, user.token_limit - user.tokens_used)
+        "tokens_used": user.tokens_used or 0,
+        "token_limit": token_limit,
+        "tokens_remaining": max(0, token_limit - (user.tokens_used or 0))
     }
 
 # ─── GET SINGLE WORKFLOW ───────────────────────────────────────────────────────
@@ -137,10 +139,10 @@ def update_workflow(workflow_id: int, req: WorkflowUpdate, user: User = Depends(
     workflow = db.query(Workflow).filter(Workflow.id == workflow_id, Workflow.user_id == user.id).first()
     if not workflow:
         raise HTTPException(status_code=404, detail="Workflow not found")
-    if req.name is not None: workflow.name = req.name
-    if req.description is not None: workflow.description = req.description
-    if req.trigger is not None: workflow.trigger = req.trigger
-    if req.action is not None: workflow.action = req.action
+    if req.name is not None: workflow.name = sanitize_input(req.name, 100)
+    if req.description is not None: workflow.description = sanitize_input(req.description, 500)
+    if req.trigger is not None: workflow.trigger = sanitize_input(req.trigger, 100)
+    if req.action is not None: workflow.action = sanitize_input(req.action, 100)
     if req.config is not None: workflow.config = json.dumps(req.config)
     if req.is_active is not None: workflow.is_active = req.is_active
     db.commit()
@@ -167,7 +169,7 @@ def delete_workflow(workflow_id: int, user: User = Depends(get_current_user), db
     db.commit()
     return {"message": "Workflow deleted"}
 
-# ─── DELETE ALL WORKFLOWS ──────────────────────────────────────────────────────
+# ─── DELETE ALL ────────────────────────────────────────────────────────────────
 @router.delete("/all/delete")
 def delete_all_workflows(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     db.query(Workflow).filter(Workflow.user_id == user.id).delete()
@@ -183,14 +185,13 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
     if not workflow.is_active:
         raise HTTPException(status_code=400, detail="Workflow is not active")
 
-    tokens_remaining = user.token_limit - user.tokens_used
-    if tokens_remaining <= 0:
-        raise HTTPException(status_code=403, detail=f"Token limit reached. Upgrade your plan.")
-    if tokens_remaining < TOKENS_PER_RUN:
-        raise HTTPException(status_code=403, detail=f"Not enough tokens. {tokens_remaining} left but need {TOKENS_PER_RUN}.")
+    # ✅ Check tokens using security module
+    can_proceed, cost, remaining = check_tokens(user, "workflow_run")
+    if not can_proceed:
+        raise HTTPException(status_code=403, detail=token_error_message("workflow_run", remaining, cost))
 
     # ✅ Deduct tokens
-    user.tokens_used += TOKENS_PER_RUN
+    deduct_tokens(user, "workflow_run", db)
     workflow.runs += 1
     workflow.last_run = datetime.utcnow()
 
@@ -201,18 +202,21 @@ def run_workflow(workflow_id: int, user: User = Depends(get_current_user), db: S
         workflow_name=workflow.name,
         action=workflow.action or "manual",
         status="success",
-        details=f"Manually triggered by user",
+        details="Manually triggered",
         ran_at=datetime.utcnow()
     )
     db.add(run)
     db.commit()
+
+    from security import get_token_limit
+    token_limit = get_token_limit(user.plan)
 
     return {
         "message": f"Workflow '{workflow.name}' executed successfully",
         "runs": workflow.runs,
         "last_run": workflow.last_run.isoformat(),
         "tokens_used": user.tokens_used,
-        "tokens_remaining": user.token_limit - user.tokens_used
+        "tokens_remaining": max(0, token_limit - user.tokens_used)
     }
 
 # ─── GET HISTORY ───────────────────────────────────────────────────────────────
@@ -221,7 +225,6 @@ def get_history(user: User = Depends(get_current_user), db: Session = Depends(ge
     runs = db.query(WorkflowRun).filter(
         WorkflowRun.user_id == user.id
     ).order_by(WorkflowRun.ran_at.desc()).limit(50).all()
-
     return {
         "history": [
             {
