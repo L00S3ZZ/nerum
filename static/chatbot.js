@@ -19,7 +19,7 @@
           "Content-Type": "application/json"
         },
         body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
+          model: "claude-haiku-4-5-20251001",
           max_tokens: 500,
           system: `You are Neru, the friendly AI support assistant for Nerum — an AI workflow automation platform built for Indian businesses.
 
