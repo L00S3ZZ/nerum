@@ -83,7 +83,7 @@ async def send_otp_email(name: str, email: str, otp: str):
                 "https://api.resend.com/emails",
                 headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
-                    "from": "Nerum <onboarding@resend.dev>",
+                    "from": "Nerum <support@nerum.in>",
                     "to": [email],
                     "subject": f"🔐 Your Nerum login code: {otp}",
                     "html": f"""
@@ -127,7 +127,7 @@ async def send_welcome_email(name: str, email: str):
                 "https://api.resend.com/emails",
                 headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
-                    "from": "Nerum <onboarding@resend.dev>",
+                    "from": "Nerum <support@nerum.in>",
                     "to": [email],
                     "subject": f"Welcome to Nerum, {first_name}! 🚀",
                     "html": f"""
@@ -169,7 +169,7 @@ async def send_verification_email(name: str, email: str, token: str):
                 "https://api.resend.com/emails",
                 headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
-                    "from": "Nerum <onboarding@resend.dev>",
+                    "from": "Nerum <support@nerum.in>",
                     "to": [email],
                     "subject": "Verify your Nerum email ✉️",
                     "html": f"""
@@ -210,7 +210,7 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
                 "https://api.resend.com/emails",
                 headers={"Authorization": f"Bearer {RESEND_API_KEY}", "Content-Type": "application/json"},
                 json={
-                    "from": "Nerum <onboarding@resend.dev>",
+                    "from": "Nerum <support@nerum.in>",
                     "to": [email],
                     "subject": "⚠️ New login to your Nerum account",
                     "html": f"""
