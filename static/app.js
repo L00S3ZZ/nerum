@@ -802,7 +802,7 @@ function setActive(el) {
 }
 
 function showPage(page) {
-  const pages = ['main-content','billing-content','settings-content','history-content','workflows-content'];
+  const pages = ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content'];
   pages.forEach(id => {
     const el = document.getElementById(id);
     if (el) el.style.display = 'none';
