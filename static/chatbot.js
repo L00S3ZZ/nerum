@@ -1,252 +1,95 @@
-// ========== NERUM SUPPORT CHATBOT ==========
-// Add this to the bottom of app.js
-// When Anthropic credits arrive, replace getSmartResponse() with real Claude API call
+// ========== NERUM SUPPORT CHATBOT — Powered by Claude AI ==========
 
 (function() {
 
-  // ===== KNOWLEDGE BASE =====
-  const KB = {
-    greetings: ['hi', 'hello', 'hey', 'helo', 'vanakkam', 'வணக்கம்'],
-    
-    topics: {
-      pricing: {
-        keywords: ['price', 'cost', 'plan', 'free', 'paid', 'rupee', 'money', 'charge', 'billing', 'upgrade', '₹', 'starter', 'pro', 'business'],
-        response: `Here are Nerum's plans 💰
+  // ===== CONVERSATION HISTORY =====
+  let conversationHistory = [];
 
-🆓 **Free** — ₹0/month
-• 3 Workflows
-• 1,000 AI tokens
-• All integrations
+  // ===== CLAUDE AI RESPONSE =====
+  async function getClaudeResponse(userMessage) {
+    conversationHistory.push({
+      role: "user",
+      content: userMessage
+    });
 
-⚡ **Starter** — ₹799/month
-• 10 Workflows
-• More AI tokens
-• Email support
+    try {
+      const response = await fetch("/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: `You are Neru, the friendly AI support assistant for Nerum — an AI workflow automation platform built for Indian businesses.
 
-🚀 **Pro** — ₹1,399/month
-• 50 Workflows
-• Priority support
+You help users with:
+- Understanding Nerum's features and how to use them
+- Pricing plans (Free: ₹0, Starter: ₹799/mo, Pro: ₹1,399/mo, Business: ₹3,499/mo)
+- Setting up integrations (Gmail, WhatsApp via Twilio, Telegram, Google Sheets)
+- Creating and managing workflows
+- Smart Lists — auto-send WhatsApp/email to lists of people based on conditions
+- Account issues, billing, and general support
 
-👑 **Business** — ₹3,499/month
-• Unlimited everything
-• Dedicated support
+Key facts about Nerum:
+- Website: nerum.in
+- Support email: support@nerum.in
+- Built in Chennai, India
+- Supports Tamil and English
+- Free plan: 3 workflows, 1000 tokens
+- WhatsApp uses Twilio sandbox (+14155238886)
+- Telegram bot: @nerum_bot
+- Smart Lists auto-send messages daily at set time based on conditions (e.g. unpaid fees, appointment reminders)
+- Custom webhooks let users connect any service (Shopify, WooCommerce, IndiaMART etc)
+- Google Forms webhook supported
+- Razorpay payment webhook supported
+- 8 business types supported in Smart Lists: School, Clinic, Shop, Restaurant, Real Estate, Gym, Company, Custom
 
-You can upgrade anytime from the Billing page!`
-      },
+Personality:
+- Friendly, helpful, concise
+- Use emojis naturally
+- Respond in the same language as the user (Tamil or English)
+- Keep responses short and clear — max 150 words
+- If you don't know something, say "Email us at support@nerum.in and we'll help!"
+- Never make up features that don't exist
+- Always encourage users to try the free plan first`,
+          messages: conversationHistory
+        })
+      });
 
-      whatsapp: {
-        keywords: ['whatsapp', 'wp', 'wapp', 'whats app', 'message', 'twilio'],
-        response: `To connect WhatsApp on Nerum 📱
+      const data = await response.json();
 
-Nerum uses **Twilio** to send WhatsApp messages. Here's how:
-
-1. Sign up at **twilio.com** (free trial available)
-2. Get your **Account SID** and **Auth Token**
-3. Activate the **WhatsApp Sandbox**
-4. Your Twilio number: **+14155238886**
-
-Once connected, create a workflow and choose WhatsApp as your action — Nerum will send messages automatically! 🚀
-
-Need help? Email us at support@nerum.in`
-      },
-
-      gmail: {
-        keywords: ['gmail', 'email', 'mail', 'google mail', 'send email'],
-        response: `To connect Gmail on Nerum 📧
-
-Gmail is already integrated! Here's how to use it:
-
-1. Go to **Dashboard → New Workflow**
-2. Choose **Gmail** as your action
-3. Set the recipient, subject and message
-4. Your workflow will send emails automatically!
-
-**Note:** Nerum uses your workflow trigger to decide WHEN to send — for example, every morning at 9 AM, or when a form is submitted.
-
-Want to send a daily morning email? Create a workflow and set the trigger to "Schedule — Daily 9 AM" 🎯`
-      },
-
-      telegram: {
-        keywords: ['telegram', 'tg', 'bot', 'telegrambot', 'nerum bot'],
-        response: `To connect Telegram on Nerum 📨
-
-Nerum has its own **@nerum_bot** on Telegram!
-
-1. Open Telegram and search **@nerum_bot**
-2. Send /start to the bot
-3. The bot will give you your **Chat ID**
-4. Use that Chat ID in your workflow
-
-Once set up, Nerum can send you Telegram notifications whenever your workflow runs! Perfect for instant alerts 🔔`
-      },
-
-      sheets: {
-        keywords: ['sheets', 'google sheets', 'spreadsheet', 'excel', 'append', 'row', 'data'],
-        response: `To connect Google Sheets on Nerum 📊
-
-1. Go to **Dashboard → New Workflow**
-2. Choose **Google Sheets** as your action
-3. Enter your **Spreadsheet ID** (from the URL)
-4. Choose the sheet name and data to append
-
-Every time your workflow runs, Nerum will automatically add a new row to your sheet — perfect for tracking leads, orders, or any data! 📈`
-      },
-
-      workflow: {
-        keywords: ['workflow', 'automate', 'automation', 'how to', 'create', 'build', 'setup', 'start'],
-        response: `How to create a workflow on Nerum ⚡
-
-1. Click **"+ New Workflow"** button
-2. Give it a name (e.g. "Morning WhatsApp message")
-3. Your workflow is created!
-
-**Coming soon:** The AI Builder will let you type in Tamil or English what you want — like *"Send a WhatsApp message every morning at 9 AM"* — and Nerum will build it for you automatically! 🤖
-
-Right now you can create workflows and our team will help you configure them. Email: support@nerum.in`
-      },
-
-      password: {
-        keywords: ['password', 'forgot', 'reset', 'login', 'cant login', 'access', 'locked'],
-        response: `Can't log in? Here's how to reset your password 🔑
-
-1. Go to **nerum.onrender.com**
-2. Click **Login**
-3. Click **"Forgot Password?"**
-4. Enter your email
-5. Check your inbox for a reset link
-6. Click the link and set a new password
-
-If you still can't access your account, email us at **support@nerum.in** and we'll help you within 24 hours! 💪`
-      },
-
-      contact: {
-        keywords: ['contact', 'support', 'help', 'issue', 'problem', 'bug', 'error', 'team', 'human'],
-        response: `Need to talk to our team? 👋
-
-📧 **Email:** support@nerum.in
-🌐 **Website:** nerum.in
-⏰ **Response time:** Within 24 hours
-
-For urgent issues, email us with:
-- Your account email
-- Description of the problem
-- Screenshot if possible
-
-We're a small team based in Chennai 🇮🇳 and we personally respond to every message!`
-      },
-
-      integrations: {
-        keywords: ['integration', 'connect', 'service', 'app', 'supported', 'available', 'instagram', 'facebook', 'linkedin', 'razorpay'],
-        response: `Nerum currently supports 🔌
-
-✅ **Gmail** — Send emails automatically
-✅ **WhatsApp** — Via Twilio sandbox
-✅ **Telegram** — Via @nerum_bot
-✅ **Google Sheets** — Append rows automatically
-✅ **AI Builder** — Tamil + English workflow creation
-
-**Coming soon:**
-🔜 Instagram
-🔜 Facebook
-🔜 Razorpay webhooks
-🔜 IndiaMART leads
-🔜 Shiprocket
-
-Want a specific integration? Email us at support@nerum.in and we'll prioritize it! 🚀`
-      },
-
-      tokens: {
-        keywords: ['token', 'tokens', 'limit', 'usage', 'ran out', 'exceeded', 'used up'],
-        response: `About AI tokens on Nerum 🤖
-
-Tokens are used when the AI processes your workflow requests.
-
-**Free plan:** 1,000 tokens
-**Starter:** More tokens
-**Pro:** Even more
-**Business:** Unlimited
-
-**Token used up?**
-→ Upgrade your plan in **Billing** page
-→ Or wait for next month reset
-
-Each workflow run uses approximately 10 tokens. So 1,000 tokens = ~100 workflow runs on the free plan! 💡`
-      },
-
-      tamil: {
-        keywords: ['tamil', 'தமிழ்', 'tamizh', 'tamil language', 'tamil support'],
-        response: `ஆம்! Nerum தமிழிலும் வேலை செய்யும்! 🇮🇳
-
-நீங்கள் AI Workflow Builder-ல் தமிழிலேயே டைப் செய்யலாம்:
-
-உதாரணம்:
-• "ஒவ்வொரு நாளும் காலை 9 மணிக்கு WhatsApp அனுப்பு"
-• "Form submit ஆனா Gmail அனுப்பு"
-
-Settings-ல் போய் Language → Tamil என்று மாற்றுங்கள்! 
-
-Nerum is built for India, by Indians 🔥`
-      },
-
-      about: {
-        keywords: ['what is nerum', 'about', 'nerum', 'company', 'who', 'founded', 'india'],
-        response: `About Nerum 🚀
-
-**Nerum** is an AI-powered workflow automation platform built for Indian businesses.
-
-We help small businesses automate repetitive tasks like:
-• Sending WhatsApp messages
-• Sending emails
-• Updating spreadsheets
-• Sending Telegram alerts
-
-**Why Nerum?**
-✅ Made in India 🇮🇳
-✅ Tamil + English AI
-✅ Affordable pricing (starts ₹0)
-✅ Simple — no coding needed
-
-Our mission: Make automation accessible to every Indian business, not just big companies! 💪`
+      if (data.content && data.content[0]) {
+        const assistantMessage = data.content[0].text;
+        conversationHistory.push({
+          role: "assistant",
+          content: assistantMessage
+        });
+        // Keep last 10 messages to save tokens
+        if (conversationHistory.length > 10) {
+          conversationHistory = conversationHistory.slice(-10);
+        }
+        return assistantMessage;
+      } else {
+        throw new Error("No response");
       }
+    } catch (error) {
+      console.error("Claude API error:", error);
+      return getSmartResponse(userMessage);
     }
-  };
+  }
 
-  // ===== SMART RESPONSE ENGINE =====
+  // ===== FALLBACK (if API fails) =====
   function getSmartResponse(message) {
     const msg = message.toLowerCase().trim();
-
-    // Greeting check
-    if (KB.greetings.some(g => msg.includes(g))) {
-      return `Hi there! 👋 I'm **Neru**, Nerum's support assistant!
-
-I can help you with:
-• 💰 Pricing & plans
-• 📱 Connecting WhatsApp, Gmail, Telegram
-• ⚡ Creating workflows
-• 🔑 Account & login issues
-• 📞 Contacting support
-
-What do you need help with?`;
+    const greetings = ['hi', 'hello', 'hey', 'vanakkam', 'வணக்கம்'];
+    if (greetings.some(g => msg.includes(g))) {
+      return `Hi there! 👋 I'm **Neru**, Nerum's AI assistant!\n\nHow can I help you today?`;
     }
-
-    // Topic matching
-    for (const [topic, data] of Object.entries(KB.topics)) {
-      if (data.keywords.some(k => msg.includes(k))) {
-        return data.response;
-      }
+    if (msg.includes('price') || msg.includes('plan') || msg.includes('cost') || msg.includes('₹')) {
+      return `Nerum Plans 💰\n\n🆓 Free — ₹0/month (3 workflows)\n⚡ Starter — ₹799/month\n🚀 Pro — ₹1,399/month\n👑 Business — ₹3,499/month`;
     }
-
-    // Default fallback
-    return `I'm not sure about that, but I'm here to help! 🤔
-
-Try asking me about:
-• **Pricing** — "How much does Nerum cost?"
-• **WhatsApp** — "How to connect WhatsApp?"
-• **Gmail** — "How to send emails?"
-• **Workflows** — "How to create a workflow?"
-• **Support** — "I need help"
-
-Or email us directly at **support@nerum.in** 📧`;
+    return `I'm here to help! 🤔\n\nEmail us at **support@nerum.in** and we'll respond within 24 hours! 💪`;
   }
 
   // ===== BUILD WIDGET HTML =====
@@ -254,7 +97,6 @@ Or email us directly at **support@nerum.in** 📧`;
     const widget = document.createElement('div');
     widget.id = 'neru-widget';
     widget.innerHTML = `
-      <!-- Floating Button -->
       <div id="neru-btn" onclick="toggleNeru()" title="Chat with Neru">
         <div id="neru-btn-icon">
           <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
@@ -264,32 +106,27 @@ Or email us directly at **support@nerum.in** 📧`;
         <div id="neru-notif">1</div>
       </div>
 
-      <!-- Chat Window -->
       <div id="neru-window">
-        <!-- Header -->
         <div id="neru-header">
           <div id="neru-header-info">
             <div id="neru-avatar">N</div>
             <div>
-              <div id="neru-name">Neru</div>
-              <div id="neru-status"><span id="neru-dot"></span>Online</div>
+              <div id="neru-name">Neru <span style="font-size:9px;background:rgba(255,255,255,0.2);padding:2px 6px;border-radius:10px;margin-left:4px">AI</span></div>
+              <div id="neru-status"><span id="neru-dot"></span>Powered by Claude</div>
             </div>
           </div>
           <button onclick="toggleNeru()" id="neru-close">✕</button>
         </div>
 
-        <!-- Messages -->
         <div id="neru-msgs"></div>
 
-        <!-- Quick replies -->
         <div id="neru-quick">
           <button onclick="neruQuick('How much does Nerum cost?')">💰 Pricing</button>
           <button onclick="neruQuick('How to connect WhatsApp?')">📱 WhatsApp</button>
           <button onclick="neruQuick('How to create a workflow?')">⚡ Workflows</button>
-          <button onclick="neruQuick('I need help')">🆘 Support</button>
+          <button onclick="neruQuick('What is Smart Lists?')">📋 Smart Lists</button>
         </div>
 
-        <!-- Input -->
         <div id="neru-input-row">
           <input id="neru-input" placeholder="Ask me anything..." onkeydown="if(event.key==='Enter')sendNeru()"/>
           <button onclick="sendNeru()" id="neru-send">
@@ -307,82 +144,42 @@ Or email us directly at **support@nerum.in** 📧`;
   function buildStyles() {
     const style = document.createElement('style');
     style.textContent = `
-      /* Floating button */
       #neru-btn {
-        position: fixed;
-        bottom: 24px;
-        right: 24px;
-        width: 54px;
-        height: 54px;
-        border-radius: 50%;
+        position: fixed; bottom: 24px; right: 24px;
+        width: 54px; height: 54px; border-radius: 50%;
         background: linear-gradient(135deg, #818cf8, #34d399);
-        cursor: pointer;
-        z-index: 9000;
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        cursor: pointer; z-index: 9000;
+        display: flex; align-items: center; justify-content: center;
         box-shadow: 0 4px 20px rgba(129,140,248,0.4);
         transition: all 0.3s ease;
         animation: neruFloat 3s ease-in-out infinite;
       }
-      #neru-btn:hover {
-        transform: scale(1.1);
-        box-shadow: 0 6px 25px rgba(129,140,248,0.5);
-      }
+      #neru-btn:hover { transform: scale(1.1); }
       @keyframes neruFloat {
-        0%,100%{transform:translateY(0)}
-        50%{transform:translateY(-4px)}
+        0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)}
       }
       #neru-notif {
-        position: absolute;
-        top: -4px;
-        right: -4px;
-        width: 18px;
-        height: 18px;
-        background: #e879f9;
-        border-radius: 50%;
-        font-size: 10px;
-        font-weight: 700;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-family: -apple-system, sans-serif;
+        position: absolute; top: -4px; right: -4px;
+        width: 18px; height: 18px; background: #e879f9;
+        border-radius: 50%; font-size: 10px; font-weight: 700;
+        color: #fff; display: flex; align-items: center;
+        justify-content: center; font-family: -apple-system, sans-serif;
       }
-
-      /* Chat window */
       #neru-window {
-        position: fixed;
-        bottom: 90px;
-        right: 24px;
-        width: 340px;
-        height: 480px;
-        border-radius: 20px;
-        z-index: 9000;
-        display: none;
-        flex-direction: column;
-        overflow: hidden;
-        animation: neruPop 0.3s ease;
+        position: fixed; bottom: 90px; right: 24px;
+        width: 340px; height: 500px; border-radius: 20px;
+        z-index: 9000; display: none; flex-direction: column;
+        overflow: hidden; animation: neruPop 0.3s ease;
         box-shadow: 0 20px 60px rgba(0,0,0,0.3);
       }
       @keyframes neruPop {
         from{opacity:0;transform:scale(0.85) translateY(20px)}
         to{opacity:1;transform:scale(1) translateY(0)}
       }
-      body.dark #neru-window {
-        background: #0d0020;
-        border: 1px solid rgba(232,121,249,0.2);
-      }
-      body.light #neru-window {
-        background: rgba(255,255,255,0.95);
-        border: 1px solid rgba(109,40,217,0.2);
-      }
-
-      /* Header */
+      body.dark #neru-window { background: #0d0020; border: 1px solid rgba(232,121,249,0.2); }
+      body.light #neru-window { background: rgba(255,255,255,0.95); border: 1px solid rgba(109,40,217,0.2); }
       #neru-header {
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
+        display: flex; align-items: center; justify-content: space-between;
         padding: 14px 16px;
         background: linear-gradient(135deg, #818cf8, #34d399);
         flex-shrink: 0;
@@ -395,10 +192,7 @@ Or email us directly at **support@nerum.in** 📧`;
         font-size: 16px; font-weight: 800; color: #fff;
         font-family: -apple-system, sans-serif;
       }
-      #neru-name {
-        font-size: 14px; font-weight: 700; color: #fff;
-        font-family: -apple-system, sans-serif;
-      }
+      #neru-name { font-size: 14px; font-weight: 700; color: #fff; font-family: -apple-system, sans-serif; }
       #neru-status {
         font-size: 10px; color: rgba(255,255,255,0.8);
         display: flex; align-items: center; gap: 4px;
@@ -410,16 +204,12 @@ Or email us directly at **support@nerum.in** 📧`;
         animation: pulse 2s ease-in-out infinite;
       }
       #neru-close {
-        background: rgba(255,255,255,0.2); border: none;
-        color: #fff; cursor: pointer; width: 28px; height: 28px;
-        border-radius: 50%; font-size: 13px; display: flex;
-        align-items: center; justify-content: center;
-        font-family: -apple-system, sans-serif;
-        transition: all 0.2s;
+        background: rgba(255,255,255,0.2); border: none; color: #fff;
+        cursor: pointer; width: 28px; height: 28px; border-radius: 50%;
+        font-size: 13px; display: flex; align-items: center;
+        justify-content: center; font-family: -apple-system, sans-serif; transition: all 0.2s;
       }
       #neru-close:hover { background: rgba(255,255,255,0.3); }
-
-      /* Messages */
       #neru-msgs {
         flex: 1; overflow-y: auto; padding: 14px;
         display: flex; flex-direction: column; gap: 10px;
@@ -427,18 +217,13 @@ Or email us directly at **support@nerum.in** 📧`;
       #neru-msgs::-webkit-scrollbar { width: 3px; }
       body.dark #neru-msgs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
       body.light #neru-msgs::-webkit-scrollbar-thumb { background: rgba(109,40,217,0.2); border-radius: 10px; }
-
       .neru-msg-bot, .neru-msg-user {
-        font-size: 11px; line-height: 1.7; padding: 9px 12px;
+        font-size: 12px; line-height: 1.7; padding: 9px 12px;
         border-radius: 12px; max-width: 88%;
         font-family: -apple-system, sans-serif;
-        animation: slideUp 0.2s ease;
-        white-space: pre-wrap;
+        animation: slideUp 0.2s ease; white-space: pre-wrap;
       }
-      .neru-msg-bot {
-        border-radius: 4px 12px 12px 12px;
-        align-self: flex-start;
-      }
+      .neru-msg-bot { border-radius: 4px 12px 12px 12px; align-self: flex-start; }
       body.dark .neru-msg-bot {
         background: rgba(129,140,248,0.1);
         border: 1px solid rgba(129,140,248,0.15);
@@ -450,26 +235,15 @@ Or email us directly at **support@nerum.in** 📧`;
         color: #1a0533;
       }
       .neru-msg-user {
-        border-radius: 12px 12px 4px 12px;
-        align-self: flex-end;
-        background: linear-gradient(135deg, #818cf8, #34d399);
-        color: #fff;
+        border-radius: 12px 12px 4px 12px; align-self: flex-end;
+        background: linear-gradient(135deg, #818cf8, #34d399); color: #fff;
       }
-
-      /* Typing indicator */
       .neru-typing {
         display: flex; gap: 4px; padding: 10px 14px;
-        border-radius: 4px 12px 12px 12px; align-self: flex-start;
-        border: 1px solid;
+        border-radius: 4px 12px 12px 12px; align-self: flex-start; border: 1px solid;
       }
-      body.dark .neru-typing {
-        background: rgba(129,140,248,0.1);
-        border-color: rgba(129,140,248,0.15);
-      }
-      body.light .neru-typing {
-        background: rgba(255,255,255,0.9);
-        border-color: rgba(109,40,217,0.15);
-      }
+      body.dark .neru-typing { background: rgba(129,140,248,0.1); border-color: rgba(129,140,248,0.15); }
+      body.light .neru-typing { background: rgba(255,255,255,0.9); border-color: rgba(109,40,217,0.15); }
       .neru-typing span {
         width: 6px; height: 6px; border-radius: 50%;
         background: #818cf8; display: inline-block;
@@ -477,12 +251,9 @@ Or email us directly at **support@nerum.in** 📧`;
       .neru-typing span:nth-child(1){animation:pulse 1.2s ease-in-out infinite}
       .neru-typing span:nth-child(2){animation:pulse 1.2s ease-in-out 0.4s infinite}
       .neru-typing span:nth-child(3){animation:pulse 1.2s ease-in-out 0.8s infinite}
-
-      /* Quick replies */
       #neru-quick {
         padding: 8px 12px; display: flex; gap: 6px;
-        flex-wrap: wrap; flex-shrink: 0;
-        border-top: 1px solid;
+        flex-wrap: wrap; flex-shrink: 0; border-top: 1px solid;
       }
       body.dark #neru-quick { border-color: rgba(255,255,255,0.07); }
       body.light #neru-quick { border-color: rgba(109,40,217,0.1); }
@@ -491,24 +262,10 @@ Or email us directly at **support@nerum.in** 📧`;
         cursor: pointer; font-family: -apple-system, sans-serif;
         transition: all 0.2s; border: 1px solid; font-weight: 500;
       }
-      body.dark #neru-quick button {
-        background: rgba(129,140,248,0.08);
-        border-color: rgba(129,140,248,0.2);
-        color: #818cf8;
-      }
-      body.dark #neru-quick button:hover {
-        background: rgba(129,140,248,0.18);
-      }
-      body.light #neru-quick button {
-        background: rgba(109,40,217,0.06);
-        border-color: rgba(109,40,217,0.2);
-        color: #6d28d9;
-      }
-      body.light #neru-quick button:hover {
-        background: rgba(109,40,217,0.12);
-      }
-
-      /* Input row */
+      body.dark #neru-quick button { background: rgba(129,140,248,0.08); border-color: rgba(129,140,248,0.2); color: #818cf8; }
+      body.dark #neru-quick button:hover { background: rgba(129,140,248,0.18); }
+      body.light #neru-quick button { background: rgba(109,40,217,0.06); border-color: rgba(109,40,217,0.2); color: #6d28d9; }
+      body.light #neru-quick button:hover { background: rgba(109,40,217,0.12); }
       #neru-input-row {
         display: flex; gap: 8px; padding: 10px 12px;
         flex-shrink: 0; border-top: 1px solid;
@@ -520,18 +277,10 @@ Or email us directly at **support@nerum.in** 📧`;
         font-size: 11px; outline: none; border: 1px solid;
         font-family: -apple-system, sans-serif;
       }
-      body.dark #neru-input {
-        background: rgba(255,255,255,0.05);
-        border-color: rgba(255,255,255,0.1);
-        color: #fff;
-      }
+      body.dark #neru-input { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
       body.dark #neru-input::placeholder { color: rgba(255,255,255,0.25); }
       body.dark #neru-input:focus { border-color: rgba(129,140,248,0.5); }
-      body.light #neru-input {
-        background: rgba(255,255,255,0.7);
-        border-color: rgba(109,40,217,0.2);
-        color: #1a0533;
-      }
+      body.light #neru-input { background: rgba(255,255,255,0.7); border-color: rgba(109,40,217,0.2); color: #1a0533; }
       body.light #neru-input::placeholder { color: #a78bfa; }
       body.light #neru-input:focus { border-color: #7c3aed; }
       #neru-send {
@@ -542,10 +291,9 @@ Or email us directly at **support@nerum.in** 📧`;
         transition: all 0.2s; flex-shrink: 0;
       }
       #neru-send:hover { transform: scale(1.1); opacity: 0.9; }
-
-      /* Bold text in messages */
       .neru-msg-bot strong { font-weight: 700; color: #818cf8; }
       body.light .neru-msg-bot strong { color: #6d28d9; }
+      #neru-input:disabled { opacity: 0.5; cursor: not-allowed; }
     `;
     document.head.appendChild(style);
   }
@@ -563,7 +311,7 @@ Or email us directly at **support@nerum.in** 📧`;
       notif.style.display = 'none';
       if (!neruGreeted) {
         neruGreeted = true;
-        setTimeout(() => addNeruMsg('bot', `Hi! 👋 I'm **Neru**, your Nerum support assistant!\n\nHow can I help you today?`), 400);
+        setTimeout(() => addNeruMsg('bot', `Hi! 👋 I'm **Neru**, Nerum's AI assistant powered by Claude!\n\nI can answer any question about Nerum — pricing, features, setup, Smart Lists, or anything else!\n\nHow can I help you? 🚀`), 400);
       }
       setTimeout(() => {
         const input = document.getElementById('neru-input');
@@ -574,35 +322,46 @@ Or email us directly at **support@nerum.in** 📧`;
     }
   };
 
-  window.sendNeru = function() {
+  window.sendNeru = async function() {
     const input = document.getElementById('neru-input');
     const msg = input.value.trim();
     if (!msg) return;
     addNeruMsg('user', msg);
     input.value = '';
-    // Show typing
+    input.disabled = true;
     const typing = showNeruTyping();
-    setTimeout(() => {
+    try {
+      const response = await getClaudeResponse(msg);
       removeNeruTyping(typing);
-      const response = getSmartResponse(msg);
       addNeruMsg('bot', response);
-    }, 900 + Math.random() * 600);
-  };
-
-  window.neruQuick = function(msg) {
-    addNeruMsg('user', msg);
-    const typing = showNeruTyping();
-    setTimeout(() => {
+    } catch(e) {
       removeNeruTyping(typing);
       addNeruMsg('bot', getSmartResponse(msg));
-    }, 800);
+    }
+    input.disabled = false;
+    input.focus();
+  };
+
+  window.neruQuick = async function(msg) {
+    addNeruMsg('user', msg);
+    const input = document.getElementById('neru-input');
+    if (input) input.disabled = true;
+    const typing = showNeruTyping();
+    try {
+      const response = await getClaudeResponse(msg);
+      removeNeruTyping(typing);
+      addNeruMsg('bot', response);
+    } catch(e) {
+      removeNeruTyping(typing);
+      addNeruMsg('bot', getSmartResponse(msg));
+    }
+    if (input) input.disabled = false;
   };
 
   function addNeruMsg(type, text) {
     const msgs = document.getElementById('neru-msgs');
     const div = document.createElement('div');
     div.className = type === 'bot' ? 'neru-msg-bot' : 'neru-msg-user';
-    // Bold text support **text**
     div.innerHTML = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     msgs.appendChild(div);
     msgs.scrollTop = msgs.scrollHeight;
@@ -622,7 +381,6 @@ Or email us directly at **support@nerum.in** 📧`;
     if (el && el.parentNode) el.parentNode.removeChild(el);
   }
 
-  // ===== INIT =====
   function initNeru() {
     buildStyles();
     buildWidget();
