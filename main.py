@@ -90,7 +90,7 @@ app.include_router(dashboard.router, prefix="/dashboard")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.post("/ai/chat")
+@app.post("/neru/message")
 async def ai_chat(data: dict, request: Request):
     import httpx
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")

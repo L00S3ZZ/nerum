@@ -13,7 +13,7 @@
     });
 
     try {
-      const response = await fetch("/ai/chat", {
+      const response = await fetch("/neru/message", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
