@@ -1009,17 +1009,19 @@ button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid 
 body.dark ::selection{background:rgba(129,140,248,0.3);color:#fff}
 body.light ::selection{background:rgba(109,40,217,0.2);color:#1a0533}
 
-select option {
-  background: #0d0020 !important;
-  color: #fff !important;
-}
-
-.dark select {
-  background: rgba(255,255,255,0.05) !important;
-  color: #fff !important;
-}
-
+/* Dark theme dropdowns */
 .dark select option {
   background: #0d0020 !important;
   color: #fff !important;
+}
+
+/* Light theme dropdowns */
+select option {
+  background: #ffffff !important;
+  color: #1a0533 !important;
+}
+
+.light select option {
+  background: #ffffff !important;
+  color: #1a0533 !important;
 }
