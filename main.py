@@ -90,6 +90,25 @@ app.include_router(dashboard.router, prefix="/dashboard")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+@app.post("/ai/chat")
+async def ai_chat(data: dict, request: Request):
+    import httpx
+    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
+    if not ANTHROPIC_API_KEY:
+        return {"error": "API key not configured"}
+    async with httpx.AsyncClient() as client:
+        res = await client.post(
+            "https://api.anthropic.com/v1/messages",
+            headers={
+                "x-api-key": ANTHROPIC_API_KEY,
+                "anthropic-version": "2023-06-01",
+                "content-type": "application/json"
+            },
+            json=data,
+            timeout=30
+        )
+        return res.json()
+
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
@@ -108,19 +127,3 @@ if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), use_reloader=False)
 
-    @app.post("/ai/chat")
-async def ai_chat(data: dict, request: Request):
-    import httpx
-    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-    async with httpx.AsyncClient() as client:
-        res = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_API_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json=data,
-            timeout=30
-        )
-        return res.json()
