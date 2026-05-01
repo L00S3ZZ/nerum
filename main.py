@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -19,14 +19,19 @@ from routes import forms
 from routes import webhook
 from routes import dashboard
 from scheduler import start_scheduler
+from security import check_content, sanitize_input, get_daily_limit
 import os
+import httpx
+from jose import jwt, JWTError
+
+SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
+ALGORITHM = "HS256"
 
 limiter = Limiter(key_func=get_remote_address, default_limits=["200/minute"])
 
 app = FastAPI(
     title="Nerum",
     version="0.1",
-    # ✅ Hide API docs in production
     docs_url=None,
     redoc_url=None,
     openapi_url=None
@@ -35,7 +40,7 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# ✅ CORS — only allow our domain
+# ✅ CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["https://nerum.in", "https://www.nerum.in", "https://nerum.onrender.com"],
@@ -44,7 +49,7 @@ app.add_middleware(
     allow_credentials=False,
 )
 
-# ✅ Security headers middleware
+# ✅ Security headers
 @app.middleware("http")
 async def add_security_headers(request: Request, call_next):
     response = await call_next(request)
@@ -56,17 +61,16 @@ async def add_security_headers(request: Request, call_next):
     response.headers["X-Permitted-Cross-Domain-Policies"] = "none"
     return response
 
-# ✅ Hide internal errors from users
+# ✅ Global error handler
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    # Log the real error internally
     print(f"❌ Internal error: {exc}")
     return JSONResponse(
         status_code=500,
         content={"detail": "Something went wrong. Please try again."}
     )
 
-# ✅ Clean validation errors
+# ✅ Validation error handler
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
     return JSONResponse(
@@ -90,30 +94,94 @@ app.include_router(dashboard.router, prefix="/dashboard")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
+# ✅ AI Chat endpoint — SECURED
 @app.post("/neru/message")
-async def ai_chat(data: dict, request: Request):
-    import httpx
+@limiter.limit("20/minute")
+async def ai_chat(request: Request, authorization: str = Header(None)):
+    # ✅ Require authentication
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Authentication required")
+
+    token = authorization.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise HTTPException(status_code=401, detail="Invalid token")
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
+
     ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
     if not ANTHROPIC_API_KEY:
-        return {"error": "API key not configured"}
-    async with httpx.AsyncClient() as client:
-        res = await client.post(
-            "https://api.anthropic.com/v1/messages",
-            headers={
-                "x-api-key": ANTHROPIC_API_KEY,
-                "anthropic-version": "2023-06-01",
-                "content-type": "application/json"
-            },
-            json=data,
-            timeout=30
-        )
-        return res.json()
+        raise HTTPException(status_code=500, detail="AI service not configured")
+
+    try:
+        data = await request.json()
+    except:
+        raise HTTPException(status_code=400, detail="Invalid request body")
+
+    # ✅ Validate and sanitize messages
+    messages = data.get("messages", [])
+    if not messages:
+        raise HTTPException(status_code=400, detail="No messages provided")
+
+    # ✅ Limit message history
+    if len(messages) > 20:
+        messages = messages[-20:]
+
+    # ✅ Content filter — check last user message
+    last_user_msg = next((m["content"] for m in reversed(messages) if m.get("role") == "user"), "")
+    last_user_msg = sanitize_input(last_user_msg, max_length=2000)
+
+    if not check_content(last_user_msg):
+        raise HTTPException(status_code=400, detail="Message contains prohibited content")
+
+    # ✅ Sanitize all messages
+    safe_messages = []
+    for msg in messages:
+        if isinstance(msg.get("content"), str):
+            safe_messages.append({
+                "role": msg["role"],
+                "content": sanitize_input(msg["content"], max_length=2000)
+            })
+
+    try:
+        async with httpx.AsyncClient() as client:
+            res = await client.post(
+                "https://api.anthropic.com/v1/messages",
+                headers={
+                    "x-api-key": ANTHROPIC_API_KEY,
+                    "anthropic-version": "2023-06-01",
+                    "content-type": "application/json"
+                },
+                json={
+                    "model": data.get("model", "claude-haiku-4-5-20251001"),
+                    "max_tokens": min(data.get("max_tokens", 500), 1000),  # Cap at 1000
+                    "system": data.get("system", ""),
+                    "messages": safe_messages
+                },
+                timeout=30
+            )
+            return res.json()
+    except httpx.TimeoutException:
+        raise HTTPException(status_code=504, detail="AI service timeout. Please try again.")
+    except Exception as e:
+        print(f"AI chat error: {e}")
+        raise HTTPException(status_code=500, detail="AI service error")
 
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
 
-# ✅ Admin page — rate limited
+@app.get("/privacy")
+def privacy():
+    return FileResponse("static/privacy.html")
+
+@app.get("/terms")
+def terms():
+    return FileResponse("static/terms.html")
+
+# ✅ Admin page — heavily rate limited
 @app.get("/admin-panel")
 @limiter.limit("10/minute")
 def admin_page(request: Request):
@@ -126,4 +194,3 @@ async def startup_event():
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), use_reloader=False)
-

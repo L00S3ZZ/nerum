@@ -871,9 +871,13 @@ async function sendChat() {
   chatHistory.push({ role: "user", content: msg });
 
   try {
-    const response = await fetch("/neru/message", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const token = localStorage.getItem('nerum_token');
+const response = await fetch("/neru/message", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    "Authorization": `Bearer ${token}`
+  },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 1000,
