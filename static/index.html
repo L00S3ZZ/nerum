@@ -4,7 +4,7 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Nerum — AI Workflow Automation</title>
-<link rel="stylesheet" href="/static/style.css?v=4"/>
+<link rel="stylesheet" href="/static/style.css?v=5"/>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script src="/static/chatbot.js"></script>
@@ -273,54 +273,72 @@
   </div>
 </div>
 
-<!-- DASHBOARD -->
+<!-- ===================== DASHBOARD ===================== -->
 <div class="dashboard" id="dashboard">
   <div class="layout">
-    <div class="sidebar">
-      <div class="sb-top" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:16px 14px">
-        <img src="/static/nerum-logo-transparent.png" height="60" style="display:block;margin:0 auto"/>
-        <div class="sb-tagline" style="margin-top:6px">AI Workflow Platform</div>
-      </div>
-      <div class="sb-nav">
-        <div class="sb-section">Main</div>
-        <div class="sb-item active" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard
+
+    <!-- SIDEBAR — diagonal gradient A1 style -->
+    <div class="sidebar new-sidebar">
+      <div class="sb-diag-bg"></div>
+      <div class="sb-inner-wrap">
+        <!-- Brand -->
+        <div class="sb-brand">
+          <img src="/static/nerum-logo-transparent.png" class="sb-logo-img" alt="Nerum"/>
+          <div class="sb-logo-text">Nerum</div>
         </div>
-        <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows
-          <span class="sb-badge" id="wf-badge">0</span>
+
+        <!-- Nav -->
+        <div class="sb-nav">
+          <div class="sb-section">Main</div>
+          <div class="sb-item active" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard
+          </div>
+          <div class="sb-item" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows
+            <span class="sb-badge" id="wf-badge">0</span>
+          </div>
+          <div class="sb-item" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History
+          </div>
+          <div class="sb-item" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists
+          </div>
+          <div class="sb-section">Account</div>
+          <div class="sb-item" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing
+          </div>
+          <div class="sb-item" onclick="setActive(this)">
+            <div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings
+          </div>
         </div>
-        <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History
+
+        <!-- User card — clean, no duplicate info -->
+        <div class="sb-usercard">
+          <div class="sb-uc-row">
+            <div class="sb-avatar" id="sb-initials">SR</div>
+            <div class="sb-uc-info">
+              <div class="sb-uname" id="sb-name">Srihari</div>
+              <div class="sb-plan">Free plan</div>
+            </div>
+          </div>
+          <div class="sb-uc-live">
+            <div class="sb-live-dot"></div>
+            <div class="sb-live-txt">API LIVE</div>
+          </div>
+          <button class="sb-logout" onclick="doLogout()">Logout</button>
         </div>
-        <!-- ✅ SMART LISTS -->
-        <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists
-        </div>
-        <div class="sb-section">Account</div>
-        <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing
-        </div>
-        <div class="sb-item" onclick="setActive(this)">
-          <div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings
-        </div>
-      </div>
-      <div class="sb-bottom">
-        <div class="sb-user">
-          <div class="sb-avatar" id="sb-initials">SR</div>
-          <div><div class="sb-uname" id="sb-name">Srihari</div><div class="sb-plan">Free plan</div></div>
-        </div>
-        <div class="sb-stats">
-          <div class="sb-stat"><div class="sb-stat-val" id="sb-tokens-used">0</div><div class="sb-stat-label">Tokens used</div></div>
-          <div class="sb-stat"><div class="sb-stat-val" style="color:#34d399">● Live</div><div class="sb-stat-label">API status</div></div>
-        </div>
-        <button class="sb-logout" onclick="doLogout()">Logout</button>
       </div>
     </div>
 
+    <!-- MAIN -->
     <div class="main">
+
+      <!-- TOPBAR -->
       <div class="topbar">
-        <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
+        <div>
+          <div class="tb-title" id="tb-title">Dashboard</div>
+          <div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div>
+        </div>
         <div class="tb-right">
           <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">Switch to Light</div>
           <!-- NOTIFICATION BELL -->
@@ -342,45 +360,24 @@
               <div id="notif-list" style="max-height:320px;overflow-y:auto"></div>
             </div>
           </div>
-          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
         </div>
       </div>
 
-      <!-- MAIN CONTENT -->
+      <!-- MAIN DASHBOARD CONTENT -->
       <div class="content" id="main-content" style="display:flex;flex-direction:column">
-        <div class="wf-card">
-          <div class="wf-icon"><i data-lucide="workflow" style="width:22px;height:22px"></i></div>
-          <div>
-            <div class="wf-num" id="wf-num">0</div>
-            <div class="wf-label">Active workflows</div>
-            <div class="wf-trend">↑ running automations</div>
-          </div>
-          <div class="wf-pills">
-            <span class="wf-pill">Gmail ✓</span>
-            <span class="wf-pill green">WhatsApp ✓</span>
-            <span class="wf-pill">Telegram ✓</span>
-            <span class="wf-pill green">Sheets ✓</span>
-          </div>
+
+        <!-- HUD CLOCK DASHBOARD -->
+        <div class="hud-dashboard">
+          <canvas id="dashClockCanvas"></canvas>
         </div>
-        <div class="bottom-row">
-          <div class="panel">
-            <div class="panel-header"><span class="panel-title">AI Workflow Builder</span><span class="panel-pill" id="lang-pill">Tamil / English</span></div>
-            <div class="chat-msgs" id="chat-msgs"><div class="chat-msg"><div class="bubble-bot" id="chat-greeting">Hi! What do you want to automate today?</div></div></div>
-            <div class="chat-input-row">
-              <input class="chat-input" id="chat-input" placeholder="Tell me what to automate..." onkeydown="if(event.key==='Enter')sendChat()"/>
-              <button class="chat-send" onclick="sendChat()">Send</button>
-            </div>
-          </div>
-          <div class="panel">
-            <div class="panel-header"><span class="panel-title">Active services</span><span class="panel-pill">Click to expand</span></div>
-            <div class="svc-item" onclick="toggleSvc('s1')"><div class="svc-icon" style="background:rgba(234,67,53,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 4h12v8H2z" fill="#EA4335"/><path d="M2 4l6 5 6-5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="svc-name">Gmail</div><div class="svc-desc">Send email</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
-            <div class="svc-detail" id="s1"><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:12 AM</span></div><div class="svc-dr"><span class="svc-dk">Total sent</span><span class="svc-dv">12 emails</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/gmail/send</span></div></div>
-            <div class="svc-item" onclick="toggleSvc('s2')"><div class="svc-icon" style="background:rgba(37,211,102,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#25D366"/><path d="M5 8.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="svc-name">WhatsApp</div><div class="svc-desc">Twilio sandbox</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
-            <div class="svc-detail" id="s2"><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 9:33 AM</span></div><div class="svc-dr"><span class="svc-dk">From</span><span class="svc-dv">+14155238886</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/whatsapp/send</span></div></div>
-            <div class="svc-item" onclick="toggleSvc('s3')"><div class="svc-icon" style="background:rgba(42,171,238,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" fill="#2AABEE"/><path d="M3 8l9-3.5-3.5 9-2-3-3.5-2.5z" fill="#fff"/></svg></div><div><div class="svc-name">Telegram</div><div class="svc-desc">Nerum bot</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
-            <div class="svc-detail" id="s3"><div class="svc-dr"><span class="svc-dk">Bot</span><span class="svc-dv">@nerum_bot</span></div><div class="svc-dr"><span class="svc-dk">Last sent</span><span class="svc-dv">Today 8:48 AM</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/telegram/send</span></div></div>
-            <div class="svc-item" onclick="toggleSvc('s4')"><div class="svc-icon" style="background:rgba(52,168,83,0.15)"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="12" height="12" rx="1" fill="#34A853"/><path d="M5 8h6M5 5h6M5 11h4" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="svc-name">Google Sheets</div><div class="svc-desc">Append rows</div></div><div class="svc-status"><span class="svc-dot"></span>Active</div></div>
-            <div class="svc-detail" id="s4"><div class="svc-dr"><span class="svc-dk">Rows appended</span><span class="svc-dv">8 rows</span></div><div class="svc-dr"><span class="svc-dk">Last updated</span><span class="svc-dv">Today 8:55 AM</span></div><div class="svc-dr"><span class="svc-dk">Endpoint</span><span class="svc-dv">/sheets/append</span></div></div>
+
+        <!-- BOTTOM BAR: New Workflow + Tokens -->
+        <div class="dash-bottom-bar">
+          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
+          <div class="dash-token-wrap">
+            <div class="dash-tok-lbl">TOKENS</div>
+            <div class="dash-tok-bar"><div class="dash-tok-fill" id="dash-tok-fill"></div></div>
+            <div class="dash-tok-val"><span id="sb-tokens-used">0</span> / <span id="dash-tok-limit">1000</span></div>
           </div>
         </div>
       </div>
@@ -401,6 +398,7 @@
       <div class="billing-content" id="workflows-content" style="display:none">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
           <div class="billing-title">My Workflows</div>
+          <button class="tb-btn" onclick="createWorkflow()" style="font-size:11px;padding:7px 16px">+ New Workflow</button>
         </div>
         <div class="billing-sub">All your automation workflows in one place</div>
         <div id="workflow-list-container"></div>
@@ -450,7 +448,6 @@
           </div>
         </div>
 
-        <!-- ✅ SECURITY — only once! -->
         <div class="settings-section">
           <div class="settings-section-title">Security</div>
           <div class="toggle-row">
@@ -480,7 +477,6 @@
           <div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div>
         </div>
 
-        <!-- ✅ LOGIN HISTORY -->
         <div class="settings-section">
           <div class="settings-section-title">🔐 Login History</div>
           <div id="login-history-list">
@@ -517,6 +513,175 @@
   function initIcons() {
     if (typeof lucide !== 'undefined') lucide.createIcons();
   }
+</script>
+
+<!-- ===== HUD CLOCK CANVAS ===== -->
+<script>
+(function(){
+  function initDashClock(){
+    const canvas = document.getElementById('dashClockCanvas');
+    if(!canvas) return;
+    const parent = canvas.parentElement;
+
+    function resize(){
+      canvas.width = parent.offsetWidth;
+      canvas.height = parent.offsetHeight;
+    }
+    resize();
+    window.addEventListener('resize', resize);
+
+    const svgStrs = [
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23EA4335' d='M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2325D366' d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%232AABEE' d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%2334A853' d='M45 16H33V3z'/><path fill='%2323A566' d='M33 3H7a2 2 0 0 0-2 2v38a2 2 0 0 0 2 2h34a2 2 0 0 0 2-2V16z'/><path fill='white' d='M15 30h18v2H15zm0-4h18v2H15zm0-4h12v2H15z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23818cf8' width='24' height='24' rx='4'/><path fill='white' d='M7 8h10v2H7zm0 4h10v2H7zm0 4h6v2H7z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle fill='%23e879f9' cx='12' cy='12' r='12'/><path fill='white' d='M8 6l8 6-8 6z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23f59e0b' width='24' height='24' rx='4'/><path fill='white' stroke='white' stroke-width='2.5' stroke-linecap='round' d='M12 5v14M5 12h14'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%2334d399' width='24' height='24' rx='12'/><path fill='none' stroke='white' stroke-width='2' stroke-linecap='round' d='M7 12l3 3 7-7'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%2360a5fa' width='24' height='24' rx='4'/><circle fill='white' cx='12' cy='9' r='3'/><path fill='white' d='M6 19c0-3.314 2.686-6 6-6s6 2.686 6 6H6z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23a78bfa' width='24' height='24' rx='4'/><path fill='white' d='M5 3l14 9-14 9z'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle fill='%23fb923c' cx='12' cy='12' r='12'/><rect fill='white' x='8' y='8' width='8' height='8' rx='1'/></svg>`,
+      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23f43f5e' width='24' height='24' rx='4'/><path fill='white' d='M12 4a8 8 0 1 0 0 16A8 8 0 0 0 12 4zm1 9H8v-2h5V8l4 4-4 4v-3z'/></svg>`
+    ];
+
+    const angles = [0,30,60,90,120,150,180,210,240,270,300,330];
+    const svcImgs = [];
+    svgStrs.forEach((s,i)=>{
+      const im = new Image(22,22);
+      im.src = 'data:image/svg+xml,' + s;
+      svcImgs[i] = im;
+    });
+
+    let animId;
+    const ctx = canvas.getContext('2d');
+
+    function drawClock(){
+      const W = canvas.width, H = canvas.height;
+      const isDark = document.body.classList.contains('dark');
+      ctx.clearRect(0,0,W,H);
+
+      const cx = W * 0.42, cy = H * 0.5;
+      const outerR = Math.min(W,H) * 0.38;
+      const innerR = outerR * 0.68;
+
+      const now = new Date();
+      const hrs = now.getHours()%12, mins = now.getMinutes();
+      const secs = now.getSeconds(), ms = now.getMilliseconds();
+      const secA = ((secs+ms/1000)/60)*Math.PI*2 - Math.PI/2;
+      const minA = ((mins+secs/60)/60)*Math.PI*2 - Math.PI/2;
+      const hrA  = ((hrs+mins/60)/12)*Math.PI*2 - Math.PI/2;
+
+      const col1 = isDark ? '#818cf8' : '#7c3aed';
+      const col2 = isDark ? '#34d399' : '#059669';
+      const col3 = isDark ? '#e879f9' : '#c026d3';
+
+      // outer dashed ring
+      ctx.save();
+      ctx.setLineDash([6,5]);
+      ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2);
+      const g1 = ctx.createLinearGradient(cx-outerR,cy,cx+outerR,cy);
+      g1.addColorStop(0,col1); g1.addColorStop(1,col2);
+      ctx.strokeStyle=g1; ctx.lineWidth=1.5; ctx.stroke();
+      ctx.restore();
+
+      // tick marks
+      for(let i=0;i<12;i++){
+        const a=(i/12)*Math.PI*2-Math.PI/2;
+        ctx.beginPath();
+        ctx.moveTo(cx+Math.cos(a)*(outerR-10),cy+Math.sin(a)*(outerR-10));
+        ctx.lineTo(cx+Math.cos(a)*(outerR-2),cy+Math.sin(a)*(outerR-2));
+        ctx.strokeStyle=isDark?'rgba(129,140,248,0.4)':'rgba(124,58,237,0.4)';
+        ctx.lineWidth=1.5; ctx.setLineDash([]); ctx.stroke();
+      }
+
+      // inner ring
+      ctx.beginPath(); ctx.arc(cx,cy,innerR,0,Math.PI*2);
+      const g2=ctx.createLinearGradient(cx-innerR,cy,cx+innerR,cy);
+      g2.addColorStop(0,col1); g2.addColorStop(1,col2);
+      ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
+
+      // service icon nodes
+      angles.forEach((deg,i)=>{
+        const a=deg*Math.PI/180-Math.PI/2;
+        const nx=cx+Math.cos(a)*outerR, ny=cy+Math.sin(a)*outerR;
+        ctx.beginPath(); ctx.arc(nx,ny,14,0,Math.PI*2);
+        ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
+        ctx.strokeStyle=isDark?'rgba(129,140,248,0.35)':'rgba(124,58,237,0.3)';
+        ctx.lineWidth=1; ctx.stroke();
+        if(svcImgs[i]&&svcImgs[i].complete&&svcImgs[i].naturalWidth>0){
+          ctx.drawImage(svcImgs[i],nx-11,ny-11,22,22);
+        }
+      });
+
+      // hands
+      function hand(angle,len,color,dotR){
+        const ex=cx+Math.cos(angle)*len, ey=cy+Math.sin(angle)*len;
+        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ex,ey);
+        ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
+        ctx.beginPath(); ctx.arc(ex,ey,dotR,0,Math.PI*2);
+        ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
+        ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
+        ctx.beginPath(); ctx.arc(ex,ey,dotR*0.4,0,Math.PI*2);
+        ctx.fillStyle=color; ctx.fill();
+      }
+      hand(hrA, innerR*0.55, col1, 6);
+      hand(minA, innerR*0.85, col2, 5);
+      ctx.beginPath(); ctx.moveTo(cx,cy);
+      ctx.lineTo(cx+Math.cos(secA)*innerR*0.88,cy+Math.sin(secA)*innerR*0.88);
+      ctx.strokeStyle=isDark?'rgba(232,121,249,0.7)':'rgba(192,38,211,0.6)';
+      ctx.lineWidth=1; ctx.stroke();
+
+      // center hub
+      ctx.beginPath(); ctx.arc(cx,cy,10,0,Math.PI*2);
+      ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
+      const cg=ctx.createLinearGradient(cx-10,cy,cx+10,cy);
+      cg.addColorStop(0,col1); cg.addColorStop(1,col2);
+      ctx.strokeStyle=cg; ctx.lineWidth=2; ctx.stroke();
+      ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2);
+      ctx.fillStyle=col1; ctx.fill();
+
+      // right side stats
+      const wfCount = document.getElementById('wf-badge')?.textContent || '0';
+      const trendEl = document.querySelector('.wf-trend');
+      const activeCount = trendEl ? trendEl.textContent.replace(/[^0-9]/g,'') : '0';
+      const tokUsed = document.getElementById('sb-tokens-used')?.textContent || '0';
+      const tokLimit = document.getElementById('dash-tok-limit')?.textContent || '1000';
+
+      const statsX = cx + outerR + 32;
+      const statColor = isDark ? 'rgba(255,255,255,0.9)' : '#1a0533';
+      const labelColor = isDark ? '#4a4a6a' : '#6d28d9';
+
+      const stats = [
+        {label:'WORKFLOWS', val: wfCount, color: col3, y: cy - 52},
+        {label:'RUNNING', val: activeCount||'0', color: col2, y: cy},
+        {label:'SERVICES', val: '4', color: col1, y: cy + 52},
+      ];
+
+      stats.forEach(s=>{
+        ctx.font = 'bold 26px DM Mono,monospace,sans-serif';
+        ctx.fillStyle = s.color;
+        ctx.textAlign = 'left';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(s.val, statsX, s.y - 6);
+        ctx.font = '400 9px DM Mono,monospace,sans-serif';
+        ctx.fillStyle = labelColor;
+        ctx.fillText(s.label, statsX, s.y + 12);
+      });
+
+      animId = requestAnimationFrame(drawClock);
+    }
+
+    setTimeout(drawClock, 300);
+  }
+
+  // init when dashboard shows
+  const origShowDash = window.showDashboard;
+  window.showDashboard = function(name){
+    if(origShowDash) origShowDash(name);
+    setTimeout(initDashClock, 200);
+  };
+})();
 </script>
 
 <!-- NEW WORKFLOW MODAL -->

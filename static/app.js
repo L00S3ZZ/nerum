@@ -213,8 +213,6 @@ async function doLogin() {
     });
     const data = await res.json();
     if (!res.ok) return showError(data.detail || 'Login failed');
-
-    // ✅ 2FA required
     if (data.two_fa_required) {
       otpEmail = data.email;
       document.getElementById('otp-overlay').style.display = 'flex';
@@ -222,7 +220,6 @@ async function doLogin() {
       hideAuthPopup();
       return;
     }
-
     localStorage.setItem('nerum_token', data.token);
     localStorage.setItem('nerum_name', data.name);
     if (data.email) localStorage.setItem('nerum_email', data.email);
@@ -341,13 +338,10 @@ async function loadLoginHistory() {
     const data = await res.json();
     const list = document.getElementById('login-history-list');
     if (!list) return;
-
-    // ✅ Load 2FA toggle state
     const toggle2FAel = document.getElementById('toggle-2fa');
     if (toggle2FAel && data.two_fa_enabled !== undefined) {
       toggle2FAel.checked = data.two_fa_enabled;
     }
-
     const isDark = document.body.classList.contains('dark');
     if (!data.history || data.history.length === 0) {
       list.innerHTML = '<div style="opacity:0.4;font-size:11px;padding:10px 0">No login history yet</div>';
@@ -433,7 +427,12 @@ async function loadWorkflows() {
       if (ptbTokens) ptbTokens.textContent = data.tokens_used;
       const ptbLimit = document.getElementById('ptb-limit');
       if (ptbLimit) ptbLimit.textContent = data.token_limit?.toLocaleString();
+      // Update dash bottom token bar
+      const dashTokLimit = document.getElementById('dash-tok-limit');
+      if (dashTokLimit) dashTokLimit.textContent = data.token_limit?.toLocaleString() || '1000';
       const pct = Math.min(100, Math.round((data.tokens_used / data.token_limit) * 100));
+      const dashTokFill = document.getElementById('dash-tok-fill');
+      if (dashTokFill) dashTokFill.style.width = pct + '%';
       const tokenFill = document.getElementById('token-fill');
       if (tokenFill) tokenFill.style.width = pct + '%';
       const tokenPct = document.getElementById('token-pct');
@@ -513,88 +512,37 @@ async function showWebhook(workflowId) {
     });
     const data = await res.json();
     const isDark = document.body.classList.contains('dark');
-
-    // Create modal
     const modal = document.createElement('div');
     modal.id = 'webhook-modal';
-    modal.style.cssText = `
-      position:fixed;inset:0;background:rgba(0,0,0,0.7);
-      z-index:5000;display:flex;align-items:center;
-      justify-content:center;backdrop-filter:blur(4px)
-    `;
+    modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:5000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)`;
     modal.innerHTML = `
-      <div style="width:100%;max-width:540px;margin:20px;
-        background:${isDark ? '#0d0020' : '#fff'};
-        border:1px solid rgba(232,121,249,0.2);
-        border-radius:20px;padding:28px;
-        max-height:80vh;overflow-y:auto;
-        animation:slideUp 0.3s ease">
+      <div style="width:100%;max-width:540px;margin:20px;background:${isDark ? '#0d0020' : '#fff'};border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:28px;max-height:80vh;overflow-y:auto;animation:slideUp 0.3s ease">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
           <div style="font-size:15px;font-weight:700;color:${isDark ? '#fff' : '#1a0533'}">🔗 Google Forms Webhook</div>
-          <button onclick="document.getElementById('webhook-modal').remove()"
-            style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
+          <button onclick="document.getElementById('webhook-modal').remove()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
         </div>
-
-        <!-- Webhook URL -->
         <div style="margin-bottom:16px">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Webhook URL</div>
           <div style="display:flex;gap:8px">
-            <input id="webhook-url-input" value="${data.webhook_url}" readonly
-              style="flex:1;padding:10px 12px;border-radius:10px;font-size:11px;
-              background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};
-              border:1px solid rgba(129,140,248,0.2);color:${isDark ? '#fff' : '#1a0533'};
-              outline:none;font-family:monospace"/>
-            <button onclick="copyWebhookUrl()"
-              style="padding:10px 16px;border-radius:10px;
-              background:linear-gradient(135deg,#e879f9,#818cf8);
-              border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">
-              Copy
-            </button>
+            <input id="webhook-url-input" value="${data.webhook_url}" readonly style="flex:1;padding:10px 12px;border-radius:10px;font-size:11px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(129,140,248,0.2);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:monospace"/>
+            <button onclick="copyWebhookUrl()" style="padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>
           </div>
         </div>
-
-        <!-- Instructions -->
         <div style="margin-bottom:16px">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:8px">How to set up</div>
-          ${data.instructions.map((step, i) => `
-            <div style="display:flex;gap:10px;padding:6px 0;font-size:12px;color:${isDark ? 'rgba(255,255,255,0.6)' : '#6d28d9'}">
-              <span style="width:20px;height:20px;border-radius:50%;
-                background:linear-gradient(135deg,#e879f9,#818cf8);
-                color:#fff;font-size:10px;font-weight:700;
-                display:flex;align-items:center;justify-content:center;flex-shrink:0">
-                ${i + 1}
-              </span>
-              ${step.substring(3)}
-            </div>
-          `).join('')}
+          ${data.instructions.map((step, i) => `<div style="display:flex;gap:10px;padding:6px 0;font-size:12px;color:${isDark ? 'rgba(255,255,255,0.6)' : '#6d28d9'}"><span style="width:20px;height:20px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-size:10px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">${i+1}</span>${step.substring(3)}</div>`).join('')}
         </div>
-
-        <!-- Apps Script -->
         <div>
           <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
             <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4">Google Apps Script Code</div>
-            <button onclick="copyScript()"
-              style="font-size:10px;padding:4px 12px;border-radius:20px;
-              background:rgba(129,140,248,0.1);color:#818cf8;
-              border:1px solid rgba(129,140,248,0.2);cursor:pointer;font-family:inherit">
-              Copy Code
-            </button>
+            <button onclick="copyScript()" style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2);cursor:pointer;font-family:inherit">Copy Code</button>
           </div>
-          <textarea id="apps-script-code" readonly rows="8"
-            style="width:100%;padding:12px;border-radius:10px;font-size:10px;
-            background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(109,40,217,0.03)'};
-            border:1px solid rgba(129,140,248,0.2);
-            color:${isDark ? 'rgba(255,255,255,0.7)' : '#6d28d9'};
-            outline:none;font-family:monospace;resize:none;line-height:1.5"
-          >${data.apps_script}</textarea>
+          <textarea id="apps-script-code" readonly rows="8" style="width:100%;padding:12px;border-radius:10px;font-size:10px;background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(109,40,217,0.03)'};border:1px solid rgba(129,140,248,0.2);color:${isDark ? 'rgba(255,255,255,0.7)' : '#6d28d9'};outline:none;font-family:monospace;resize:none;line-height:1.5">${data.apps_script}</textarea>
         </div>
-      </div>
-    `;
+      </div>`;
     document.body.appendChild(modal);
     modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
-  } catch(e) {
-    showToast('Error loading webhook URL', 'error');
-  }
+  } catch(e) { showToast('Error loading webhook URL', 'error'); }
 }
 
 function copyWebhookUrl() {
@@ -612,9 +560,7 @@ function copyScript() {
 async function showWebhookConfig(workflowId) {
   const token = localStorage.getItem('nerum_token');
   try {
-    const res = await fetch(`/webhook/url/${workflowId}`, {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetch(`/webhook/url/${workflowId}`, { headers: { 'Authorization': `Bearer ${token}` } });
     const data = await res.json();
     const isDark = document.body.classList.contains('dark');
     const modal = document.createElement('div');
@@ -626,57 +572,26 @@ async function showWebhookConfig(workflowId) {
           <div style="font-size:15px;font-weight:700;color:${isDark ? '#fff' : '#1a0533'}">⚙️ Configure Workflow</div>
           <button onclick="document.getElementById('config-modal').remove()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
         </div>
-
-        <!-- Webhook URL -->
         <div style="margin-bottom:16px">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Your Webhook URL</div>
           <div style="display:flex;gap:8px">
             <input value="${data.webhook_url}" readonly style="flex:1;padding:10px 12px;border-radius:10px;font-size:10px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(52,211,153,0.2);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:monospace" id="custom-webhook-url"/>
             <button onclick="navigator.clipboard.writeText(document.getElementById('custom-webhook-url').value);showToast('Copied! 🔗','success')" style="padding:10px 16px;border-radius:10px;background:linear-gradient(135deg,#34d399,#818cf8);border:none;color:#fff;font-size:11px;font-weight:700;cursor:pointer;font-family:inherit">Copy</button>
           </div>
-          <div style="font-size:10px;opacity:0.4;margin-top:6px">Paste this URL in Shopify, WooCommerce, IndiaMART or any service</div>
         </div>
-
-        <!-- Actions -->
         <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:10px">When triggered, send to:</div>
-
         <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:16px">
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:16px">💬</span>
-            <input id="cfg-whatsapp" placeholder="WhatsApp number (+91...)" value="${data.integrations.whatsapp_to}"
-              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:16px">📧</span>
-            <input id="cfg-email" placeholder="Email address" value="${data.integrations.email_to}"
-              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:16px">✈️</span>
-            <input id="cfg-telegram" placeholder="Telegram Chat ID" value="${data.integrations.telegram_chat_id}"
-              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
-          </div>
-          <div style="display:flex;align-items:center;gap:10px">
-            <span style="font-size:16px">🔗</span>
-            <input id="cfg-forward" placeholder="Forward to URL (optional)" value="${data.integrations.forward_url}"
-              style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/>
-          </div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">💬</span><input id="cfg-whatsapp" placeholder="WhatsApp number (+91...)" value="${data.integrations.whatsapp_to}" style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">📧</span><input id="cfg-email" placeholder="Email address" value="${data.integrations.email_to}" style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">✈️</span><input id="cfg-telegram" placeholder="Telegram Chat ID" value="${data.integrations.telegram_chat_id}" style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/></div>
+          <div style="display:flex;align-items:center;gap:10px"><span style="font-size:16px">🔗</span><input id="cfg-forward" placeholder="Forward to URL (optional)" value="${data.integrations.forward_url}" style="flex:1;padding:10px 12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit"/></div>
         </div>
-
-        <!-- Message template -->
         <div style="margin-bottom:20px">
           <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;opacity:0.4;margin-bottom:6px">Message Template</div>
-          <textarea id="cfg-template" rows="4" placeholder="Use {field_name} for dynamic data&#10;Example: New order from {name}! Phone: {phone}"
-            style="width:100%;padding:12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit;resize:none;line-height:1.5"
-          >${data.message_template}</textarea>
-          <div style="font-size:10px;opacity:0.35;margin-top:4px">Use {name}, {email}, {phone} etc to insert data from the webhook</div>
+          <textarea id="cfg-template" rows="4" placeholder="Use {field_name} for dynamic data" style="width:100%;padding:12px;border-radius:10px;font-size:12px;background:${isDark ? 'rgba(255,255,255,0.05)' : 'rgba(109,40,217,0.05)'};border:1px solid rgba(255,255,255,0.1);color:${isDark ? '#fff' : '#1a0533'};outline:none;font-family:inherit;resize:none;line-height:1.5">${data.message_template}</textarea>
         </div>
-
-        <button onclick="saveWebhookConfig(${workflowId})" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#34d399,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">
-          Save Configuration ✓
-        </button>
-      </div>
-    `;
+        <button onclick="saveWebhookConfig(${workflowId})" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#34d399,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Save Configuration ✓</button>
+      </div>`;
     document.body.appendChild(modal);
     modal.addEventListener('click', e => { if(e.target === modal) modal.remove(); });
   } catch(e) { showToast('Error loading config', 'error'); }
@@ -697,12 +612,8 @@ async function saveWebhookConfig(workflowId) {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify(config)
     });
-    if (res.ok) {
-      showToast('Configuration saved! ✅', 'success');
-      document.getElementById('config-modal').remove();
-    } else {
-      showToast('Error saving config', 'error');
-    }
+    if (res.ok) { showToast('Configuration saved! ✅', 'success'); document.getElementById('config-modal').remove(); }
+    else { showToast('Error saving config', 'error'); }
   } catch(e) { showToast('Error saving config', 'error'); }
 }
 
@@ -730,9 +641,7 @@ function createWorkflow() {
   setTimeout(() => document.getElementById('wf-name-input').focus(), 100);
 }
 
-function closeWfModal() {
-  document.getElementById('wf-modal-overlay').style.display = 'none';
-}
+function closeWfModal() { document.getElementById('wf-modal-overlay').style.display = 'none'; }
 
 async function saveWfModal() {
   const name = document.getElementById('wf-name-input').value.trim();
@@ -784,9 +693,7 @@ async function saveWfModal() {
 }
 
 const _wfOverlay = document.getElementById('wf-modal-overlay');
-if (_wfOverlay) _wfOverlay.addEventListener('click', function(e) {
-  if (e.target === this) closeWfModal();
-});
+if (_wfOverlay) _wfOverlay.addEventListener('click', function(e) { if (e.target === this) closeWfModal(); });
 
 // ===== SIDEBAR NAVIGATION =====
 function setActive(el) {
@@ -803,31 +710,15 @@ function setActive(el) {
 
 function showPage(page) {
   const pages = ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content'];
-  pages.forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = 'none';
-  });
+  pages.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const titles = { billing:'Billing', settings:'Settings', history:'Service History', workflows:'Workflows', dashboard:'Dashboard' };
   const titleEl = document.getElementById('tb-title');
   if (titleEl) titleEl.textContent = titles[page] || 'Dashboard';
-  if (page === 'billing') {
-    const el = document.getElementById('billing-content');
-    el.style.display = 'flex'; el.style.flexDirection = 'column';
-  } else if (page === 'settings') {
-    const el = document.getElementById('settings-content');
-    el.style.display = 'flex'; el.style.flexDirection = 'column';
-  } else if (page === 'history') {
-    const el = document.getElementById('history-content');
-    el.style.display = 'flex'; el.style.flexDirection = 'column';
-    loadHistory();
-  } else if (page === 'workflows') {
-    const el = document.getElementById('workflows-content');
-    if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; }
-    loadWorkflows();
-  } else {
-    const el = document.getElementById('main-content');
-    el.style.display = 'flex'; el.style.flexDirection = 'column';
-  }
+  if (page === 'billing') { const el = document.getElementById('billing-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
+  else if (page === 'settings') { const el = document.getElementById('settings-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
+  else if (page === 'history') { const el = document.getElementById('history-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; loadHistory(); }
+  else if (page === 'workflows') { const el = document.getElementById('workflows-content'); if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; } loadWorkflows(); }
+  else { const el = document.getElementById('main-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
 }
 
 // ===== SERVICES =====
@@ -836,131 +727,53 @@ function toggleSvc(id) {
   const isOpen = el.classList.contains('show');
   document.querySelectorAll('.svc-detail').forEach(d => d.classList.remove('show'));
   document.querySelectorAll('.svc-item').forEach(d => d.classList.remove('expanded'));
-  if (!isOpen) {
-    el.classList.add('show');
-    el.previousElementSibling.classList.add('expanded');
-  }
+  if (!isOpen) { el.classList.add('show'); el.previousElementSibling.classList.add('expanded'); }
 }
 
-// ===== CHAT — Powered by Claude AI =====
+// ===== CHAT =====
 let chatHistory = [];
 
 async function sendChat() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
   if (!msg) return;
-
   const msgs = document.getElementById('chat-msgs');
-
-  // Show user message
   msgs.innerHTML += `<div class="chat-msg" style="text-align:right"><div class="bubble-user">${msg}</div></div>`;
   input.value = '';
   input.disabled = true;
   msgs.scrollTop = msgs.scrollHeight;
-
-  // Show typing indicator
   const typingId = 'typing-' + Date.now();
-  msgs.innerHTML += `<div class="chat-msg" id="${typingId}"><div class="bubble-bot" style="display:flex;gap:4px;align-items:center;padding:10px 14px">
-    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out infinite"></span>
-    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.4s infinite"></span>
-    <span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.8s infinite"></span>
-  </div></div>`;
+  msgs.innerHTML += `<div class="chat-msg" id="${typingId}"><div class="bubble-bot" style="display:flex;gap:4px;align-items:center;padding:10px 14px"><span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.4s infinite"></span><span style="width:6px;height:6px;border-radius:50%;background:#818cf8;display:inline-block;animation:pulse 1.2s ease-in-out 0.8s infinite"></span></div></div>`;
   msgs.scrollTop = msgs.scrollHeight;
-
-  // Add to history
   chatHistory.push({ role: "user", content: msg });
-
   try {
     const token = localStorage.getItem('nerum_token');
-const response = await fetch("/neru/message", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-    "Authorization": `Bearer ${token}`
-  },
+    const response = await fetch("/neru/message", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
       body: JSON.stringify({
         model: "claude-haiku-4-5-20251001",
         max_tokens: 1000,
-        system: `You are an AI workflow automation assistant inside Nerum — a platform that helps Indian businesses automate WhatsApp, Gmail, Telegram and Google Sheets.
-
-Your job is to help users build and configure workflows by understanding what they want to automate.
-
-**Nerum's capabilities:**
-- Send WhatsApp messages (via Twilio)
-- Send Gmail/emails (via Resend)
-- Send Telegram notifications (via @nerum_bot)
-- Append rows to Google Sheets
-- Google Forms webhook trigger
-- Razorpay payment webhook trigger
-- Custom webhooks (Shopify, WooCommerce, IndiaMART etc)
-- Smart Lists — scheduled bulk messaging to contacts based on conditions
-- 8 business types: School, Clinic, Shop, Restaurant, Real Estate, Gym, Company, Custom
-
-**When a user describes what they want to automate:**
-1. Understand their use case
-2. Suggest which trigger and action to use
-3. Give clear step-by-step instructions
-4. Provide the exact message template they can use with {variables}
-5. Guide them to configure their workflow
-
-**Examples of what users might say:**
-- "Send WhatsApp when someone fills my Google Form"
-- "Notify me on Telegram when payment is received"
-- "Fee reminder to all unpaid students daily at 5PM"
-- "Auto email receipt when Razorpay payment is captured"
-
-**Response style:**
-- Concise and practical
-- Use bullet points for steps
-- Provide exact message templates when relevant
-- Support Tamil and English — respond in the same language as the user
-- Talk like a friendly colleague, not a manual
-- No bullet point lists for greetings — just talk naturally
-- Keep it conversational and warm
-- Don't use headers like ## or --- ever
-- First response should feel like chatting with a friend who knows automation
-- Example good greeting: "Hey! 👋 What do you want to automate? Tell me what your business does and I'll help you set it up!"
-- Example bad greeting: listing all features like a brochure
-- Short punchy replies — not essays
-- Use emojis naturally but not excessively`,
+        system: `You are an AI workflow automation assistant inside Nerum — a platform that helps Indian businesses automate WhatsApp, Gmail, Telegram and Google Sheets. Your job is to help users build and configure workflows. Be concise, practical, friendly. Support Tamil and English.`,
         messages: chatHistory
       })
     });
-
     const data = await response.json();
-
-    // Remove typing indicator
     const typingEl = document.getElementById(typingId);
     if (typingEl) typingEl.remove();
-
     if (data.content && data.content[0]) {
       const reply = data.content[0].text;
       chatHistory.push({ role: "assistant", content: reply });
-
-      // Keep last 10 messages
       if (chatHistory.length > 10) chatHistory = chatHistory.slice(-10);
-
-      // Format reply — convert **bold** and newlines
-      const formatted = reply
-        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
-        .replace(/\n/g, '<br/>');
-
+      const formatted = reply.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>').replace(/\n/g, '<br/>');
       msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${formatted}</div></div>`;
-    } else {
-      throw new Error("No response");
-    }
+    } else { throw new Error("No response"); }
   } catch (error) {
-    console.error("Chat error:", error);
     const typingEl = document.getElementById(typingId);
     if (typingEl) typingEl.remove();
-
-    const fallback = selectedLang === 'tamil'
-      ? 'மன்னிக்கவும், தற்போது AI unavailable. support@nerum.in-ல் தொடர்பு கொள்ளுங்கள்! 🙏'
-      : 'AI is temporarily unavailable. Please try again or email support@nerum.in 🙏';
-
+    const fallback = selectedLang === 'tamil' ? 'மன்னிக்கவும், தற்போது AI unavailable. support@nerum.in-ல் தொடர்பு கொள்ளுங்கள்! 🙏' : 'AI is temporarily unavailable. Please try again or email support@nerum.in 🙏';
     msgs.innerHTML += `<div class="chat-msg"><div class="bubble-bot">${fallback}</div></div>`;
   }
-
   input.disabled = false;
   input.focus();
   msgs.scrollTop = msgs.scrollHeight;
@@ -1007,9 +820,7 @@ function closeProfilePopup() {
 }
 
 const _profOverlay = document.getElementById('profile-popup-overlay');
-if (_profOverlay) _profOverlay.addEventListener('click', function(e) {
-  if (e.target === this) closeProfilePopup();
-});
+if (_profOverlay) _profOverlay.addEventListener('click', function(e) { if (e.target === this) closeProfilePopup(); });
 
 function saveSettings() {
   const name = document.getElementById('settings-name').value.trim();
@@ -1032,29 +843,15 @@ function saveSettings() {
   applyTheme(theme);
   applyLang(lang);
   document.getElementById('settings-success').style.display = 'block';
-  setTimeout(() => {
-    document.getElementById('settings-success').style.display = 'none';
-    closeProfilePopup();
-  }, 2000);
+  setTimeout(() => { document.getElementById('settings-success').style.display = 'none'; closeProfilePopup(); }, 2000);
 }
 
 // ===== LANDING PAGE =====
-function showAuthPopup() {
-  document.getElementById('auth-popup-overlay').style.display = 'flex';
-}
-
-function hideAuthPopup() {
-  document.getElementById('auth-popup-overlay').style.display = 'none';
-}
-
+function showAuthPopup() { document.getElementById('auth-popup-overlay').style.display = 'flex'; }
+function hideAuthPopup() { document.getElementById('auth-popup-overlay').style.display = 'none'; }
 const _authOverlay = document.getElementById('auth-popup-overlay');
-if (_authOverlay) _authOverlay.addEventListener('click', function(e) {
-  if (e.target === this) hideAuthPopup();
-});
-
-function loadVideo() {
-  alert('Demo video coming soon! 🎬');
-}
+if (_authOverlay) _authOverlay.addEventListener('click', function(e) { if (e.target === this) hideAuthPopup(); });
+function loadVideo() { alert('Demo video coming soon! 🎬'); }
 
 // ===== HISTORY =====
 async function loadHistory() {
@@ -1063,50 +860,28 @@ async function loadHistory() {
   const token = localStorage.getItem('nerum_token');
   if (!token) return;
   try {
-    const res = await fetch('/workflow/history/list', {
-      headers: { 'Authorization': `Bearer ${token}` }
-    });
+    const res = await fetch('/workflow/history/list', { headers: { 'Authorization': `Bearer ${token}` } });
     const data = await res.json();
     const history = data.history || [];
     if (history.length === 0) {
-      container.innerHTML = `
-        <div style="text-align:center;padding:40px;opacity:0.4">
-          <div style="font-size:28px;margin-bottom:8px">📋</div>
-          <div style="font-size:13px;font-weight:600">No history yet</div>
-          <div style="font-size:11px;margin-top:4px">Run a workflow to see activity here</div>
-        </div>`;
+      container.innerHTML = `<div style="text-align:center;padding:40px;opacity:0.4"><div style="font-size:28px;margin-bottom:8px">📋</div><div style="font-size:13px;font-weight:600">No history yet</div><div style="font-size:11px;margin-top:4px">Run a workflow to see activity here</div></div>`;
       return;
     }
-    const icons = { gmail: '📧', whatsapp: '💬', telegram: '✈️', sheets: '📊', manual: '▶️', forms: '📋' };
-    const colors = { success: '#34d399', failed: '#ff8a7a' };
-    const isDark = document.body.classList.contains('dark');
+    const icons = { gmail:'📧', whatsapp:'💬', telegram:'✈️', sheets:'📊', manual:'▶️', forms:'📋' };
+    const colors = { success:'#34d399', failed:'#ff8a7a' };
     container.innerHTML = history.map(h => `
       <div class="history-item">
-        <div class="h-icon" style="background:rgba(129,140,248,0.1);font-size:16px;display:flex;align-items:center;justify-content:center">
-          ${icons[h.action?.toLowerCase()] || '⚡'}
-        </div>
-        <div class="h-info">
-          <div class="h-action">${h.workflow_name} — ${h.details}</div>
-          <div class="h-time">${new Date(h.ran_at).toLocaleDateString()} ${new Date(h.ran_at).toLocaleTimeString()}</div>
-        </div>
-        <span style="font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;
-          background:${h.status === 'success' ? 'rgba(52,211,153,0.1)' : 'rgba(255,80,80,0.1)'};
-          color:${colors[h.status] || '#818cf8'};
-          border:1px solid ${h.status === 'success' ? 'rgba(52,211,153,0.2)' : 'rgba(255,80,80,0.2)'}">
-          ${h.status}
-        </span>
-      </div>
-    `).join('');
-  } catch(e) {
-    container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Error loading history</div>';
-  }
+        <div class="h-icon" style="background:rgba(129,140,248,0.1);font-size:16px;display:flex;align-items:center;justify-content:center">${icons[h.action?.toLowerCase()]||'⚡'}</div>
+        <div class="h-info"><div class="h-action">${h.workflow_name} — ${h.details}</div><div class="h-time">${new Date(h.ran_at).toLocaleDateString()} ${new Date(h.ran_at).toLocaleTimeString()}</div></div>
+        <span style="font-size:9px;padding:3px 10px;border-radius:20px;font-weight:600;background:${h.status==='success'?'rgba(52,211,153,0.1)':'rgba(255,80,80,0.1)'};color:${colors[h.status]||'#818cf8'};border:1px solid ${h.status==='success'?'rgba(52,211,153,0.2)':'rgba(255,80,80,0.2)'}">${h.status}</span>
+      </div>`).join('');
+  } catch(e) { container.innerHTML = '<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Error loading history</div>'; }
 }
 
 // ===== TOGGLES =====
 function saveToggle(id, value) { localStorage.setItem(id, value); }
-
 function loadToggles() {
-  ['notif-email', 'notif-telegram', 'notif-weekly'].forEach(id => {
+  ['notif-email','notif-telegram','notif-weekly'].forEach(id => {
     const el = document.getElementById(id);
     const saved = localStorage.getItem(id);
     if (el && saved !== null) el.checked = saved === 'true';
@@ -1234,16 +1009,7 @@ function showToast(message, type = 'success') {
   };
   const c = colors[type] || colors.info;
   const toast = document.createElement('div');
-  toast.style.cssText = `
-    position:fixed;bottom:24px;left:24px;z-index:9999;
-    padding:12px 16px;border-radius:12px;font-size:12px;
-    font-family:-apple-system,sans-serif;font-weight:500;
-    display:flex;align-items:center;gap:10px;
-    background:${c.bg};border:1px solid ${c.border};color:${c.color};
-    backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.2);
-    animation:slideUp 0.3s ease;max-width:300px;
-    transition:opacity 0.3s ease;
-  `;
+  toast.style.cssText = `position:fixed;bottom:24px;left:24px;z-index:9999;padding:12px 16px;border-radius:12px;font-size:12px;font-family:-apple-system,sans-serif;font-weight:500;display:flex;align-items:center;gap:10px;background:${c.bg};border:1px solid ${c.border};color:${c.color};backdrop-filter:blur(12px);box-shadow:0 8px 24px rgba(0,0,0,0.2);animation:slideUp 0.3s ease;max-width:300px;transition:opacity 0.3s ease;`;
   toast.innerHTML = `<span>${c.icon}</span><span>${message}</span>`;
   document.body.appendChild(toast);
   setTimeout(() => { toast.style.opacity = '0'; setTimeout(() => toast.remove(), 300); }, 3000);
@@ -1253,11 +1019,7 @@ let notifications = [];
 let unreadCount = 0;
 
 function addNotification(title, message, type = 'info') {
-  const n = {
-    id: Date.now(), title, message, type,
-    time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}),
-    read: false
-  };
+  const n = { id: Date.now(), title, message, type, time: new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}), read: false };
   notifications.unshift(n);
   if (notifications.length > 20) notifications.pop();
   unreadCount++;
@@ -1287,9 +1049,7 @@ function toggleNotifPanel() {
     updateBellBadge();
     notifications.forEach(n => n.read = true);
     renderNotifications();
-  } else {
-    panel.style.display = 'none';
-  }
+  } else { panel.style.display = 'none'; }
 }
 
 function renderNotifications() {
@@ -1298,29 +1058,21 @@ function renderNotifications() {
   const isDark = document.body.classList.contains('dark');
   list.style.background = isDark ? '#0d0020' : '#ffffff';
   if (notifications.length === 0) {
-    list.innerHTML = `
-      <div style="text-align:center;padding:32px 16px;opacity:0.4">
-        <div style="font-size:28px;margin-bottom:8px">🔔</div>
-        <div style="font-size:12px;font-weight:600">No notifications yet</div>
-        <div style="font-size:10px;margin-top:4px">Activity will appear here</div>
-      </div>`;
+    list.innerHTML = `<div style="text-align:center;padding:32px 16px;opacity:0.4"><div style="font-size:28px;margin-bottom:8px">🔔</div><div style="font-size:12px;font-weight:600">No notifications yet</div><div style="font-size:10px;margin-top:4px">Activity will appear here</div></div>`;
     return;
   }
-  const typeColors = { success: '#34d399', error: '#ff8a7a', warning: '#fbbf24', info: '#818cf8' };
-  const typeIcons = { success: '✅', error: '❌', warning: '⚠️', info: 'ℹ️' };
+  const typeColors = { success:'#34d399', error:'#ff8a7a', warning:'#fbbf24', info:'#818cf8' };
+  const typeIcons = { success:'✅', error:'❌', warning:'⚠️', info:'ℹ️' };
   list.innerHTML = notifications.map(n => `
-    <div style="padding:12px 14px;border-bottom:1px solid;display:flex;gap:10px;align-items:flex-start;
-      ${isDark ? 'border-color:rgba(255,255,255,0.06);' + (!n.read ? 'background:rgba(129,140,248,0.04);' : '')
-               : 'border-color:rgba(109,40,217,0.08);' + (!n.read ? 'background:rgba(109,40,217,0.03);' : '')}">
-      <span style="font-size:14px;flex-shrink:0">${typeIcons[n.type] || 'ℹ️'}</span>
+    <div style="padding:12px 14px;border-bottom:1px solid;display:flex;gap:10px;align-items:flex-start;${isDark?'border-color:rgba(255,255,255,0.06);'+(!n.read?'background:rgba(129,140,248,0.04);':''):'border-color:rgba(109,40,217,0.08);'+(!n.read?'background:rgba(109,40,217,0.03);':'')}">
+      <span style="font-size:14px;flex-shrink:0">${typeIcons[n.type]||'ℹ️'}</span>
       <div style="flex:1;min-width:0">
-        <div style="font-size:11px;font-weight:600;margin-bottom:2px;color:${typeColors[n.type] || '#818cf8'}">${n.title}</div>
-        <div style="font-size:10px;opacity:0.6;line-height:1.5;color:${isDark ? '#fff' : '#1a0533'}">${n.message}</div>
-        <div style="font-size:9px;opacity:0.35;margin-top:4px;color:${isDark ? '#fff' : '#1a0533'}">${n.time}</div>
+        <div style="font-size:11px;font-weight:600;margin-bottom:2px;color:${typeColors[n.type]||'#818cf8'}">${n.title}</div>
+        <div style="font-size:10px;opacity:0.6;line-height:1.5;color:${isDark?'#fff':'#1a0533'}">${n.message}</div>
+        <div style="font-size:9px;opacity:0.35;margin-top:4px;color:${isDark?'#fff':'#1a0533'}">${n.time}</div>
       </div>
-      ${!n.read ? `<div style="width:7px;height:7px;border-radius:50%;background:#818cf8;flex-shrink:0;margin-top:3px"></div>` : ''}
-    </div>
-  `).join('');
+      ${!n.read?`<div style="width:7px;height:7px;border-radius:50%;background:#818cf8;flex-shrink:0;margin-top:3px"></div>`:''}
+    </div>`).join('');
 }
 
 function clearAllNotifications() {
@@ -1337,4 +1089,3 @@ document.addEventListener('click', function(e) {
     panel.style.display = 'none';
   }
 });
-// ========== END NOTIFICATION SYSTEM ==========
