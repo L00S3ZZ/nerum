@@ -4,22 +4,30 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Nerum — AI Workflow Automation</title>
-<link rel="stylesheet" href="/static/style.css?v=5"/>
+<link rel="stylesheet" href="/static/style.css?v=6"/>
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/static/chatbot.js"></script>
 <link rel="icon" type="image/png" href="/static/nerum-logo-transparent.png"/>
 </head>
 <body class="dark">
 <canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
 
-<!-- LANDING PAGE -->
+<!-- ==================== LANDING PAGE ==================== -->
 <div id="landing-page">
-  <nav class="nav">
-    <div class="nav-logo"><img src="/static/nerum-logo-transparent.png" height="100" style="vertical-align:middle"/></div>
+
+  <!-- NAVBAR -->
+  <nav class="nav" id="main-nav">
+    <div class="nav-logo">
+      <img src="/static/nerum-logo-transparent.png" height="48" style="vertical-align:middle;margin-right:4px" onerror="this.style.display='none'"/>
+      <span style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum</span>
+    </div>
     <div class="nav-links">
-      <a class="nav-link" href="#features">Features</a>
-      <a class="nav-link" href="#pricing">Pricing</a>
+      <a class="nav-link lp-link" href="#lp-integrations">Integrations</a>
+      <a class="nav-link lp-link" href="#lp-demo">Sample</a>
+      <a class="nav-link lp-link" href="#lp-pricing">Pricing</a>
+      <a class="nav-link lp-link" href="#lp-bio">Bio</a>
     </div>
     <div class="nav-btns">
       <button class="nav-login-btn" onclick="showAuthPopup()">Login</button>
@@ -27,84 +35,220 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <h1 class="hero-title">Automate your business<br/><span class="hero-gradient">with AI workflows</span></h1>
-    <p class="hero-sub">Connect Gmail, WhatsApp, Telegram and Google Sheets.<br/>Type what you want in Tamil or English — Nerum builds it for you.</p>
-    <div class="hero-btns">
-      <button class="hero-cta" onclick="showAuthPopup()">Start for free →</button>
-      <button class="hero-demo-btn" onclick="document.getElementById('demo-section').scrollIntoView({behavior:'smooth'})">Watch demo ↓</button>
-    </div>
-    <div class="hero-pills">
-      <span class="hero-pill">✓ No credit card required</span>
-      <span class="hero-pill">✓ Free forever plan</span>
-      <span class="hero-pill">✓ Tamil + English AI</span>
-      <span class="hero-pill">✓ 5 min setup</span>
-    </div>
-  </section>
+  <!-- ===== 3D CINEMATIC HERO ===== -->
+  <div id="lp-3d-wrap" style="position:relative;">
+    <!-- Tall scroll spacer so sticky works -->
+    <div style="height:700vh;position:relative;" id="lp-scroll-space">
+      <div id="lp-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;">
+        <canvas id="lp-3d-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;"></canvas>
 
-  <section class="demo-section" id="demo-section">
-    <div class="section-label">See it in action</div>
-    <h2 class="section-title">Watch how Nerum works</h2>
-    <div class="video-wrap">
-      <div class="video-placeholder" id="video-placeholder">
-        <div class="vp-inner">
-          <div class="vp-play" onclick="loadVideo()"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M5 3l14 9-14 9V3z" fill="#fff"/></svg></div>
-          <div class="vp-title">Nerum Demo</div>
-          <div class="vp-sub">See how to automate WhatsApp, Gmail & more in 2 minutes</div>
+        <!-- HERO TEXT LEFT -->
+        <div id="lp-hero-text" style="
+          position:absolute;left:60px;top:50%;transform:translateY(-50%);
+          z-index:10;pointer-events:none;
+          animation:lpFadeUp 1.2s 0.6s ease forwards;opacity:0;
+        ">
+          <div style="font-size:10px;letter-spacing:4px;color:rgba(232,121,249,0.8);font-family:monospace;text-transform:uppercase;margin-bottom:14px;
+            padding:4px 12px;border-radius:20px;border:1px solid rgba(232,121,249,0.2);background:rgba(232,121,249,0.05);display:inline-block;">
+            AI Workflow Platform · India 🇮🇳
+          </div>
+          <h1 style="font-size:58px;font-weight:900;letter-spacing:-3px;line-height:1.0;margin-bottom:18px;max-width:580px;color:#fff;">
+            Automate your<br/>business with<br/>
+            <span style="background:linear-gradient(135deg,#e879f9,#818cf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">AI workflows</span>
+          </h1>
+          <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;max-width:360px;margin-bottom:30px;">
+            Connect Gmail, WhatsApp, Telegram and Google Sheets.<br/>
+            Type what you want in Tamil or English.
+          </p>
+          <div style="display:flex;gap:10px;margin-bottom:18px;pointer-events:all;">
+            <button onclick="showAuthPopup()" style="padding:13px 28px;border-radius:30px;font-size:13px;font-weight:700;color:#fff;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#e879f9,#818cf8);box-shadow:0 0 30px rgba(232,121,249,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Start for free →</button>
+            <button onclick="document.getElementById('lp-demo').scrollIntoView({behavior:'smooth'})" style="padding:13px 28px;border-radius:30px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.15);cursor:pointer;font-family:inherit;background:transparent;transition:all 0.2s;">Watch demo ↓</button>
+          </div>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;">
+            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ No credit card</span>
+            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ Free forever</span>
+            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ Tamil + English AI</span>
+            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ 5 min setup</span>
+          </div>
+        </div>
+
+        <!-- RIGHT SIDE INTEGRATION LABEL -->
+        <div id="lp-int-label" style="
+          position:absolute;right:56px;top:50%;transform:translateY(-50%);
+          z-index:10;text-align:right;pointer-events:none;
+          opacity:0;transition:opacity 0.4s;
+        ">
+          <div style="font-size:10px;letter-spacing:3px;color:rgba(232,121,249,0.6);font-family:monospace;text-transform:uppercase;margin-bottom:8px;" id="lp-int-num">01 / 12</div>
+          <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;" id="lp-int-name">Gmail</div>
+          <div style="font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;" id="lp-int-desc">Send automated emails</div>
+        </div>
+
+        <!-- SCROLL PROGRESS RIGHT -->
+        <div style="position:absolute;right:24px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;">
+          <div style="width:1px;height:100px;background:rgba(255,255,255,0.08);position:relative;border-radius:1px;">
+            <div id="lp-prog-fill" style="position:absolute;top:0;left:0;right:0;background:linear-gradient(180deg,#e879f9,#818cf8);border-radius:1px;width:100%;height:0%;transition:height 0.05s;"></div>
+          </div>
+          <div id="lp-prog-pct" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;letter-spacing:1px;">0%</div>
+        </div>
+
+        <!-- SCROLL HINT BOTTOM -->
+        <div style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:10;text-align:center;animation:lpBlink 2s ease-in-out infinite;" id="lp-scroll-hint">
+          <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.2);font-family:monospace;">↓ SCROLL TO FLY THROUGH</div>
+        </div>
+
+        <!-- TOOLTIP -->
+        <div id="lp-tooltip" style="position:fixed;background:rgba(2,0,10,0.97);border:1px solid rgba(232,121,249,0.4);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;color:#fff;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:999;white-space:nowrap;box-shadow:0 0 30px rgba(232,121,249,0.15);"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== DEMO VIDEO SECTION ===== -->
+  <section id="lp-demo" style="padding:120px 60px;text-align:center;background:#02000a;position:relative;">
+    <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(109,28,217,0.12) 0%,transparent 70%);pointer-events:none;"></div>
+    <div class="lp-reveal" style="position:relative;z-index:1;">
+      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">See it in action</div>
+      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Watch how <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum works</span></h2>
+      <p style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:48px;">Automate WhatsApp, Gmail & more in under 2 minutes</p>
+      <div style="max-width:900px;margin:0 auto;border-radius:24px;border:1px solid rgba(232,121,249,0.12);background:rgba(255,255,255,0.02);aspect-ratio:16/9;position:relative;overflow:hidden;box-shadow:0 0 80px rgba(232,121,249,0.07),0 60px 120px rgba(0,0,0,0.5);">
+        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at center,rgba(109,28,217,0.12) 0%,transparent 70%);">
+          <div onclick="alert('Demo video coming soon! 🎬')" style="width:80px;height:80px;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(232,121,249,0.5);animation:lpFloat 3s ease-in-out infinite;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='none'">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="white" style="margin-left:4px"><path d="M5 3l14 9-14 9V3z"/></svg>
+          </div>
+          <div style="font-size:20px;font-weight:800;color:#fff;">Nerum Demo Video</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.3);">Full walkthrough — workflows, integrations, AI builder</div>
+          <div style="font-size:10px;color:rgba(232,121,249,0.4);font-family:monospace;padding:4px 14px;border-radius:20px;border:1px dashed rgba(232,121,249,0.2);">📹 Video uploading soon</div>
         </div>
       </div>
-      <iframe id="demo-video" style="display:none;width:100%;height:100%;border-radius:16px;border:none" allowfullscreen></iframe>
     </div>
   </section>
 
-  <section class="features-section" id="features">
-    <div class="section-label">Integrations</div>
-    <h2 class="section-title">Everything connected in one place</h2>
-    <div class="features-grid">
-      <div class="feature-card"><div class="fc-icon" style="background:rgba(234,67,53,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><path d="M2 7h24v14H2z" fill="#EA4335"/><path d="M2 7l12 9 12-9" stroke="#fff" stroke-width="1.5"/></svg></div><div class="fc-name">Gmail</div><div class="fc-desc">Send automated emails to customers, leads and team members instantly</div></div>
-      <div class="feature-card"><div class="fc-icon" style="background:rgba(37,211,102,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#25D366"/><path d="M9 15l3 3 7-7" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div><div class="fc-name">WhatsApp</div><div class="fc-desc">Send WhatsApp messages automatically to any number via Twilio</div></div>
-      <div class="feature-card"><div class="fc-icon" style="background:rgba(42,171,238,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="#2AABEE"/><path d="M5 14l16-6-6 16-3.5-5L5 14z" fill="#fff"/></svg></div><div class="fc-name">Telegram</div><div class="fc-desc">Send instant Telegram notifications via your own Nerum bot</div></div>
-      <div class="feature-card"><div class="fc-icon" style="background:rgba(52,168,83,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" fill="#34A853"/><path d="M8 14h12M8 9h12M8 19h8" stroke="#fff" stroke-width="1.5"/></svg></div><div class="fc-name">Google Sheets</div><div class="fc-desc">Automatically append data rows to any Google Sheet in real time</div></div>
-      <div class="feature-card"><div class="fc-icon" style="background:rgba(129,140,248,0.15)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><circle cx="14" cy="14" r="11" fill="rgba(129,140,248,0.8)"/><path d="M8 14l4 4 8-8" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg></div><div class="fc-name">AI Builder</div><div class="fc-desc">Type workflows in Tamil or English — AI understands and builds them</div></div>
-      <div class="feature-card fc-coming"><div class="fc-icon" style="background:rgba(255,255,255,0.08)"><svg width="28" height="28" viewBox="0 0 28 28" fill="none"><rect x="3" y="3" width="22" height="22" rx="2" stroke="rgba(255,255,255,0.3)" stroke-width="1.5"/><path d="M14 8v12M8 14h12" stroke="rgba(255,255,255,0.3)" stroke-width="1.5" stroke-linecap="round"/></svg></div><div class="fc-name" style="opacity:0.4">More coming</div><div class="fc-desc" style="opacity:0.3">Instagram, LinkedIn, Facebook and more integrations on the way!</div></div>
+  <!-- ===== INTEGRATIONS GRID ===== -->
+  <section id="lp-integrations" style="padding:120px 60px;background:#02000a;">
+    <div class="lp-reveal" style="text-align:center;margin-bottom:56px;">
+      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">Integrations</div>
+      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Everything connected <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">in one place</span></h2>
+      <p style="font-size:13px;color:rgba(255,255,255,0.3);">12 integrations. One platform. Built for Indian businesses.</p>
+    </div>
+    <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto;">
+      <div class="lp-int-card" style="--col:#EA4335"><div class="lic-icon">📧</div><div class="lic-name">Gmail</div><div class="lic-desc">Send automated emails instantly</div></div>
+      <div class="lp-int-card" style="--col:#25D366"><div class="lic-icon">💬</div><div class="lic-name">WhatsApp</div><div class="lic-desc">Message any number via Twilio</div></div>
+      <div class="lp-int-card" style="--col:#2AABEE"><div class="lic-icon">✈️</div><div class="lic-name">Telegram</div><div class="lic-desc">Bot notifications instantly</div></div>
+      <div class="lp-int-card" style="--col:#34A853"><div class="lic-icon">📊</div><div class="lic-name">Google Sheets</div><div class="lic-desc">Append rows live in real time</div></div>
+      <div class="lp-int-card" style="--col:#818cf8"><div class="lic-icon">🤖</div><div class="lic-name">AI Builder</div><div class="lic-desc">Tamil + English workflow builder</div></div>
+      <div class="lp-int-card" style="--col:#e879f9"><div class="lic-icon">🔗</div><div class="lic-name">Webhooks</div><div class="lic-desc">Connect any external service</div></div>
+      <div class="lp-int-card" style="--col:#2563EB"><div class="lic-icon">💳</div><div class="lic-name">Razorpay</div><div class="lic-desc">Trigger on payment capture</div></div>
+      <div class="lp-int-card" style="--col:#f59e0b"><div class="lic-icon">📋</div><div class="lic-name">Smart Lists</div><div class="lic-desc">Bulk scheduled messaging</div></div>
+      <div class="lp-int-card" style="--col:#9333ea"><div class="lic-icon">📝</div><div class="lic-name">Google Forms</div><div class="lic-desc">Trigger on form submissions</div></div>
+      <div class="lp-int-card" style="--col:#34d399"><div class="lic-icon">⏰</div><div class="lic-name">Scheduler</div><div class="lic-desc">Cron-based timed automation</div></div>
+      <div class="lp-int-card" style="--col:#4285F4"><div class="lic-icon">🔐</div><div class="lic-name">Google OAuth</div><div class="lic-desc">Secure Google authentication</div></div>
+      <div class="lp-int-card" style="--col:#06b6d4"><div class="lic-icon">⚡</div><div class="lic-name">REST API</div><div class="lic-desc">Full API access for developers</div></div>
     </div>
   </section>
 
-  <section class="how-section">
-    <div class="section-label">How it works</div>
-    <h2 class="section-title">3 steps to automate anything</h2>
-    <div class="steps-grid">
-      <div class="step-card"><div class="step-num">01</div><div class="step-title">Sign up free</div><div class="step-desc">Create your account in seconds with Google or email. No credit card needed.</div></div>
-      <div class="step-arrow">→</div>
-      <div class="step-card"><div class="step-num">02</div><div class="step-title">Tell the AI</div><div class="step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div></div>
-      <div class="step-arrow">→</div>
-      <div class="step-card"><div class="step-num">03</div><div class="step-title">It runs itself</div><div class="step-desc">Your workflow runs automatically. Get notified when it executes!</div></div>
+  <!-- ===== HOW IT WORKS ===== -->
+  <section style="padding:120px 60px;text-align:center;background:#02000a;">
+    <div class="lp-reveal">
+      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">How it works</div>
+      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:48px;color:#fff;">3 steps to <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">automate anything</span></h2>
+      <div style="display:flex;align-items:center;justify-content:center;gap:0;max-width:800px;margin:0 auto;">
+        <div class="lp-step-card"><div class="lp-step-num">01</div><div class="lp-step-title">Sign up free</div><div class="lp-step-desc">Create your account in seconds with Google or email. No credit card needed.</div></div>
+        <div style="font-size:24px;padding:0 20px;color:rgba(255,255,255,0.15);">→</div>
+        <div class="lp-step-card"><div class="lp-step-num">02</div><div class="lp-step-title">Tell the AI</div><div class="lp-step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div></div>
+        <div style="font-size:24px;padding:0 20px;color:rgba(255,255,255,0.15);">→</div>
+        <div class="lp-step-card"><div class="lp-step-num">03</div><div class="lp-step-title">It runs itself</div><div class="lp-step-desc">Your workflow runs automatically. Get notified when it executes!</div></div>
+      </div>
     </div>
   </section>
 
-  <section class="pricing-section" id="pricing">
-    <div class="section-label">Pricing</div>
-    <h2 class="section-title">Simple, honest pricing</h2>
-    <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
-    <div class="lp-plans-grid">
-      <div class="lp-plan-card"><div class="lp-plan-name">Free</div><div class="lp-plan-price">₹0<span>/month</span></div><div class="lp-plan-desc">Perfect to get started</div><div class="lp-plan-features"><div class="lp-feat">✓ 3 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat lp-feat-no">✗ Priority support</div></div><button class="lp-plan-btn lp-btn-free" onclick="showAuthPopup()">Get started free</button></div>
-      <div class="lp-plan-card lp-popular"><div class="lp-popular-badge">MOST POPULAR</div><div class="lp-plan-name" style="color:#818cf8">Starter</div><div class="lp-plan-price">₹799<span>/month</span></div><div class="lp-plan-desc">For growing businesses</div><div class="lp-plan-features"><div class="lp-feat">✓ 10 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Email support</div></div><button class="lp-plan-btn lp-btn-starter" onclick="showAuthPopup()">Get Starter</button></div>
-      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#34d399">Pro</div><div class="lp-plan-price">₹1,399<span>/month</span></div><div class="lp-plan-desc">For power users</div><div class="lp-plan-features"><div class="lp-feat">✓ 50 Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Priority support</div></div><button class="lp-plan-btn lp-btn-pro" onclick="showAuthPopup()">Get Pro</button></div>
-      <div class="lp-plan-card"><div class="lp-plan-name" style="color:#fbbf24">Business</div><div class="lp-plan-price">₹3,499<span>/month</span></div><div class="lp-plan-desc">For teams & agencies</div><div class="lp-plan-features"><div class="lp-feat">✓ Unlimited Workflows</div><div class="lp-feat">✓ 1,000 AI tokens</div><div class="lp-feat">✓ All integrations</div><div class="lp-feat">✓ Dedicated support</div></div><button class="lp-plan-btn lp-btn-business" onclick="showAuthPopup()">Get Business</button></div>
+  <!-- ===== PRICING ===== -->
+  <section id="lp-pricing" style="padding:120px 60px;background:#02000a;">
+    <div class="lp-reveal" style="text-align:center;margin-bottom:56px;">
+      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">Pricing</div>
+      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Simple, <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">honest pricing</span></h2>
+      <p style="font-size:13px;color:rgba(255,255,255,0.3);">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    </div>
+    <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto;">
+      <div class="lp-plan-card">
+        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:1px;">FREE</div>
+        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹0<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">Perfect to get started</div>
+        <div class="lp-feat">3 Workflows</div>
+        <div class="lp-feat">1,000 AI tokens</div>
+        <div class="lp-feat">All integrations</div>
+        <div class="lp-feat lp-feat-no">Priority support</div>
+        <button class="lp-plan-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.35);" onclick="showAuthPopup()">Get started free</button>
+      </div>
+      <div class="lp-plan-card" style="border-color:#818cf8;border-width:2px;background:rgba(129,140,248,0.04);">
+        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:9px;padding:4px 14px;border-radius:20px;background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;font-weight:700;white-space:nowrap;">MOST POPULAR</div>
+        <div style="font-size:11px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:1px;">STARTER</div>
+        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹799<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For growing businesses</div>
+        <div class="lp-feat">10 Workflows</div>
+        <div class="lp-feat">1,000 AI tokens</div>
+        <div class="lp-feat">All integrations</div>
+        <div class="lp-feat">Email support</div>
+        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;box-shadow:0 0 20px rgba(129,140,248,0.25);" onclick="showAuthPopup()">Get Starter</button>
+      </div>
+      <div class="lp-plan-card">
+        <div style="font-size:11px;font-weight:700;color:#34d399;margin-bottom:8px;letter-spacing:1px;">PRO</div>
+        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹1,399<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For power users</div>
+        <div class="lp-feat">50 Workflows</div>
+        <div class="lp-feat">1,000 AI tokens</div>
+        <div class="lp-feat">Priority support</div>
+        <div class="lp-feat">Advanced analytics</div>
+        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#34d399,#059669);color:#fff;" onclick="showAuthPopup()">Get Pro</button>
+      </div>
+      <div class="lp-plan-card">
+        <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px;letter-spacing:1px;">BUSINESS</div>
+        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹3,499<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
+        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For teams & agencies</div>
+        <div class="lp-feat">Unlimited Workflows</div>
+        <div class="lp-feat">1,000 AI tokens</div>
+        <div class="lp-feat">Dedicated support</div>
+        <div class="lp-feat">Custom integrations</div>
+        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f0a00;" onclick="showAuthPopup()">Get Business</button>
+      </div>
     </div>
   </section>
 
+  <!-- ===== BIO ===== -->
+  <section id="lp-bio" style="padding:120px 60px;background:#02000a;border-top:1px solid rgba(255,255,255,0.04);">
+    <div class="lp-reveal" style="text-align:center;margin-bottom:60px;">
+      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">The Builder</div>
+      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;color:#fff;">About <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum</span></h2>
+    </div>
+    <div class="lp-reveal" style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:80px;align-items:center;">
+      <div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#fff;box-shadow:0 0 80px rgba(232,121,249,0.3);flex-shrink:0;">SH</div>
+      <div>
+        <div style="font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:6px;color:#fff;">Sri Hari Raju</div>
+        <div style="font-size:12px;color:#e879f9;font-family:monospace;letter-spacing:2px;margin-bottom:18px;">FOUNDER · DEVELOPER · CHENNAI 🇮🇳</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.9;margin-bottom:22px;max-width:500px;">Building Nerum — AI workflow automation made for Indian businesses. Passionate about making powerful automation accessible to schools, clinics, shops and restaurants across Tamil Nadu and India.</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">FastAPI</span>
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Python</span>
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Three.js</span>
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">AI/ML</span>
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Tamil Nadu</span>
+          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">SaaS</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
   <footer class="footer">
-    <div class="footer-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-    <div class="footer-tagline">AI Workflow Automation</div>
+    <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">Nerum</div>
+    <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:16px;">AI Workflow Automation · Built in Chennai 🇮🇳</div>
     <div class="footer-links">
-      <a class="footer-link" href="#features">Features</a>
-      <a class="footer-link" href="#pricing">Pricing</a>
-      <a class="footer-link" onclick="showAuthPopup()">Login</a>
+      <a class="footer-link lp-link" href="#lp-integrations">Integrations</a>
+      <a class="footer-link lp-link" href="#lp-demo">Sample</a>
+      <a class="footer-link lp-link" href="#lp-pricing">Pricing</a>
+      <a class="footer-link lp-link" href="#lp-bio">Bio</a>
       <a class="footer-link" href="/privacy">Privacy</a>
       <a class="footer-link" href="/terms">Terms</a>
     </div>
-    <div class="footer-copy">© 2026 Nerum.</div>
+    <div class="footer-copy">© 2026 Nerum. All rights reserved.</div>
   </footer>
 </div>
 
@@ -134,9 +278,7 @@
           <label>PASSWORD</label>
           <input type="password" id="signup-password" placeholder="Min 6 characters" oninput="checkPasswordStrength(this.value)"/>
           <div id="strength-bar-wrap" style="margin-top:6px;display:none">
-            <div style="height:3px;border-radius:10px;background:rgba(255,255,255,0.08);overflow:hidden">
-              <div id="strength-bar" style="height:100%;border-radius:10px;transition:all 0.3s;width:0%"></div>
-            </div>
+            <div style="height:3px;border-radius:10px;background:rgba(255,255,255,0.08);overflow:hidden"><div id="strength-bar" style="height:100%;border-radius:10px;transition:all 0.3s;width:0%"></div></div>
             <div id="strength-text" style="font-size:10px;margin-top:4px"></div>
           </div>
         </div>
@@ -153,31 +295,6 @@
   <div class="load-tag">AI WORKFLOW PLATFORM</div>
   <div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div>
   <div class="load-text" id="loading-text">Starting up...</div>
-</div>
-
-<!-- AUTH PAGE -->
-<div class="auth-page" id="auth-page" style="display:none">
-  <div class="auth-box">
-    <div class="auth-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-    <div class="auth-sub">AI workflow automation platform</div>
-    <a href="/auth/google" class="google-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>Continue with Google</a>
-    <div class="auth-divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
-    <div class="auth-tabs"><button class="auth-tab active" onclick="switchTab('login')">Login</button><button class="auth-tab" onclick="switchTab('signup')">Sign up</button></div>
-    <div id="auth-error" class="auth-error"></div>
-    <div id="login-form">
-      <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
-      <div class="form-group"><label>PASSWORD</label><input type="password" id="login-password" placeholder="••••••••"/></div>
-      <button class="auth-btn" onclick="doLogin()">Login to Nerum</button>
-      <div class="auth-switch">Don't have an account? <span onclick="switchTab('signup')">Sign up free</span></div>
-    </div>
-    <div id="signup-form" style="display:none">
-      <div class="form-group"><label>FULL NAME</label><input type="text" id="signup-name" placeholder="Your name"/></div>
-      <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
-      <div class="form-group"><label>PASSWORD</label><input type="password" id="signup-password" placeholder="Min 6 characters"/></div>
-      <button class="auth-btn" onclick="doSignup()">Create account</button>
-      <div class="auth-switch">Already have an account? <span onclick="switchTab('login')">Login</span></div>
-    </div>
-  </div>
 </div>
 
 <!-- ONBOARDING -->
@@ -248,17 +365,8 @@
         <div class="prog-step"><div class="prog-dot current">3</div><span class="prog-label current">Ready</span></div>
       </div>
       <div class="ob-summary">
-        <div class="ob-sum-row">
-          <span class="ob-sum-key">Name</span>
-          <div style="display:flex;align-items:center;gap:8px">
-            <span class="ob-sum-val" id="sum-name">—</span>
-            <span id="name-edit-btn" onclick="editName()" style="font-size:9px;cursor:pointer;padding:2px 8px;border-radius:10px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)">Edit</span>
-          </div>
-        </div>
-        <div id="name-edit-row" style="display:none;padding:8px 0">
-          <input id="name-edit-input" class="name-edit-input" placeholder="Enter your name"/>
-          <div class="name-edit-btns"><button class="name-save-btn" onclick="saveName()">Save</button><button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button></div>
-        </div>
+        <div class="ob-sum-row"><span class="ob-sum-key">Name</span><div style="display:flex;align-items:center;gap:8px"><span class="ob-sum-val" id="sum-name">—</span><span id="name-edit-btn" onclick="editName()" style="font-size:9px;cursor:pointer;padding:2px 8px;border-radius:10px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)">Edit</span></div></div>
+        <div id="name-edit-row" style="display:none;padding:8px 0"><input id="name-edit-input" class="name-edit-input" placeholder="Enter your name"/><div class="name-edit-btns"><button class="name-save-btn" onclick="saveName()">Save</button><button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button></div></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Theme</span><span class="ob-sum-val" id="sum-theme">Dark — Aurora</span></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Language</span><span class="ob-sum-val" id="sum-lang">English</span></div>
         <div class="ob-sum-row"><span class="ob-sum-key">Plan</span><span class="ob-sum-val">Free</span></div>
@@ -273,84 +381,42 @@
   </div>
 </div>
 
-<!-- ===================== DASHBOARD ===================== -->
+<!-- DASHBOARD -->
 <div class="dashboard" id="dashboard">
   <div class="layout">
-
-    <!-- SIDEBAR — diagonal gradient A1 style -->
     <div class="sidebar new-sidebar">
       <div class="sb-diag-bg"></div>
       <div class="sb-inner-wrap">
-        <!-- Brand -->
         <div class="sb-brand">
           <img src="/static/nerum-logo-transparent.png" class="sb-logo-img" alt="Nerum"/>
           <div class="sb-logo-text">Nerum</div>
         </div>
-
-        <!-- Nav -->
         <div class="sb-nav">
           <div class="sb-section">Main</div>
-          <div class="sb-item active" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard
-          </div>
-          <div class="sb-item" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows
-            <span class="sb-badge" id="wf-badge">0</span>
-          </div>
-          <div class="sb-item" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History
-          </div>
-          <div class="sb-item" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists
-          </div>
+          <div class="sb-item active" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard</div>
+          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows<span class="sb-badge" id="wf-badge">0</span></div>
+          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History</div>
+          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists</div>
           <div class="sb-section">Account</div>
-          <div class="sb-item" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing
-          </div>
-          <div class="sb-item" onclick="setActive(this)">
-            <div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings
-          </div>
+          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing</div>
+          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings</div>
         </div>
-
-        <!-- User card — clean, no duplicate info -->
         <div class="sb-usercard">
-          <div class="sb-uc-row">
-            <div class="sb-avatar" id="sb-initials">SR</div>
-            <div class="sb-uc-info">
-              <div class="sb-uname" id="sb-name">Srihari</div>
-              <div class="sb-plan">Free plan</div>
-            </div>
-          </div>
-          <div class="sb-uc-live">
-            <div class="sb-live-dot"></div>
-            <div class="sb-live-txt">API LIVE</div>
-          </div>
+          <div class="sb-uc-row"><div class="sb-avatar" id="sb-initials">SR</div><div class="sb-uc-info"><div class="sb-uname" id="sb-name">Srihari</div><div class="sb-plan">Free plan</div></div></div>
+          <div class="sb-uc-live"><div class="sb-live-dot"></div><div class="sb-live-txt">API LIVE</div></div>
           <button class="sb-logout" onclick="doLogout()">Logout</button>
         </div>
       </div>
     </div>
-
-    <!-- MAIN -->
     <div class="main">
-
-      <!-- TOPBAR -->
       <div class="topbar">
-        <div>
-          <div class="tb-title" id="tb-title">Dashboard</div>
-          <div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div>
-        </div>
+        <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
         <div class="tb-right">
           <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">Switch to Light</div>
-          <!-- NOTIFICATION BELL -->
           <div style="position:relative">
             <button id="notif-bell-btn" onclick="toggleNotifPanel()" style="width:36px;height:36px;border-radius:50%;border:1px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;transition:all 0.2s;position:relative;" class="notif-bell-style">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                <path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.3"/>
-                <path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/>
-              </svg>
-              <div id="notif-dot" style="display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:20px;background:#e879f9;color:#fff;font-size:9px;font-weight:700;font-family:-apple-system,sans-serif;align-items:center;justify-content:center;padding:0 3px;">
-                <span id="notif-badge-count">0</span>
-              </div>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              <div id="notif-dot" style="display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:20px;background:#e879f9;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 3px;"><span id="notif-badge-count">0</span></div>
             </button>
             <div id="notif-panel" style="display:none;position:fixed;top:62px;right:24px;width:300px;border-radius:16px;z-index:999999;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);animation:slideUp 0.2s ease;">
               <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid;" class="notif-header-style">
@@ -363,15 +429,9 @@
         </div>
       </div>
 
-      <!-- MAIN DASHBOARD CONTENT -->
+      <!-- MAIN DASHBOARD -->
       <div class="content" id="main-content" style="display:flex;flex-direction:column">
-
-        <!-- HUD CLOCK DASHBOARD -->
-        <div class="hud-dashboard">
-          <canvas id="dashClockCanvas"></canvas>
-        </div>
-
-        <!-- BOTTOM BAR: New Workflow + Tokens -->
+        <div class="hud-dashboard"><canvas id="dashClockCanvas"></canvas></div>
         <div class="dash-bottom-bar">
           <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
           <div class="dash-token-wrap">
@@ -426,8 +486,6 @@
           <div class="token-progress-bar"><div class="token-progress-fill" id="token-fill" style="width:0%"></div></div>
           <div class="token-progress-footer"><span id="token-used-label">0 used</span><span id="token-limit-label">1,000 limit</span></div>
         </div>
-
-        <!-- Profile Edit Popup -->
         <div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
           <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
             <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><div style="font-size:15px;font-weight:700" id="popup-title">Edit Profile</div><button onclick="closeProfilePopup()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;padding:4px 8px">✕</button></div>
@@ -439,56 +497,12 @@
             <div class="settings-success" id="settings-success">✓ Saved successfully!</div>
           </div>
         </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">Preferences</div>
-          <div class="settings-row">
-            <div class="settings-field"><label>THEME</label><select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)"><option value="dark">Dark — Aurora</option><option value="light">Light — Arctic Ice</option></select></div>
-            <div class="settings-field"><label>LANGUAGE</label><select class="settings-select" id="settings-lang" onchange="applyLang(this.value)"><option value="english">English 🇬🇧</option><option value="tamil">Tamil — தமிழ் 🇮🇳</option></select></div>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">Security</div>
-          <div class="toggle-row">
-            <div>
-              <div class="toggle-label">Two-Factor Authentication (2FA)</div>
-              <div class="toggle-desc">Send OTP to email on every login</div>
-            </div>
-            <label class="toggle-switch">
-              <input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/>
-              <span class="toggle-slider"></span>
-            </label>
-          </div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">Notifications</div>
-          <div class="toggle-row"><div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div><label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label></div>
-          <div class="toggle-row"><div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div><label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label></div>
-          <div class="toggle-row"><div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div><label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label></div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">Connected integrations</div>
-          <div class="integration-item"><div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
-          <div class="integration-item"><div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
-          <div class="integration-item"><div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div><div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div>
-          <div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div>
-        </div>
-
-        <div class="settings-section">
-          <div class="settings-section-title">🔐 Login History</div>
-          <div id="login-history-list">
-            <div style="opacity:0.4;font-size:11px;padding:10px 0">Loading...</div>
-          </div>
-        </div>
-
-        <div class="danger-section">
-          <div class="danger-title">⚠️ Danger Zone</div>
-          <div class="danger-row"><div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div><button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button></div>
-          <div class="danger-row"><div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div><button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button></div>
-        </div>
+        <div class="settings-section"><div class="settings-section-title">Preferences</div><div class="settings-row"><div class="settings-field"><label>THEME</label><select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)"><option value="dark">Dark — Aurora</option><option value="light">Light — Arctic Ice</option></select></div><div class="settings-field"><label>LANGUAGE</label><select class="settings-select" id="settings-lang" onchange="applyLang(this.value)"><option value="english">English 🇬🇧</option><option value="tamil">Tamil — தமிழ் 🇮🇳</option></select></div></div></div>
+        <div class="settings-section"><div class="settings-section-title">Security</div><div class="toggle-row"><div><div class="toggle-label">Two-Factor Authentication (2FA)</div><div class="toggle-desc">Send OTP to email on every login</div></div><label class="toggle-switch"><input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/><span class="toggle-slider"></span></label></div></div>
+        <div class="settings-section"><div class="settings-section-title">Notifications</div><div class="toggle-row"><div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div><label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label></div><div class="toggle-row"><div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div><label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label></div><div class="toggle-row"><div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div><label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label></div></div>
+        <div class="settings-section"><div class="settings-section-title">Connected integrations</div><div class="integration-item"><div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div><div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div></div>
+        <div class="settings-section"><div class="settings-section-title">🔐 Login History</div><div id="login-history-list"><div style="opacity:0.4;font-size:11px;padding:10px 0">Loading...</div></div></div>
+        <div class="danger-section"><div class="danger-title">⚠️ Danger Zone</div><div class="danger-row"><div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div><button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button></div><div class="danger-row"><div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div><button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button></div></div>
       </div>
 
       <!-- HISTORY -->
@@ -497,7 +511,6 @@
         <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
         <div id="history-list"></div>
       </div>
-
     </div>
   </div>
 </div>
@@ -505,32 +518,21 @@
 <script src="/static/app.js"></script>
 <script src="/static/smartlists.js"></script>
 
-<!-- Init Lucide icons -->
 <script>
-  document.addEventListener('DOMContentLoaded', function() {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  });
-  function initIcons() {
-    if (typeof lucide !== 'undefined') lucide.createIcons();
-  }
+  document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});
+  function initIcons(){if(typeof lucide!=='undefined')lucide.createIcons();}
 </script>
 
-<!-- ===== HUD CLOCK CANVAS ===== -->
+<!-- DASHBOARD HUD CLOCK -->
 <script>
 (function(){
   function initDashClock(){
-    const canvas = document.getElementById('dashClockCanvas');
-    if(!canvas) return;
-    const parent = canvas.parentElement;
-
-    function resize(){
-      canvas.width = parent.offsetWidth;
-      canvas.height = parent.offsetHeight;
-    }
-    resize();
-    window.addEventListener('resize', resize);
-
-    const svgStrs = [
+    const canvas=document.getElementById('dashClockCanvas');
+    if(!canvas)return;
+    const parent=canvas.parentElement;
+    function resize(){canvas.width=parent.offsetWidth;canvas.height=parent.offsetHeight;}
+    resize();window.addEventListener('resize',resize);
+    const svgStrs=[
       `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23EA4335' d='M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z'/></svg>`,
       `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2325D366' d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z'/></svg>`,
       `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%232AABEE' d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/></svg>`,
@@ -544,170 +546,55 @@
       `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle fill='%23fb923c' cx='12' cy='12' r='12'/><rect fill='white' x='8' y='8' width='8' height='8' rx='1'/></svg>`,
       `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23f43f5e' width='24' height='24' rx='4'/><path fill='white' d='M12 4a8 8 0 1 0 0 16A8 8 0 0 0 12 4zm1 9H8v-2h5V8l4 4-4 4v-3z'/></svg>`
     ];
-
-    const angles = [0,30,60,90,120,150,180,210,240,270,300,330];
-    const svcImgs = [];
-    svgStrs.forEach((s,i)=>{
-      const im = new Image(22,22);
-      im.src = 'data:image/svg+xml,' + s;
-      svcImgs[i] = im;
-    });
-
-    let animId;
-    const ctx = canvas.getContext('2d');
-
+    const angles=[0,30,60,90,120,150,180,210,240,270,300,330];
+    const svcImgs=[];
+    svgStrs.forEach((s,i)=>{const im=new Image(22,22);im.src='data:image/svg+xml,'+s;svcImgs[i]=im;});
+    const ctx=canvas.getContext('2d');
     function drawClock(){
-      const W = canvas.width, H = canvas.height;
-      const isDark = document.body.classList.contains('dark');
+      const W=canvas.width,H=canvas.height;
+      const isDark=document.body.classList.contains('dark');
       ctx.clearRect(0,0,W,H);
-
-      const cx = W * 0.42, cy = H * 0.5;
-      const outerR = Math.min(W,H) * 0.38;
-      const innerR = outerR * 0.68;
-
-      const now = new Date();
-      const hrs = now.getHours()%12, mins = now.getMinutes();
-      const secs = now.getSeconds(), ms = now.getMilliseconds();
-      const secA = ((secs+ms/1000)/60)*Math.PI*2 - Math.PI/2;
-      const minA = ((mins+secs/60)/60)*Math.PI*2 - Math.PI/2;
-      const hrA  = ((hrs+mins/60)/12)*Math.PI*2 - Math.PI/2;
-
-      const col1 = isDark ? '#818cf8' : '#7c3aed';
-      const col2 = isDark ? '#34d399' : '#059669';
-      const col3 = isDark ? '#e879f9' : '#c026d3';
-
-      // outer dashed ring
-      ctx.save();
-      ctx.setLineDash([6,5]);
-      ctx.beginPath(); ctx.arc(cx,cy,outerR,0,Math.PI*2);
-      const g1 = ctx.createLinearGradient(cx-outerR,cy,cx+outerR,cy);
-      g1.addColorStop(0,col1); g1.addColorStop(1,col2);
-      ctx.strokeStyle=g1; ctx.lineWidth=1.5; ctx.stroke();
-      ctx.restore();
-
-      // tick marks
-      for(let i=0;i<12;i++){
-        const a=(i/12)*Math.PI*2-Math.PI/2;
-        ctx.beginPath();
-        ctx.moveTo(cx+Math.cos(a)*(outerR-10),cy+Math.sin(a)*(outerR-10));
-        ctx.lineTo(cx+Math.cos(a)*(outerR-2),cy+Math.sin(a)*(outerR-2));
-        ctx.strokeStyle=isDark?'rgba(129,140,248,0.4)':'rgba(124,58,237,0.4)';
-        ctx.lineWidth=1.5; ctx.setLineDash([]); ctx.stroke();
-      }
-
-      // inner ring
-      ctx.beginPath(); ctx.arc(cx,cy,innerR,0,Math.PI*2);
-      const g2=ctx.createLinearGradient(cx-innerR,cy,cx+innerR,cy);
-      g2.addColorStop(0,col1); g2.addColorStop(1,col2);
-      ctx.strokeStyle=g2; ctx.lineWidth=1.2; ctx.stroke();
-
-      // service icon nodes
-      angles.forEach((deg,i)=>{
-        const a=deg*Math.PI/180-Math.PI/2;
-        const nx=cx+Math.cos(a)*outerR, ny=cy+Math.sin(a)*outerR;
-        ctx.beginPath(); ctx.arc(nx,ny,14,0,Math.PI*2);
-        ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
-        ctx.strokeStyle=isDark?'rgba(129,140,248,0.35)':'rgba(124,58,237,0.3)';
-        ctx.lineWidth=1; ctx.stroke();
-        if(svcImgs[i]&&svcImgs[i].complete&&svcImgs[i].naturalWidth>0){
-          ctx.drawImage(svcImgs[i],nx-11,ny-11,22,22);
-        }
-      });
-
-      // hands
-      function hand(angle,len,color,dotR){
-        const ex=cx+Math.cos(angle)*len, ey=cy+Math.sin(angle)*len;
-        ctx.beginPath(); ctx.moveTo(cx,cy); ctx.lineTo(ex,ey);
-        ctx.strokeStyle=color; ctx.lineWidth=2; ctx.stroke();
-        ctx.beginPath(); ctx.arc(ex,ey,dotR,0,Math.PI*2);
-        ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
-        ctx.strokeStyle=color; ctx.lineWidth=1.5; ctx.stroke();
-        ctx.beginPath(); ctx.arc(ex,ey,dotR*0.4,0,Math.PI*2);
-        ctx.fillStyle=color; ctx.fill();
-      }
-      hand(hrA, innerR*0.55, col1, 6);
-      hand(minA, innerR*0.85, col2, 5);
-      ctx.beginPath(); ctx.moveTo(cx,cy);
-      ctx.lineTo(cx+Math.cos(secA)*innerR*0.88,cy+Math.sin(secA)*innerR*0.88);
-      ctx.strokeStyle=isDark?'rgba(232,121,249,0.7)':'rgba(192,38,211,0.6)';
-      ctx.lineWidth=1; ctx.stroke();
-
-      // center hub
-      ctx.beginPath(); ctx.arc(cx,cy,10,0,Math.PI*2);
-      ctx.fillStyle=isDark?'#08080f':'#f0eaff'; ctx.fill();
-      const cg=ctx.createLinearGradient(cx-10,cy,cx+10,cy);
-      cg.addColorStop(0,col1); cg.addColorStop(1,col2);
-      ctx.strokeStyle=cg; ctx.lineWidth=2; ctx.stroke();
-      ctx.beginPath(); ctx.arc(cx,cy,4,0,Math.PI*2);
-      ctx.fillStyle=col1; ctx.fill();
-
-      // right side stats
-      const wfCount = document.getElementById('wf-badge')?.textContent || '0';
-      const trendEl = document.querySelector('.wf-trend');
-      const activeCount = trendEl ? trendEl.textContent.replace(/[^0-9]/g,'') : '0';
-      const tokUsed = document.getElementById('sb-tokens-used')?.textContent || '0';
-      const tokLimit = document.getElementById('dash-tok-limit')?.textContent || '1000';
-
-      const statsX = cx + outerR + 32;
-      const statColor = isDark ? 'rgba(255,255,255,0.9)' : '#1a0533';
-      const labelColor = isDark ? '#4a4a6a' : '#6d28d9';
-
-      const stats = [
-        {label:'WORKFLOWS', val: wfCount, color: col3, y: cy - 52},
-        {label:'RUNNING', val: activeCount||'0', color: col2, y: cy},
-        {label:'SERVICES', val: '4', color: col1, y: cy + 52},
-      ];
-
-      stats.forEach(s=>{
-        ctx.font = 'bold 26px DM Mono,monospace,sans-serif';
-        ctx.fillStyle = s.color;
-        ctx.textAlign = 'left';
-        ctx.textBaseline = 'middle';
-        ctx.fillText(s.val, statsX, s.y - 6);
-        ctx.font = '400 9px DM Mono,monospace,sans-serif';
-        ctx.fillStyle = labelColor;
-        ctx.fillText(s.label, statsX, s.y + 12);
-      });
-
-      animId = requestAnimationFrame(drawClock);
+      const cx=W*0.42,cy=H*0.5,outerR=Math.min(W,H)*0.38,innerR=outerR*0.68;
+      const now=new Date();
+      const hrs=now.getHours()%12,mins=now.getMinutes(),secs=now.getSeconds(),ms=now.getMilliseconds();
+      const secA=((secs+ms/1000)/60)*Math.PI*2-Math.PI/2;
+      const minA=((mins+secs/60)/60)*Math.PI*2-Math.PI/2;
+      const hrA=((hrs+mins/60)/12)*Math.PI*2-Math.PI/2;
+      const col1=isDark?'#818cf8':'#7c3aed',col2=isDark?'#34d399':'#059669',col3=isDark?'#e879f9':'#c026d3';
+      ctx.save();ctx.setLineDash([6,5]);
+      const g1=ctx.createLinearGradient(cx-outerR,cy,cx+outerR,cy);
+      g1.addColorStop(0,col1);g1.addColorStop(1,col2);
+      ctx.beginPath();ctx.arc(cx,cy,outerR,0,Math.PI*2);ctx.strokeStyle=g1;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
+      for(let i=0;i<12;i++){const a=(i/12)*Math.PI*2-Math.PI/2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(outerR-10),cy+Math.sin(a)*(outerR-10));ctx.lineTo(cx+Math.cos(a)*(outerR-2),cy+Math.sin(a)*(outerR-2));ctx.strokeStyle=isDark?'rgba(129,140,248,0.4)':'rgba(124,58,237,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([]);ctx.stroke();}
+      ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);const g2=ctx.createLinearGradient(cx-innerR,cy,cx+innerR,cy);g2.addColorStop(0,col1);g2.addColorStop(1,col2);ctx.strokeStyle=g2;ctx.lineWidth=1.2;ctx.stroke();
+      angles.forEach((deg,i)=>{const a=deg*Math.PI/180-Math.PI/2;const nx=cx+Math.cos(a)*outerR,ny=cy+Math.sin(a)*outerR;ctx.beginPath();ctx.arc(nx,ny,14,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();ctx.strokeStyle=isDark?'rgba(129,140,248,0.35)':'rgba(124,58,237,0.3)';ctx.lineWidth=1;ctx.stroke();if(svcImgs[i]&&svcImgs[i].complete&&svcImgs[i].naturalWidth>0){ctx.drawImage(svcImgs[i],nx-11,ny-11,22,22);}});
+      function hand(angle,len,color,dotR){const ex=cx+Math.cos(angle)*len,ey=cy+Math.sin(angle)*len;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(ex,ey,dotR,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();ctx.beginPath();ctx.arc(ex,ey,dotR*0.4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
+      hand(hrA,innerR*0.55,col1,6);hand(minA,innerR*0.85,col2,5);
+      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(secA)*innerR*0.88,cy+Math.sin(secA)*innerR*0.88);ctx.strokeStyle=isDark?'rgba(232,121,249,0.7)':'rgba(192,38,211,0.6)';ctx.lineWidth=1;ctx.stroke();
+      ctx.beginPath();ctx.arc(cx,cy,10,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();const cg=ctx.createLinearGradient(cx-10,cy,cx+10,cy);cg.addColorStop(0,col1);cg.addColorStop(1,col2);ctx.strokeStyle=cg;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fillStyle=col1;ctx.fill();
+      const wfCount=document.getElementById('wf-badge')?.textContent||'0';const trendEl=document.querySelector('.wf-trend');const activeCount=trendEl?trendEl.textContent.replace(/[^0-9]/g,''):'0';const statsX=cx+outerR+32;const labelColor=isDark?'#4a4a6a':'#6d28d9';const stats=[{label:'WORKFLOWS',val:wfCount,color:col3,y:cy-52},{label:'RUNNING',val:activeCount||'0',color:col2,y:cy},{label:'SERVICES',val:'4',color:col1,y:cy+52}];
+      stats.forEach(s=>{ctx.font='bold 26px DM Mono,monospace,sans-serif';ctx.fillStyle=s.color;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(s.val,statsX,s.y-6);ctx.font='400 9px DM Mono,monospace,sans-serif';ctx.fillStyle=labelColor;ctx.fillText(s.label,statsX,s.y+12);});
+      requestAnimationFrame(drawClock);
     }
-
-    setTimeout(drawClock, 300);
+    setTimeout(drawClock,300);
   }
-
-  // init when dashboard shows
-  const origShowDash = window.showDashboard;
-  window.showDashboard = function(name){
-    if(origShowDash) origShowDash(name);
-    setTimeout(initDashClock, 200);
-  };
+  const origShowDash=window.showDashboard;
+  window.showDashboard=function(name){if(origShowDash)origShowDash(name);setTimeout(initDashClock,200);};
 })();
 </script>
 
-<!-- NEW WORKFLOW MODAL -->
+<!-- WF MODAL -->
 <div id="wf-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div id="wf-modal" style="width:100%;max-width:440px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-size:16px;font-weight:700">New Workflow</div>
-      <button onclick="closeWfModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
-    </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">WORKFLOW NAME</label>
-      <input id="wf-name-input" placeholder="e.g. Send WhatsApp on form submit" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit" onkeydown="if(event.key==='Enter')saveWfModal()"/>
-    </div>
-    <div style="margin-bottom:20px">
-      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">DESCRIPTION (optional)</label>
-      <input id="wf-desc-input" placeholder="What does this workflow do?" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit"/>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="saveWfModal()" id="wf-save-btn" style="flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-family:inherit">Create Workflow</button>
-      <button onclick="closeWfModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button>
-    </div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><div style="font-size:16px;font-weight:700">New Workflow</div><button onclick="closeWfModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button></div>
+    <div style="margin-bottom:14px"><label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">WORKFLOW NAME</label><input id="wf-name-input" placeholder="e.g. Send WhatsApp on form submit" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit" onkeydown="if(event.key==='Enter')saveWfModal()"/></div>
+    <div style="margin-bottom:20px"><label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">DESCRIPTION (optional)</label><input id="wf-desc-input" placeholder="What does this workflow do?" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit"/></div>
+    <div style="display:flex;gap:10px"><button onclick="saveWfModal()" id="wf-save-btn" style="flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-family:inherit">Create Workflow</button><button onclick="closeWfModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button></div>
     <div id="wf-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
   </div>
 </div>
 
-<!-- OTP POPUP -->
+<!-- OTP -->
 <div id="otp-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
   <div style="width:100%;max-width:380px;margin:20px;background:#0d0020;border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:32px;text-align:center;animation:slideUp 0.3s ease">
     <div style="font-size:36px;margin-bottom:12px">🔐</div>
@@ -719,6 +606,300 @@
     <button onclick="document.getElementById('otp-overlay').style.display='none'" style="width:100%;padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit">← Back to Login</button>
   </div>
 </div>
+
+<!-- ==================== 3D LANDING ENGINE ==================== -->
+<style>
+/* Landing page specific styles */
+@keyframes lpFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes lpBlink{0%,100%{opacity:0.2}50%{opacity:0.7}}
+@keyframes lpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+.lp-reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
+.lp-reveal.lp-vis{opacity:1;transform:none;}
+
+/* integration cards grid */
+.lp-int-card{
+  border-radius:16px;padding:20px;
+  border:1px solid rgba(255,255,255,0.06);
+  background:rgba(255,255,255,0.02);
+  transition:all 0.3s;cursor:default;
+  position:relative;overflow:hidden;
+}
+.lp-int-card::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(var(--col-r,232),var(--col-g,121),var(--col-b,249),0.06) 0%,transparent 60%);
+  pointer-events:none;
+}
+.lp-int-card:hover{transform:translateY(-4px);border-color:rgba(232,121,249,0.2);box-shadow:0 20px 60px rgba(0,0,0,0.3);}
+.lic-icon{font-size:28px;margin-bottom:10px;}
+.lic-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
+.lic-desc{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5;}
+
+/* steps */
+.lp-step-card{
+  border-radius:16px;padding:28px 24px;flex:1;
+  border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);
+  transition:all 0.25s;
+}
+.lp-step-card:hover{transform:translateY(-4px);border-color:rgba(232,121,249,0.2);}
+.lp-step-num{font-size:32px;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.lp-step-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;}
+.lp-step-desc{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;}
+
+/* pricing */
+.lp-plan-card{
+  border-radius:20px;padding:28px 20px;
+  border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);
+  position:relative;transition:all 0.3s;
+}
+.lp-plan-card:hover{transform:translateY(-8px);box-shadow:0 30px 80px rgba(0,0,0,0.4);}
+.lp-feat{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
+.lp-feat::before{content:'✓';color:#34d399;font-weight:700;flex-shrink:0;}
+.lp-feat.lp-feat-no{color:rgba(255,255,255,0.18);}
+.lp-feat.lp-feat-no::before{content:'✗';color:rgba(255,255,255,0.1);}
+.lp-plan-btn{width:100%;margin-top:20px;padding:12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all 0.2s;}
+.lp-plan-btn:hover{transform:translateY(-2px);opacity:0.9;}
+
+/* navbar landing override */
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(2,0,10,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.08);transition:all 0.3s;}
+.nav-logo{display:flex;align-items:center;gap:8px;}
+.nav-links{display:flex;gap:4px;}
+.nav-link.lp-link{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.2s;text-decoration:none;}
+.nav-link.lp-link:hover{color:#fff;background:rgba(255,255,255,0.06);}
+.nav-btns{display:flex;align-items:center;gap:8px;}
+.nav-login-btn{padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.2s;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);}
+.nav-login-btn:hover{border-color:rgba(255,255,255,0.3);color:#fff;}
+.nav-signup-btn{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;box-shadow:0 0 20px rgba(232,121,249,0.3);}
+.nav-signup-btn:hover{transform:translateY(-1px);opacity:0.9;}
+
+/* footer for landing */
+.footer{padding:50px 60px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);background:#02000a;}
+.footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:14px;}
+.footer-link{font-size:11px;color:rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;transition:color 0.2s;}
+.footer-link:hover{color:#e879f9;}
+.footer-copy{font-size:10px;color:rgba(255,255,255,0.12);}
+</style>
+
+<script>
+// ==================== 3D CINEMATIC ENGINE ====================
+(function(){
+  const canvas3d = document.getElementById('lp-3d-canvas');
+  if(!canvas3d || typeof THREE === 'undefined') return;
+
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.FogExp2(0x02000a, 0.025);
+
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 300);
+  camera.position.set(0,0,10);
+
+  const renderer = new THREE.WebGLRenderer({canvas:canvas3d, antialias:true});
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+  renderer.setClearColor(0x02000a,1);
+
+  // LIGHTS
+  scene.add(new THREE.AmbientLight(0x111122,1.5));
+  const pL1=new THREE.PointLight(0xe879f9,8,30);pL1.position.set(-5,4,5);scene.add(pL1);
+  const pL2=new THREE.PointLight(0x818cf8,5,30);pL2.position.set(5,-3,5);scene.add(pL2);
+  const pL3=new THREE.PointLight(0x34d399,3,20);pL3.position.set(0,5,-5);scene.add(pL3);
+
+  // PARTICLES
+  const pG=new THREE.BufferGeometry();
+  const pA=new Float32Array(2500*3);
+  for(let i=0;i<2500*3;i++) pA[i]=(Math.random()-0.5)*80;
+  pG.setAttribute('position',new THREE.BufferAttribute(pA,3));
+  const particles=new THREE.Points(pG,new THREE.PointsMaterial({color:0x818cf8,size:0.022,transparent:true,opacity:0.4,sizeAttenuation:true}));
+  scene.add(particles);
+
+  // GRID
+  const gridH=new THREE.GridHelper(80,80,0x1a0040,0x0d0020);
+  gridH.position.y=-5;gridH.material.transparent=true;gridH.material.opacity=0.2;
+  scene.add(gridH);
+
+  // INTEGRATION DATA
+  const INTS=[
+    {name:'Gmail',       desc:'Send automated emails instantly',    col:0xEA4335,short:'GM',emoji:'📧'},
+    {name:'WhatsApp',    desc:'Message any number via Twilio',       col:0x25D366,short:'WA',emoji:'💬'},
+    {name:'Telegram',    desc:'Bot notifications in seconds',        col:0x2AABEE,short:'TG',emoji:'✈️'},
+    {name:'Google Sheets',desc:'Append rows live in real time',     col:0x34A853,short:'GS',emoji:'📊'},
+    {name:'AI Builder',  desc:'Tamil + English workflow builder',   col:0x9b8ffd,short:'AI',emoji:'🤖'},
+    {name:'Webhook',     desc:'Connect any external service',        col:0xe879f9,short:'WH',emoji:'🔗'},
+    {name:'Razorpay',    desc:'Trigger on payment capture',          col:0x2563EB,short:'RP',emoji:'💳'},
+    {name:'Smart Lists', desc:'Bulk message scheduled contacts',     col:0xf59e0b,short:'SL',emoji:'📋'},
+    {name:'Google Forms',desc:'Trigger on form submissions',         col:0x9333ea,short:'GF',emoji:'📝'},
+    {name:'Scheduler',   desc:'Cron-based timed automation',         col:0x34d399,short:'SC',emoji:'⏰'},
+    {name:'Google OAuth',desc:'Secure Google authentication',        col:0x4285F4,short:'OA',emoji:'🔐'},
+    {name:'REST API',    desc:'Full API access for developers',      col:0x06b6d4,short:'API',emoji:'⚡'},
+  ];
+
+  function makeCardTex(intg){
+    const can=document.createElement('canvas');can.width=512;can.height=320;
+    const c=can.getContext('2d');
+    const r=(intg.col>>16)&0xff,g=(intg.col>>8)&0xff,b=intg.col&0xff;
+    const bgG=c.createLinearGradient(0,0,512,320);
+    bgG.addColorStop(0,`rgba(${r},${g},${b},0.18)`);
+    bgG.addColorStop(1,'rgba(2,0,10,0.9)');
+    c.fillStyle=bgG;c.roundRect(0,0,512,320,24);c.fill();
+    c.strokeStyle=`rgba(${r},${g},${b},0.55)`;c.lineWidth=2;
+    c.roundRect(1,1,510,318,23);c.stroke();
+    const topG=c.createLinearGradient(0,0,512,0);
+    topG.addColorStop(0,`rgba(${r},${g},${b},0)`);
+    topG.addColorStop(0.5,`rgba(${r},${g},${b},0.9)`);
+    topG.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    c.strokeStyle=topG;c.lineWidth=3;c.beginPath();c.moveTo(24,2);c.lineTo(488,2);c.stroke();
+    c.font='60px serif';c.textAlign='left';c.textBaseline='top';c.fillText(intg.emoji,32,28);
+    const nameG=c.createLinearGradient(0,130,512,130);
+    nameG.addColorStop(0,`rgb(${r},${g},${b})`);nameG.addColorStop(1,'#fff');
+    c.fillStyle=nameG;c.font='bold 52px -apple-system,sans-serif';
+    c.textAlign='left';c.textBaseline='middle';c.fillText(intg.name,32,150);
+    c.fillStyle='rgba(255,255,255,0.4)';c.font='22px -apple-system,sans-serif';
+    c.fillText(intg.desc,32,218);
+    c.fillStyle=`rgba(${r},${g},${b},0.25)`;c.font='bold 38px monospace';
+    c.textAlign='right';c.fillText(intg.short,480,280);
+    return new THREE.CanvasTexture(can);
+  }
+
+  const cardMeshes=[];
+  INTS.forEach((intg,i)=>{
+    const geo=new THREE.PlaneGeometry(3.8,2.4);
+    const mat=new THREE.MeshBasicMaterial({map:makeCardTex(intg),transparent:true,side:THREE.DoubleSide});
+    const mesh=new THREE.Mesh(geo,mat);
+    const angle=(i/INTS.length)*Math.PI*2.4;
+    const spread=4+((i%3)*1.5);
+    mesh.position.set(
+      Math.cos(angle)*spread*0.55,
+      Math.sin(i*0.75)*2.8,
+      -i*8.5
+    );
+    mesh.rotation.set((Math.random()-0.5)*0.25,Math.atan2(mesh.position.x,9)*0.45,(Math.random()-0.5)*0.08);
+    mesh.userData={intg,index:i,basePos:mesh.position.clone(),baseRot:mesh.rotation.clone()};
+    scene.add(mesh);cardMeshes.push(mesh);
+  });
+
+  // STATE
+  let scrollPct=0,mouseX=0,mouseY=0,t=0,hovCard=null;
+  const raycaster=new THREE.Raycaster();
+  const mouse=new THREE.Vector2();
+  const progFill=document.getElementById('lp-prog-fill');
+  const progPct=document.getElementById('lp-prog-pct');
+  const scrollHint=document.getElementById('lp-scroll-hint');
+  const intLabel=document.getElementById('lp-int-label');
+  const intNum=document.getElementById('lp-int-num');
+  const intName=document.getElementById('lp-int-name');
+  const intDesc=document.getElementById('lp-int-desc');
+  const heroText=document.getElementById('lp-hero-text');
+  const tt=document.getElementById('lp-tooltip');
+
+  // SCROLL — only when landing page visible
+  window.addEventListener('scroll',()=>{
+    const lp=document.getElementById('landing-page');
+    if(!lp||lp.style.display==='none') return;
+    const scrollSpace=document.getElementById('lp-scroll-space');
+    if(!scrollSpace) return;
+    const rect=scrollSpace.getBoundingClientRect();
+    const total=scrollSpace.offsetHeight-window.innerHeight;
+    const scrolled=Math.max(0,-rect.top);
+    scrollPct=Math.max(0,Math.min(1,scrolled/total));
+    progFill.style.height=(scrollPct*100)+'%';
+    progPct.textContent=Math.round(scrollPct*100)+'%';
+
+    const fade=Math.max(0,1-scrollPct*5);
+    heroText.style.opacity=fade;
+    heroText.style.pointerEvents=fade>0.1?'all':'none';
+
+    if(scrollPct>0.03){
+      intLabel.style.opacity='1';
+      scrollHint.style.opacity='0';
+      const idx=Math.max(0,Math.min(INTS.length-1,Math.floor(scrollPct*INTS.length)));
+      intNum.textContent=String(idx+1).padStart(2,'0')+' / 12';
+      intName.textContent=INTS[idx].emoji+'  '+INTS[idx].name;
+      intDesc.textContent=INTS[idx].desc;
+    } else {
+      intLabel.style.opacity='0';
+      scrollHint.style.opacity='1';
+    }
+  },{passive:true});
+
+  // MOUSE
+  window.addEventListener('mousemove',e=>{
+    const lp=document.getElementById('landing-page');
+    if(!lp||lp.style.display==='none') return;
+    mouseX=(e.clientX/window.innerWidth-0.5)*2;
+    mouseY=(e.clientY/window.innerHeight-0.5)*2;
+    mouse.x=(e.clientX/window.innerWidth)*2-1;
+    mouse.y=-(e.clientY/window.innerHeight)*2+1;
+    raycaster.setFromCamera(mouse,camera);
+    const hits=raycaster.intersectObjects(cardMeshes);
+    if(hits.length>0){
+      const h=hits[0].object;
+      if(hovCard!==h){if(hovCard)hovCard.scale.set(1,1,1);hovCard=h;}
+      hovCard.scale.set(1.05,1.05,1.05);
+      tt.textContent=h.userData.intg.name+' — '+h.userData.intg.desc;
+      tt.style.left=(e.clientX-130)+'px';
+      tt.style.top=(e.clientY-52)+'px';
+      tt.style.opacity='1';
+      document.body.style.cursor='pointer';
+    } else {
+      if(hovCard){hovCard.scale.set(1,1,1);hovCard=null;}
+      tt.style.opacity='0';
+      document.body.style.cursor='default';
+    }
+  });
+
+  window.addEventListener('resize',()=>{
+    camera.aspect=window.innerWidth/window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth,window.innerHeight);
+  });
+
+  // ANIMATE
+  function animate(){
+    requestAnimationFrame(animate);
+    t+=0.006;
+    const lp=document.getElementById('landing-page');
+    if(!lp||lp.style.display==='none'){renderer.render(scene,camera);return;}
+
+    // camera flies through cards
+    const targetZ=10-scrollPct*(INTS.length*8.5*0.88);
+    camera.position.z+=(targetZ-camera.position.z)*0.055;
+    camera.position.x+=(mouseX*1.2-camera.position.x)*0.025;
+    camera.position.y+=(-mouseY*0.8-camera.position.y)*0.025;
+    camera.lookAt(0,0,camera.position.z-15);
+
+    // cards float
+    cardMeshes.forEach((mesh,i)=>{
+      mesh.position.y=mesh.userData.basePos.y+Math.sin(t*0.5+i*0.6)*0.14;
+      mesh.rotation.z=mesh.userData.baseRot.z+Math.sin(t*0.35+i*0.4)*0.025;
+      const dist=Math.abs(mesh.position.z-camera.position.z);
+      mesh.material.opacity=Math.max(0.05,Math.min(1,1-dist/22));
+    });
+
+    // lights orbit
+    pL1.position.x=Math.cos(t*0.3)*7;pL1.position.z=camera.position.z+Math.sin(t*0.3)*7;
+    pL2.position.x=Math.cos(t*0.3+Math.PI)*7;pL2.position.z=camera.position.z+Math.sin(t*0.3+Math.PI)*7;
+
+    particles.position.z=camera.position.z*0.25;
+    particles.rotation.y+=0.0001;
+    gridH.position.z=camera.position.z*0.4;
+
+    renderer.render(scene,camera);
+  }
+  animate();
+
+  // REVEAL
+  const revEls=document.querySelectorAll('.lp-reveal');
+  const io=new IntersectionObserver(entries=>{
+    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('lp-vis');});
+  },{threshold:0.1});
+  revEls.forEach(r=>io.observe(r));
+
+  // NAV scroll
+  window.addEventListener('scroll',()=>{
+    const nav=document.getElementById('main-nav');
+    if(nav) nav.style.background=window.scrollY>50?'rgba(2,0,10,0.98)':'rgba(2,0,10,0.8)';
+  });
+})();
+</script>
 
 </body>
 </html>
