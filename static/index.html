@@ -27,7 +27,7 @@
       <a class="nav-link lp-link" href="#lp-integrations">Integrations</a>
       <a class="nav-link lp-link" href="#lp-demo">Sample</a>
       <a class="nav-link lp-link" href="#lp-pricing">Pricing</a>
-      <a class="nav-link lp-link" href="#lp-bio">Bio</a>
+      
     </div>
     <div class="nav-btns">
       <button class="nav-login-btn" onclick="showAuthPopup()">Login</button>
@@ -38,15 +38,15 @@
   <!-- ===== 3D CINEMATIC HERO ===== -->
   <div id="lp-3d-wrap" style="position:relative;">
     <!-- Tall scroll spacer so sticky works -->
-    <div style="height:700vh;position:relative;" id="lp-scroll-space">
+    <div style="height:700vh;position:relative;padding-top:64px;" id="lp-scroll-space">
       <div id="lp-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;">
         <canvas id="lp-3d-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;"></canvas>
 
         <!-- HERO TEXT LEFT -->
         <div id="lp-hero-text" style="
-          position:absolute;left:60px;top:50%;transform:translateY(-50%);
+          position:absolute;left:60px;top:50%;transform:translateY(-58%);margin-top:32px;
           z-index:10;pointer-events:none;
-          animation:lpFadeUp 1.2s 0.6s ease forwards;opacity:0;
+          animation:lpFadeUp 1.2s 0.6s ease forwards;opacity:0;padding-top:64px;
         ">
           <div style="font-size:10px;letter-spacing:4px;color:rgba(232,121,249,0.8);font-family:monospace;text-transform:uppercase;margin-bottom:14px;
             padding:4px 12px;border-radius:20px;border:1px solid rgba(232,121,249,0.2);background:rgba(232,121,249,0.05);display:inline-block;">
@@ -71,22 +71,9 @@
             <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ 5 min setup</span>
           </div>
         </div>
-
-        <!-- RIGHT SIDE INTEGRATION LABEL -->
-        <div id="lp-int-label" style="
-          position:absolute;right:56px;top:50%;transform:translateY(-50%);
-          z-index:10;text-align:right;pointer-events:none;
-          opacity:0;transition:opacity 0.4s;
-        ">
-          <div style="font-size:10px;letter-spacing:3px;color:rgba(232,121,249,0.6);font-family:monospace;text-transform:uppercase;margin-bottom:8px;" id="lp-int-num">01 / 12</div>
           <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;" id="lp-int-name">Gmail</div>
           <div style="font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;" id="lp-int-desc">Send automated emails</div>
         </div>
-
-        <!-- SCROLL PROGRESS RIGHT -->
-        <div style="position:absolute;right:24px;top:50%;transform:translateY(-50%);z-index:10;display:flex;flex-direction:column;align-items:center;gap:8px;">
-          <div style="width:1px;height:100px;background:rgba(255,255,255,0.08);position:relative;border-radius:1px;">
-            <div id="lp-prog-fill" style="position:absolute;top:0;left:0;right:0;background:linear-gradient(180deg,#e879f9,#818cf8);border-radius:1px;width:100%;height:0%;transition:height 0.05s;"></div>
           </div>
           <div id="lp-prog-pct" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;letter-spacing:1px;">0%</div>
         </div>
@@ -211,31 +198,6 @@
       </div>
     </div>
   </section>
-
-  <!-- ===== BIO ===== -->
-  <section id="lp-bio" style="padding:120px 60px;background:#02000a;border-top:1px solid rgba(255,255,255,0.04);">
-    <div class="lp-reveal" style="text-align:center;margin-bottom:60px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">The Builder</div>
-      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;color:#fff;">About <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum</span></h2>
-    </div>
-    <div class="lp-reveal" style="max-width:900px;margin:0 auto;display:grid;grid-template-columns:auto 1fr;gap:80px;align-items:center;">
-      <div style="width:160px;height:160px;border-radius:50%;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:52px;font-weight:900;color:#fff;box-shadow:0 0 80px rgba(232,121,249,0.3);flex-shrink:0;">SH</div>
-      <div>
-        <div style="font-size:32px;font-weight:900;letter-spacing:-1px;margin-bottom:6px;color:#fff;">Sri Hari Raju</div>
-        <div style="font-size:12px;color:#e879f9;font-family:monospace;letter-spacing:2px;margin-bottom:18px;">FOUNDER · DEVELOPER · CHENNAI 🇮🇳</div>
-        <div style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.9;margin-bottom:22px;max-width:500px;">Building Nerum — AI workflow automation made for Indian businesses. Passionate about making powerful automation accessible to schools, clinics, shops and restaurants across Tamil Nadu and India.</div>
-        <div style="display:flex;flex-wrap:wrap;gap:8px;">
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">FastAPI</span>
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Python</span>
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Three.js</span>
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">AI/ML</span>
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">Tamil Nadu</span>
-          <span style="font-size:10px;padding:5px 14px;border-radius:20px;border:1px solid rgba(129,140,248,0.2);color:#818cf8;background:rgba(129,140,248,0.05);font-family:monospace;">SaaS</span>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <!-- FOOTER -->
   <footer class="footer">
     <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">Nerum</div>
@@ -244,7 +206,7 @@
       <a class="footer-link lp-link" href="#lp-integrations">Integrations</a>
       <a class="footer-link lp-link" href="#lp-demo">Sample</a>
       <a class="footer-link lp-link" href="#lp-pricing">Pricing</a>
-      <a class="footer-link lp-link" href="#lp-bio">Bio</a>
+      
       <a class="footer-link" href="/privacy">Privacy</a>
       <a class="footer-link" href="/terms">Terms</a>
     </div>
@@ -661,7 +623,7 @@
 .lp-plan-btn:hover{transform:translateY(-2px);opacity:0.9;}
 
 /* navbar landing override */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(2,0,10,0.8);backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.08);transition:all 0.3s;}
+.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,0,14,0.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.15);}
 .nav-logo{display:flex;align-items:center;gap:8px;}
 .nav-links{display:flex;gap:4px;}
 .nav-link.lp-link{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.2s;text-decoration:none;}
@@ -780,13 +742,6 @@
   let scrollPct=0,mouseX=0,mouseY=0,t=0,hovCard=null;
   const raycaster=new THREE.Raycaster();
   const mouse=new THREE.Vector2();
-  const progFill=document.getElementById('lp-prog-fill');
-  const progPct=document.getElementById('lp-prog-pct');
-  const scrollHint=document.getElementById('lp-scroll-hint');
-  const intLabel=document.getElementById('lp-int-label');
-  const intNum=document.getElementById('lp-int-num');
-  const intName=document.getElementById('lp-int-name');
-  const intDesc=document.getElementById('lp-int-desc');
   const heroText=document.getElementById('lp-hero-text');
   const tt=document.getElementById('lp-tooltip');
 
@@ -800,24 +755,12 @@
     const total=scrollSpace.offsetHeight-window.innerHeight;
     const scrolled=Math.max(0,-rect.top);
     scrollPct=Math.max(0,Math.min(1,scrolled/total));
-    progFill.style.height=(scrollPct*100)+'%';
-    progPct.textContent=Math.round(scrollPct*100)+'%';
 
     const fade=Math.max(0,1-scrollPct*5);
     heroText.style.opacity=fade;
     heroText.style.pointerEvents=fade>0.1?'all':'none';
 
-    if(scrollPct>0.03){
-      intLabel.style.opacity='1';
-      scrollHint.style.opacity='0';
-      const idx=Math.max(0,Math.min(INTS.length-1,Math.floor(scrollPct*INTS.length)));
-      intNum.textContent=String(idx+1).padStart(2,'0')+' / 12';
-      intName.textContent=INTS[idx].emoji+'  '+INTS[idx].name;
-      intDesc.textContent=INTS[idx].desc;
-    } else {
-      intLabel.style.opacity='0';
-      scrollHint.style.opacity='1';
-    }
+
   },{passive:true});
 
   // MOUSE
@@ -893,11 +836,7 @@
   },{threshold:0.1});
   revEls.forEach(r=>io.observe(r));
 
-  // NAV scroll
-  window.addEventListener('scroll',()=>{
-    const nav=document.getElementById('main-nav');
-    if(nav) nav.style.background=window.scrollY>50?'rgba(2,0,10,0.98)':'rgba(2,0,10,0.8)';
-  });
+
 })();
 </script>
 

@@ -908,94 +908,187 @@ function deleteAccount() {
   alert('Account deleted. Sorry to see you go!');
 }
 
-// ========== NEBULA BACKGROUND ==========
+// ========== AURORA BACKGROUND ==========
 (function() {
   const canvas = document.getElementById('nebula-canvas');
   if (!canvas) return;
   const ctx = canvas.getContext('2d');
-  let W, H, pts = [], t = 0, animId = null;
-  const themes = {
-    dark: {
-      base: '#06000f',
-      clouds: [
-        {x:.15,y:.25,r:320,col:'rgba(232,121,249,0.22)'},{x:.75,y:.2,r:280,col:'rgba(129,140,248,0.22)'},
-        {x:.5,y:.75,r:380,col:'rgba(167,139,250,0.16)'},{x:.08,y:.72,r:240,col:'rgba(232,121,249,0.12)'},
-        {x:.88,y:.65,r:260,col:'rgba(99,102,241,0.14)'},
-      ],
-      stars: [
-        {x:.25,y:.15,r:80,col:'rgba(255,255,255,0.18)'},{x:.6,y:.3,r:65,col:'rgba(255,255,255,0.14)'},
-        {x:.82,y:.55,r:55,col:'rgba(255,255,255,0.12)'},
-      ],
-      ptCols: ['232,121,249','129,140,248'],
-      gridCol: 'rgba(232,121,249,0.05)',
-    },
-    light: {
-      base: '#ddc6ff',
-      clouds: [
-        {x:.15,y:.25,r:340,col:'rgba(139,92,246,0.4)'},{x:.75,y:.15,r:300,col:'rgba(99,102,241,0.35)'},
-        {x:.5,y:.8,r:400,col:'rgba(167,139,250,0.42)'},{x:.05,y:.65,r:260,col:'rgba(192,132,252,0.3)'},
-        {x:.9,y:.6,r:280,col:'rgba(124,58,237,0.32)'},{x:.4,y:.1,r:220,col:'rgba(139,92,246,0.25)'},
-      ],
-      stars: [
-        {x:.2,y:.2,r:90,col:'rgba(109,40,217,0.45)'},{x:.65,y:.25,r:75,col:'rgba(79,70,229,0.4)'},
-        {x:.8,y:.6,r:70,col:'rgba(139,92,246,0.45)'},{x:.35,y:.7,r:80,col:'rgba(124,58,237,0.38)'},
-      ],
-      ptCols: ['91,33,182','67,56,202','109,40,217'],
-      gridCol: 'rgba(76,29,149,0.12)',
-    }
-  };
-  function resize() { W = canvas.width = window.innerWidth; H = canvas.height = window.innerHeight; }
-  function makePts(cols) {
-    pts = Array.from({length: 120}, () => ({
+  let W, H, t = 0, animId = null;
+
+  // Aurora curtain streams
+  const streams = [
+    {x:0.12, speed:0.0007, amp:160, freq:0.0028, c1:'232,121,249', c2:'129,140,248', phase:0.0},
+    {x:0.35, speed:0.0005, amp:200, freq:0.0022, c1:'129,140,248', c2:'52,211,153',  phase:2.1},
+    {x:0.58, speed:0.0009, amp:140, freq:0.0032, c1:'52,211,153',  c2:'232,121,249', phase:4.2},
+    {x:0.78, speed:0.0006, amp:180, freq:0.0026, c1:'99,102,241',  c2:'129,140,248', phase:1.0},
+    {x:0.92, speed:0.0008, amp:120, freq:0.003,  c1:'232,121,249', c2:'52,211,153',  phase:3.3},
+  ];
+
+  // Glowing orbs that drift
+  const orbs = [
+    {x:0.15,y:0.25,r:280,c:'232,121,249',sp:0.4,ph:0.0},
+    {x:0.75,y:0.20,r:240,c:'129,140,248',sp:0.35,ph:2.0},
+    {x:0.50,y:0.75,r:320,c:'167,139,250',sp:0.3,ph:1.0},
+    {x:0.08,y:0.70,r:200,c:'232,121,249',sp:0.5,ph:3.0},
+    {x:0.88,y:0.60,r:220,c:'99,102,241', sp:0.45,ph:4.0},
+    {x:0.40,y:0.10,r:180,c:'52,211,153', sp:0.38,ph:5.0},
+  ];
+
+  // Star field
+  let stars = [], pts = [];
+
+  function resize() {
+    W = canvas.width = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initStars() {
+    stars = Array.from({length:120}, () => ({
       x: Math.random()*W, y: Math.random()*H,
-      vx: (Math.random()-.5)*.35, vy: (Math.random()-.5)*.35,
-      r: Math.random()*1.8+.3, a: Math.random()*.5+.1,
-      col: cols[Math.floor(Math.random()*cols.length)]
+      r: Math.random()*1.2+0.2,
+      a: Math.random()*0.7+0.1,
+      ph: Math.random()*Math.PI*2,
+      sp: 0.015+Math.random()*0.025,
+    }));
+    pts = Array.from({length:100}, () => ({
+      x: Math.random()*W, y: Math.random()*H,
+      vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+      r: Math.random()*1.6+0.3,
+      a: Math.random()*.5+0.1,
+      col:['232,121,249','129,140,248','52,211,153'][Math.floor(Math.random()*3)],
     }));
   }
+
+  // Shooting star state
+  let shooters = [];
+
+  function spawnShooter() {
+    if(shooters.length < 3 && Math.random() < 0.008) {
+      shooters.push({
+        x: Math.random()*W*0.7,
+        y: Math.random()*H*0.4,
+        len: 60+Math.random()*100,
+        alpha: 1, speed: 8+Math.random()*6,
+        angle: 0.3+Math.random()*0.3,
+      });
+    }
+  }
+
   function draw() {
     const isDark = document.body.classList.contains('dark');
-    const th = isDark ? themes.dark : themes.light;
-    ctx.clearRect(0,0,W,H); ctx.fillStyle=th.base; ctx.fillRect(0,0,W,H);
-    th.clouds.forEach((c,i) => {
-      const ox=Math.sin(t*.18+i*1.3)*60, oy=Math.cos(t*.14+i*1.1)*50;
-      const g=ctx.createRadialGradient(c.x*W+ox,c.y*H+oy,0,c.x*W+ox,c.y*H+oy,c.r);
-      g.addColorStop(0,c.col); g.addColorStop(1,'transparent');
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+    t += 0.006;
+
+    // Base background
+    ctx.fillStyle = isDark ? '#04000e' : '#ddc6ff';
+    ctx.fillRect(0,0,W,H);
+
+    if(isDark) {
+      // ---- AURORA CURTAINS ----
+      streams.forEach((s,si) => {
+        const baseCX = s.x * W;
+        const drift = Math.sin(t*s.speed*800 + s.phase)*80;
+
+        for(let y = -20; y < H+20; y += 2) {
+          const wave1 = Math.sin(y*s.freq + t*s.speed*700 + s.phase)*s.amp;
+          const wave2 = Math.sin(y*s.freq*1.8 + t*s.speed*500 + s.phase+1)*s.amp*0.35;
+          const x = baseCX + drift + wave1 + wave2;
+          const brightness = Math.sin(y/H*Math.PI) * (0.5+Math.sin(y*0.01+t*0.8+s.phase)*0.5);
+          const alpha = Math.max(0, brightness * 0.09);
+          const w = 35 + Math.sin(y*0.02+t+s.phase)*20;
+
+          const g = ctx.createLinearGradient(x-w,y,x+w,y);
+          g.addColorStop(0,   `rgba(${s.c1},0)`);
+          g.addColorStop(0.25,`rgba(${s.c1},${alpha})`);
+          g.addColorStop(0.5, `rgba(${s.c2},${alpha*1.3})`);
+          g.addColorStop(0.75,`rgba(${s.c1},${alpha})`);
+          g.addColorStop(1,   `rgba(${s.c2},0)`);
+          ctx.fillStyle = g;
+          ctx.fillRect(x-w,y,w*2,3);
+        }
+      });
+
+      // ---- SHOOTING STARS ----
+      spawnShooter();
+      shooters = shooters.filter(sh => sh.alpha > 0.02);
+      shooters.forEach(sh => {
+        sh.x += Math.cos(sh.angle)*sh.speed;
+        sh.y += Math.sin(sh.angle)*sh.speed;
+        sh.alpha *= 0.94;
+        const g = ctx.createLinearGradient(
+          sh.x - Math.cos(sh.angle)*sh.len, sh.y - Math.sin(sh.angle)*sh.len,
+          sh.x, sh.y
+        );
+        g.addColorStop(0,'rgba(255,255,255,0)');
+        g.addColorStop(0.6,`rgba(255,255,255,${sh.alpha*0.6})`);
+        g.addColorStop(1,`rgba(255,255,255,${sh.alpha})`);
+        ctx.strokeStyle = g; ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(sh.x - Math.cos(sh.angle)*sh.len, sh.y - Math.sin(sh.angle)*sh.len);
+        ctx.lineTo(sh.x, sh.y);
+        ctx.stroke();
+      });
+    }
+
+    // ---- GLOWING ORBS ----
+    orbs.forEach((o,i) => {
+      const ox = (o.x + Math.sin(t*o.sp*0.3+o.ph)*0.08)*W;
+      const oy = (o.y + Math.cos(t*o.sp*0.25+o.ph)*0.06)*H;
+      const pulse = 0.55 + Math.sin(t*o.sp+o.ph)*0.45;
+      const r = o.r * pulse;
+      const maxA = isDark ? 0.2 : 0.3;
+      const g = ctx.createRadialGradient(ox,oy,0,ox,oy,r);
+      g.addColorStop(0, `rgba(${o.c},${maxA*pulse})`);
+      g.addColorStop(0.5,`rgba(${o.c},${maxA*0.4*pulse})`);
+      g.addColorStop(1,  `rgba(${o.c},0)`);
+      ctx.fillStyle = g;
+      ctx.fillRect(ox-r,oy-r,r*2,r*2);
     });
-    th.stars.forEach((s,i) => {
-      const px=s.x*W+Math.sin(t*.2+i)*40, py=s.y*H+Math.cos(t*.15+i)*30;
-      const g=ctx.createRadialGradient(px,py,0,px,py,s.r*(.8+Math.sin(t*1.5+i)*.2));
-      g.addColorStop(0,s.col); g.addColorStop(1,'transparent');
-      ctx.fillStyle=g; ctx.fillRect(0,0,W,H);
+
+    // ---- GRID ----
+    const gc = isDark ? 'rgba(129,140,248,0.04)':'rgba(109,40,217,0.07)';
+    ctx.strokeStyle = gc; ctx.lineWidth = 0.5;
+    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // ---- TWINKLING STARS ----
+    stars.forEach(s => {
+      s.ph += s.sp;
+      const a = s.a*(0.4+0.6*Math.sin(s.ph));
+      ctx.beginPath(); ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle = isDark?`rgba(255,255,255,${a})`:`rgba(109,40,217,${a*0.5})`;
+      ctx.fill();
     });
-    for(let x=0;x<W;x+=65){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.strokeStyle=th.gridCol;ctx.lineWidth=.5;ctx.stroke();}
-    for(let y=0;y<H;y+=65){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.strokeStyle=th.gridCol;ctx.lineWidth=.5;ctx.stroke();}
+
+    // ---- FLOATING PARTICLES + CONNECTIONS ----
     pts.forEach(p => {
       p.x+=p.vx; p.y+=p.vy;
-      if(p.x<0)p.x=W; if(p.x>W)p.x=0; if(p.y<0)p.y=H; if(p.y>H)p.y=0;
-      ctx.beginPath(); ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-      ctx.fillStyle=`rgba(${p.col},${p.a})`; ctx.fill();
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col},${p.a})`;ctx.fill();
     });
     for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
-      const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
-      if(d<100){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
-        ctx.strokeStyle=`rgba(${pts[i].col},${.07*(1-d/100)})`;ctx.lineWidth=.4;ctx.stroke();}
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<90){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(${pts[i].col},${.06*(1-d/90)})`;ctx.lineWidth=.4;ctx.stroke();}
     }
-    t+=.006; animId=requestAnimationFrame(draw);
+
+    animId = requestAnimationFrame(draw);
   }
+
   function init() {
-    resize();
-    makePts((document.body.classList.contains('dark') ? themes.dark : themes.light).ptCols);
+    resize(); initStars();
     if(animId) cancelAnimationFrame(animId);
     draw();
   }
-  window.addEventListener('resize', resize);
+
+  window.addEventListener('resize', ()=>{ resize(); initStars(); });
+
   const origToggle = window.toggleTheme;
   window.toggleTheme = function() {
     if(origToggle) origToggle();
-    setTimeout(() => makePts((document.body.classList.contains('dark') ? themes.dark : themes.light).ptCols), 50);
+    setTimeout(initStars, 50);
   };
+
   init();
 })();
 
