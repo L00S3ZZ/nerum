@@ -58,6 +58,7 @@ window.addEventListener('load', () => {
           const savedName = localStorage.getItem('nerum_name');
           if (savedToken && savedName) {
             document.getElementById('landing-page').style.display = 'none';
+            window.scrollTo(0, 0);
             const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
             const savedLang = localStorage.getItem('nerum_lang') || 'english';
             applyTheme(savedTheme);
@@ -304,6 +305,7 @@ async function doSignup() {
 function afterLogin(name) {
   currentUser = name;
   hideAuthPopup();
+  window.scrollTo(0, 0);
   document.getElementById('landing-page').style.display = 'none';
   const onboarded = localStorage.getItem('nerum_onboarded');
   if (!onboarded) {
