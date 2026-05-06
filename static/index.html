@@ -10,6 +10,26 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="/static/chatbot.js"></script>
 <link rel="icon" type="image/png" href="/static/nerum-logo-transparent.png"/>
+
+<style>
+/* NAVBAR ALWAYS VISIBLE - HARD OVERRIDE */
+#main-nav, .nav {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  z-index: 99999 !important;
+  background: rgba(4,0,14,0.97) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(232,121,249,0.15) !important;
+  height: 64px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 40px !important;
+}
+</style>
 </head>
 <body class="dark">
 <canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
@@ -44,7 +64,7 @@
 
         <!-- HERO TEXT LEFT -->
         <div id="lp-hero-text" style="
-          position:absolute;left:60px;top:50%;transform:translateY(-58%);margin-top:32px;
+          position:absolute;left:60px;top:80px;
           z-index:10;pointer-events:none;
           animation:lpFadeUp 1.2s 0.6s ease forwards;opacity:0;padding-top:64px;
         ">
@@ -623,7 +643,7 @@
 .lp-plan-btn:hover{transform:translateY(-2px);opacity:0.9;}
 
 /* navbar landing override */
-.nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,0,14,0.97);backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.15);}
+.nav{position:fixed;top:0;left:0;right:0;z-index:9999 !important;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,0,14,0.98) !important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.15);}
 .nav-logo{display:flex;align-items:center;gap:8px;}
 .nav-links{display:flex;gap:4px;}
 .nav-link.lp-link{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.2s;text-decoration:none;}
@@ -837,6 +857,166 @@
   revEls.forEach(r=>io.observe(r));
 
 
+})();
+</script>
+
+
+<!-- ===== AURORA BACKGROUND (inline — guaranteed to load) ===== -->
+<script>
+(function() {
+  const canvas = document.getElementById('nebula-canvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0, animId = null, stars = [], pts = [], shooters = [];
+
+  const streams = [
+    {x:0.12,speed:0.0007,amp:160,freq:0.0028,c1:'232,121,249',c2:'129,140,248',phase:0.0},
+    {x:0.35,speed:0.0005,amp:200,freq:0.0022,c1:'129,140,248',c2:'52,211,153', phase:2.1},
+    {x:0.58,speed:0.0009,amp:140,freq:0.0032,c1:'52,211,153', c2:'232,121,249',phase:4.2},
+    {x:0.78,speed:0.0006,amp:180,freq:0.0026,c1:'99,102,241', c2:'129,140,248',phase:1.0},
+    {x:0.92,speed:0.0008,amp:120,freq:0.003, c1:'232,121,249',c2:'52,211,153', phase:3.3},
+  ];
+
+  const orbs = [
+    {x:0.15,y:0.25,r:280,c:'232,121,249',sp:0.4,ph:0.0},
+    {x:0.75,y:0.20,r:240,c:'129,140,248',sp:0.35,ph:2.0},
+    {x:0.50,y:0.75,r:320,c:'167,139,250',sp:0.3,ph:1.0},
+    {x:0.08,y:0.70,r:200,c:'232,121,249',sp:0.5,ph:3.0},
+    {x:0.88,y:0.60,r:220,c:'99,102,241', sp:0.45,ph:4.0},
+    {x:0.40,y:0.10,r:180,c:'52,211,153', sp:0.38,ph:5.0},
+  ];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+
+  function initParticles() {
+    stars = Array.from({length:150}, () => ({
+      x:Math.random()*W, y:Math.random()*H,
+      r:Math.random()*1.2+0.2,
+      a:Math.random()*0.7+0.1,
+      ph:Math.random()*Math.PI*2,
+      sp:0.015+Math.random()*0.025,
+    }));
+    pts = Array.from({length:100}, () => ({
+      x:Math.random()*W, y:Math.random()*H,
+      vx:(Math.random()-.5)*.4, vy:(Math.random()-.5)*.4,
+      r:Math.random()*1.6+0.3,
+      a:Math.random()*.5+0.1,
+      col:['232,121,249','129,140,248','52,211,153'][Math.floor(Math.random()*3)],
+    }));
+  }
+
+  function draw() {
+    const isDark = document.body.classList.contains('dark');
+    t += 0.006;
+
+    // Base
+    ctx.fillStyle = isDark ? '#04000e' : '#ddc6ff';
+    ctx.fillRect(0,0,W,H);
+
+    if (isDark) {
+      // Aurora curtain streams
+      streams.forEach(s => {
+        const baseCX = s.x * W;
+        const drift = Math.sin(t*s.speed*800+s.phase)*80;
+        for (let y=-20; y<H+20; y+=2) {
+          const wave1 = Math.sin(y*s.freq+t*s.speed*700+s.phase)*s.amp;
+          const wave2 = Math.sin(y*s.freq*1.8+t*s.speed*500+s.phase+1)*s.amp*0.35;
+          const x = baseCX + drift + wave1 + wave2;
+          const brightness = Math.sin(y/H*Math.PI)*(0.5+Math.sin(y*0.01+t*0.8+s.phase)*0.5);
+          const alpha = Math.max(0, brightness*0.09);
+          const w = 35+Math.sin(y*0.02+t+s.phase)*20;
+          const g = ctx.createLinearGradient(x-w,y,x+w,y);
+          g.addColorStop(0,   `rgba(${s.c1},0)`);
+          g.addColorStop(0.25,`rgba(${s.c1},${alpha})`);
+          g.addColorStop(0.5, `rgba(${s.c2},${alpha*1.3})`);
+          g.addColorStop(0.75,`rgba(${s.c1},${alpha})`);
+          g.addColorStop(1,   `rgba(${s.c2},0)`);
+          ctx.fillStyle = g;
+          ctx.fillRect(x-w,y,w*2,3);
+        }
+      });
+
+      // Shooting stars
+      if (Math.random()<0.007 && shooters.length<3) {
+        shooters.push({x:Math.random()*W*0.7,y:Math.random()*H*0.4,
+          len:80+Math.random()*100,alpha:1,speed:9+Math.random()*5,angle:0.3+Math.random()*0.3});
+      }
+      shooters = shooters.filter(sh=>sh.alpha>0.02);
+      shooters.forEach(sh=>{
+        sh.x+=Math.cos(sh.angle)*sh.speed; sh.y+=Math.sin(sh.angle)*sh.speed; sh.alpha*=0.93;
+        const g=ctx.createLinearGradient(sh.x-Math.cos(sh.angle)*sh.len,sh.y-Math.sin(sh.angle)*sh.len,sh.x,sh.y);
+        g.addColorStop(0,'rgba(255,255,255,0)');
+        g.addColorStop(0.6,`rgba(255,255,255,${sh.alpha*0.6})`);
+        g.addColorStop(1,`rgba(255,255,255,${sh.alpha})`);
+        ctx.strokeStyle=g; ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(sh.x-Math.cos(sh.angle)*sh.len,sh.y-Math.sin(sh.angle)*sh.len);
+        ctx.lineTo(sh.x,sh.y);ctx.stroke();
+      });
+    }
+
+    // Glowing orbs
+    orbs.forEach(o=>{
+      const ox=(o.x+Math.sin(t*o.sp*0.3+o.ph)*0.08)*W;
+      const oy=(o.y+Math.cos(t*o.sp*0.25+o.ph)*0.06)*H;
+      const pulse=0.55+Math.sin(t*o.sp+o.ph)*0.45;
+      const r=o.r*pulse;
+      const maxA=isDark?0.2:0.28;
+      const g=ctx.createRadialGradient(ox,oy,0,ox,oy,r);
+      g.addColorStop(0,`rgba(${o.c},${maxA*pulse})`);
+      g.addColorStop(0.5,`rgba(${o.c},${maxA*0.4*pulse})`);
+      g.addColorStop(1,`rgba(${o.c},0)`);
+      ctx.fillStyle=g; ctx.fillRect(ox-r,oy-r,r*2,r*2);
+    });
+
+    // Grid
+    const gc=isDark?'rgba(129,140,248,0.04)':'rgba(109,40,217,0.07)';
+    ctx.strokeStyle=gc; ctx.lineWidth=0.5;
+    for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
+    for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
+
+    // Twinkling stars
+    stars.forEach(s=>{
+      s.ph+=s.sp;
+      const a=s.a*(0.4+0.6*Math.sin(s.ph));
+      ctx.beginPath();ctx.arc(s.x,s.y,s.r,0,Math.PI*2);
+      ctx.fillStyle=isDark?`rgba(255,255,255,${a})`:`rgba(109,40,217,${a*0.5})`;
+      ctx.fill();
+    });
+
+    // Floating particles + connections
+    pts.forEach(p=>{
+      p.x+=p.vx; p.y+=p.vy;
+      if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
+      ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+      ctx.fillStyle=`rgba(${p.col},${p.a})`;ctx.fill();
+    });
+    for(let i=0;i<pts.length;i++) for(let j=i+1;j<pts.length;j++){
+      const dx=pts[i].x-pts[j].x,dy=pts[i].y-pts[j].y,d=Math.sqrt(dx*dx+dy*dy);
+      if(d<90){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
+        ctx.strokeStyle=`rgba(${pts[i].col},${0.06*(1-d/90)})`;ctx.lineWidth=0.4;ctx.stroke();}
+    }
+
+    animId=requestAnimationFrame(draw);
+  }
+
+  function init(){
+    resize(); initParticles();
+    if(animId) cancelAnimationFrame(animId);
+    draw();
+  }
+
+  window.addEventListener('resize',()=>{resize();initParticles();});
+  init();
+
+  // Override toggleTheme to re-init
+  const _origToggle=window.toggleTheme;
+  window.toggleTheme=function(){
+    if(_origToggle)_origToggle();
+    setTimeout(initParticles,50);
+  };
 })();
 </script>
 
