@@ -744,6 +744,7 @@ function showPage(page) {
   else if (page === 'settings') { const el = document.getElementById('settings-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
   else if (page === 'history') { const el = document.getElementById('history-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; loadHistory(); }
   else if (page === 'workflows') { const el = document.getElementById('workflows-content'); if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; } loadWorkflows(); }
+  else if (page === 'chatbots') { const el = document.getElementById('chatbots-content'); if (el) { el.style.display = 'flex'; el.style.flexDirection = 'column'; } loadChatbots(); }
   else { const el = document.getElementById('main-content'); el.style.display = 'flex'; el.style.flexDirection = 'column'; }
 }
 
