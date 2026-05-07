@@ -18,9 +18,9 @@ from routes import admin
 from routes import forms
 from routes import webhook
 from routes import dashboard
+from routes.chatbot import router as chatbot_router
 from scheduler import start_scheduler
 from security import check_content, sanitize_input, get_daily_limit
-from routes.chatbot import router as chatbot_router
 import os
 import httpx
 from jose import jwt, JWTError
@@ -92,6 +92,7 @@ app.include_router(admin.router, prefix="/admin")
 app.include_router(forms.router, prefix="/forms")
 app.include_router(webhook.router, prefix="/webhook")
 app.include_router(dashboard.router, prefix="/dashboard")
+app.include_router(chatbot_router, prefix="/chatbot")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
