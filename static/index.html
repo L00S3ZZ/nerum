@@ -394,6 +394,7 @@
           <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows<span class="sb-badge" id="wf-badge">0</span></div>
           <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History</div>
           <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists</div>
+<div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="bot" style="width:14px;height:14px"></i></div>Chatbots</div>
           <div class="sb-section">Account</div>
           <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing</div>
           <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings</div>
@@ -501,6 +502,68 @@
         <div class="settings-section"><div class="settings-section-title">🔐 Login History</div><div id="login-history-list"><div style="opacity:0.4;font-size:11px;padding:10px 0">Loading...</div></div></div>
         <div class="danger-section"><div class="danger-title">⚠️ Danger Zone</div><div class="danger-row"><div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div><button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button></div><div class="danger-row"><div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div><button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button></div></div>
       </div>
+      
+      <!-- CHATBOTS -->
+<div class="billing-content" id="chatbots-content" style="display:none">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+    <div class="billing-title">My Chatbots</div>
+    <button class="tb-btn" onclick="showCreateChatbot()" style="font-size:11px;padding:7px 16px">+ New Chatbot</button>
+  </div>
+  <div class="billing-sub">Embed AI chatbots on any website with one script tag</div>
+  <div id="chatbot-list-container"></div>
+</div>
+
+<!-- CHATBOT CREATE MODAL -->
+<div id="chatbot-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div id="chatbot-modal" style="width:100%;max-width:460px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:16px;font-weight:700">🤖 New Chatbot</div>
+      <button onclick="closeChatbotModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">CHATBOT NAME</label>
+      <input id="cb-name-input" placeholder="e.g. Sri Dental Clinic Assistant" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit"/>
+    </div>
+    <div style="margin-bottom:14px">
+      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">BUSINESS DESCRIPTION</label>
+      <textarea id="cb-desc-input" placeholder="e.g. We are a dental clinic in Chennai. We offer cleaning, braces, root canal. Open Mon-Sat 9AM-6PM." rows="4" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit;resize:none;line-height:1.5"></textarea>
+    </div>
+    <div style="margin-bottom:20px">
+      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">LANGUAGE</label>
+      <select id="cb-lang-input" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit">
+        <option value="both">Tamil + English</option>
+        <option value="english">English only</option>
+        <option value="tamil">Tamil only</option>
+      </select>
+    </div>
+    <div style="display:flex;gap:10px">
+      <button onclick="saveChatbotModal()" id="cb-save-btn" style="flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-family:inherit">Create Chatbot 🤖</button>
+      <button onclick="closeChatbotModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button>
+    </div>
+    <div id="cb-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
+  </div>
+</div>
+
+<!-- CHATBOT EMBED MODAL -->
+<div id="embed-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
+  <div id="embed-modal" style="width:100%;max-width:500px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+      <div style="font-size:16px;font-weight:700">🔗 Embed Script</div>
+      <button onclick="closeEmbedModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
+    </div>
+    <div style="font-size:12px;opacity:0.5;margin-bottom:14px">Paste this script tag just before the &lt;/body&gt; tag on your website</div>
+    <div style="position:relative;margin-bottom:16px">
+      <textarea id="embed-script-text" readonly rows="3" style="width:100%;padding:12px 14px;border-radius:12px;font-size:11px;outline:none;border:1px solid rgba(129,140,248,0.3);font-family:monospace;resize:none;line-height:1.6;background:rgba(129,140,248,0.05);color:#818cf8"></textarea>
+      <button onclick="copyEmbedScript()" style="position:absolute;top:8px;right:8px;padding:4px 12px;border-radius:8px;font-size:10px;font-weight:700;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;cursor:pointer;font-family:inherit">Copy</button>
+    </div>
+    <div style="font-size:11px;opacity:0.4;line-height:1.8">
+      ✅ Works on any website — WordPress, Wix, custom HTML<br/>
+      ✅ Chat bubble appears bottom right<br/>
+      ✅ Customers chat in Tamil or English<br/>
+      ✅ No coding needed
+    </div>
+  </div>
+</div>
 
       <!-- HISTORY -->
       <div class="history-content" id="history-content" style="display:none">

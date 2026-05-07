@@ -728,12 +728,14 @@ function setActive(el) {
   else if (text.startsWith('Settings')) { showPage('settings'); loadLoginHistory(); }
   else if (text.startsWith('Service History')) showPage('history');
   else if (text.startsWith('Workflows')) showPage('workflows');
+  else if (page === 'chatbots') { const el = document.getElementById('chatbots-content'); if(el){ el.style.display='flex'; el.style.flexDirection='column'; } loadChatbots(); }
   else if (text.startsWith('Smart Lists')) showSmartLists();
+  else if (text.startsWith('Chatbots')) { showPage('chatbots'); loadChatbots(); }
   else showPage('dashboard');
 }
 
 function showPage(page) {
-  const pages = ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content'];
+  const pages = ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content','chatbots-content'];
   pages.forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
   const titles = { billing:'Billing', settings:'Settings', history:'Service History', workflows:'Workflows', dashboard:'Dashboard' };
   const titleEl = document.getElementById('tb-title');
@@ -1181,3 +1183,179 @@ document.addEventListener('click', function(e) {
     panel.style.display = 'none';
   }
 });
+
+// ========== CHATBOT SECTION ==========
+
+async function loadChatbots() {
+  const container = document.getElementById('chatbot-list-container');
+  if (!container) return;
+  const token = localStorage.getItem('nerum_token');
+  if (!token) return;
+  const isDark = document.body.classList.contains('dark');
+  container.innerHTML = `<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Loading...</div>`;
+  try {
+    const res = await fetch('/chatbot/list', { headers: { 'Authorization': `Bearer ${token}` } });
+    const data = await res.json();
+    const bots = data.chatbots || [];
+    if (bots.length === 0) {
+      container.innerHTML = `
+        <div style="text-align:center;padding:60px 20px;opacity:0.4">
+          <div style="font-size:32px;margin-bottom:12px">🤖</div>
+          <div style="font-size:14px;font-weight:600">No chatbots yet</div>
+          <div style="font-size:12px;margin-top:6px">Click "+ New Chatbot" to create your first one</div>
+        </div>`;
+      return;
+    }
+    container.innerHTML = bots.map(b => `
+      <div style="border-radius:14px;padding:16px 18px;margin-bottom:10px;display:flex;align-items:center;gap:14px;
+        border:1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(109,40,217,0.15)'};
+        background:${isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.5)'}">
+        <div style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">🤖</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13px;font-weight:600;color:${isDark ? '#fff' : '#1a0533'};margin-bottom:3px">${b.name}</div>
+          <div style="font-size:10px;color:${isDark ? 'rgba(255,255,255,0.35)' : '#6d28d9'}">
+            ${b.language === 'both' ? 'Tamil + English' : b.language} &nbsp;·&nbsp;
+            <span style="color:${b.is_active ? '#34d399' : 'rgba(255,255,255,0.3)'}">
+              ${b.is_active ? '● Active' : '○ Inactive'}
+            </span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button onclick="showEmbedModal('${b.embed_script}')" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2);font-family:inherit">🔗 Embed</button>
+          <button onclick="toggleChatbot('${b.id}')" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;border:1px solid;font-family:inherit;
+            background:${b.is_active ? 'rgba(52,211,153,0.1)' : 'rgba(255,255,255,0.05)'};
+            color:${b.is_active ? '#34d399' : 'rgba(255,255,255,0.4)'};
+            border-color:${b.is_active ? 'rgba(52,211,153,0.2)' : 'rgba(255,255,255,0.1)'}">
+            ${b.is_active ? 'Active' : 'Paused'}
+          </button>
+          <button onclick="deleteChatbot('${b.id}')" style="padding:5px 12px;border-radius:20px;font-size:10px;font-weight:600;cursor:pointer;background:rgba(255,80,80,0.1);color:#ff8a7a;border:1px solid rgba(255,80,80,0.2);font-family:inherit">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  } catch(e) {
+    container.innerHTML = `<div style="opacity:0.4;font-size:11px;text-align:center;padding:20px">Error loading chatbots</div>`;
+  }
+}
+
+function showCreateChatbot() {
+  const modal = document.getElementById('chatbot-modal-overlay');
+  const box = document.getElementById('chatbot-modal');
+  const isDark = document.body.classList.contains('dark');
+  box.style.background = isDark ? '#0d0020' : 'rgba(255,255,255,0.95)';
+  box.style.border = isDark ? '1px solid rgba(232,121,249,0.2)' : '1px solid rgba(109,40,217,0.2)';
+  box.style.color = isDark ? '#fff' : '#1a0533';
+  ['cb-name-input', 'cb-desc-input', 'cb-lang-input'].forEach(id => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.background = isDark ? 'rgba(255,255,255,0.05)' : 'rgba(255,255,255,0.8)';
+    el.style.borderColor = isDark ? 'rgba(255,255,255,0.1)' : 'rgba(109,40,217,0.2)';
+    el.style.color = isDark ? '#fff' : '#1a0533';
+  });
+  document.getElementById('cb-name-input').value = '';
+  document.getElementById('cb-desc-input').value = '';
+  document.getElementById('cb-lang-input').value = 'both';
+  document.getElementById('cb-modal-error').style.display = 'none';
+  modal.style.display = 'flex';
+  setTimeout(() => document.getElementById('cb-name-input').focus(), 100);
+}
+
+function closeChatbotModal() {
+  document.getElementById('chatbot-modal-overlay').style.display = 'none';
+}
+
+async function saveChatbotModal() {
+  const name = document.getElementById('cb-name-input').value.trim();
+  const desc = document.getElementById('cb-desc-input').value.trim();
+  const lang = document.getElementById('cb-lang-input').value;
+  const errEl = document.getElementById('cb-modal-error');
+  const btn = document.getElementById('cb-save-btn');
+  const isDark = document.body.classList.contains('dark');
+
+  if (!name) {
+    errEl.textContent = 'Please enter a chatbot name';
+    errEl.style.display = 'block';
+    errEl.style.background = isDark ? 'rgba(255,80,80,0.12)' : '#fef2f2';
+    errEl.style.color = isDark ? '#ff8a7a' : '#dc2626';
+    return;
+  }
+  if (!desc) {
+    errEl.textContent = 'Please describe your business';
+    errEl.style.display = 'block';
+    errEl.style.background = isDark ? 'rgba(255,80,80,0.12)' : '#fef2f2';
+    errEl.style.color = isDark ? '#ff8a7a' : '#dc2626';
+    return;
+  }
+
+  btn.textContent = 'Creating...';
+  btn.disabled = true;
+
+  try {
+    const token = localStorage.getItem('nerum_token');
+    const res = await fetch('/chatbot/create', {
+      method: 'POST',
+      headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, business_description: desc, language: lang })
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      errEl.textContent = data.detail || 'Failed to create chatbot';
+      errEl.style.display = 'block';
+      btn.textContent = 'Create Chatbot 🤖';
+      btn.disabled = false;
+      return;
+    }
+    closeChatbotModal();
+    addNotification('Chatbot Created! 🤖', `"${name}" is ready to embed`, 'success');
+    loadChatbots();
+    // Auto show embed script
+    showEmbedModal(data.embed_script);
+  } catch(e) {
+    errEl.textContent = 'Something went wrong. Try again.';
+    errEl.style.display = 'block';
+    btn.textContent = 'Create Chatbot 🤖';
+    btn.disabled = false;
+  }
+}
+
+function showEmbedModal(embedScript) {
+  const overlay = document.getElementById('embed-modal-overlay');
+  const box = document.getElementById('embed-modal');
+  const isDark = document.body.classList.contains('dark');
+  box.style.background = isDark ? '#0d0020' : 'rgba(255,255,255,0.95)';
+  box.style.border = isDark ? '1px solid rgba(129,140,248,0.2)' : '1px solid rgba(109,40,217,0.2)';
+  box.style.color = isDark ? '#fff' : '#1a0533';
+  document.getElementById('embed-script-text').value = embedScript;
+  overlay.style.display = 'flex';
+}
+
+function closeEmbedModal() {
+  document.getElementById('embed-modal-overlay').style.display = 'none';
+}
+
+function copyEmbedScript() {
+  const text = document.getElementById('embed-script-text').value;
+  navigator.clipboard.writeText(text);
+  showToast('Embed script copied! 🔗', 'success');
+}
+
+async function toggleChatbot(id) {
+  const token = localStorage.getItem('nerum_token');
+  try {
+    await fetch(`/chatbot/${id}/toggle`, { method: 'POST', headers: { 'Authorization': `Bearer ${token}` } });
+    loadChatbots();
+  } catch(e) {}
+}
+
+async function deleteChatbot(id) {
+  if (!confirm('Delete this chatbot?')) return;
+  const token = localStorage.getItem('nerum_token');
+  try {
+    await fetch(`/chatbot/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${token}` } });
+    addNotification('Chatbot Deleted', 'Chatbot was removed', 'warning');
+    loadChatbots();
+  } catch(e) {}
+}
+
+// close modals on overlay click
+document.getElementById('chatbot-modal-overlay')?.addEventListener('click', function(e) { if(e.target===this) closeChatbotModal(); });
+document.getElementById('embed-modal-overlay')?.addEventListener('click', function(e) { if(e.target===this) closeEmbedModal(); });
