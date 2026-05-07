@@ -25,10 +25,19 @@ def get_current_user(authorization: str):
     token = authorization.split(" ")[1]
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")
-        if not user_id:
+        email = payload.get("sub")
+        if not email:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return user_id
+        # get user id from db
+        db = SessionLocal()
+        try:
+            from models.database import User
+            user = db.query(User).filter(User.email == email).first()
+            if not user:
+                raise HTTPException(status_code=401, detail="User not found")
+            return user.id
+        finally:
+            db.close()
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
