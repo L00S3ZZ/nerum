@@ -20,6 +20,7 @@ from routes import webhook
 from routes import dashboard
 from scheduler import start_scheduler
 from security import check_content, sanitize_input, get_daily_limit
+from routes.chatbot import router as chatbot_router
 import os
 import httpx
 from jose import jwt, JWTError
