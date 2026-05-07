@@ -728,9 +728,8 @@ function setActive(el) {
   else if (text.startsWith('Settings')) { showPage('settings'); loadLoginHistory(); }
   else if (text.startsWith('Service History')) showPage('history');
   else if (text.startsWith('Workflows')) showPage('workflows');
-  else if (page === 'chatbots') { const el = document.getElementById('chatbots-content'); if(el){ el.style.display='flex'; el.style.flexDirection='column'; } loadChatbots(); }
-  else if (text.startsWith('Smart Lists')) showSmartLists();
   else if (text.startsWith('Chatbots')) { showPage('chatbots'); loadChatbots(); }
+  else if (text.startsWith('Smart Lists')) showSmartLists();
   else showPage('dashboard');
 }
 
