@@ -12,6 +12,32 @@ const msgInterval = setInterval(() => {
   if (loadingText) loadingText.textContent = loadMessages[msgIndex];
 }, 3000);
 
+// ===== HELPER: Reset landing page to visible state =====
+function resetLandingPage() {
+  const lp = document.getElementById('landing-page');
+  lp.style.display = 'block';
+  lp.style.visibility = 'visible';
+  lp.style.height = '';
+  lp.style.overflow = '';
+  lp.style.position = '';
+  const ss = document.getElementById('lp-scroll-space');
+  if (ss) ss.style.height = '700vh';
+  window.scrollTo(0, 0);
+}
+
+// ===== HELPER: Hide landing page completely =====
+function hideLandingPage() {
+  const lp = document.getElementById('landing-page');
+  lp.style.display = 'none';
+  lp.style.visibility = 'hidden';
+  lp.style.height = '0';
+  lp.style.overflow = 'hidden';
+  lp.style.position = 'fixed';
+  const ss = document.getElementById('lp-scroll-space');
+  if (ss) ss.style.height = '0';
+  window.scrollTo(0, 0);
+}
+
 window.addEventListener('load', () => {
   const urlParams = new URLSearchParams(window.location.search);
   const googleToken = urlParams.get('token');
@@ -51,15 +77,13 @@ window.addEventListener('load', () => {
         ls.style.display = 'none';
         clearInterval(msgInterval);
         if (googleToken && googleName) {
-          document.getElementById('landing-page').style.display = 'none';
+          hideLandingPage();
           afterLogin(currentUser);
         } else {
           const savedToken = localStorage.getItem('nerum_token');
           const savedName = localStorage.getItem('nerum_name');
           if (savedToken && savedName) {
-            document.getElementById('landing-page').style.display = 'none';
-            document.getElementById('lp-scroll-space').style.height = '0';
-            window.scrollTo(0, 0);
+            hideLandingPage();
             const savedTheme = localStorage.getItem('nerum_theme') || 'dark';
             const savedLang = localStorage.getItem('nerum_lang') || 'english';
             applyTheme(savedTheme);
@@ -270,7 +294,6 @@ async function toggle2FA(enable) {
       headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ enable })
     });
-    const data = await res.json();
     if (res.ok) {
       showToast(enable ? '2FA enabled! 🔐' : '2FA disabled', enable ? 'success' : 'warning');
     }
@@ -306,9 +329,7 @@ async function doSignup() {
 function afterLogin(name) {
   currentUser = name;
   hideAuthPopup();
-  window.scrollTo(0, 0);
-  document.getElementById('landing-page').style.display = 'none';
-  document.getElementById('lp-scroll-space').style.height = '0';
+  hideLandingPage();
   const onboarded = localStorage.getItem('nerum_onboarded');
   if (!onboarded) {
     document.getElementById('ob-welcome-name').textContent = `Welcome, ${name}! 👋`;
@@ -328,7 +349,7 @@ function doLogout() {
   localStorage.removeItem('nerum_onboarded');
   localStorage.removeItem('nerum_email');
   document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('landing-page').style.display = 'block';
+  resetLandingPage();
 }
 
 // ===== LOGIN HISTORY =====
@@ -408,7 +429,7 @@ async function loadWorkflows() {
       localStorage.removeItem('nerum_token');
       localStorage.removeItem('nerum_name');
       document.getElementById('dashboard').style.display = 'none';
-      document.getElementById('landing-page').style.display = 'block';
+      resetLandingPage();
       return;
     }
     const data = await res.json();
@@ -431,7 +452,6 @@ async function loadWorkflows() {
       if (ptbTokens) ptbTokens.textContent = data.tokens_used;
       const ptbLimit = document.getElementById('ptb-limit');
       if (ptbLimit) ptbLimit.textContent = data.token_limit?.toLocaleString();
-      // Update dash bottom token bar
       const dashTokLimit = document.getElementById('dash-tok-limit');
       if (dashTokLimit) dashTokLimit.textContent = data.token_limit?.toLocaleString() || '1000';
       const pct = Math.min(100, Math.round((data.tokens_used / data.token_limit) * 100));
@@ -908,7 +928,7 @@ function deleteAccount() {
   if (!confirm('Last warning! This cannot be undone!')) return;
   localStorage.clear();
   document.getElementById('dashboard').style.display = 'none';
-  document.getElementById('landing-page').style.display = 'block';
+  resetLandingPage();
   alert('Account deleted. Sorry to see you go!');
 }
 
@@ -919,7 +939,6 @@ function deleteAccount() {
   const ctx = canvas.getContext('2d');
   let W, H, t = 0, animId = null;
 
-  // Aurora curtain streams
   const streams = [
     {x:0.12, speed:0.0007, amp:160, freq:0.0028, c1:'232,121,249', c2:'129,140,248', phase:0.0},
     {x:0.35, speed:0.0005, amp:200, freq:0.0022, c1:'129,140,248', c2:'52,211,153',  phase:2.1},
@@ -928,7 +947,6 @@ function deleteAccount() {
     {x:0.92, speed:0.0008, amp:120, freq:0.003,  c1:'232,121,249', c2:'52,211,153',  phase:3.3},
   ];
 
-  // Glowing orbs that drift
   const orbs = [
     {x:0.15,y:0.25,r:280,c:'232,121,249',sp:0.4,ph:0.0},
     {x:0.75,y:0.20,r:240,c:'129,140,248',sp:0.35,ph:2.0},
@@ -938,8 +956,7 @@ function deleteAccount() {
     {x:0.40,y:0.10,r:180,c:'52,211,153', sp:0.38,ph:5.0},
   ];
 
-  // Star field
-  let stars = [], pts = [];
+  let stars = [], pts = [], shooters = [];
 
   function resize() {
     W = canvas.width = window.innerWidth;
@@ -963,9 +980,6 @@ function deleteAccount() {
     }));
   }
 
-  // Shooting star state
-  let shooters = [];
-
   function spawnShooter() {
     if(shooters.length < 3 && Math.random() < 0.008) {
       shooters.push({
@@ -981,17 +995,12 @@ function deleteAccount() {
   function draw() {
     const isDark = document.body.classList.contains('dark');
     t += 0.006;
-
-    // Base background
     ctx.fillStyle = isDark ? '#04000e' : '#ddc6ff';
     ctx.fillRect(0,0,W,H);
-
     if(isDark) {
-      // ---- AURORA CURTAINS ----
-      streams.forEach((s,si) => {
+      streams.forEach((s) => {
         const baseCX = s.x * W;
         const drift = Math.sin(t*s.speed*800 + s.phase)*80;
-
         for(let y = -20; y < H+20; y += 2) {
           const wave1 = Math.sin(y*s.freq + t*s.speed*700 + s.phase)*s.amp;
           const wave2 = Math.sin(y*s.freq*1.8 + t*s.speed*500 + s.phase+1)*s.amp*0.35;
@@ -999,7 +1008,6 @@ function deleteAccount() {
           const brightness = Math.sin(y/H*Math.PI) * (0.5+Math.sin(y*0.01+t*0.8+s.phase)*0.5);
           const alpha = Math.max(0, brightness * 0.09);
           const w = 35 + Math.sin(y*0.02+t+s.phase)*20;
-
           const g = ctx.createLinearGradient(x-w,y,x+w,y);
           g.addColorStop(0,   `rgba(${s.c1},0)`);
           g.addColorStop(0.25,`rgba(${s.c1},${alpha})`);
@@ -1010,8 +1018,6 @@ function deleteAccount() {
           ctx.fillRect(x-w,y,w*2,3);
         }
       });
-
-      // ---- SHOOTING STARS ----
       spawnShooter();
       shooters = shooters.filter(sh => sh.alpha > 0.02);
       shooters.forEach(sh => {
@@ -1032,9 +1038,7 @@ function deleteAccount() {
         ctx.stroke();
       });
     }
-
-    // ---- GLOWING ORBS ----
-    orbs.forEach((o,i) => {
+    orbs.forEach((o) => {
       const ox = (o.x + Math.sin(t*o.sp*0.3+o.ph)*0.08)*W;
       const oy = (o.y + Math.cos(t*o.sp*0.25+o.ph)*0.06)*H;
       const pulse = 0.55 + Math.sin(t*o.sp+o.ph)*0.45;
@@ -1047,14 +1051,10 @@ function deleteAccount() {
       ctx.fillStyle = g;
       ctx.fillRect(ox-r,oy-r,r*2,r*2);
     });
-
-    // ---- GRID ----
     const gc = isDark ? 'rgba(129,140,248,0.04)':'rgba(109,40,217,0.07)';
     ctx.strokeStyle = gc; ctx.lineWidth = 0.5;
     for(let x=0;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke();}
     for(let y=0;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke();}
-
-    // ---- TWINKLING STARS ----
     stars.forEach(s => {
       s.ph += s.sp;
       const a = s.a*(0.4+0.6*Math.sin(s.ph));
@@ -1062,8 +1062,6 @@ function deleteAccount() {
       ctx.fillStyle = isDark?`rgba(255,255,255,${a})`:`rgba(109,40,217,${a*0.5})`;
       ctx.fill();
     });
-
-    // ---- FLOATING PARTICLES + CONNECTIONS ----
     pts.forEach(p => {
       p.x+=p.vx; p.y+=p.vy;
       if(p.x<0)p.x=W;if(p.x>W)p.x=0;if(p.y<0)p.y=H;if(p.y>H)p.y=0;
@@ -1075,7 +1073,6 @@ function deleteAccount() {
       if(d<90){ctx.beginPath();ctx.moveTo(pts[i].x,pts[i].y);ctx.lineTo(pts[j].x,pts[j].y);
         ctx.strokeStyle=`rgba(${pts[i].col},${.06*(1-d/90)})`;ctx.lineWidth=.4;ctx.stroke();}
     }
-
     animId = requestAnimationFrame(draw);
   }
 
@@ -1086,13 +1083,11 @@ function deleteAccount() {
   }
 
   window.addEventListener('resize', ()=>{ resize(); initStars(); });
-
   const origToggle = window.toggleTheme;
   window.toggleTheme = function() {
     if(origToggle) origToggle();
     setTimeout(initStars, 50);
   };
-
   init();
 })();
 
