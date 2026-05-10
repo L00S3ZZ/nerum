@@ -5,7 +5,7 @@
 
   if (!BOT_ID) return;
 
-  const LOGO = `<img src="https://nerum.in/static/nerum-logo-transparent.png" width="28" height="28" style="object-fit:contain;filter:brightness(0) invert(1);" />`;
+  const LOGO = `<img src="https://nerum.in/static/Nerumlogo.png.png" width="28" height="28" style="object-fit:contain;filter:brightness(0) invert(1);" />`;
 
   const style = document.createElement('style');
   style.textContent = `
@@ -253,7 +253,7 @@
     <div class="nerum-powered">
       ⚡ Powered by
       <a href="https://nerum.in" target="_blank" rel="noopener">
-        <img src="https://nerum.in/static/nerum-logo-transparent.png" alt="Nerum"/>
+        <img src="https://nerum.in/static/Nerumlogo.png.png" alt="Nerum"/>
         Nerum AI
       </a>
     </div>
