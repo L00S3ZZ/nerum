@@ -125,13 +125,13 @@
     const resize = () => {
       W = sf.width = window.innerWidth * devicePixelRatio;
       H = sf.height = Math.max(window.innerHeight, document.documentElement.scrollHeight) * devicePixelRatio;
-      stars = Array.from({ length: 280 }, () => {
+      stars = Array.from({ length: 350 }, () => {
         const col = starColors[Math.floor(Math.random() * starColors.length)];
         return {
           x: Math.random() * W,
           y: Math.random() * H,
-          z: Math.random() * 1 + 0.2,
-          s: Math.random() * 1.6 + 0.4,
+          z: Math.random() * 1.2 + 0.4,
+          s: Math.random() * 2.2 + 0.6,
           tw: Math.random() * Math.PI * 2,
           dx: (Math.random() - 0.5) * 0.3,
           col,
@@ -151,12 +151,12 @@
     function drawStars(t) {
       ctx.clearRect(0, 0, W, H);
       for (const s of stars) {
-        const a = 0.4 + 0.6 * Math.sin(t * 0.0008 + s.tw);
+        const a = 0.6 + 0.4 * Math.sin(t * 0.0008 + s.tw);
         const [r,g,b] = s.col;
-        const glow = s.s * devicePixelRatio * 2.5;
+        const glow = s.s * devicePixelRatio * 3.5;
         // glow
         const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glow);
-        grad.addColorStop(0, `rgba(${r},${g},${b},${a * 0.9})`);
+        grad.addColorStop(0, `rgba(${r},${g},${b},${a})`);
         grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.beginPath();
         ctx.fillStyle = grad;
@@ -164,8 +164,8 @@
         ctx.fill();
         // core
         ctx.beginPath();
-        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
-        ctx.arc(s.x, s.y, s.s * devicePixelRatio * 0.6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${Math.min(1, a + 0.2)})`;
+        ctx.arc(s.x, s.y, s.s * devicePixelRatio * 0.8, 0, Math.PI * 2);
         ctx.fill();
         // drift upward + sideways
         s.y -= 0.12 * s.z * devicePixelRatio;
