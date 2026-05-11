@@ -28,11 +28,10 @@
 html,body{color:var(--ink);font-family:var(--font-sans);-webkit-font-smoothing:antialiased;line-height:1.5;overflow-x:hidden}
 html{
   background:
-    radial-gradient(ellipse 80% 60% at 20% 10%, rgba(168,85,247,0.18) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 80% at 80% 80%, rgba(232,121,249,0.12) 0%, transparent 55%),
-    radial-gradient(ellipse 50% 40% at 60% 20%, rgba(129,140,248,0.10) 0%, transparent 50%),
-    radial-gradient(ellipse 55% 40% at 82% 28%, rgba(180,60,150,.12), transparent 60%),
-    radial-gradient(ellipse 70% 50% at 50% 70%, rgba(50,25,120,.15), transparent 65%),
+    radial-gradient(ellipse 60% 45% at 18% 12%, rgba(80,50,160,.22), transparent 60%),
+    radial-gradient(ellipse 55% 40% at 82% 28%, rgba(180,60,150,.14), transparent 60%),
+    radial-gradient(ellipse 70% 50% at 50% 70%, rgba(50,25,120,.18), transparent 65%),
+    radial-gradient(ellipse 90% 60% at 50% 100%, rgba(120,70,200,.10), transparent 60%),
     linear-gradient(180deg,#000005 0%, #02010C 35%, #04020F 65%, #000005 100%);
   background-attachment: fixed;
   min-height:100%;
@@ -110,31 +109,18 @@ img,svg{display:block}
   mix-blend-mode:screen;
   opacity:.9;
 }
-.bg-logo{position:fixed;left:50%;top:50%;width:min(80vw,960px);aspect-ratio:1;transform:translate(-50%,-50%);background:url("/static/Nerumlogo.png") center/contain no-repeat;opacity:.18;pointer-events:none;z-index:-1;filter:drop-shadow(0 0 120px rgba(232,121,249,.8)) drop-shadow(0 0 60px rgba(167,139,250,.6)) drop-shadow(0 0 30px rgba(244,114,182,.5));animation:bgLogoSpin 90s linear infinite}
+.bg-logo{position:fixed;left:50%;top:50%;width:min(75vw,900px);aspect-ratio:1;transform:translate(-50%,-50%);background:url("/static/Nerumlogo.png") center/contain no-repeat;opacity:.22;pointer-events:none;z-index:-1;filter:drop-shadow(0 0 80px rgba(255,77,222,.6)) drop-shadow(0 0 40px rgba(180,100,255,.45));animation:bgLogoSpin 90s linear infinite}
 @keyframes bgLogoSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .ambient::after{content:"";position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.18),transparent 60%),
   radial-gradient(ellipse at 80% 100%,rgba(255,77,222,.12),transparent 55%);}
-.aurora{position:absolute;width:60vw;height:60vw;border-radius:50%;filter:blur(140px);opacity:.50;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite alternate}
-.aurora-1{top:-15vw;left:-10vw;background:radial-gradient(circle,#e879f9 0%,transparent 60%)}
+.aurora{position:absolute;width:60vw;height:60vw;border-radius:50%;filter:blur(140px);opacity:.55;mix-blend-mode:screen;animation:drift 22s ease-in-out infinite alternate}
+.aurora-1{top:-15vw;left:-10vw;background:radial-gradient(circle,#FF4DDE 0%,transparent 60%)}
 .aurora-2{top:30vh;right:-15vw;background:radial-gradient(circle,#8B5CF6 0%,transparent 60%);animation-delay:-7s}
-.aurora-3{bottom:-20vw;left:30vw;background:radial-gradient(circle,#FF4DDE 0%,transparent 60%);animation-delay:-14s}
+.aurora-3{bottom:-20vw;left:30vw;background:radial-gradient(circle,#FF00C8 0%,transparent 60%);animation-delay:-14s}
 @keyframes drift{0%{transform:translate(0,0) scale(1)}100%{transform:translate(8vw,-6vh) scale(1.15)}}
 
-#starfield{position:fixed;inset:0;width:100vw;height:100vh;opacity:1;z-index:-1}
-
-.grid-floor{position:absolute;left:50%;bottom:-20vh;width:200vw;height:80vh;transform:translateX(-50%) perspective(800px) rotateX(60deg);
-  background:
-    linear-gradient(transparent 96%,rgba(255,77,222,.4) 96%) 0 0/60px 60px,
-    linear-gradient(90deg,transparent 96%,rgba(139,92,246,.35) 96%) 0 0/60px 60px;
-  mask-image:radial-gradient(ellipse at center 0,black 0,transparent 70%);
-  opacity:.45;animation:gridPan 18s linear infinite}
-@keyframes gridPan{from{background-position:0 0,0 0}to{background-position:0 60px,60px 0}}
-
-.noise{position:absolute;inset:0;opacity:.06;mix-blend-mode:overlay;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='1.2' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)' opacity='0.6'/></svg>")}
-
-.kolam-mark{position:fixed;width:120px;height:120px;color:rgba(255,77,222,.18);right:24px;top:50%;transform:translateY(-50%) rotate(0);pointer-events:none;z-index:1;animation:slowSpin 60s linear infinite}
-@keyframes slowSpin{to{transform:translateY(-50%) rotate(360deg)}}
+#starfield{position:absolute;inset:0;width:100%;height:100%;opacity:.65}
 
 .grid-floor{position:absolute;left:50%;bottom:-20vh;width:200vw;height:80vh;transform:translateX(-50%) perspective(800px) rotateX(60deg);
   background:
@@ -176,8 +162,9 @@ img,svg{display:block}
 .nav.scrolled{box-shadow:0 16px 50px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,77,222,.18);border-color:rgba(255,77,222,.18)}
 
 .nav-brand{display:flex;align-items:center;gap:.5rem;height:100%}
-.brand-mark{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,77,222,.5));overflow:hidden}
-.brand-mark img{width:100%;height:100%;object-fit:contain;display:block;color:transparent}
+.brand-mark{width:32px;height:32px;display:grid;place-items:center;flex-shrink:0;filter:drop-shadow(0 0 8px rgba(255,77,222,.5))}
+.brand-mark img{width:100%;height:100%;object-fit:contain;display:block}
+.brand-mark svg{width:18px;height:18px;filter:drop-shadow(0 0 5px rgba(255,255,255,.55))}
 .brand-word{font-family:var(--font-display);font-weight:700;letter-spacing:.02em;font-size:1rem;line-height:1}
 
 .nav-links{display:flex;align-items:center;gap:.15rem;list-style:none;height:100%}

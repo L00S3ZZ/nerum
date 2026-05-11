@@ -107,71 +107,82 @@
   });
 
   /* =========================================
-     STARFIELD CANVAS
+     STARFIELD CANVAS — colored drifting stars
      ========================================= */
   const sf = $('#starfield');
   if (sf) {
+    // Make canvas fixed + full viewport so it covers all pages on scroll
+    sf.style.position = 'fixed';
+    sf.style.inset = '0';
+    sf.style.width = '100vw';
+    sf.style.height = '100vh';
+    sf.style.zIndex = '-1';
+    sf.style.pointerEvents = 'none';
+
     const ctx = sf.getContext('2d');
     let stars = [];
     let W, H;
-    // Dashboard-style star colors: white, pink, purple, violet, indigo
-    const starColors = [
-      [255,255,255],   // white
-      [232,121,249],   // purple (--purple)
-      [129,140,248],   // indigo (--indigo)
-      [167,139,250],   // violet
-      [244,114,182],   // pink
+
+    // Pink, purple, indigo, violet, white — matching dashboard palette
+    const COLORS = [
+      [255,255,255],
+      [232,121,249],
+      [129,140,248],
+      [167,139,250],
+      [244,114,182],
+      [255,77,222],
     ];
+
     const resize = () => {
-      W = sf.width = window.innerWidth * devicePixelRatio;
-      H = sf.height = Math.max(window.innerHeight, document.documentElement.scrollHeight) * devicePixelRatio;
+      const dpr = window.devicePixelRatio || 1;
+      W = sf.width = window.innerWidth * dpr;
+      H = sf.height = window.innerHeight * dpr;
       stars = Array.from({ length: 350 }, () => {
-        const col = starColors[Math.floor(Math.random() * starColors.length)];
+        const col = COLORS[Math.floor(Math.random() * COLORS.length)];
         return {
           x: Math.random() * W,
           y: Math.random() * H,
-          z: Math.random() * 1.2 + 0.4,
-          s: Math.random() * 2.2 + 0.6,
+          z: Math.random() * 1.2 + 0.3,
+          s: Math.random() * 2.0 + 0.5,
           tw: Math.random() * Math.PI * 2,
-          dx: (Math.random() - 0.5) * 0.3,
+          dx: (Math.random() - 0.5) * 0.25,
           col,
+          dpr,
         };
       });
     };
     resize();
     window.addEventListener('resize', resize);
 
-    // Parallax offset
-    let px = 0, py = 0;
-    document.addEventListener('mousemove', e => {
-      px = (e.clientX / window.innerWidth - 0.5) * 18;
-      py = (e.clientY / window.innerHeight - 0.5) * 18;
-    });
-
     function drawStars(t) {
       ctx.clearRect(0, 0, W, H);
       for (const s of stars) {
-        const a = 0.6 + 0.4 * Math.sin(t * 0.0008 + s.tw);
+        const a = 0.55 + 0.45 * Math.sin(t * 0.0007 + s.tw);
         const [r,g,b] = s.col;
-        const glow = s.s * devicePixelRatio * 3.5;
-        // glow
-        const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glow);
-        grad.addColorStop(0, `rgba(${r},${g},${b},${a})`);
+        const radius = s.s * s.dpr;
+        const glowR = radius * 3.5;
+
+        // Glow halo
+        const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glowR);
+        grad.addColorStop(0, `rgba(${r},${g},${b},${(a * 0.85).toFixed(2)})`);
         grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.beginPath();
         ctx.fillStyle = grad;
-        ctx.arc(s.x, s.y, glow, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, glowR, 0, Math.PI * 2);
         ctx.fill();
-        // core
+
+        // Bright core
         ctx.beginPath();
-        ctx.fillStyle = `rgba(${r},${g},${b},${Math.min(1, a + 0.2)})`;
-        ctx.arc(s.x, s.y, s.s * devicePixelRatio * 0.8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${r},${g},${b},${Math.min(1, a + 0.2).toFixed(2)})`;
+        ctx.arc(s.x, s.y, radius * 0.7, 0, Math.PI * 2);
         ctx.fill();
-        // drift upward + sideways
-        s.y -= 0.12 * s.z * devicePixelRatio;
-        s.x += s.dx * s.z * devicePixelRatio;
-        if (s.y < 0) { s.y = H; s.x = Math.random() * W; }
-        if (s.x < 0 || s.x > W) { s.x = Math.random() * W; }
+
+        // Drift upward + sideways
+        s.y -= 0.10 * s.z * s.dpr;
+        s.x += s.dx * s.z * s.dpr;
+        if (s.y < -10) { s.y = H + 10; s.x = Math.random() * W; }
+        if (s.x < -10) s.x = W + 10;
+        if (s.x > W + 10) s.x = -10;
       }
       requestAnimationFrame(drawStars);
     }
