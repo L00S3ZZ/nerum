@@ -104,80 +104,15 @@ async def ai_chat(request: Request, authorization: str = Header(None)):
         status_code=503,
         content={"error": "AI service temporarily unavailable. Please try again later."}
     )
-    # ✅ Require authentication
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authentication required")
-
-    token = authorization.split(" ")[1]
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        if not email:
-            raise HTTPException(status_code=401, detail="Invalid token")
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-    ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY")
-    if not ANTHROPIC_API_KEY:
-        raise HTTPException(status_code=500, detail="AI service not configured")
-
-    try:
-        data = await request.json()
-    except:
-        raise HTTPException(status_code=400, detail="Invalid request body")
-
-    # ✅ Validate and sanitize messages
-    messages = data.get("messages", [])
-    if not messages:
-        raise HTTPException(status_code=400, detail="No messages provided")
-
-    # ✅ Limit message history
-    if len(messages) > 20:
-        messages = messages[-20:]
-
-    # ✅ Content filter — check last user message
-    last_user_msg = next((m["content"] for m in reversed(messages) if m.get("role") == "user"), "")
-    last_user_msg = sanitize_input(last_user_msg, max_length=2000)
-
-    if not check_content(last_user_msg):
-        raise HTTPException(status_code=400, detail="Message contains prohibited content")
-
-    # ✅ Sanitize all messages
-    safe_messages = []
-    for msg in messages:
-        if isinstance(msg.get("content"), str):
-            safe_messages.append({
-                "role": msg["role"],
-                "content": sanitize_input(msg["content"], max_length=2000)
-            })
-
-    try:
-        async with httpx.AsyncClient() as client:
-            res = await client.post(
-                "https://api.anthropic.com/v1/messages",
-                headers={
-                    "x-api-key": ANTHROPIC_API_KEY,
-                    "anthropic-version": "2023-06-01",
-                    "content-type": "application/json"
-                },
-                json={
-                    "model": data.get("model", "claude-haiku-4-5-20251001"),
-                    "max_tokens": min(data.get("max_tokens", 500), 1000),  # Cap at 1000
-                    "system": data.get("system", ""),
-                    "messages": safe_messages
-                },
-                timeout=30
-            )
-            return res.json()
-    except httpx.TimeoutException:
-        raise HTTPException(status_code=504, detail="AI service timeout. Please try again.")
-    except Exception as e:
-        print(f"AI chat error: {e}")
-        raise HTTPException(status_code=500, detail="AI service error")
 
 @app.get("/")
 def home():
     return FileResponse("static/index.html")
+
+# ✅ Dashboard page — serves dashboard.html
+@app.get("/dashboard")
+def dashboard_page():
+    return FileResponse("static/dashboard.html")
 
 @app.get("/privacy")
 def privacy():

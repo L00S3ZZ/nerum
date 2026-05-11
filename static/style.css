@@ -109,7 +109,7 @@ img,svg{display:block}
   mix-blend-mode:screen;
   opacity:.9;
 }
-.bg-logo{position:fixed;left:50%;top:50%;width:min(75vw,900px);aspect-ratio:1;transform:translate(-50%,-50%);background:url("nerum-logo-transparent.png") center/contain no-repeat;opacity:.22;pointer-events:none;z-index:-1;filter:drop-shadow(0 0 80px rgba(255,77,222,.6)) drop-shadow(0 0 40px rgba(180,100,255,.45));animation:bgLogoSpin 90s linear infinite}
+.bg-logo{position:fixed;left:50%;top:50%;width:min(75vw,900px);aspect-ratio:1;transform:translate(-50%,-50%);background:url("/static/Nerumlogo.png") center/contain no-repeat;opacity:.22;pointer-events:none;z-index:-1;filter:drop-shadow(0 0 80px rgba(255,77,222,.6)) drop-shadow(0 0 40px rgba(180,100,255,.45));animation:bgLogoSpin 90s linear infinite}
 @keyframes bgLogoSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
 .ambient::after{content:"";position:absolute;inset:0;background:
   radial-gradient(ellipse at 50% 0%,rgba(139,92,246,.18),transparent 60%),
