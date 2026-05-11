@@ -114,30 +114,64 @@
     const ctx = sf.getContext('2d');
     let stars = [];
     let W, H;
+    // Dashboard-style star colors: white, pink, purple, violet, indigo
+    const starColors = [
+      [255,255,255],   // white
+      [232,121,249],   // purple (--purple)
+      [129,140,248],   // indigo (--indigo)
+      [167,139,250],   // violet
+      [244,114,182],   // pink
+    ];
     const resize = () => {
       W = sf.width = window.innerWidth * devicePixelRatio;
       H = sf.height = window.innerHeight * devicePixelRatio;
-      stars = Array.from({ length: 220 }, () => ({
-        x: Math.random() * W,
-        y: Math.random() * H,
-        z: Math.random() * 1 + 0.2,
-        s: Math.random() * 1.4 + 0.3,
-        tw: Math.random() * Math.PI * 2,
-      }));
+      stars = Array.from({ length: 280 }, () => {
+        const col = starColors[Math.floor(Math.random() * starColors.length)];
+        return {
+          x: Math.random() * W,
+          y: Math.random() * H,
+          z: Math.random() * 1 + 0.2,
+          s: Math.random() * 1.6 + 0.4,
+          tw: Math.random() * Math.PI * 2,
+          dx: (Math.random() - 0.5) * 0.3,
+          col,
+        };
+      });
     };
     resize();
     window.addEventListener('resize', resize);
 
+    // Parallax offset
+    let px = 0, py = 0;
+    document.addEventListener('mousemove', e => {
+      px = (e.clientX / window.innerWidth - 0.5) * 18;
+      py = (e.clientY / window.innerHeight - 0.5) * 18;
+    });
+
     function drawStars(t) {
       ctx.clearRect(0, 0, W, H);
       for (const s of stars) {
-        const a = 0.5 + 0.5 * Math.sin(t * 0.001 + s.tw);
+        const a = 0.4 + 0.6 * Math.sin(t * 0.0008 + s.tw);
+        const [r,g,b] = s.col;
+        const glow = s.s * devicePixelRatio * 2.5;
+        // glow
+        const grad = ctx.createRadialGradient(s.x, s.y, 0, s.x, s.y, glow);
+        grad.addColorStop(0, `rgba(${r},${g},${b},${a * 0.9})`);
+        grad.addColorStop(1, `rgba(${r},${g},${b},0)`);
         ctx.beginPath();
-        ctx.fillStyle = `rgba(255,${180 + Math.floor(60 * s.z)},${230 + Math.floor(20 * s.z)},${a * s.z * 0.85})`;
-        ctx.arc(s.x, s.y, s.s * devicePixelRatio, 0, Math.PI * 2);
+        ctx.fillStyle = grad;
+        ctx.arc(s.x, s.y, glow, 0, Math.PI * 2);
         ctx.fill();
-        s.y += 0.05 * s.z * devicePixelRatio;
-        if (s.y > H) { s.y = 0; s.x = Math.random() * W; }
+        // core
+        ctx.beginPath();
+        ctx.fillStyle = `rgba(${r},${g},${b},${a})`;
+        ctx.arc(s.x, s.y, s.s * devicePixelRatio * 0.6, 0, Math.PI * 2);
+        ctx.fill();
+        // drift upward + sideways
+        s.y -= 0.12 * s.z * devicePixelRatio;
+        s.x += s.dx * s.z * devicePixelRatio;
+        if (s.y < 0) { s.y = H; s.x = Math.random() * W; }
+        if (s.x < 0 || s.x > W) { s.x = Math.random() * W; }
       }
       requestAnimationFrame(drawStars);
     }
