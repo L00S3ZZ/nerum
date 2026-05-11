@@ -124,7 +124,7 @@
     ];
     const resize = () => {
       W = sf.width = window.innerWidth * devicePixelRatio;
-      H = sf.height = window.innerHeight * devicePixelRatio;
+      H = sf.height = Math.max(window.innerHeight, document.documentElement.scrollHeight) * devicePixelRatio;
       stars = Array.from({ length: 280 }, () => {
         const col = starColors[Math.floor(Math.random() * starColors.length)];
         return {
