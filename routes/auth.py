@@ -28,7 +28,6 @@ RESEND_API_KEY = os.environ.get("RESEND_API_KEY")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
-# ✅ Failed login tracker
 failed_attempts = defaultdict(lambda: {"count": 0, "locked_until": None})
 
 def get_db():
@@ -37,6 +36,20 @@ def get_db():
         yield db
     finally:
         db.close()
+
+def get_current_user(authorization: str = Header(None), db: Session = Depends(get_db)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Not authenticated")
+    token = authorization.split(" ")[1]
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        user = db.query(User).filter(User.email == email).first()
+        if not user:
+            raise HTTPException(status_code=401, detail="User not found")
+        return user
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")
 
 class SignupRequest(BaseModel):
     name: str = Field(..., min_length=1, max_length=100)
@@ -64,13 +77,30 @@ class OTPVerifyRequest(BaseModel):
     otp: str
 
 class Toggle2FARequest(BaseModel):
-    enable: bool
+    enabled: bool
+
+class UpdateProfileRequest(BaseModel):
+    name: str = Field(..., min_length=1, max_length=100)
 
 def create_token(data: dict):
     to_encode = data.copy()
     expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+
+def user_to_dict(user):
+    from security import get_token_limit
+    limit = get_token_limit(user.plan or "free")
+    return {
+        "id": user.id,
+        "name": user.name,
+        "email": user.email,
+        "plan": user.plan or "free",
+        "tokens_used": user.tokens_used or 0,
+        "token_limit": limit,
+        "two_fa_enabled": getattr(user, 'two_fa_enabled', False) or False,
+        "is_verified": getattr(user, 'is_verified', True) or False,
+    }
 
 # ===== SEND OTP EMAIL =====
 async def send_otp_email(name: str, email: str, otp: str):
@@ -143,7 +173,7 @@ async def send_welcome_email(name: str, email: str):
                                 You're all set to automate your business with AI workflows.<br/>
                                 Connect Gmail, WhatsApp, Telegram and Google Sheets.
                             </p>
-                            <a href="https://nerum.in" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700">
+                            <a href="https://nerum.in/dashboard" style="display:inline-block;padding:14px 32px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:25px;font-size:14px;font-weight:700">
                                 Go to Dashboard →
                             </a>
                         </div>
@@ -215,10 +245,6 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
                     "subject": "⚠️ New login to your Nerum account",
                     "html": f"""
                     <div style="background:#06000f;padding:40px;font-family:sans-serif;max-width:560px;margin:0 auto">
-                        <div style="text-align:center;margin-bottom:24px">
-                            <span style="font-size:24px;font-weight:800;color:#e879f9">Ne</span>
-                            <span style="font-size:24px;font-weight:800;color:#818cf8">rum</span>
-                        </div>
                         <div style="background:rgba(255,140,0,0.08);border:1px solid rgba(255,140,0,0.2);border-radius:20px;padding:32px;text-align:center">
                             <div style="font-size:40px;margin-bottom:12px">⚠️</div>
                             <h2 style="color:#fff;margin:0 0 8px">New login detected, {first_name}!</h2>
@@ -245,13 +271,24 @@ async def send_suspicious_login_alert(name: str, email: str, ip: str, device: st
     except Exception:
         pass
 
+# ===== GET ME (current user) =====
+@router.get("/me")
+def get_me(user: User = Depends(get_current_user)):
+    return user_to_dict(user)
+
+# ===== UPDATE PROFILE =====
+@router.post("/update-profile")
+def update_profile(req: UpdateProfileRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user.name = req.name.strip()
+    db.commit()
+    return {"message": "Profile updated!", "name": user.name}
+
 # ===== LOGIN =====
 @router.post("/login")
 @limiter.limit("5/minute")
 async def login(request: Request, req: LoginRequest, db: Session = Depends(get_db)):
     email = req.email.lower().strip()
 
-    # ✅ Check lockout
     attempt_data = failed_attempts[email]
     if attempt_data["locked_until"]:
         if datetime.utcnow() < attempt_data["locked_until"]:
@@ -269,23 +306,16 @@ async def login(request: Request, req: LoginRequest, db: Session = Depends(get_d
             raise HTTPException(status_code=429, detail="Too many failed attempts. Account locked for 15 minutes.")
         raise HTTPException(status_code=401, detail=f"Invalid email or password. {5 - count} attempts remaining.")
 
-    # ✅ Reset failed attempts
     failed_attempts[email] = {"count": 0, "locked_until": None}
 
-    # ✅ Check email verified
     if not getattr(user, 'is_verified', True):
         raise HTTPException(status_code=403, detail="Please verify your email first. Check your inbox!")
 
-    # ✅ Check 2FA enabled
+    # ✅ 2FA check
     if getattr(user, 'two_fa_enabled', False):
-        # Generate 6 digit OTP
         otp = str(random.randint(100000, 999999))
-
-        # Delete old OTPs for this email
         db.query(OTPCode).filter(OTPCode.email == email).delete()
         db.commit()
-
-        # Save new OTP
         otp_record = OTPCode(
             email=email,
             code=otp,
@@ -294,16 +324,8 @@ async def login(request: Request, req: LoginRequest, db: Session = Depends(get_d
         )
         db.add(otp_record)
         db.commit()
-
-        # Send OTP email
         await send_otp_email(user.name, email, otp)
-
-        # Return 2FA required signal
-        return {
-            "two_fa_required": True,
-            "email": email,
-            "message": f"OTP sent to {email}. Valid for 10 minutes."
-        }
+        return {"requires_otp": True, "email": email, "message": f"OTP sent to {email}. Valid for 10 minutes."}
 
     # ✅ Save login history
     user_agent = request.headers.get("user-agent", "Unknown")
@@ -313,80 +335,22 @@ async def login(request: Request, req: LoginRequest, db: Session = Depends(get_d
     db.add(history)
     db.commit()
 
-    # ✅ Send login alert
     await send_suspicious_login_alert(user.name, user.email, ip, device)
 
-    token = create_token({"sub": user.email, "name": user.name})
-    return {"token": token, "name": user.name, "email": user.email, "is_verified": True}
+    access_token = create_token({"sub": user.email, "name": user.name})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user_to_dict(user)
+    }
 
-# ===== VERIFY OTP =====
-@router.post("/verify-otp")
-@limiter.limit("5/minute")
-async def verify_otp(request: Request, req: OTPVerifyRequest, db: Session = Depends(get_db)):
-    email = req.email.lower().strip()
-
-    otp_record = db.query(OTPCode).filter(
-        OTPCode.email == email,
-        OTPCode.used == False
-    ).order_by(OTPCode.created_at.desc()).first()
-
-    if not otp_record:
-        raise HTTPException(status_code=400, detail="OTP not found. Please login again.")
-
-    if datetime.utcnow() > otp_record.expires_at:
-        raise HTTPException(status_code=400, detail="OTP expired. Please login again.")
-
-    if otp_record.code != req.otp.strip():
-        raise HTTPException(status_code=400, detail="Invalid OTP. Please try again.")
-
-    # ✅ Mark OTP used
-    otp_record.used = True
-    db.commit()
-
-    # ✅ Get user and create token
-    user = db.query(User).filter(User.email == email).first()
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    # Save login history
-    history = LoginHistory(
-        user_id=user.id,
-        email=user.email,
-        ip_address=request.client.host if request.client else "Unknown",
-        device="Unknown",
-        logged_in_at=datetime.utcnow()
-    )
-    db.add(history)
-    db.commit()
-
-    token = create_token({"sub": user.email, "name": user.name})
-    return {"token": token, "name": user.name, "email": user.email, "is_verified": True}
-
-# ===== TOGGLE 2FA =====
-@router.post("/toggle-2fa")
-def toggle_2fa(req: Toggle2FARequest, authorization: str = Header(None), db: Session = Depends(get_db)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    token = authorization.split(" ")[1]
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            raise HTTPException(status_code=404, detail="User not found")
-        user.two_fa_enabled = req.enable
-        db.commit()
-        return {"message": f"2FA {'enabled' if req.enable else 'disabled'} successfully!", "two_fa_enabled": req.enable}
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-# ===== SIGNUP =====
-@router.post("/signup")
+# ===== REGISTER =====
+@router.post("/register")
 @limiter.limit("3/minute")
-async def signup(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
+async def register(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
     existing = db.query(User).filter(User.email == req.email).first()
     if existing:
-        raise HTTPException(status_code=400, detail="Email already registered")
+        raise HTTPException(status_code=400, detail="Email already registered. Please login instead.")
     hashed = pwd_context.hash(req.password)
     user = User(name=req.name, email=req.email, hashed_password=hashed, is_verified=False, two_fa_enabled=False)
     db.add(user)
@@ -406,8 +370,61 @@ async def signup(request: Request, req: SignupRequest, db: Session = Depends(get
     await send_verification_email(user.name, user.email, vtoken_str)
     await send_welcome_email(user.name, user.email)
 
-    jwt_token = create_token({"sub": user.email, "name": user.name})
-    return {"token": jwt_token, "name": user.name, "email": user.email, "is_verified": False}
+    return {"message": "Account created! Please check your email to verify."}
+
+# ===== SIGNUP (alias for register) =====
+@router.post("/signup")
+@limiter.limit("3/minute")
+async def signup(request: Request, req: SignupRequest, db: Session = Depends(get_db)):
+    return await register(request, req, db)
+
+# ===== VERIFY OTP (2FA) =====
+@router.post("/verify-2fa")
+@limiter.limit("5/minute")
+async def verify_2fa(request: Request, req: OTPVerifyRequest, db: Session = Depends(get_db)):
+    email = req.email.lower().strip()
+
+    otp_record = db.query(OTPCode).filter(
+        OTPCode.email == email,
+        OTPCode.used == False
+    ).order_by(OTPCode.created_at.desc()).first()
+
+    if not otp_record:
+        raise HTTPException(status_code=400, detail="OTP not found. Please login again.")
+    if datetime.utcnow() > otp_record.expires_at:
+        raise HTTPException(status_code=400, detail="OTP expired. Please login again.")
+    if otp_record.code != req.otp.strip():
+        raise HTTPException(status_code=400, detail="Invalid OTP. Please try again.")
+
+    otp_record.used = True
+    db.commit()
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    history = LoginHistory(
+        user_id=user.id,
+        email=user.email,
+        ip_address=request.client.host if request.client else "Unknown",
+        device="Unknown",
+        logged_in_at=datetime.utcnow()
+    )
+    db.add(history)
+    db.commit()
+
+    access_token = create_token({"sub": user.email, "name": user.name})
+    return {
+        "access_token": access_token,
+        "token_type": "bearer",
+        "user": user_to_dict(user)
+    }
+
+# ===== VERIFY OTP (alias) =====
+@router.post("/verify-otp")
+@limiter.limit("5/minute")
+async def verify_otp(request: Request, req: OTPVerifyRequest, db: Session = Depends(get_db)):
+    return await verify_2fa(request, req, db)
 
 # ===== VERIFY EMAIL =====
 @router.get("/verify-email")
@@ -437,11 +454,11 @@ def verify_email(token: str, db: Session = Depends(get_db)):
     return HTMLResponse("""<html><body style="background:#06000f;display:flex;align-items:center;justify-content:center;height:100vh;font-family:sans-serif">
         <div style="text-align:center;color:#fff"><div style="font-size:48px">🎉</div>
         <h2 style="color:#34d399">Email Verified!</h2>
-        <p style="color:rgba(255,255,255,0.5);margin:8px 0 24px">Your account is verified. You can now login!</p>
+        <p style="color:rgba(255,255,255,0.5);margin:8px 0 24px">Your account is verified. Redirecting to login...</p>
         <a href="https://nerum.in" style="display:inline-block;padding:12px 28px;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;text-decoration:none;border-radius:20px;font-weight:700">
-                Go to Login →
-            </a>
-            <script>setTimeout(() => window.location.href = "https://nerum.in", 3000)</script>
+            Go to Login →
+        </a>
+        <script>setTimeout(() => window.location.href = "https://nerum.in", 3000)</script>
         </div></body></html>""")
 
 # ===== RESEND VERIFICATION =====
@@ -460,25 +477,38 @@ async def resend_verification(data: dict, db: Session = Depends(get_db)):
     await send_verification_email(user.name, email, vtoken_str)
     return {"message": "Verification email sent!"}
 
+# ===== RESEND OTP =====
+@router.post("/resend-otp")
+@limiter.limit("3/minute")
+async def resend_otp(request: Request, data: dict, db: Session = Depends(get_db)):
+    email = data.get("email", "").lower().strip()
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    otp = str(random.randint(100000, 999999))
+    db.query(OTPCode).filter(OTPCode.email == email).delete()
+    db.commit()
+    otp_record = OTPCode(email=email, code=otp, expires_at=datetime.utcnow() + timedelta(minutes=10), used=False)
+    db.add(otp_record)
+    db.commit()
+    await send_otp_email(user.name, email, otp)
+    return {"message": "OTP resent!"}
+
+# ===== TOGGLE 2FA =====
+@router.post("/toggle-2fa")
+def toggle_2fa(req: Toggle2FARequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    user.two_fa_enabled = req.enabled
+    db.commit()
+    return {"message": f"2FA {'enabled' if req.enabled else 'disabled'} successfully!", "two_fa_enabled": req.enabled}
+
 # ===== LOGIN HISTORY =====
 @router.get("/login-history")
-def get_login_history(authorization: str = Header(None), db: Session = Depends(get_db)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    token = authorization.split(" ")[1]
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        email = payload.get("sub")
-        user = db.query(User).filter(User.email == email).first()
-        if not user:
-            raise HTTPException(status_code=401, detail="User not found")
-        history = db.query(LoginHistory).filter(LoginHistory.user_id == user.id).order_by(LoginHistory.logged_in_at.desc()).limit(10).all()
-        return {
-            "history": [{"ip_address": h.ip_address, "device": h.device, "logged_in_at": h.logged_in_at.isoformat()} for h in history],
-            "two_fa_enabled": getattr(user, 'two_fa_enabled', False)
-        }
-    except JWTError:
-        raise HTTPException(status_code=401, detail="Invalid token")
+def get_login_history(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
+    history = db.query(LoginHistory).filter(LoginHistory.user_id == user.id).order_by(LoginHistory.logged_in_at.desc()).limit(10).all()
+    return {
+        "history": [{"ip_address": h.ip_address, "device": h.device, "logged_in_at": h.logged_in_at.isoformat()} for h in history],
+        "two_fa_enabled": getattr(user, 'two_fa_enabled', False)
+    }
 
 # ===== GOOGLE OAUTH =====
 @router.get("/google")
@@ -490,35 +520,38 @@ def google_login():
 @router.get("/google/callback")
 async def google_callback(code: str, db: Session = Depends(get_db)):
     async with httpx.AsyncClient() as client:
-        token_res = await client.post("https://oauth2.googleapis.com/token", data={"code": code, "client_id": GOOGLE_CLIENT_ID, "client_secret": GOOGLE_CLIENT_SECRET, "redirect_uri": GOOGLE_REDIRECT_URI, "grant_type": "authorization_code"})
+        token_res = await client.post(
+            "https://oauth2.googleapis.com/token",
+            data={"code": code, "client_id": GOOGLE_CLIENT_ID, "client_secret": GOOGLE_CLIENT_SECRET, "redirect_uri": GOOGLE_REDIRECT_URI, "grant_type": "authorization_code"}
+        )
         access_token = token_res.json().get("access_token")
         user_res = await client.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access_token}"})
         user_info = user_res.json()
 
     email = user_info.get("email")
     name = user_info.get("name", email)
+
+    if not email:
+        return RedirectResponse("/?error=Google+login+failed")
+
     user = db.query(User).filter(User.email == email).first()
 
     if not user:
-        user = User(name=name, email=email, hashed_password=pwd_context.hash(os.urandom(32).hex()), is_verified=False, two_fa_enabled=False)
+        user = User(
+            name=name, email=email,
+            hashed_password=pwd_context.hash(os.urandom(32).hex()),
+            is_verified=True,
+            two_fa_enabled=False
+        )
         db.add(user)
         db.commit()
         db.refresh(user)
-        vtoken_str = secrets.token_urlsafe(32)
-        vtoken = EmailVerificationToken(email=email, token=vtoken_str, expires_at=datetime.utcnow() + timedelta(hours=24), used=False)
-        db.add(vtoken)
-        db.commit()
-        await send_verification_email(name, email, vtoken_str)
         await send_welcome_email(name, email)
-        return RedirectResponse(f"/?verify_pending=true&email={email}&name={name}")
 
+    # ✅ Always mark Google users as verified
     if not getattr(user, 'is_verified', True):
-        vtoken_str = secrets.token_urlsafe(32)
-        vtoken = EmailVerificationToken(email=email, token=vtoken_str, expires_at=datetime.utcnow() + timedelta(hours=24), used=False)
-        db.add(vtoken)
+        user.is_verified = True
         db.commit()
-        await send_verification_email(name, email, vtoken_str)
-        return RedirectResponse(f"/?verify_pending=true&email={email}&name={name}")
 
     token = create_token({"sub": user.email, "name": user.name})
     return RedirectResponse(f"/?token={token}&name={name}")
