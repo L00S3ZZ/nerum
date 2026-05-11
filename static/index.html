@@ -1,865 +1,579 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Nerum — AI Workflow Automation</title>
-<link rel="stylesheet" href="/static/style.css?v=6"/>
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="/static/chatbot.js"></script>
-<link rel="icon" type="image/png" href="/static/Nerumlogo.png"/>
-
-<style>
-#main-nav, .nav {
-  position: fixed !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  z-index: 99999 !important;
-  background: rgba(4,0,14,0.97) !important;
-  backdrop-filter: blur(20px) !important;
-  -webkit-backdrop-filter: blur(20px) !important;
-  border-bottom: 1px solid rgba(232,121,249,0.15) !important;
-  height: 64px !important;
-  display: flex !important;
-  align-items: center !important;
-  justify-content: space-between !important;
-  padding: 0 40px !important;
-}
-
-#landing-page.hidden {
-  display: none !important;
-  visibility: hidden !important;
-  height: 0 !important;
-  overflow: hidden !important;
-  position: fixed !important;
-  pointer-events: none !important;
-}
-#landing-page.hidden * {
-  animation-play-state: paused !important;
-}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nerum — Automate Smarter with AI</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-<body class="dark">
-<canvas id="nebula-canvas" style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0"></canvas>
+<body>
 
-<!-- ==================== LANDING PAGE ==================== -->
-<div id="landing-page">
+  <!-- Custom cursor -->
+  <div class="cursor" id="cursor">
+    <div class="cursor-dot"></div>
+    <div class="cursor-ring"></div>
+  </div>
 
-  <!-- NAVBAR -->
-  <nav class="nav" id="main-nav">
-    <div class="nav-logo">
-      <img src="/static/Nerumlogo.png" height="48" style="vertical-align:middle;margin-right:4px" onerror="this.style.display='none'"/>
-      <span style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum</span>
-    </div>
-    <div class="nav-links">
-      <a class="nav-link lp-link" href="#lp-integrations">Integrations</a>
-      <a class="nav-link lp-link" href="#lp-demo">Sample</a>
-      <a class="nav-link lp-link" href="#lp-pricing">Pricing</a>
-    </div>
-    <div class="nav-btns">
-      <button class="nav-login-btn" onclick="showAuthPopup()">Login</button>
-      <button class="nav-signup-btn" onclick="showAuthPopup()">Get Started Free →</button>
+  <!-- Scroll progress -->
+  <div class="scroll-progress" id="scrollProgress"></div>
+
+  <!-- Background logo watermark -->
+  <div class="bg-logo" aria-hidden="true"></div>
+
+  <!-- Ambient background layers -->
+  <div class="ambient">
+    <div class="aurora aurora-1"></div>
+    <div class="aurora aurora-2"></div>
+    <div class="aurora aurora-3"></div>
+    <div class="grid-floor"></div>
+    <div class="noise"></div>
+    <canvas id="starfield"></canvas>
+  </div>
+
+  <!-- Kolam-inspired ornament marker (corner) -->
+  <svg class="kolam-mark" viewBox="0 0 80 80" aria-hidden="true">
+    <g fill="none" stroke="currentColor" stroke-width="0.6">
+      <circle cx="40" cy="40" r="36" />
+      <circle cx="40" cy="40" r="24" />
+      <circle cx="40" cy="40" r="12" />
+      <path d="M40 4 L40 76 M4 40 L76 40 M14 14 L66 66 M66 14 L14 66" />
+      <circle cx="40" cy="4" r="1.5" fill="currentColor" />
+      <circle cx="40" cy="76" r="1.5" fill="currentColor" />
+      <circle cx="4" cy="40" r="1.5" fill="currentColor" />
+      <circle cx="76" cy="40" r="1.5" fill="currentColor" />
+    </g>
+  </svg>
+
+  <!-- ============= NAV ============= -->
+  <nav class="nav" id="nav">
+    <a class="nav-brand" href="#top">
+      <span class="brand-mark">
+        <img src="nerum-logo-transparent.png" alt="Nerum"/>
+      </span>
+      <span class="brand-word">Nerum</span>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#integrations" data-magnet>Integrations</a></li>
+      <li><a href="#workflow" data-magnet>Workflows</a></li>
+      <li><a href="#demo" data-magnet>Demo</a></li>
+      <li><a href="#pricing" data-magnet>Pricing</a></li>
+    </ul>
+    <div class="nav-actions">
+      <a class="btn-ghost" href="#" data-magnet id="nav-login-btn" onclick="openModal('loginModal')">Login</a>
+      <a class="btn-primary" href="#" data-magnet id="nav-signup-btn" onclick="openModal('signupModal')">
+        <span>Start free</span>
+        <span class="arrow">→</span>
+      </a>
     </div>
   </nav>
 
-  <!-- ===== 3D CINEMATIC HERO ===== -->
-  <div id="lp-3d-wrap" style="position:relative;">
-    <div style="height:700vh;position:relative;padding-top:64px;" id="lp-scroll-space">
-      <div id="lp-sticky" style="position:sticky;top:0;height:100vh;overflow:hidden;">
-        <canvas id="lp-3d-canvas" style="position:absolute;inset:0;width:100%;height:100%;display:block;z-index:1;"></canvas>
+  <!-- ============= HERO ============= -->
+  <section class="hero" id="top">
+    <div class="hero-glow hero-glow-a"></div>
+    <div class="hero-glow hero-glow-b"></div>
 
-        <div id="lp-hero-text" style="
-          position:absolute;left:60px;top:80px;
-          z-index:10;pointer-events:none;
-          animation:lpFadeUp 1.2s 0.6s ease forwards;opacity:0;padding-top:64px;
-        ">
-          <div style="font-size:10px;letter-spacing:4px;color:rgba(232,121,249,0.8);font-family:monospace;text-transform:uppercase;margin-bottom:14px;
-            padding:4px 12px;border-radius:20px;border:1px solid rgba(232,121,249,0.2);background:rgba(232,121,249,0.05);display:inline-block;">
-            AI Workflow Platform · India 🇮🇳
+    <div class="hero-inner">
+
+      <!-- LEFT -->
+      <div class="hero-left">
+        <div class="eyebrow">
+          <span class="dot"></span>
+          AI Workflow Platform
+        </div>
+        <h1 class="hero-title reveal">
+          <span class="line"><span class="word">Automate</span></span>
+          <span class="line"><span class="word grad">Smarter</span></span>
+          <span class="line"><span class="word">with <span class="grad-alt">AI.</span></span></span>
+        </h1>
+        <p class="hero-sub reveal">
+          Build intelligent workflows with futuristic automation powered by Nerum.
+          Connect Gmail, WhatsApp, Telegram and Sheets — type what you want in
+          <span class="hl">Tamil</span> or <span class="hl">English</span>.
+        </p>
+
+        <div class="hero-cta reveal">
+          <a class="btn-primary big" href="#" data-magnet onclick="openModal('signupModal')">
+            <span>Start free</span>
+            <span class="arrow">→</span>
+          </a>
+          <a class="btn-glass" href="#demo" data-magnet>
+            <span class="play">▶</span>
+            <span>Watch demo</span>
+          </a>
+        </div>
+
+        <ul class="hero-checks reveal">
+          <li><span>✓</span> No credit card</li>
+          <li><span>✓</span> Free forever</li>
+          <li><span>✓</span> Tamil + English AI</li>
+          <li><span>✓</span> 5 min setup</li>
+        </ul>
+
+        <!-- Bilingual prompt console -->
+        <div class="prompt-console reveal" aria-hidden="true">
+          <div class="pc-head">
+            <span class="pc-dot r"></span><span class="pc-dot y"></span><span class="pc-dot g"></span>
+            <span class="pc-title">nerum · ai-builder</span>
+            <span class="pc-blink">REC</span>
           </div>
-          <h1 style="font-size:58px;font-weight:900;letter-spacing:-3px;line-height:1.0;margin-bottom:18px;max-width:580px;color:#fff;">
-            Automate your<br/>business with<br/>
-            <span style="background:linear-gradient(135deg,#e879f9,#818cf8,#34d399);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">AI workflows</span>
-          </h1>
-          <p style="font-size:14px;color:rgba(255,255,255,0.4);line-height:1.8;max-width:360px;margin-bottom:30px;">
-            Connect Gmail, WhatsApp, Telegram and Google Sheets.<br/>
-            Type what you want in Tamil or English.
-          </p>
-          <div style="display:flex;gap:10px;margin-bottom:18px;pointer-events:all;">
-            <button onclick="showAuthPopup()" style="padding:13px 28px;border-radius:30px;font-size:13px;font-weight:700;color:#fff;border:none;cursor:pointer;font-family:inherit;background:linear-gradient(135deg,#e879f9,#818cf8);box-shadow:0 0 30px rgba(232,121,249,0.4);transition:all 0.2s;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">Start for free →</button>
-            <button onclick="document.getElementById('lp-demo').scrollIntoView({behavior:'smooth'})" style="padding:13px 28px;border-radius:30px;font-size:13px;font-weight:600;color:rgba(255,255,255,0.6);border:1px solid rgba(255,255,255,0.15);cursor:pointer;font-family:inherit;background:transparent;transition:all 0.2s;">Watch demo ↓</button>
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:8px;">
-            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ No credit card</span>
-            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ Free forever</span>
-            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ Tamil + English AI</span>
-            <span style="font-size:10px;padding:4px 12px;border-radius:20px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.35);">✓ 5 min setup</span>
-          </div>
-        </div>
-
-        <!-- Integration name display -->
-        <div id="lp-int-info" style="position:absolute;right:60px;top:50%;transform:translateY(-50%);z-index:10;text-align:right;pointer-events:none;">
-          <div style="font-size:22px;font-weight:800;color:#fff;margin-bottom:4px;" id="lp-int-name">Gmail</div>
-          <div style="font-size:11px;color:rgba(255,255,255,0.35);font-family:monospace;" id="lp-int-desc">Send automated emails</div>
-        </div>
-
-        <!-- Progress -->
-        <div style="position:absolute;bottom:60px;right:60px;z-index:10;text-align:right;">
-          <div id="lp-prog-pct" style="font-size:9px;color:rgba(255,255,255,0.2);font-family:monospace;letter-spacing:1px;">0%</div>
-        </div>
-
-        <!-- SCROLL HINT -->
-        <div style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:10;text-align:center;animation:lpBlink 2s ease-in-out infinite;" id="lp-scroll-hint">
-          <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.2);font-family:monospace;">↓ SCROLL TO FLY THROUGH</div>
-        </div>
-
-        <!-- TOOLTIP -->
-        <div id="lp-tooltip" style="position:fixed;background:rgba(2,0,10,0.97);border:1px solid rgba(232,121,249,0.4);border-radius:10px;padding:8px 16px;font-size:12px;font-weight:700;color:#fff;pointer-events:none;opacity:0;transition:opacity 0.15s;z-index:999;white-space:nowrap;box-shadow:0 0 30px rgba(232,121,249,0.15);"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== DEMO VIDEO SECTION ===== -->
-  <section id="lp-demo" style="padding:120px 60px;text-align:center;background:#02000a;position:relative;">
-    <div style="position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(109,28,217,0.12) 0%,transparent 70%);pointer-events:none;"></div>
-    <div class="lp-reveal" style="position:relative;z-index:1;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">See it in action</div>
-      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Watch how <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Nerum works</span></h2>
-      <p style="font-size:13px;color:rgba(255,255,255,0.3);margin-bottom:48px;">Automate WhatsApp, Gmail & more in under 2 minutes</p>
-      <div style="max-width:900px;margin:0 auto;border-radius:24px;border:1px solid rgba(232,121,249,0.12);background:rgba(255,255,255,0.02);aspect-ratio:16/9;position:relative;overflow:hidden;box-shadow:0 0 80px rgba(232,121,249,0.07),0 60px 120px rgba(0,0,0,0.5);">
-        <div style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:radial-gradient(ellipse at center,rgba(109,28,217,0.12) 0%,transparent 70%);">
-          <div onclick="alert('Demo video coming soon! 🎬')" style="width:80px;height:80px;border-radius:50%;cursor:pointer;background:linear-gradient(135deg,#e879f9,#818cf8);display:flex;align-items:center;justify-content:center;box-shadow:0 0 50px rgba(232,121,249,0.5);animation:lpFloat 3s ease-in-out infinite;transition:transform 0.3s;" onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='none'">
-            <svg width="30" height="30" viewBox="0 0 24 24" fill="white" style="margin-left:4px"><path d="M5 3l14 9-14 9V3z"/></svg>
-          </div>
-          <div style="font-size:20px;font-weight:800;color:#fff;">Nerum Demo Video</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.3);">Full walkthrough — workflows, integrations, AI builder</div>
-          <div style="font-size:10px;color:rgba(232,121,249,0.4);font-family:monospace;padding:4px 14px;border-radius:20px;border:1px dashed rgba(232,121,249,0.2);">📹 Video uploading soon</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== INTEGRATIONS GRID ===== -->
-  <section id="lp-integrations" style="padding:120px 60px;background:#02000a;">
-    <div class="lp-reveal" style="text-align:center;margin-bottom:56px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">Integrations</div>
-      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Everything connected <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">in one place</span></h2>
-      <p style="font-size:13px;color:rgba(255,255,255,0.3);">12 integrations. One platform. Built for Indian businesses.</p>
-    </div>
-    <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto;">
-      <div class="lp-int-card" style="--col:#EA4335"><div class="lic-icon">📧</div><div class="lic-name">Gmail</div><div class="lic-desc">Send automated emails instantly</div></div>
-      <div class="lp-int-card" style="--col:#25D366"><div class="lic-icon">💬</div><div class="lic-name">WhatsApp</div><div class="lic-desc">Message any number via Twilio</div></div>
-      <div class="lp-int-card" style="--col:#2AABEE"><div class="lic-icon">✈️</div><div class="lic-name">Telegram</div><div class="lic-desc">Bot notifications instantly</div></div>
-      <div class="lp-int-card" style="--col:#34A853"><div class="lic-icon">📊</div><div class="lic-name">Google Sheets</div><div class="lic-desc">Append rows live in real time</div></div>
-      <div class="lp-int-card" style="--col:#818cf8"><div class="lic-icon">🤖</div><div class="lic-name">AI Builder</div><div class="lic-desc">Tamil + English workflow builder</div></div>
-      <div class="lp-int-card" style="--col:#e879f9"><div class="lic-icon">🔗</div><div class="lic-name">Webhooks</div><div class="lic-desc">Connect any external service</div></div>
-      <div class="lp-int-card" style="--col:#2563EB"><div class="lic-icon">💳</div><div class="lic-name">Razorpay</div><div class="lic-desc">Trigger on payment capture</div></div>
-      <div class="lp-int-card" style="--col:#f59e0b"><div class="lic-icon">📋</div><div class="lic-name">Smart Lists</div><div class="lic-desc">Bulk scheduled messaging</div></div>
-      <div class="lp-int-card" style="--col:#9333ea"><div class="lic-icon">📝</div><div class="lic-name">Google Forms</div><div class="lic-desc">Trigger on form submissions</div></div>
-      <div class="lp-int-card" style="--col:#34d399"><div class="lic-icon">⏰</div><div class="lic-name">Scheduler</div><div class="lic-desc">Cron-based timed automation</div></div>
-      <div class="lp-int-card" style="--col:#4285F4"><div class="lic-icon">🔐</div><div class="lic-name">Google OAuth</div><div class="lic-desc">Secure Google authentication</div></div>
-      <div class="lp-int-card" style="--col:#06b6d4"><div class="lic-icon">⚡</div><div class="lic-name">REST API</div><div class="lic-desc">Full API access for developers</div></div>
-    </div>
-  </section>
-
-  <!-- ===== HOW IT WORKS ===== -->
-  <section style="padding:120px 60px;text-align:center;background:#02000a;">
-    <div class="lp-reveal">
-      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">How it works</div>
-      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:48px;color:#fff;">3 steps to <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">automate anything</span></h2>
-      <div style="display:flex;align-items:center;justify-content:center;gap:0;max-width:800px;margin:0 auto;">
-        <div class="lp-step-card"><div class="lp-step-num">01</div><div class="lp-step-title">Sign up free</div><div class="lp-step-desc">Create your account in seconds with Google or email. No credit card needed.</div></div>
-        <div style="font-size:24px;padding:0 20px;color:rgba(255,255,255,0.15);">→</div>
-        <div class="lp-step-card"><div class="lp-step-num">02</div><div class="lp-step-title">Tell the AI</div><div class="lp-step-desc">Type what you want to automate in Tamil or English. Nerum AI understands!</div></div>
-        <div style="font-size:24px;padding:0 20px;color:rgba(255,255,255,0.15);">→</div>
-        <div class="lp-step-card"><div class="lp-step-num">03</div><div class="lp-step-title">It runs itself</div><div class="lp-step-desc">Your workflow runs automatically. Get notified when it executes!</div></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- ===== PRICING ===== -->
-  <section id="lp-pricing" style="padding:120px 60px;background:#02000a;">
-    <div class="lp-reveal" style="text-align:center;margin-bottom:56px;">
-      <div style="font-size:10px;letter-spacing:3px;color:#e879f9;font-family:monospace;text-transform:uppercase;margin-bottom:10px;">Pricing</div>
-      <h2 style="font-size:36px;font-weight:900;letter-spacing:-1px;margin-bottom:8px;color:#fff;">Simple, <span style="background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;">honest pricing</span></h2>
-      <p style="font-size:13px;color:rgba(255,255,255,0.3);">Start free. Upgrade when you're ready. Cancel anytime.</p>
-    </div>
-    <div class="lp-reveal" style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;max-width:1000px;margin:0 auto;">
-      <div class="lp-plan-card">
-        <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.35);margin-bottom:8px;letter-spacing:1px;">FREE</div>
-        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹0<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">Perfect to get started</div>
-        <div class="lp-feat">3 Workflows</div>
-        <div class="lp-feat">1,000 AI tokens</div>
-        <div class="lp-feat">All integrations</div>
-        <div class="lp-feat lp-feat-no">Priority support</div>
-        <button class="lp-plan-btn" style="background:transparent;border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.35);" onclick="showAuthPopup()">Get started free</button>
-      </div>
-      <div class="lp-plan-card" style="border-color:#818cf8;border-width:2px;background:rgba(129,140,248,0.04);">
-        <div style="position:absolute;top:-12px;left:50%;transform:translateX(-50%);font-size:9px;padding:4px 14px;border-radius:20px;background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;font-weight:700;white-space:nowrap;">MOST POPULAR</div>
-        <div style="font-size:11px;font-weight:700;color:#818cf8;margin-bottom:8px;letter-spacing:1px;">STARTER</div>
-        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹799<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For growing businesses</div>
-        <div class="lp-feat">10 Workflows</div>
-        <div class="lp-feat">1,000 AI tokens</div>
-        <div class="lp-feat">All integrations</div>
-        <div class="lp-feat">Email support</div>
-        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#818cf8,#34d399);color:#fff;box-shadow:0 0 20px rgba(129,140,248,0.25);" onclick="showAuthPopup()">Get Starter</button>
-      </div>
-      <div class="lp-plan-card">
-        <div style="font-size:11px;font-weight:700;color:#34d399;margin-bottom:8px;letter-spacing:1px;">PRO</div>
-        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹1,399<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For power users</div>
-        <div class="lp-feat">50 Workflows</div>
-        <div class="lp-feat">1,000 AI tokens</div>
-        <div class="lp-feat">Priority support</div>
-        <div class="lp-feat">Advanced analytics</div>
-        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#34d399,#059669);color:#fff;" onclick="showAuthPopup()">Get Pro</button>
-      </div>
-      <div class="lp-plan-card">
-        <div style="font-size:11px;font-weight:700;color:#fbbf24;margin-bottom:8px;letter-spacing:1px;">BUSINESS</div>
-        <div style="font-size:34px;font-weight:900;margin-bottom:6px;color:#fff;">₹3,499<small style="font-size:12px;font-weight:400;opacity:0.35;">/mo</small></div>
-        <div style="font-size:11px;color:rgba(255,255,255,0.25);margin-bottom:16px;padding-bottom:14px;border-bottom:1px solid rgba(255,255,255,0.05);">For teams & agencies</div>
-        <div class="lp-feat">Unlimited Workflows</div>
-        <div class="lp-feat">1,000 AI tokens</div>
-        <div class="lp-feat">Dedicated support</div>
-        <div class="lp-feat">Custom integrations</div>
-        <button class="lp-plan-btn" style="background:linear-gradient(135deg,#fbbf24,#f59e0b);color:#0f0a00;" onclick="showAuthPopup()">Get Business</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- FOOTER -->
-  <footer class="footer">
-    <div style="font-size:20px;font-weight:900;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;">Nerum</div>
-    <div style="font-size:11px;color:rgba(255,255,255,0.2);margin-bottom:16px;">AI Workflow Automation · Built in Chennai 🇮🇳</div>
-    <div class="footer-links">
-      <a class="footer-link lp-link" href="#lp-integrations">Integrations</a>
-      <a class="footer-link lp-link" href="#lp-demo">Sample</a>
-      <a class="footer-link lp-link" href="#lp-pricing">Pricing</a>
-      <a class="footer-link" href="/privacy">Privacy</a>
-      <a class="footer-link" href="/terms">Terms</a>
-    </div>
-    <div class="footer-copy">© 2026 Nerum. All rights reserved.</div>
-  </footer>
-
-</div>
-<!-- ==================== END LANDING PAGE ==================== -->
-
-<!-- AUTH POPUP -->
-<div id="auth-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:2000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-  <div style="width:100%;max-width:420px;margin:20px;animation:slideUp 0.3s ease">
-    <div id="auth-popup-box">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-        <div class="auth-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-        <button onclick="hideAuthPopup()" style="background:transparent;border:none;cursor:pointer;font-size:20px;opacity:0.5;color:inherit">✕</button>
-      </div>
-      <div class="auth-sub">AI workflow automation platform</div>
-      <a href="/auth/google" class="google-btn"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M17.5 9.2c0-.6-.1-1.2-.2-1.8H9v3.4h4.8a4.1 4.1 0 01-1.8 2.7v2.2h2.9c1.7-1.6 2.6-3.9 2.6-6.5z" fill="#4285F4"/><path d="M9 18c2.4 0 4.4-.8 5.9-2.1l-2.9-2.2c-.8.5-1.8.8-3 .8-2.3 0-4.3-1.6-5-3.7H1v2.3A9 9 0 009 18z" fill="#34A853"/><path d="M4 10.8a5.4 5.4 0 010-3.5V5H1a9 9 0 000 8l3-2.2z" fill="#FBBC05"/><path d="M9 3.6c1.3 0 2.5.4 3.4 1.3l2.5-2.5A9 9 0 001 5l3 2.3C4.7 5.1 6.7 3.6 9 3.6z" fill="#EA4335"/></svg>Continue with Google</a>
-      <div class="auth-divider"><div class="div-line"></div><span class="div-text">or</span><div class="div-line"></div></div>
-      <div class="auth-tabs"><button class="auth-tab active" onclick="switchTab('login')">Login</button><button class="auth-tab" onclick="switchTab('signup')">Sign up</button></div>
-      <div id="auth-error" class="auth-error"></div>
-      <div id="login-form">
-        <div class="form-group"><label>EMAIL</label><input type="email" id="login-email" placeholder="you@example.com"/></div>
-        <div class="form-group"><label>PASSWORD</label><input type="password" id="login-password" placeholder="••••••••"/></div>
-        <button class="auth-btn" onclick="doLogin()">Login to Nerum</button>
-        <div class="auth-switch">Don't have an account? <span onclick="switchTab('signup')">Sign up free</span></div>
-      </div>
-      <div id="signup-form" style="display:none">
-        <div class="form-group"><label>FULL NAME</label><input type="text" id="signup-name" placeholder="Your name"/></div>
-        <div class="form-group"><label>EMAIL</label><input type="email" id="signup-email" placeholder="you@example.com"/></div>
-        <div class="form-group">
-          <label>PASSWORD</label>
-          <input type="password" id="signup-password" placeholder="Min 6 characters" oninput="checkPasswordStrength(this.value)"/>
-          <div id="strength-bar-wrap" style="margin-top:6px;display:none">
-            <div style="height:3px;border-radius:10px;background:rgba(255,255,255,0.08);overflow:hidden"><div id="strength-bar" style="height:100%;border-radius:10px;transition:all 0.3s;width:0%"></div></div>
-            <div id="strength-text" style="font-size:10px;margin-top:4px"></div>
-          </div>
-        </div>
-        <button class="auth-btn" onclick="doSignup()">Create account</button>
-        <div class="auth-switch">Already have an account? <span onclick="switchTab('login')">Login</span></div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- LOADING SCREEN -->
-<div id="loading-screen">
-  <div class="load-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-  <div class="load-tag">AI WORKFLOW PLATFORM</div>
-  <div class="load-dots"><div class="load-dot"></div><div class="load-dot"></div><div class="load-dot"></div></div>
-  <div class="load-text" id="loading-text">Starting up...</div>
-</div>
-
-<!-- ONBOARDING -->
-<div class="onboarding" id="onboarding" style="display:none">
-  <div class="ob-box">
-    <div class="ob-logo"><span class="a">Ne</span><span class="b">rum</span></div>
-    <div id="ob-step1">
-      <div class="ob-welcome" id="ob-welcome-name">Welcome! 👋</div>
-      <div class="ob-sub">Let's set up Nerum just for you</div>
-      <div class="progress">
-        <div class="prog-step"><div class="prog-dot current">1</div><span class="prog-label current">Theme</span></div>
-        <div class="prog-line"></div>
-        <div class="prog-step"><div class="prog-dot">2</div><span class="prog-label">Language</span></div>
-        <div class="prog-line"></div>
-        <div class="prog-step"><div class="prog-dot">3</div><span class="prog-label">Ready</span></div>
-      </div>
-      <div class="ob-section">Choose your theme</div>
-      <div class="ob-grid">
-        <div class="ob-card selected" id="ob-dark" onclick="selectTheme('dark')">
-          <div class="ob-preview"><div class="preview-dark-wrap"><div class="pd-sb"></div><div class="pd-main"><div class="pd-top"></div><div class="pd-card"></div><div class="pd-bottom"><div class="pd-p"></div><div class="pd-p"></div></div></div></div></div>
-          <div class="ob-name">Dark</div><div class="ob-desc">Aurora — Purple & Green</div>
-          <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        </div>
-        <div class="ob-card" id="ob-light" onclick="selectTheme('light')">
-          <div class="ob-preview"><div class="preview-light-wrap"><div class="pl-sb"></div><div class="pl-main"><div class="pl-top"></div><div class="pl-card"></div><div class="pl-bottom"><div class="pl-p"></div><div class="pl-p"></div></div></div></div></div>
-          <div class="ob-name">Light</div><div class="ob-desc">Arctic Ice — Blue & White</div>
-          <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        </div>
-      </div>
-      <div class="ob-btn-row"><div></div><button class="ob-btn-next" onclick="obStep(2)">Next →</button></div>
-    </div>
-    <div id="ob-step2" style="display:none">
-      <div class="ob-welcome">Choose your language</div>
-      <div class="ob-sub">Nerum speaks Tamil and English</div>
-      <div class="progress">
-        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Theme</span></div>
-        <div class="prog-line done"></div>
-        <div class="prog-step"><div class="prog-dot current">2</div><span class="prog-label current">Language</span></div>
-        <div class="prog-line"></div>
-        <div class="prog-step"><div class="prog-dot">3</div><span class="prog-label">Ready</span></div>
-      </div>
-      <div class="ob-section">Choose your language</div>
-      <div class="ob-grid">
-        <div class="ob-card selected" id="ob-en" onclick="selectLang('english')">
-          <div class="lang-flag">🇬🇧</div><div class="ob-name">English</div><div class="lang-native">English</div>
-          <div class="lang-sample">"Send WhatsApp on form submit"</div>
-          <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        </div>
-        <div class="ob-card" id="ob-ta" onclick="selectLang('tamil')">
-          <div class="lang-flag">🇮🇳</div><div class="ob-name">Tamil</div><div class="lang-native">தமிழ்</div>
-          <div class="lang-sample">"Form submit ஆனா WhatsApp அனுப்பு"</div>
-          <div class="ob-check"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div>
-        </div>
-      </div>
-      <div class="ob-btn-row">
-        <button class="ob-btn-back" onclick="obStep(1)">← Back</button>
-        <button class="ob-btn-next" onclick="obStep(3)">Next →</button>
-      </div>
-    </div>
-    <div id="ob-step3" style="display:none">
-      <div class="ob-welcome">You're all set! 🎉</div>
-      <div class="ob-sub">Here's your Nerum setup</div>
-      <div class="progress">
-        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Theme</span></div>
-        <div class="prog-line done"></div>
-        <div class="prog-step"><div class="prog-dot done"><svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2 5l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></svg></div><span class="prog-label done">Language</span></div>
-        <div class="prog-line done"></div>
-        <div class="prog-step"><div class="prog-dot current">3</div><span class="prog-label current">Ready</span></div>
-      </div>
-      <div class="ob-summary">
-        <div class="ob-sum-row"><span class="ob-sum-key">Name</span><div style="display:flex;align-items:center;gap:8px"><span class="ob-sum-val" id="sum-name">—</span><span id="name-edit-btn" onclick="editName()" style="font-size:9px;cursor:pointer;padding:2px 8px;border-radius:10px;background:rgba(129,140,248,0.1);color:#818cf8;border:1px solid rgba(129,140,248,0.2)">Edit</span></div></div>
-        <div id="name-edit-row" style="display:none;padding:8px 0"><input id="name-edit-input" class="name-edit-input" placeholder="Enter your name"/><div class="name-edit-btns"><button class="name-save-btn" onclick="saveName()">Save</button><button class="name-cancel-btn" onclick="cancelEdit()">Cancel</button></div></div>
-        <div class="ob-sum-row"><span class="ob-sum-key">Theme</span><span class="ob-sum-val" id="sum-theme">Dark — Aurora</span></div>
-        <div class="ob-sum-row"><span class="ob-sum-key">Language</span><span class="ob-sum-val" id="sum-lang">English</span></div>
-        <div class="ob-sum-row"><span class="ob-sum-key">Plan</span><span class="ob-sum-val">Free</span></div>
-        <div class="ob-sum-row"><span class="ob-sum-key">AI Builder</span><span class="ob-sum-val">Tamil + English ✓</span></div>
-      </div>
-      <div class="ob-hint">You can change these anytime in Settings</div>
-      <div class="ob-btn-row">
-        <button class="ob-btn-back" onclick="obStep(2)">← Back</button>
-        <button class="ob-btn-next" onclick="startDashboard()">Go to Dashboard →</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- DASHBOARD -->
-<div class="dashboard" id="dashboard" style="display:none">
-  <div class="layout">
-    <div class="sidebar new-sidebar">
-      <div class="sb-diag-bg"></div>
-      <div class="sb-inner-wrap">
-        <div class="sb-brand">
-          <img src="/static/Nerumlogo.png" class="sb-logo-img" alt="Nerum"/>
-          <div class="sb-logo-text">Nerum</div>
-        </div>
-        <div class="sb-nav">
-          <div class="sb-section">Main</div>
-          <div class="sb-item active" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="layout-dashboard" style="width:14px;height:14px"></i></div>Dashboard</div>
-          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="zap" style="width:14px;height:14px"></i></div>Workflows<span class="sb-badge" id="wf-badge">0</span></div>
-          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="history" style="width:14px;height:14px"></i></div>Service History</div>
-          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="list" style="width:14px;height:14px"></i></div>Smart Lists</div>
-<div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="bot" style="width:14px;height:14px"></i></div>Chatbots</div>
-          <div class="sb-section">Account</div>
-          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="credit-card" style="width:14px;height:14px"></i></div>Billing</div>
-          <div class="sb-item" onclick="setActive(this)"><div class="sb-icon"><i data-lucide="settings" style="width:14px;height:14px"></i></div>Settings</div>
-        </div>
-        <div class="sb-usercard">
-          <div class="sb-uc-row"><div class="sb-avatar" id="sb-initials">SR</div><div class="sb-uc-info"><div class="sb-uname" id="sb-name">Srihari</div><div class="sb-plan">Free plan</div></div></div>
-          <div class="sb-uc-live"><div class="sb-live-dot"></div><div class="sb-live-txt">API LIVE</div></div>
-          <button class="sb-logout" onclick="doLogout()">Logout</button>
-        </div>
-      </div>
-    </div>
-    <div class="main">
-      <div class="topbar">
-        <div><div class="tb-title" id="tb-title">Dashboard</div><div class="tb-sub">Welcome back, <span id="tb-name">Srihari</span></div></div>
-        <div class="tb-right">
-          <div class="theme-switch" onclick="toggleTheme()" id="theme-switch-btn">Switch to Light</div>
-          <div style="position:relative">
-            <button id="notif-bell-btn" onclick="toggleNotifPanel()" style="width:36px;height:36px;border-radius:50%;border:1px solid;cursor:pointer;display:flex;align-items:center;justify-content:center;background:transparent;transition:all 0.2s;position:relative;" class="notif-bell-style">
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1a5 5 0 00-5 5v3l-1.5 2h13L13 9V6a5 5 0 00-5-5z" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 13a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
-              <div id="notif-dot" style="display:none;position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;border-radius:20px;background:#e879f9;color:#fff;font-size:9px;font-weight:700;align-items:center;justify-content:center;padding:0 3px;"><span id="notif-badge-count">0</span></div>
-            </button>
-            <div id="notif-panel" style="display:none;position:fixed;top:62px;right:24px;width:300px;border-radius:16px;z-index:999999;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,0.6);animation:slideUp 0.2s ease;">
-              <div style="padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid;" class="notif-header-style">
-                <div style="font-size:13px;font-weight:700" class="notif-title-style">Notifications</div>
-                <button onclick="clearAllNotifications()" style="font-size:10px;padding:3px 10px;border-radius:20px;cursor:pointer;font-family:-apple-system,sans-serif;background:transparent;transition:all 0.2s;" class="notif-clear-style">Clear all</button>
-              </div>
-              <div id="notif-list" style="max-height:320px;overflow-y:auto"></div>
+          <div class="pc-body">
+            <div class="pc-line"><span class="pc-prompt">›</span> <span class="typed" data-typed></span><span class="caret">▍</span></div>
+            <div class="pc-out">
+              <span class="chip">trigger</span><span class="arr">→</span>
+              <span class="chip alt">ai parse</span><span class="arr">→</span>
+              <span class="chip">whatsapp</span><span class="arr">→</span>
+              <span class="chip alt">sheets</span>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- MAIN DASHBOARD -->
-      <div class="content" id="main-content" style="display:flex;flex-direction:column">
-        <div class="hud-dashboard"><canvas id="dashClockCanvas"></canvas></div>
-        <div class="dash-bottom-bar">
-          <button class="tb-btn" onclick="createWorkflow()">+ New Workflow</button>
-          <div class="dash-token-wrap">
-            <div class="dash-tok-lbl">TOKENS</div>
-            <div class="dash-tok-bar"><div class="dash-tok-fill" id="dash-tok-fill"></div></div>
-            <div class="dash-tok-val"><span id="sb-tokens-used">0</span> / <span id="dash-tok-limit">1000</span></div>
+      <!-- RIGHT: 3D wheel + floating dashboard -->
+      <div class="hero-right">
+        <div class="orbit-stage" id="orbitStage">
+          <div class="orbit-rings">
+            <div class="ring r1"></div>
+            <div class="ring r2"></div>
+            <div class="ring r3"></div>
+          </div>
+
+          <div class="wheel-wrap">
+            <div class="wheel" id="wheel">
+              <div class="wcard" data-i="0" style="--c:#EA4335"><span class="ic" data-mark="gmail"></span></div>
+              <div class="wcard" data-i="1" style="--c:#25D366"><span class="ic" data-mark="whatsapp"></span></div>
+              <div class="wcard" data-i="2" style="--c:#ECB22E"><span class="ic" data-mark="slack"></span></div>
+              <div class="wcard" data-i="3" style="--c:#635BFF"><span class="ic" data-mark="stripe"></span></div>
+              <div class="wcard" data-i="4" style="--c:#229ED9"><span class="ic" data-mark="telegram"></span></div>
+              <div class="wcard" data-i="5" style="--c:#95BF47"><span class="ic" data-mark="shopify"></span></div>
+              <div class="wcard" data-i="6" style="--c:#F22F46"><span class="ic" data-mark="twilio"></span></div>
+              <div class="wcard" data-i="7" style="--c:#FFFFFF"><span class="ic" data-mark="notion"></span></div>
+            </div>
+          </div>
+
+          <!-- Floating dashboard cards -->
+          <div class="float-card fc-1">
+            <div class="fc-head"><span class="fc-led"></span> WORKFLOW · live</div>
+            <div class="fc-body">
+              <div class="fc-row"><span class="fc-tag">trigger</span> Form submit</div>
+              <div class="fc-row"><span class="fc-tag alt">action</span> Send WhatsApp</div>
+              <div class="fc-row"><span class="fc-tag">action</span> Append row</div>
+            </div>
+            <div class="fc-foot">
+              <span>0.42s</span><span>· 14 nodes</span><span class="ok">● ok</span>
+            </div>
+          </div>
+
+          <div class="float-card fc-2">
+            <div class="fc-head"><span class="fc-led g"></span> AI BUILDER</div>
+            <div class="fc-quote">
+              "Form submit ஆனா<br/>WhatsApp அனுப்பு"
+            </div>
+            <div class="fc-bars">
+              <span style="--h:.45"></span><span style="--h:.7"></span><span style="--h:.5"></span>
+              <span style="--h:.85"></span><span style="--h:.6"></span><span style="--h:.92"></span>
+              <span style="--h:.4"></span><span style="--h:.78"></span>
+            </div>
+          </div>
+
+          <!-- Particle layer -->
+          <div class="particles" id="particles"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Scroll cue -->
+    <div class="scroll-cue">
+      <span></span><span></span><span></span>
+      <em>SCROLL · அலசு</em>
+    </div>
+  </section>
+
+  <!-- ============= DEMO ============= -->
+  <section class="section demo" id="demo">
+    <div class="section-head">
+      <div class="kicker">// 03 · Live</div>
+      <h2 class="section-title">Watch how <span class="grad">Nerum</span> works.</h2>
+      <p class="section-sub">Automate WhatsApp, Gmail &amp; more in under 2 minutes.</p>
+    </div>
+
+    <div class="holo-frame">
+      <div class="holo-spotlight"></div>
+      <div class="holo-screen">
+        <div class="holo-bars">
+          <span></span><span></span><span></span>
+          <em>nerum · live demo</em>
+          <i>1080p · holographic</i>
+        </div>
+        <div class="holo-content">
+          <button class="play-orb" aria-label="Play demo">
+            <span class="po-ring"></span>
+            <span class="po-ring d"></span>
+            <span class="po-tri">▶</span>
+          </button>
+          <div class="holo-meta">
+            <div><b>Nerum Demo</b><span>Full walkthrough — workflows, integrations, AI builder</span></div>
+            <div class="upload">📹 video uploading soon</div>
+          </div>
+          <div class="holo-hud">
+            <span class="hh hh-1">◢ AI · 0.42s</span>
+            <span class="hh hh-2">◤ 14 nodes</span>
+            <span class="hh hh-3">◣ tamil + en</span>
+            <span class="hh hh-4">◥ live</span>
           </div>
         </div>
       </div>
+    </div>
+  </section>
 
-      <!-- BILLING -->
-      <div class="billing-content" id="billing-content" style="display:none">
-        <div class="billing-title">Choose your plan</div>
-        <div class="billing-sub">Upgrade to unlock more workflows and AI tokens</div>
-        <div class="plans-grid">
-          <div class="plan-card"><div class="plan-name" style="opacity:0.5">FREE</div><div class="plan-price">₹0<span>/mo</span></div><div class="plan-desc">Perfect to get started</div><div class="plan-features"><div>✓ 3 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div style="opacity:0.35">✗ Priority support</div></div><button class="plan-btn plan-btn-free">Current Plan</button></div>
-          <div class="plan-card popular"><div class="plan-popular-badge">MOST POPULAR</div><div class="plan-name" style="color:#818cf8">STARTER</div><div class="plan-price">₹799<span>/mo</span></div><div class="plan-desc">For growing businesses</div><div class="plan-features"><div>✓ 10 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Tamil + English AI</div><div>✓ Email support</div></div><button class="plan-btn plan-btn-starter" onclick="startPayment('starter',79900)">Upgrade to Starter</button></div>
-          <div class="plan-card"><div class="plan-name" style="color:#34d399">PRO</div><div class="plan-price">₹1,399<span>/mo</span></div><div class="plan-desc">For power users</div><div class="plan-features"><div>✓ 50 Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Priority support</div><div>✓ Advanced analytics</div></div><button class="plan-btn plan-btn-pro" onclick="startPayment('pro',139900)">Upgrade to Pro</button></div>
-          <div class="plan-card"><div class="plan-name" style="color:#fbbf24">BUSINESS</div><div class="plan-price">₹3,499<span>/mo</span></div><div class="plan-desc">For teams & agencies</div><div class="plan-features"><div>✓ Unlimited Workflows</div><div>✓ 1,000 AI tokens</div><div>✓ All integrations</div><div>✓ Dedicated support</div><div>✓ Custom integrations</div></div><button class="plan-btn plan-btn-business" onclick="startPayment('business',349900)">Upgrade to Business</button></div>
-        </div>
+  <!-- ============= WORKFLOW NODE GRAPH ============= -->
+  <section class="section" id="workflow">
+    <div class="section-head">
+      <div class="kicker">// 02 · How it works</div>
+      <h2 class="section-title">Three steps to <span class="grad">automate anything.</span></h2>
+      <p class="section-sub">From a single sentence in Tamil or English, Nerum compiles a live workflow graph.</p>
+    </div>
+
+    <div class="graph">
+      <svg class="graph-lines" viewBox="0 0 1200 360" preserveAspectRatio="none" aria-hidden="true">
+        <defs>
+          <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#FF4DDE" stop-opacity="0.1"/>
+            <stop offset="50%" stop-color="#FF4DDE" stop-opacity="0.9"/>
+            <stop offset="100%" stop-color="#8B5CF6" stop-opacity="0.1"/>
+          </linearGradient>
+        </defs>
+        <path d="M 200 180 C 350 180, 350 180, 600 180" stroke="url(#lineGrad)" stroke-width="2" fill="none" />
+        <path d="M 600 180 C 850 180, 850 180, 1000 180" stroke="url(#lineGrad)" stroke-width="2" fill="none" />
+        <circle r="4" fill="#FF4DDE">
+          <animateMotion dur="3s" repeatCount="indefinite" path="M 200 180 C 350 180, 350 180, 600 180"/>
+        </circle>
+        <circle r="4" fill="#8B5CF6">
+          <animateMotion dur="3s" begin="1s" repeatCount="indefinite" path="M 600 180 C 850 180, 850 180, 1000 180"/>
+        </circle>
+      </svg>
+
+      <div class="node">
+        <div class="n-head"><span class="n-num">01</span><span class="n-pulse"></span></div>
+        <h3>Sign up free</h3>
+        <p>Create your account in seconds with Google or email. No credit card needed.</p>
+        <div class="n-foot"><span class="chip">trigger</span></div>
       </div>
 
-      <!-- WORKFLOWS -->
-      <div class="billing-content" id="workflows-content" style="display:none">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-          <div class="billing-title">My Workflows</div>
-          <button class="tb-btn" onclick="createWorkflow()" style="font-size:11px;padding:7px 16px">+ New Workflow</button>
-        </div>
-        <div class="billing-sub">All your automation workflows in one place</div>
-        <div id="workflow-list-container"></div>
+      <div class="node alt">
+        <div class="n-head"><span class="n-num">02</span><span class="n-pulse"></span></div>
+        <h3>Tell the AI</h3>
+        <p>Type what you want to automate in Tamil or English. Nerum AI understands instantly.</p>
+        <div class="n-foot"><span class="chip alt">ai parse</span><span class="chip">compile</span></div>
       </div>
 
-      <!-- SETTINGS -->
-      <div class="settings-content" id="settings-content" style="display:none">
-        <div class="profile-header">
-          <div class="profile-avatar-big" id="settings-avatar-big">SR</div>
-          <div class="profile-info">
-            <div class="profile-name-row"><span class="profile-name-display" id="profile-name-display">Srihari</span><button class="profile-edit-btn" onclick="toggleProfileEdit()">Edit Profile</button></div>
-            <div class="profile-email-display" id="profile-email-display">srihari@gmail.com</div>
-            <div class="profile-plan-badge" id="profile-plan-badge">Free Plan</div>
-          </div>
-          <div class="profile-token-box">
-            <div class="ptb-item"><div class="ptb-val" id="ptb-tokens">0</div><div class="ptb-label">Tokens used</div></div>
-            <div class="ptb-divider"></div>
-            <div class="ptb-item"><div class="ptb-val" id="ptb-limit">1,000</div><div class="ptb-label">Token limit</div></div>
-            <div class="ptb-divider"></div>
-            <div class="ptb-item"><div class="ptb-val" id="ptb-wf">0</div><div class="ptb-label">Workflows</div></div>
-          </div>
-        </div>
-        <div class="token-progress-wrap">
-          <div class="token-progress-header"><span class="token-progress-label">Token usage this month</span><span class="token-progress-pct" id="token-pct">0%</span></div>
-          <div class="token-progress-bar"><div class="token-progress-fill" id="token-fill" style="width:0%"></div></div>
-          <div class="token-progress-footer"><span id="token-used-label">0 used</span><span id="token-limit-label">1,000 limit</span></div>
-        </div>
-        <div id="profile-popup-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);z-index:1000;align-items:center;justify-content:center">
-          <div id="profile-popup" style="width:100%;max-width:460px;border-radius:20px;padding:24px;margin:20px">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><div style="font-size:15px;font-weight:700" id="popup-title">Edit Profile</div><button onclick="closeProfilePopup()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;padding:4px 8px">✕</button></div>
-            <div class="settings-field" style="margin-bottom:14px"><label>FULL NAME</label><input class="settings-input" id="settings-name" placeholder="Your name"/></div>
-            <div class="settings-field" style="margin-bottom:14px"><label>EMAIL</label><input class="settings-input" id="settings-email" placeholder="you@example.com" disabled/></div>
-            <div class="settings-field" style="margin-bottom:14px"><label>NEW PASSWORD</label><input class="settings-input" id="settings-newpass" type="password" placeholder="Leave blank to keep current"/></div>
-            <div class="settings-field" style="margin-bottom:20px"><label>CONFIRM PASSWORD</label><input class="settings-input" id="settings-confirmpass" type="password" placeholder="Repeat new password"/></div>
-            <div style="display:flex;gap:10px"><button class="settings-save-btn" onclick="saveSettings()" style="flex:1">Save Changes</button><button class="settings-cancel-btn" onclick="closeProfilePopup()">Cancel</button></div>
-            <div class="settings-success" id="settings-success">✓ Saved successfully!</div>
-          </div>
-        </div>
-        <div class="settings-section"><div class="settings-section-title">Preferences</div><div class="settings-row"><div class="settings-field"><label>THEME</label><select class="settings-select" id="settings-theme" onchange="applyTheme(this.value)"><option value="dark">Dark — Aurora</option><option value="light">Light — Arctic Ice</option></select></div><div class="settings-field"><label>LANGUAGE</label><select class="settings-select" id="settings-lang" onchange="applyLang(this.value)"><option value="english">English 🇬🇧</option><option value="tamil">Tamil — தமிழ் 🇮🇳</option></select></div></div></div>
-        <div class="settings-section"><div class="settings-section-title">Security</div><div class="toggle-row"><div><div class="toggle-label">Two-Factor Authentication (2FA)</div><div class="toggle-desc">Send OTP to email on every login</div></div><label class="toggle-switch"><input type="checkbox" id="toggle-2fa" onchange="toggle2FA(this.checked)"/><span class="toggle-slider"></span></label></div></div>
-        <div class="settings-section"><div class="settings-section-title">Notifications</div><div class="toggle-row"><div><div class="toggle-label">Email notifications</div><div class="toggle-desc">Get notified when workflows run</div></div><label class="toggle-switch"><input type="checkbox" id="notif-email" checked onchange="saveToggle('notif-email',this.checked)"/><span class="toggle-slider"></span></label></div><div class="toggle-row"><div><div class="toggle-label">Telegram notifications</div><div class="toggle-desc">Get alerts via Telegram bot</div></div><label class="toggle-switch"><input type="checkbox" id="notif-telegram" onchange="saveToggle('notif-telegram',this.checked)"/><span class="toggle-slider"></span></label></div><div class="toggle-row"><div><div class="toggle-label">Weekly report</div><div class="toggle-desc">Summary email every Monday</div></div><label class="toggle-switch"><input type="checkbox" id="notif-weekly" checked onchange="saveToggle('notif-weekly',this.checked)"/><span class="toggle-slider"></span></label></div></div>
-        <div class="settings-section"><div class="settings-section-title">Connected integrations</div><div class="integration-item"><div class="integration-icon" style="background:rgba(234,67,53,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M1 4h16v10H1z" fill="#EA4335"/><path d="M1 4l8 6 8-6" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Gmail</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(52,168,83,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="14" height="14" rx="1" fill="#34A853"/><path d="M5 9h8M5 6h8M5 12h5" stroke="#fff" stroke-width="1.2"/></svg></div><div><div class="integration-name">Google Sheets</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(42,171,238,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#2AABEE"/><path d="M3.5 9l11-4-4 11-2.5-3.5-4.5-3.5z" fill="#fff"/></svg></div><div><div class="integration-name">Telegram</div><div class="integration-status connected">● Connected</div></div><span class="integration-badge badge-connected">Active</span></div><div class="integration-item"><div class="integration-icon" style="background:rgba(37,211,102,0.15)"><svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="9" r="7" fill="#25D366"/><path d="M6 9.5l2 2 4-4" stroke="#fff" stroke-width="1.3" stroke-linecap="round"/></svg></div><div><div class="integration-name">WhatsApp</div><div class="integration-status connected">● Connected via Twilio</div></div><span class="integration-badge badge-connected">Active</span></div></div>
-        <div class="settings-section"><div class="settings-section-title">🔐 Login History</div><div id="login-history-list"><div style="opacity:0.4;font-size:11px;padding:10px 0">Loading...</div></div></div>
-        <div class="danger-section"><div class="danger-title">⚠️ Danger Zone</div><div class="danger-row"><div><div class="danger-row-label">Delete all workflows</div><div class="danger-row-desc">Permanently removes all your workflows</div></div><button class="danger-btn danger-btn-warn" onclick="deleteAllWorkflows()">Delete Workflows</button></div><div class="danger-row"><div><div class="danger-row-label">Delete account</div><div class="danger-row-desc">Permanently delete your Nerum account</div></div><button class="danger-btn danger-btn-red" onclick="deleteAccount()">Delete Account</button></div></div>
-      </div>
-      
-      <!-- CHATBOTS -->
-<div class="billing-content" id="chatbots-content" style="display:none">
-  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
-    <div class="billing-title">My Chatbots</div>
-    <button class="tb-btn" onclick="showCreateChatbot()" style="font-size:11px;padding:7px 16px">+ New Chatbot</button>
-  </div>
-  <div class="billing-sub">Embed AI chatbots on any website with one script tag</div>
-  <div id="chatbot-list-container"></div>
-</div>
-
-<!-- CHATBOT CREATE MODAL -->
-<div id="chatbot-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-  <div id="chatbot-modal" style="width:100%;max-width:460px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-size:16px;font-weight:700">🤖 New Chatbot</div>
-      <button onclick="closeChatbotModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
-    </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">CHATBOT NAME</label>
-      <input id="cb-name-input" placeholder="e.g. Sri Dental Clinic Assistant" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit"/>
-    </div>
-    <div style="margin-bottom:14px">
-      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">BUSINESS DESCRIPTION</label>
-      <textarea id="cb-desc-input" placeholder="e.g. We are a dental clinic in Chennai. We offer cleaning, braces, root canal. Open Mon-Sat 9AM-6PM." rows="4" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit;resize:none;line-height:1.5"></textarea>
-    </div>
-    <div style="margin-bottom:20px">
-      <label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">LANGUAGE</label>
-      <select id="cb-lang-input" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit">
-        <option value="both">Tamil + English</option>
-        <option value="english">English only</option>
-        <option value="tamil">Tamil only</option>
-      </select>
-    </div>
-    <div style="display:flex;gap:10px">
-      <button onclick="saveChatbotModal()" id="cb-save-btn" style="flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-family:inherit">Create Chatbot 🤖</button>
-      <button onclick="closeChatbotModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button>
-    </div>
-    <div id="cb-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
-  </div>
-</div>
-
-<!-- CHATBOT EMBED MODAL -->
-<div id="embed-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-  <div id="embed-modal" style="width:100%;max-width:500px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
-      <div style="font-size:16px;font-weight:700">🔗 Embed Script</div>
-      <button onclick="closeEmbedModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button>
-    </div>
-    <div style="font-size:12px;opacity:0.5;margin-bottom:14px">Paste this script tag just before the &lt;/body&gt; tag on your website</div>
-    <div style="position:relative;margin-bottom:16px">
-      <textarea id="embed-script-text" readonly rows="3" style="width:100%;padding:12px 14px;border-radius:12px;font-size:11px;outline:none;border:1px solid rgba(129,140,248,0.3);font-family:monospace;resize:none;line-height:1.6;background:rgba(129,140,248,0.05);color:#818cf8"></textarea>
-      <button onclick="copyEmbedScript()" style="position:absolute;top:8px;right:8px;padding:4px 12px;border-radius:8px;font-size:10px;font-weight:700;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;cursor:pointer;font-family:inherit">Copy</button>
-    </div>
-    <div style="font-size:11px;opacity:0.4;line-height:1.8">
-      ✅ Works on any website — WordPress, Wix, custom HTML<br/>
-      ✅ Chat bubble appears bottom right<br/>
-      ✅ Customers chat in Tamil or English<br/>
-      ✅ No coding needed
-    </div>
-  </div>
-</div>
-
-      <!-- HISTORY -->
-      <div class="history-content" id="history-content" style="display:none">
-        <div style="font-size:18px;font-weight:700;margin-bottom:4px">Service History</div>
-        <div style="font-size:11px;margin-bottom:16px;opacity:0.5">All your automation activity</div>
-        <div id="history-list"></div>
+      <div class="node">
+        <div class="n-head"><span class="n-num">03</span><span class="n-pulse"></span></div>
+        <h3>It runs itself</h3>
+        <p>Your workflow runs automatically. Get notified the moment it executes.</p>
+        <div class="n-foot"><span class="chip">action</span><span class="chip alt">notify</span></div>
       </div>
     </div>
+  </section>
+
+  <!-- ============= INTEGRATIONS ============= -->
+  <section class="section" id="integrations">
+    <div class="section-head">
+      <div class="kicker">// 01 · Integrations</div>
+      <h2 class="section-title">Everything connected, <span class="grad">in one signal.</span></h2>
+      <p class="section-sub">12 integrations. One platform. Built for Indian businesses.</p>
+    </div>
+
+    <div class="integ-grid">
+      <article class="integ" style="--c:#EA4335"><div class="ic-wrap" data-mark="gmail"></div><h3>Gmail</h3><p>Send automated emails instantly</p></article>
+      <article class="integ" style="--c:#25D366"><div class="ic-wrap" data-mark="whatsapp"></div><h3>WhatsApp</h3><p>Message any number via Twilio</p></article>
+      <article class="integ" style="--c:#29B6F6"><div class="ic-wrap" data-mark="telegram"></div><h3>Telegram</h3><p>Bot notifications instantly</p></article>
+      <article class="integ" style="--c:#34A853"><div class="ic-wrap" data-mark="sheets"></div><h3>Google Sheets</h3><p>Append rows live in real time</p></article>
+      <article class="integ" style="--c:#FF4DDE"><div class="ic-wrap" data-mark="ai"></div><h3>AI Builder</h3><p>Tamil + English workflow builder</p></article>
+      <article class="integ" style="--c:#FF8A3D"><div class="ic-wrap" data-mark="webhook"></div><h3>Webhooks</h3><p>Connect any external service</p></article>
+      <article class="integ" style="--c:#3395FF"><div class="ic-wrap" data-mark="razorpay"></div><h3>Razorpay</h3><p>Trigger on payment capture</p></article>
+      <article class="integ" style="--c:#F4B400"><div class="ic-wrap" data-mark="lists"></div><h3>Smart Lists</h3><p>Bulk scheduled messaging</p></article>
+      <article class="integ" style="--c:#A78BFA"><div class="ic-wrap" data-mark="forms"></div><h3>Google Forms</h3><p>Trigger on form submissions</p></article>
+      <article class="integ" style="--c:#2DD4BF"><div class="ic-wrap" data-mark="cron"></div><h3>Scheduler</h3><p>Cron-based timed automation</p></article>
+      <article class="integ" style="--c:#60A5FA"><div class="ic-wrap" data-mark="oauth"></div><h3>Google OAuth</h3><p>Secure Google authentication</p></article>
+      <article class="integ" style="--c:#7CFFB2"><div class="ic-wrap" data-mark="api"></div><h3>REST API</h3><p>Full API access for developers</p></article>
+    </div>
+  </section>
+
+  <!-- ============= PRICING ============= -->
+  <section class="section pricing" id="pricing">
+    <div class="section-head">
+      <div class="kicker">// 04 · Pricing</div>
+      <h2 class="section-title">Pricing</h2>
+      <p class="section-sub">Start free. Upgrade when you're ready. Cancel anytime.</p>
+    </div>
+
+    <div class="plan-grid">
+
+      <article class="plan">
+        <div class="p-head"><span class="p-tag">FREE</span></div>
+        <div class="p-price">₹0<span>/mo</span></div>
+        <p class="p-cap">Perfect to get started</p>
+        <ul>
+          <li>3 Workflows</li>
+          <li>1 Smart List, 10 rows</li>
+          <li>1,000 AI tokens</li>
+          <li>All integrations</li>
+          <li class="muted">Priority support</li>
+        </ul>
+        <a href="#" class="btn-glass full" data-magnet onclick="openModal('signupModal')">Get started free</a>
+      </article>
+
+      <article class="plan">
+        <div class="p-head"><span class="p-tag">STARTER</span></div>
+        <div class="p-price">₹799<span>/mo</span></div>
+        <p class="p-cap">For growing businesses</p>
+        <ul>
+          <li>10 Workflows</li>
+          <li>5 Smart Lists, 100 rows</li>
+          <li>1,000 AI tokens</li>
+          <li>All integrations</li>
+          <li>Email support</li>
+        </ul>
+        <a href="#" class="btn-glass full" data-magnet onclick="handlePlanClick('starter')">Get Starter</a>
+      </article>
+
+      <article class="plan featured">
+        <div class="p-popular">MOST POPULAR</div>
+        <div class="p-head"><span class="p-tag">PRO</span></div>
+        <div class="p-price">₹1,399<span>/mo</span></div>
+        <p class="p-cap">For power users</p>
+        <ul>
+          <li>50 Workflows</li>
+          <li>20 Smart Lists, 1000 rows</li>
+          <li>1,000 AI tokens</li>
+          <li>Priority support</li>
+          <li>Advanced analytics</li>
+        </ul>
+        <a href="#" class="btn-primary full" data-magnet onclick="handlePlanClick('pro')"><span>Get Pro</span><span class="arrow">→</span></a>
+      </article>
+
+      <article class="plan">
+        <div class="p-head"><span class="p-tag">BUSINESS</span></div>
+        <div class="p-price">₹3,499<span>/mo</span></div>
+        <p class="p-cap">For teams &amp; agencies</p>
+        <ul>
+          <li>Unlimited Workflows</li>
+          <li>Unlimited Smart Lists</li>
+          <li>1,000 AI tokens</li>
+          <li>Dedicated support</li>
+          <li>Custom integrations</li>
+        </ul>
+        <a href="#" class="btn-glass full" data-magnet onclick="handlePlanClick('business')">Get Business</a>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- ============= CTA ============= -->
+  <section class="cta">
+    <div class="cta-aura"></div>
+    <div class="cta-inner">
+      <div class="kicker center">// ready when you are</div>
+      <h2 class="cta-title">
+        Build your first <span class="grad">workflow</span><br/>in the next <span class="grad-alt">5 minutes.</span>
+      </h2>
+      <p class="cta-sub">Free forever. Tamil + English. No credit card.</p>
+      <div class="cta-actions">
+        <a class="btn-primary mega" href="#" data-magnet onclick="openModal('signupModal')">
+          <span>Start free</span>
+          <span class="arrow">→</span>
+        </a>
+        <a class="btn-glass mega" href="#pricing" data-magnet>See pricing</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============= FOOTER ============= -->
+  <footer class="footer">
+    <div class="footer-grid">
+      <div class="f-brand">
+        <a class="nav-brand" href="#top">
+          <span class="brand-mark">
+            <img src="nerum-logo-transparent.png" alt="Nerum"/>
+          </span>
+          <span class="brand-word">Nerum</span>
+        </a>
+        <p>AI Workflow Automation for Indian Businesses</p>
+        <p class="micro">© 2026 Nerum. All rights reserved.</p>
+      </div>
+      <div>
+        <h4>Product</h4>
+        <a href="#integrations">Integrations</a>
+        <a href="#demo">Demo</a>
+        <a href="#pricing">Pricing</a>
+      </div>
+      <div>
+        <h4>Company</h4>
+        <a href="#">About</a>
+        <a href="#">Blog</a>
+        <a href="#">Contact</a>
+      </div>
+      <div>
+        <h4>Legal</h4>
+        <a href="privacy.html">Privacy</a>
+        <a href="terms.html">Terms</a>
+        <a href="#">DPA</a>
+      </div>
+    </div>
+    <div class="footer-grid-bg"></div>
+    <div class="footer-mega">NERUM</div>
+  </footer>
+
+  <!-- =====================================================================
+       MODALS — Preserved exactly from existing Nerum frontend
+       ===================================================================== -->
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('loginModal')">✕</button>
+      <div class="modal-header">
+        <img src="nerum-logo-transparent.png" alt="Nerum" class="modal-logo"/>
+        <h2>Welcome back</h2>
+        <p>Sign in to your Nerum account</p>
+      </div>
+      <div id="loginError" class="modal-error" style="display:none;"></div>
+      <div id="loginSuccess" class="modal-success" style="display:none;"></div>
+
+      <!-- Google Login -->
+      <a href="/auth/google" class="btn-google">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </a>
+
+      <div class="modal-divider"><span>or</span></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="loginEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="loginPassword" placeholder="••••••••" required />
+        </div>
+        <div class="form-row">
+          <label class="checkbox-label">
+            <input type="checkbox" id="rememberMe"/> Remember me
+          </label>
+          <a href="#" class="forgot-link" onclick="openModal('forgotModal'); closeModal('loginModal')">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-submit" id="loginBtn">Sign in</button>
+      </form>
+
+      <p class="modal-switch">Don't have an account? <a href="#" onclick="switchModal('loginModal','signupModal')">Sign up free</a></p>
+    </div>
   </div>
-</div>
 
-<script src="/static/app.js"></script>
-<script src="/static/smartlists.js"></script>
+  <!-- Signup Modal -->
+  <div id="signupModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('signupModal')">✕</button>
+      <div class="modal-header">
+        <img src="nerum-logo-transparent.png" alt="Nerum" class="modal-logo"/>
+        <h2>Create account</h2>
+        <p>Start automating for free — no credit card needed</p>
+      </div>
+      <div id="signupError" class="modal-error" style="display:none;"></div>
+      <div id="signupSuccess" class="modal-success" style="display:none;"></div>
 
-<script>
-  document.addEventListener('DOMContentLoaded',function(){if(typeof lucide!=='undefined')lucide.createIcons();});
-  function initIcons(){if(typeof lucide!=='undefined')lucide.createIcons();}
-</script>
+      <!-- Google Signup -->
+      <a href="/auth/google" class="btn-google">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
+      </a>
 
-<!-- DASHBOARD HUD CLOCK -->
-<script>
-(function(){
-  function initDashClock(){
-    const canvas=document.getElementById('dashClockCanvas');
-    if(!canvas)return;
-    const parent=canvas.parentElement;
-    function resize(){canvas.width=parent.offsetWidth;canvas.height=parent.offsetHeight;}
-    resize();window.addEventListener('resize',resize);
-    const svgStrs=[
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%23EA4335' d='M24 5.457v13.909c0 .904-.732 1.636-1.636 1.636h-3.819V11.73L12 16.64l-6.545-4.91v9.273H1.636A1.636 1.636 0 0 1 0 19.366V5.457c0-2.023 2.309-3.178 3.927-1.964L5.455 4.64 12 9.548l6.545-4.91 1.528-1.145C21.69 2.28 24 3.434 24 5.457z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%2325D366' d='M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill='%232AABEE' d='M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'><path fill='%2334A853' d='M45 16H33V3z'/><path fill='%2323A566' d='M33 3H7a2 2 0 0 0-2 2v38a2 2 0 0 0 2 2h34a2 2 0 0 0 2-2V16z'/><path fill='white' d='M15 30h18v2H15zm0-4h18v2H15zm0-4h12v2H15z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23818cf8' width='24' height='24' rx='4'/><path fill='white' d='M7 8h10v2H7zm0 4h10v2H7zm0 4h6v2H7z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle fill='%23e879f9' cx='12' cy='12' r='12'/><path fill='white' d='M8 6l8 6-8 6z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23f59e0b' width='24' height='24' rx='4'/><path fill='white' stroke='white' stroke-width='2.5' stroke-linecap='round' d='M12 5v14M5 12h14'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%2334d399' width='24' height='24' rx='12'/><path fill='none' stroke='white' stroke-width='2' stroke-linecap='round' d='M7 12l3 3 7-7'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%2360a5fa' width='24' height='24' rx='4'/><circle fill='white' cx='12' cy='9' r='3'/><path fill='white' d='M6 19c0-3.314 2.686-6 6-6s6 2.686 6 6H6z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23a78bfa' width='24' height='24' rx='4'/><path fill='white' d='M5 3l14 9-14 9z'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle fill='%23fb923c' cx='12' cy='12' r='12'/><rect fill='white' x='8' y='8' width='8' height='8' rx='1'/></svg>`,
-      `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><rect fill='%23f43f5e' width='24' height='24' rx='4'/><path fill='white' d='M12 4a8 8 0 1 0 0 16A8 8 0 0 0 12 4zm1 9H8v-2h5V8l4 4-4 4v-3z'/></svg>`
-    ];
-    const angles=[0,30,60,90,120,150,180,210,240,270,300,330];
-    const svcImgs=[];
-    svgStrs.forEach((s,i)=>{const im=new Image(22,22);im.src='data:image/svg+xml,'+s;svcImgs[i]=im;});
-    const ctx=canvas.getContext('2d');
-    function drawClock(){
-      const W=canvas.width,H=canvas.height;
-      const isDark=document.body.classList.contains('dark');
-      ctx.clearRect(0,0,W,H);
-      const cx=W*0.42,cy=H*0.5,outerR=Math.min(W,H)*0.38,innerR=outerR*0.68;
-      const now=new Date();
-      const hrs=now.getHours()%12,mins=now.getMinutes(),secs=now.getSeconds(),ms=now.getMilliseconds();
-      const secA=((secs+ms/1000)/60)*Math.PI*2-Math.PI/2;
-      const minA=((mins+secs/60)/60)*Math.PI*2-Math.PI/2;
-      const hrA=((hrs+mins/60)/12)*Math.PI*2-Math.PI/2;
-      const col1=isDark?'#818cf8':'#7c3aed',col2=isDark?'#34d399':'#059669',col3=isDark?'#e879f9':'#c026d3';
-      ctx.save();ctx.setLineDash([6,5]);
-      const g1=ctx.createLinearGradient(cx-outerR,cy,cx+outerR,cy);
-      g1.addColorStop(0,col1);g1.addColorStop(1,col2);
-      ctx.beginPath();ctx.arc(cx,cy,outerR,0,Math.PI*2);ctx.strokeStyle=g1;ctx.lineWidth=1.5;ctx.stroke();ctx.restore();
-      for(let i=0;i<12;i++){const a=(i/12)*Math.PI*2-Math.PI/2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(outerR-10),cy+Math.sin(a)*(outerR-10));ctx.lineTo(cx+Math.cos(a)*(outerR-2),cy+Math.sin(a)*(outerR-2));ctx.strokeStyle=isDark?'rgba(129,140,248,0.4)':'rgba(124,58,237,0.4)';ctx.lineWidth=1.5;ctx.setLineDash([]);ctx.stroke();}
-      ctx.beginPath();ctx.arc(cx,cy,innerR,0,Math.PI*2);const g2=ctx.createLinearGradient(cx-innerR,cy,cx+innerR,cy);g2.addColorStop(0,col1);g2.addColorStop(1,col2);ctx.strokeStyle=g2;ctx.lineWidth=1.2;ctx.stroke();
-      angles.forEach((deg,i)=>{const a=deg*Math.PI/180-Math.PI/2;const nx=cx+Math.cos(a)*outerR,ny=cy+Math.sin(a)*outerR;ctx.beginPath();ctx.arc(nx,ny,14,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();ctx.strokeStyle=isDark?'rgba(129,140,248,0.35)':'rgba(124,58,237,0.3)';ctx.lineWidth=1;ctx.stroke();if(svcImgs[i]&&svcImgs[i].complete&&svcImgs[i].naturalWidth>0){ctx.drawImage(svcImgs[i],nx-11,ny-11,22,22);}});
-      function hand(angle,len,color,dotR){const ex=cx+Math.cos(angle)*len,ey=cy+Math.sin(angle)*len;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(ex,ey);ctx.strokeStyle=color;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(ex,ey,dotR,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.stroke();ctx.beginPath();ctx.arc(ex,ey,dotR*0.4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();}
-      hand(hrA,innerR*0.55,col1,6);hand(minA,innerR*0.85,col2,5);
-      ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(cx+Math.cos(secA)*innerR*0.88,cy+Math.sin(secA)*innerR*0.88);ctx.strokeStyle=isDark?'rgba(232,121,249,0.7)':'rgba(192,38,211,0.6)';ctx.lineWidth=1;ctx.stroke();
-      ctx.beginPath();ctx.arc(cx,cy,10,0,Math.PI*2);ctx.fillStyle=isDark?'#08080f':'#f0eaff';ctx.fill();const cg=ctx.createLinearGradient(cx-10,cy,cx+10,cy);cg.addColorStop(0,col1);cg.addColorStop(1,col2);ctx.strokeStyle=cg;ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(cx,cy,4,0,Math.PI*2);ctx.fillStyle=col1;ctx.fill();
-      const wfCount=document.getElementById('wf-badge')?.textContent||'0';const trendEl=document.querySelector('.wf-trend');const activeCount=trendEl?trendEl.textContent.replace(/[^0-9]/g,''):'0';const statsX=cx+outerR+32;const labelColor=isDark?'#4a4a6a':'#6d28d9';const stats=[{label:'WORKFLOWS',val:wfCount,color:col3,y:cy-52},{label:'RUNNING',val:activeCount||'0',color:col2,y:cy},{label:'SERVICES',val:'4',color:col1,y:cy+52}];
-      stats.forEach(s=>{ctx.font='bold 26px DM Mono,monospace,sans-serif';ctx.fillStyle=s.color;ctx.textAlign='left';ctx.textBaseline='middle';ctx.fillText(s.val,statsX,s.y-6);ctx.font='400 9px DM Mono,monospace,sans-serif';ctx.fillStyle=labelColor;ctx.fillText(s.label,statsX,s.y+12);});
-      requestAnimationFrame(drawClock);
-    }
-    setTimeout(drawClock,300);
-  }
-  const origShowDash=window.showDashboard;
-  window.showDashboard=function(name){if(origShowDash)origShowDash(name);setTimeout(initDashClock,200);};
-})();
-</script>
+      <div class="modal-divider"><span>or</span></div>
 
-<!-- WF MODAL -->
-<div id="wf-modal-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-  <div id="wf-modal" style="width:100%;max-width:440px;margin:20px;border-radius:20px;padding:28px;animation:slideUp 0.3s ease">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px"><div style="font-size:16px;font-weight:700">New Workflow</div><button onclick="closeWfModal()" style="background:transparent;border:none;cursor:pointer;font-size:18px;opacity:0.5;color:inherit">✕</button></div>
-    <div style="margin-bottom:14px"><label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">WORKFLOW NAME</label><input id="wf-name-input" placeholder="e.g. Send WhatsApp on form submit" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit" onkeydown="if(event.key==='Enter')saveWfModal()"/></div>
-    <div style="margin-bottom:20px"><label style="font-size:10px;letter-spacing:1px;opacity:0.5;display:block;margin-bottom:6px">DESCRIPTION (optional)</label><input id="wf-desc-input" placeholder="What does this workflow do?" style="width:100%;padding:11px 14px;border-radius:12px;font-size:13px;outline:none;border:1px solid;font-family:inherit"/></div>
-    <div style="display:flex;gap:10px"><button onclick="saveWfModal()" id="wf-save-btn" style="flex:1;padding:12px;border-radius:12px;border:none;cursor:pointer;font-size:13px;font-weight:600;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;font-family:inherit">Create Workflow</button><button onclick="closeWfModal()" style="padding:12px 20px;border-radius:12px;cursor:pointer;font-size:13px;font-family:inherit">Cancel</button></div>
-    <div id="wf-modal-error" style="display:none;margin-top:12px;font-size:11px;padding:8px 12px;border-radius:8px"></div>
+      <form id="signupForm" onsubmit="handleSignup(event)">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" id="signupName" placeholder="Your name" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="signupEmail" placeholder="you@example.com" required />
+        </div>
+        <div class="form-group">
+          <label>Password</label>
+          <input type="password" id="signupPassword" placeholder="Min 8 characters" required minlength="8"/>
+        </div>
+        <div class="form-group">
+          <label>Confirm Password</label>
+          <input type="password" id="signupConfirm" placeholder="Repeat password" required />
+        </div>
+        <button type="submit" class="btn-submit" id="signupBtn">Create account</button>
+      </form>
+
+      <p class="modal-switch">Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Sign in</a></p>
+      <p class="modal-terms">By signing up you agree to our <a href="terms.html">Terms</a> and <a href="privacy.html">Privacy Policy</a>.</p>
+    </div>
   </div>
-</div>
 
-<!-- OTP -->
-<div id="otp-overlay" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:3000;align-items:center;justify-content:center;backdrop-filter:blur(4px)">
-  <div style="width:100%;max-width:380px;margin:20px;background:#0d0020;border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:32px;text-align:center;animation:slideUp 0.3s ease">
-    <div style="font-size:36px;margin-bottom:12px">🔐</div>
-    <div style="font-size:18px;font-weight:700;color:#fff;margin-bottom:8px">Enter OTP</div>
-    <div style="font-size:12px;color:rgba(255,255,255,0.4);margin-bottom:24px" id="otp-email-hint">Check your email for the 6-digit code</div>
-    <input id="otp-input" type="text" maxlength="6" placeholder="000000" style="width:100%;padding:16px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid rgba(232,121,249,0.3);color:#fff;font-size:28px;font-weight:700;letter-spacing:8px;text-align:center;outline:none;font-family:inherit;margin-bottom:14px" onkeydown="if(event.key==='Enter')verifyOTP()"/>
-    <div id="otp-error" style="display:none;font-size:11px;color:#ff8a7a;margin-bottom:12px"></div>
-    <button onclick="verifyOTP()" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px">Verify OTP →</button>
-    <button onclick="document.getElementById('otp-overlay').style.display='none'" style="width:100%;padding:10px;border-radius:12px;background:transparent;border:1px solid rgba(255,255,255,0.1);color:rgba(255,255,255,0.4);font-size:12px;cursor:pointer;font-family:inherit">← Back to Login</button>
+  <!-- OTP Verification Modal -->
+  <div id="otpModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('otpModal')">✕</button>
+      <div class="modal-header">
+        <h2>Verify your email</h2>
+        <p id="otpDesc">Enter the 6-digit OTP sent to your email</p>
+      </div>
+      <div id="otpError" class="modal-error" style="display:none;"></div>
+      <div id="otpSuccess" class="modal-success" style="display:none;"></div>
+      <form id="otpForm" onsubmit="handleOtp(event)">
+        <div class="form-group">
+          <label>OTP Code</label>
+          <input type="text" id="otpCode" placeholder="123456" maxlength="6" pattern="[0-9]{6}" required />
+        </div>
+        <button type="submit" class="btn-submit" id="otpBtn">Verify</button>
+      </form>
+      <p class="modal-switch"><a href="#" onclick="resendOtp()">Resend OTP</a></p>
+    </div>
   </div>
-</div>
 
-<!-- ==================== 3D LANDING ENGINE ==================== -->
-<style>
-@keyframes lpFadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
-@keyframes lpBlink{0%,100%{opacity:0.2}50%{opacity:0.7}}
-@keyframes lpFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-.lp-reveal{opacity:0;transform:translateY(40px);transition:opacity 0.9s ease,transform 0.9s ease;}
-.lp-reveal.lp-vis{opacity:1;transform:none;}
-.lp-int-card{border-radius:16px;padding:20px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);transition:all 0.3s;cursor:default;position:relative;overflow:hidden;}
-.lp-int-card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(var(--col-r,232),var(--col-g,121),var(--col-b,249),0.06) 0%,transparent 60%);pointer-events:none;}
-.lp-int-card:hover{transform:translateY(-4px);border-color:rgba(232,121,249,0.2);box-shadow:0 20px 60px rgba(0,0,0,0.3);}
-.lic-icon{font-size:28px;margin-bottom:10px;}
-.lic-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:5px;}
-.lic-desc{font-size:11px;color:rgba(255,255,255,0.35);line-height:1.5;}
-.lp-step-card{border-radius:16px;padding:28px 24px;flex:1;border:1px solid rgba(255,255,255,0.07);background:rgba(255,255,255,0.02);transition:all 0.25s;}
-.lp-step-card:hover{transform:translateY(-4px);border-color:rgba(232,121,249,0.2);}
-.lp-step-num{font-size:32px;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,#e879f9,#818cf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
-.lp-step-title{font-size:14px;font-weight:700;color:#fff;margin-bottom:8px;}
-.lp-step-desc{font-size:11px;color:rgba(255,255,255,0.4);line-height:1.6;}
-.lp-plan-card{border-radius:20px;padding:28px 20px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);position:relative;transition:all 0.3s;}
-.lp-plan-card:hover{transform:translateY(-8px);box-shadow:0 30px 80px rgba(0,0,0,0.4);}
-.lp-feat{font-size:11px;color:rgba(255,255,255,0.5);margin-bottom:9px;display:flex;align-items:center;gap:7px;}
-.lp-feat::before{content:'✓';color:#34d399;font-weight:700;flex-shrink:0;}
-.lp-feat.lp-feat-no{color:rgba(255,255,255,0.18);}
-.lp-feat.lp-feat-no::before{content:'✗';color:rgba(255,255,255,0.1);}
-.lp-plan-btn{width:100%;margin-top:20px;padding:12px;border-radius:14px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;border:none;transition:all 0.2s;}
-.lp-plan-btn:hover{transform:translateY(-2px);opacity:0.9;}
-.nav{position:fixed;top:0;left:0;right:0;z-index:9999 !important;padding:0 40px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(4,0,14,0.98) !important;backdrop-filter:blur(20px);border-bottom:1px solid rgba(232,121,249,0.15);}
-.nav-logo{display:flex;align-items:center;gap:8px;}
-.nav-links{display:flex;gap:4px;}
-.nav-link.lp-link{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:500;color:rgba(255,255,255,0.45);cursor:pointer;transition:all 0.2s;text-decoration:none;}
-.nav-link.lp-link:hover{color:#fff;background:rgba(255,255,255,0.06);}
-.nav-btns{display:flex;align-items:center;gap:8px;}
-.nav-login-btn{padding:8px 16px;border-radius:20px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:500;transition:all 0.2s;background:transparent;border:1px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.6);}
-.nav-login-btn:hover{border-color:rgba(255,255,255,0.3);color:#fff;}
-.nav-signup-btn{padding:8px 18px;border-radius:20px;font-size:12px;font-weight:700;cursor:pointer;border:none;font-family:inherit;background:linear-gradient(135deg,#e879f9,#818cf8);color:#fff;box-shadow:0 0 20px rgba(232,121,249,0.3);}
-.nav-signup-btn:hover{transform:translateY(-1px);opacity:0.9;}
-.footer{padding:50px 60px;text-align:center;border-top:1px solid rgba(255,255,255,0.04);background:#02000a;}
-.footer-links{display:flex;justify-content:center;gap:20px;margin-bottom:14px;}
-.footer-link{font-size:11px;color:rgba(255,255,255,0.25);text-decoration:none;cursor:pointer;transition:color 0.2s;}
-.footer-link:hover{color:#e879f9;}
-.footer-copy{font-size:10px;color:rgba(255,255,255,0.12);}
-</style>
+  <!-- Forgot Password Modal -->
+  <div id="forgotModal" class="modal-overlay" style="display:none;">
+    <div class="modal-box">
+      <button class="modal-close" onclick="closeModal('forgotModal')">✕</button>
+      <div class="modal-header">
+        <h2>Reset password</h2>
+        <p>Enter your email to receive a reset link</p>
+      </div>
+      <div id="forgotError" class="modal-error" style="display:none;"></div>
+      <div id="forgotSuccess" class="modal-success" style="display:none;"></div>
+      <form id="forgotForm" onsubmit="handleForgot(event)">
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" id="forgotEmail" placeholder="you@example.com" required />
+        </div>
+        <button type="submit" class="btn-submit" id="forgotBtn">Send reset link</button>
+      </form>
+      <p class="modal-switch"><a href="#" onclick="switchModal('forgotModal','loginModal')">← Back to login</a></p>
+    </div>
+  </div>
 
-<script>
-(function(){
-  const canvas3d = document.getElementById('lp-3d-canvas');
-  if(!canvas3d || typeof THREE === 'undefined') return;
-  const scene = new THREE.Scene();
-  scene.fog = new THREE.FogExp2(0x02000a, 0.025);
-  const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 300);
-  camera.position.set(0,0,10);
-  const renderer = new THREE.WebGLRenderer({canvas:canvas3d, antialias:true});
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
-  renderer.setClearColor(0x02000a,1);
-  scene.add(new THREE.AmbientLight(0x111122,1.5));
-  const pL1=new THREE.PointLight(0xe879f9,8,30);pL1.position.set(-5,4,5);scene.add(pL1);
-  const pL2=new THREE.PointLight(0x818cf8,5,30);pL2.position.set(5,-3,5);scene.add(pL2);
-  const pL3=new THREE.PointLight(0x34d399,3,20);pL3.position.set(0,5,-5);scene.add(pL3);
-  const pG=new THREE.BufferGeometry();
-  const pA=new Float32Array(2500*3);
-  for(let i=0;i<2500*3;i++) pA[i]=(Math.random()-0.5)*80;
-  pG.setAttribute('position',new THREE.BufferAttribute(pA,3));
-  const particles=new THREE.Points(pG,new THREE.PointsMaterial({color:0x818cf8,size:0.022,transparent:true,opacity:0.4,sizeAttenuation:true}));
-  scene.add(particles);
-  const gridH=new THREE.GridHelper(80,80,0x1a0040,0x0d0020);
-  gridH.position.y=-5;gridH.material.transparent=true;gridH.material.opacity=0.2;
-  scene.add(gridH);
-  const INTS=[
-    {name:'Gmail',desc:'Send automated emails instantly',col:0xEA4335,short:'GM',emoji:'📧'},
-    {name:'WhatsApp',desc:'Message any number via Twilio',col:0x25D366,short:'WA',emoji:'💬'},
-    {name:'Telegram',desc:'Bot notifications in seconds',col:0x2AABEE,short:'TG',emoji:'✈️'},
-    {name:'Google Sheets',desc:'Append rows live in real time',col:0x34A853,short:'GS',emoji:'📊'},
-    {name:'AI Builder',desc:'Tamil + English workflow builder',col:0x9b8ffd,short:'AI',emoji:'🤖'},
-    {name:'Webhook',desc:'Connect any external service',col:0xe879f9,short:'WH',emoji:'🔗'},
-    {name:'Razorpay',desc:'Trigger on payment capture',col:0x2563EB,short:'RP',emoji:'💳'},
-    {name:'Smart Lists',desc:'Bulk message scheduled contacts',col:0xf59e0b,short:'SL',emoji:'📋'},
-    {name:'Google Forms',desc:'Trigger on form submissions',col:0x9333ea,short:'GF',emoji:'📝'},
-    {name:'Scheduler',desc:'Cron-based timed automation',col:0x34d399,short:'SC',emoji:'⏰'},
-    {name:'Google OAuth',desc:'Secure Google authentication',col:0x4285F4,short:'OA',emoji:'🔐'},
-    {name:'REST API',desc:'Full API access for developers',col:0x06b6d4,short:'API',emoji:'⚡'},
-  ];
-  function makeCardTex(intg){
-    const can=document.createElement('canvas');can.width=512;can.height=320;
-    const c=can.getContext('2d');
-    const r=(intg.col>>16)&0xff,g=(intg.col>>8)&0xff,b=intg.col&0xff;
-    const bgG=c.createLinearGradient(0,0,512,320);
-    bgG.addColorStop(0,`rgba(${r},${g},${b},0.18)`);
-    bgG.addColorStop(1,'rgba(2,0,10,0.9)');
-    c.fillStyle=bgG;c.roundRect(0,0,512,320,24);c.fill();
-    c.strokeStyle=`rgba(${r},${g},${b},0.55)`;c.lineWidth=2;
-    c.roundRect(1,1,510,318,23);c.stroke();
-    c.font='60px serif';c.textAlign='left';c.textBaseline='top';c.fillText(intg.emoji,32,28);
-    const nameG=c.createLinearGradient(0,130,512,130);
-    nameG.addColorStop(0,`rgb(${r},${g},${b})`);nameG.addColorStop(1,'#fff');
-    c.fillStyle=nameG;c.font='bold 52px -apple-system,sans-serif';
-    c.textAlign='left';c.textBaseline='middle';c.fillText(intg.name,32,150);
-    c.fillStyle='rgba(255,255,255,0.4)';c.font='22px -apple-system,sans-serif';
-    c.fillText(intg.desc,32,218);
-    c.fillStyle=`rgba(${r},${g},${b},0.25)`;c.font='bold 38px monospace';
-    c.textAlign='right';c.fillText(intg.short,480,280);
-    return new THREE.CanvasTexture(can);
-  }
-  const cardMeshes=[];
-  INTS.forEach((intg,i)=>{
-    const geo=new THREE.PlaneGeometry(3.8,2.4);
-    const mat=new THREE.MeshBasicMaterial({map:makeCardTex(intg),transparent:true,side:THREE.DoubleSide});
-    const mesh=new THREE.Mesh(geo,mat);
-    const angle=(i/INTS.length)*Math.PI*2.4;
-    const spread=4+((i%3)*1.5);
-    mesh.position.set(Math.cos(angle)*spread*0.55,Math.sin(i*0.75)*2.8,-i*8.5);
-    mesh.rotation.set((Math.random()-0.5)*0.25,Math.atan2(mesh.position.x,9)*0.45,(Math.random()-0.5)*0.08);
-    mesh.userData={intg,index:i,basePos:mesh.position.clone(),baseRot:mesh.rotation.clone()};
-    scene.add(mesh);cardMeshes.push(mesh);
-  });
-  let scrollPct=0,mouseX=0,mouseY=0,t=0,hovCard=null;
-  const raycaster=new THREE.Raycaster();
-  const mouse=new THREE.Vector2();
-  const heroText=document.getElementById('lp-hero-text');
-  const tt=document.getElementById('lp-tooltip');
-  window.addEventListener('scroll',()=>{
-    const lp=document.getElementById('landing-page');
-    if(!lp||lp.classList.contains('hidden')) return;
-    const scrollSpace=document.getElementById('lp-scroll-space');
-    if(!scrollSpace) return;
-    const rect=scrollSpace.getBoundingClientRect();
-    const total=scrollSpace.offsetHeight-window.innerHeight;
-    const scrolled=Math.max(0,-rect.top);
-    scrollPct=Math.max(0,Math.min(1,scrolled/total));
-    const fade=Math.max(0,1-scrollPct*5);
-    heroText.style.opacity=fade;
-    heroText.style.pointerEvents=fade>0.1?'all':'none';
-  },{passive:true});
-  window.addEventListener('mousemove',e=>{
-    const lp=document.getElementById('landing-page');
-    if(!lp||lp.classList.contains('hidden')) return;
-    mouseX=(e.clientX/window.innerWidth-0.5)*2;
-    mouseY=(e.clientY/window.innerHeight-0.5)*2;
-    mouse.x=(e.clientX/window.innerWidth)*2-1;
-    mouse.y=-(e.clientY/window.innerHeight)*2+1;
-    raycaster.setFromCamera(mouse,camera);
-    const hits=raycaster.intersectObjects(cardMeshes);
-    if(hits.length>0){
-      const h=hits[0].object;
-      if(hovCard!==h){if(hovCard)hovCard.scale.set(1,1,1);hovCard=h;}
-      hovCard.scale.set(1.05,1.05,1.05);
-      tt.textContent=h.userData.intg.name+' — '+h.userData.intg.desc;
-      tt.style.left=(e.clientX-130)+'px';
-      tt.style.top=(e.clientY-52)+'px';
-      tt.style.opacity='1';
-      document.body.style.cursor='pointer';
-    } else {
-      if(hovCard){hovCard.scale.set(1,1,1);hovCard=null;}
-      tt.style.opacity='0';
-      document.body.style.cursor='default';
-    }
-  });
-  window.addEventListener('resize',()=>{
-    camera.aspect=window.innerWidth/window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth,window.innerHeight);
-  });
-  function animate(){
-    requestAnimationFrame(animate);
-    t+=0.006;
-    const lp=document.getElementById('landing-page');
-    if(!lp||lp.classList.contains('hidden')){renderer.render(scene,camera);return;}
-    const targetZ=10-scrollPct*(INTS.length*8.5*0.88);
-    camera.position.z+=(targetZ-camera.position.z)*0.055;
-    camera.position.x+=(mouseX*1.2-camera.position.x)*0.025;
-    camera.position.y+=(-mouseY*0.8-camera.position.y)*0.025;
-    camera.lookAt(0,0,camera.position.z-15);
-    cardMeshes.forEach((mesh,i)=>{
-      mesh.position.y=mesh.userData.basePos.y+Math.sin(t*0.5+i*0.6)*0.14;
-      mesh.rotation.z=mesh.userData.baseRot.z+Math.sin(t*0.35+i*0.4)*0.025;
-      const dist=Math.abs(mesh.position.z-camera.position.z);
-      mesh.material.opacity=Math.max(0.05,Math.min(1,1-dist/22));
-    });
-    pL1.position.x=Math.cos(t*0.3)*7;pL1.position.z=camera.position.z+Math.sin(t*0.3)*7;
-    pL2.position.x=Math.cos(t*0.3+Math.PI)*7;pL2.position.z=camera.position.z+Math.sin(t*0.3+Math.PI)*7;
-    particles.position.z=camera.position.z*0.25;
-    particles.rotation.y+=0.0001;
-    gridH.position.z=camera.position.z*0.4;
-    renderer.render(scene,camera);
-  }
-  animate();
-  const revEls=document.querySelectorAll('.lp-reveal');
-  const io=new IntersectionObserver(entries=>{
-    entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('lp-vis');});
-  },{threshold:0.1});
-  revEls.forEach(r=>io.observe(r));
-})();
-</script>
+  <!-- Chatbot -->
+  <div id="chatbot-container" style="display:none;">
+    <div id="chatbot-header">
+      <span>🤖 Neru Assistant</span>
+      <button id="chatbot-toggle-btn" onclick="toggleChatbot()">−</button>
+    </div>
+    <div id="chatbot-messages"></div>
+    <div id="chatbot-input-area">
+      <input type="text" id="chatbot-input" placeholder="Ask anything about Nerum..." onkeypress="if(event.key==='Enter') sendChatbotMessage()" />
+      <button onclick="sendChatbotMessage()">Send</button>
+    </div>
+  </div>
+  <div id="chatbot-fab" onclick="openChatbot()" title="Chat with Neru">💬</div>
 
+  <script src="app.js"></script>
 </body>
 </html>
