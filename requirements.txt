@@ -18,3 +18,4 @@ razorpay
 psycopg2-binary
 slowapi
 apscheduler
+anthropic
