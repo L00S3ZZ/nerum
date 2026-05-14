@@ -1,11 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Header, UploadFile, File
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
-from models.database import SessionLocal, User, Workflow
-from models.ai_agent_model import AIAgentConversation
+from models.database import SessionLocal, User, Workflow, AIAgentConversation
 from jose import jwt, JWTError
 from datetime import datetime
-from security import sanitize_input
+from security import sanitize_input, check_tokens, deduct_tokens, token_error_message
 import os
 import re
 import json
@@ -16,7 +15,9 @@ router = APIRouter()
 SECRET_KEY = os.environ.get("SECRET_KEY", "nerum-secret-key-2026")
 ALGORITHM = "HS256"
 ANTHROPIC_API_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+AI_ENABLED = os.environ.get("AI_ENABLED", "false").lower() == "true"
 NERU_MODEL = "claude-haiku-4-5"
+NERU_MAX_TOKENS = 1500
 NERU_TOKEN_COST = 15
 
 AVATARS_DIR = os.path.join("static", "avatars")
@@ -387,7 +388,7 @@ def _call_claude(messages):
 
     resp = client.messages.create(
         model=NERU_MODEL,
-        max_tokens=1500,
+        max_tokens=NERU_MAX_TOKENS,
         system=NERU_SYSTEM_PROMPT,
         messages=api_messages,
     )
@@ -414,7 +415,6 @@ def _extract_workflow_json(text: str):
     if not m:
         return None
     raw = m.group(0)
-    # try progressive parsing — JSON may be embedded with surrounding text
     for end in range(len(raw), 0, -1):
         try:
             return json.loads(raw[:end])
@@ -440,7 +440,6 @@ def _build_workflow_steps(workflow_data: dict):
     return steps
 
 
-# ─── POST /ai-agent/chat ────────────────────────────────────────────────────────
 @router.post("/chat")
 def chat(req: ChatRequest, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     msg_text = sanitize_input(req.message, 2000)
@@ -448,6 +447,22 @@ def chat(req: ChatRequest, user: User = Depends(get_current_user), db: Session =
         raise HTTPException(status_code=400, detail="Message cannot be empty")
 
     conv_id = sanitize_input(req.conversation_id, 80) or str(uuid.uuid4())
+
+    if not AI_ENABLED:
+        return {
+            "reply": "AI is currently being configured. Check back soon!",
+            "agent_state": "listening",
+            "workflow_created": False,
+            "workflow_id": None,
+            "workflow_data": None,
+            "workflow_steps": None,
+            "tokens_used": user.tokens_used or 0,
+            "conversation_id": conv_id,
+        }
+
+    can_proceed, cost, remaining = check_tokens(user, "ai_chat")
+    if not can_proceed:
+        raise HTTPException(status_code=403, detail=token_error_message("ai_chat", remaining, cost))
 
     convo = db.query(AIAgentConversation).filter(
         AIAgentConversation.conversation_id == conv_id,
@@ -477,7 +492,7 @@ def chat(req: ChatRequest, user: User = Depends(get_current_user), db: Session =
     except HTTPException:
         raise
     except Exception as e:
-        print(f"❌ Neru AI error: {e}")
+        print(f"Neru AI error: {e}")
         raise HTTPException(status_code=502, detail="Neru is taking a break. Try again in a moment.")
 
     history.append({"role": "assistant", "content": ai_text})
@@ -515,22 +530,19 @@ def chat(req: ChatRequest, user: User = Depends(get_current_user), db: Session =
             convo.workflow_created = True
             convo.workflow_id = new_wf.id
             workflow_steps = _build_workflow_steps(workflow_data)
-            # remove embedded JSON from displayed reply
             cleaned_reply = WORKFLOW_JSON_PATTERN.sub("", cleaned_reply).strip()
         except Exception as e:
-            print(f"❌ Workflow save error: {e}")
+            print(f"Workflow save error: {e}")
             workflow_created = False
 
     if not workflow_steps and workflow_data:
         workflow_steps = _build_workflow_steps(workflow_data)
 
-    # persist conversation
     convo.messages = json.dumps(history)
     convo.updated_at = datetime.utcnow()
     if not convo.preview:
         convo.preview = msg_text[:60]
 
-    # deduct tokens
     user.tokens_used = (user.tokens_used or 0) + NERU_TOKEN_COST
 
     db.commit()
@@ -547,7 +559,6 @@ def chat(req: ChatRequest, user: User = Depends(get_current_user), db: Session =
     }
 
 
-# ─── POST /ai-agent/upload-avatar ───────────────────────────────────────────────
 @router.post("/upload-avatar")
 async def upload_avatar(file: UploadFile = File(...), user: User = Depends(get_current_user)):
     if not file.content_type or file.content_type.lower() not in ("image/jpeg", "image/jpg", "image/png"):
@@ -565,13 +576,12 @@ async def upload_avatar(file: UploadFile = File(...), user: User = Depends(get_c
         with open(save_path, "wb") as f:
             f.write(data)
     except Exception as e:
-        print(f"❌ Avatar save error: {e}")
+        print(f"Avatar save error: {e}")
         raise HTTPException(status_code=500, detail="Failed to save avatar")
 
     return {"avatar_url": f"/static/avatars/{filename}"}
 
 
-# ─── GET /ai-agent/avatar ───────────────────────────────────────────────────────
 @router.get("/avatar")
 def get_avatar(user: User = Depends(get_current_user)):
     filename = f"{user.id}.jpg"
@@ -581,7 +591,6 @@ def get_avatar(user: User = Depends(get_current_user)):
     return {"avatar_url": None, "has_avatar": False}
 
 
-# ─── GET /ai-agent/conversations ────────────────────────────────────────────────
 @router.get("/conversations")
 def list_conversations(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     convos = db.query(AIAgentConversation).filter(
@@ -600,7 +609,6 @@ def list_conversations(user: User = Depends(get_current_user), db: Session = Dep
     ]
 
 
-# ─── GET /ai-agent/conversation/{id} ────────────────────────────────────────────
 @router.get("/conversation/{conversation_id}")
 def get_conversation(conversation_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     convo = db.query(AIAgentConversation).filter(
@@ -613,15 +621,21 @@ def get_conversation(conversation_id: str, user: User = Depends(get_current_user
         messages = json.loads(convo.messages) if convo.messages else []
     except Exception:
         messages = []
+    # strip state tags from messages for display
+    cleaned = []
+    for m in messages:
+        c = m.get("content", "")
+        if m.get("role") == "assistant":
+            c = _strip_state(c)
+        cleaned.append({"role": m.get("role"), "content": c})
     return {
         "conversation_id": convo.conversation_id,
-        "messages": messages,
+        "messages": cleaned,
         "workflow_created": convo.workflow_created,
         "workflow_id": convo.workflow_id,
     }
 
 
-# ─── DELETE /ai-agent/conversation/{id} ─────────────────────────────────────────
 @router.delete("/conversation/{conversation_id}")
 def delete_conversation(conversation_id: str, user: User = Depends(get_current_user), db: Session = Depends(get_db)):
     convo = db.query(AIAgentConversation).filter(
