@@ -8,6 +8,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from routes.workflow import router
 from routes.gmail import router as gmail_router
+from routes.ai_agent import router as ai_agent_router
 from routes.sheets import router as sheets_router
 from routes.auth import router as auth_router
 from routes.telegram import router as telegram_router
@@ -81,6 +82,7 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 
 # ✅ Routers
 app.include_router(router, prefix="/workflow")
+app.include_router(ai_agent_router, prefix="/ai-agent")
 app.include_router(gmail_router, prefix="/gmail")
 app.include_router(sheets_router, prefix="/sheets")
 app.include_router(auth_router, prefix="/auth")
@@ -134,4 +136,4 @@ async def startup_event():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), use_reloader=False)
+    uvicorn.run("main:app", host="0.0.0.0", port=int(os.environ.get("PORT", 8000)), )

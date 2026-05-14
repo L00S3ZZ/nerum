@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Neru — Nerum AI Agent</title>
+<link rel="stylesheet" href="/static/ai_agent.css" />
+</head>
+<body>
+
+<!-- Galaxy starfield -->
+<div class="galaxy" id="galaxy"></div>
+
+<!-- Top bar -->
+<header class="top-bar">
+  <div class="brand">
+    <button class="hamburger" id="hamburgerBtn" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+    <h1 class="brand-title">Neru <span class="brand-sub">AI Agent</span></h1>
+  </div>
+  <div class="token-balance" id="tokenBalance">
+    <span class="token-icon">◆</span>
+    <span id="tokenCount">—</span> tokens
+  </div>
+</header>
+
+<div class="layout">
+
+  <!-- LEFT SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <button class="new-chat-btn" id="newChatBtn">
+      <span class="plus">＋</span> New Chat
+    </button>
+    <div class="divider"></div>
+    <div class="sidebar-label">Past chats</div>
+    <div class="convo-list" id="convoList">
+      <div class="convo-empty">No conversations yet</div>
+    </div>
+  </aside>
+
+  <!-- CENTER STAGE -->
+  <main class="stage">
+
+    <!-- Avatar area -->
+    <section class="avatar-stage" id="avatarStage">
+      <div class="speech-bubble" id="speechBubble">
+        <span id="speechText">Hi! I'm Neru.</span>
+        <div class="bubble-tail"></div>
+      </div>
+
+      <div class="avatar-wrapper" id="avatarWrapper">
+        <!-- Particle trail container -->
+        <div class="particle-trail" id="particleTrail"></div>
+
+        <!-- Question mark for thinking -->
+        <div class="thought-mark" id="thoughtMark">?</div>
+
+        <!-- Thinking dots -->
+        <div class="thinking-dots" id="thinkingDots">
+          <span>•</span><span>•</span><span>•</span>
+        </div>
+
+        <!-- Confetti container -->
+        <div class="confetti-container" id="confettiContainer"></div>
+
+        <!-- THE AVATAR (SVG) -->
+        <svg class="avatar-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" id="avatarSvg">
+          <defs>
+            <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stop-color="#f472b6" />
+              <stop offset="100%" stop-color="#e879f9" />
+            </linearGradient>
+            <radialGradient id="headGrad" cx="50%" cy="40%" r="60%">
+              <stop offset="0%" stop-color="#fbcfe8" />
+              <stop offset="100%" stop-color="#f472b6" />
+            </radialGradient>
+            <clipPath id="headClip">
+              <circle cx="100" cy="80" r="48" />
+            </clipPath>
+          </defs>
+
+          <!-- Legs (animate while walking) -->
+          <g class="legs">
+            <rect class="leg leg-left"  x="82"  y="200" width="14" height="46" rx="6" fill="url(#bodyGrad)" />
+            <rect class="leg leg-right" x="104" y="200" width="14" height="46" rx="6" fill="url(#bodyGrad)" />
+          </g>
+
+          <!-- Body -->
+          <ellipse class="body" cx="100" cy="160" rx="55" ry="50" fill="url(#bodyGrad)" />
+
+          <!-- Arms -->
+          <g class="arms">
+            <rect class="arm arm-left"  x="38"  y="135" width="14" height="52" rx="7" fill="url(#bodyGrad)" />
+            <rect class="arm arm-right" x="148" y="135" width="14" height="52" rx="7" fill="url(#bodyGrad)" />
+          </g>
+
+          <!-- Mini laptop (working state) -->
+          <g class="mini-laptop" id="miniLaptop">
+            <rect x="78" y="178" width="44" height="28" rx="3" fill="#1a0a25" stroke="#f472b6" stroke-width="1.5"/>
+            <rect x="82" y="182" width="36" height="18" rx="1" fill="#e879f9" opacity="0.5"/>
+          </g>
+
+          <!-- Head -->
+          <g class="head" id="headGroup">
+            <circle cx="100" cy="80" r="48" fill="url(#headGrad)" stroke="#f472b6" stroke-width="2"/>
+
+            <!-- Avatar photo overlay (if uploaded) -->
+            <image id="avatarPhoto" href="" x="52" y="32" width="96" height="96" clip-path="url(#headClip)" preserveAspectRatio="xMidYMid slice" style="display:none;"/>
+
+            <!-- Default "N" monogram -->
+            <text id="monogram" x="100" y="92" text-anchor="middle" font-family="system-ui,sans-serif" font-size="42" font-weight="700" fill="#ffffff">N</text>
+
+            <!-- Eyes (hidden when photo is set) -->
+            <g class="eyes" id="eyesGroup" style="display:none;">
+              <ellipse class="eye eye-left"  cx="84"  cy="76" rx="5" ry="6" fill="#1a0a25"/>
+              <ellipse class="eye eye-right" cx="116" cy="76" rx="5" ry="6" fill="#1a0a25"/>
+            </g>
+
+            <!-- Mouth (hidden when photo is set) -->
+            <path id="mouth" class="mouth-neutral" d="M 84 100 Q 100 108 116 100" stroke="#1a0a25" stroke-width="2.5" fill="none" stroke-linecap="round" style="display:none;"/>
+          </g>
+        </svg>
+      </div>
+
+      <!-- Avatar upload -->
+      <div class="avatar-upload">
+        <div class="upload-label">Make it yours</div>
+        <label class="upload-btn" id="uploadBtn" for="avatarFile">
+          <span class="upload-icon">＋</span>
+          <span class="upload-hint" id="uploadHint">Upload photo</span>
+        </label>
+        <input type="file" id="avatarFile" accept="image/jpeg,image/png" hidden />
+      </div>
+    </section>
+
+    <!-- Workflow canvas -->
+    <section class="workflow-canvas" id="workflowCanvas">
+      <div class="canvas-empty" id="canvasEmpty">Your workflow will appear here</div>
+      <div class="step-row" id="stepRow"></div>
+    </section>
+
+    <!-- Chat scroll area -->
+    <section class="chat-area" id="chatArea">
+      <div class="chat-messages" id="chatMessages"></div>
+    </section>
+
+    <!-- Input bar -->
+    <section class="input-bar">
+      <button class="mic-btn" id="micBtn" aria-label="Voice input" title="Voice input">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+          <rect x="9" y="3" width="6" height="12" rx="3"/>
+          <path d="M5 11a7 7 0 0 0 14 0"/>
+          <line x1="12" y1="18" x2="12" y2="22"/>
+          <line x1="8" y1="22" x2="16" y2="22"/>
+        </svg>
+      </button>
+      <input type="text" class="chat-input" id="chatInput" placeholder="Tell Neru what you want to automate…" autocomplete="off" />
+      <button class="send-btn" id="sendBtn">Send</button>
+    </section>
+
+    <div class="voice-status" id="voiceStatus" style="display:none;">
+      <span class="rec-dot"></span> Listening…
+    </div>
+
+  </main>
+</div>
+
+<script src="/static/ai_agent.js"></script>
+</body>
+</html>
