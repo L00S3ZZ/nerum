@@ -23,7 +23,7 @@ def whatsapp_status():
     return {
         "connected": connected,
         "provider": "Meta Cloud API",
-        "phone_number_id": META_PHONE_NUMBER_ID or "not configured"
+        "phone_number_id": META_PHONE_NUMBER_ID
     }
 
 

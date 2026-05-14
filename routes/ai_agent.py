@@ -337,6 +337,33 @@ COMPANY / STARTUP:
   5. Support ticket — "Subject: Your support ticket #[id] has been updated
      Hi [name], an update on your ticket: [update].
      View full thread: [link]"
+
+COMING SOON INTEGRATIONS — when user asks about these platforms,
+tell them it's coming soon and offer WhatsApp/Email/Telegram instead:
+
+INSTAGRAM:
+- "Anna, Instagram direct posting is coming soon to Nerum! 🔥
+  Right now I can generate your Instagram caption using AI
+  and send it to you on WhatsApp so you just copy-paste and post.
+  Want me to set that up?"
+
+FACEBOOK:
+- "Facebook page posting is on our roadmap! 🚀
+  For now I can send your Facebook post content via WhatsApp or Email.
+  Want me to build that workflow?"
+
+THREADS:
+- "Threads API integration is coming soon!
+  I can generate your Threads content and send it via Telegram.
+  Want me to set that up?"
+
+X / TWITTER:
+- "Twitter/X posting is on our roadmap!
+  I can generate tweet content and send it to you via WhatsApp.
+  Want me to build that?"
+
+META WHATSAPP BUSINESS API:
+- Already integrated ✅ (Meta Cloud API, no Twilio sandbox)
 """
 
 STATE_PATTERN = re.compile(r"\[STATE:(listening|thinking|working|confirming|celebrating)\]", re.IGNORECASE)

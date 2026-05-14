@@ -1053,8 +1053,8 @@ function useTemplate(name, desc, trigger, action) {
   openModal();
 }
 
-// ── AI BUILDER (chatbot-like) ────────────────────────────────────────────────
-function sendAIMsg() {
+// ── AI BUILDER (Neru AI) ─────────────────────────────────────────────────────
+async function sendAIMsg() {
   const input = document.getElementById('ai-input');
   const msg = input.value.trim();
   if (!msg) return;
@@ -1062,10 +1062,46 @@ function sendAIMsg() {
   box.innerHTML += `<div class="ai-msg user"><div class="ai-avatar user-av">SH</div><div class="ai-bubble">${msg}</div></div>`;
   input.value = '';
   box.scrollTop = box.scrollHeight;
-  setTimeout(() => {
-    box.innerHTML += `<div class="ai-msg"><div class="ai-avatar bot">N</div><div class="ai-bubble">✦ Got it! I'd suggest building: <strong>${msg}</strong><br><br>AI workflow generation is coming soon. For now, use the template below or the "New Workflow" button to set it up manually!</div></div>`;
+
+  // Typing indicator
+  const typingId = 'ai-typing-' + Date.now();
+  box.innerHTML += `<div class="ai-msg" id="${typingId}"><div class="ai-avatar bot">N</div><div class="ai-bubble">✦ Thinking...</div></div>`;
+  box.scrollTop = box.scrollHeight;
+
+  // Conversation id (persisted)
+  let convId = localStorage.getItem('neru_conv_id');
+  if (!convId) {
+    convId = (crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now() + '-' + Math.random().toString(36).slice(2));
+    localStorage.setItem('neru_conv_id', convId);
+  }
+
+  try {
+    const res = await fetch(API + '/ai-agent/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + localStorage.getItem('nerum_token')
+      },
+      body: JSON.stringify({ message: msg, conversation_id: convId, voice_mode: false })
+    });
+    const data = await res.json();
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+
+    if (!res.ok) {
+      const err = (data && (data.detail || data.message)) || 'Something went wrong. Try again.';
+      box.innerHTML += `<div class="ai-msg"><div class="ai-avatar bot">N</div><div class="ai-bubble">⚠️ ${err}</div></div>`;
+    } else {
+      const reply = (data && data.reply) ? data.reply : '✦ (no reply)';
+      box.innerHTML += `<div class="ai-msg"><div class="ai-avatar bot">N</div><div class="ai-bubble">${reply}</div></div>`;
+    }
     box.scrollTop = box.scrollHeight;
-  }, 800);
+  } catch (e) {
+    const typingEl = document.getElementById(typingId);
+    if (typingEl) typingEl.remove();
+    box.innerHTML += `<div class="ai-msg"><div class="ai-avatar bot">N</div><div class="ai-bubble">⚠️ Network error. Please check your connection and try again.</div></div>`;
+    box.scrollTop = box.scrollHeight;
+  }
 }
 
 // ── CHATBOT (Neru Support Bot) ───────────────────────────────────────────────
