@@ -20,6 +20,7 @@ from routes import forms
 from routes import webhook
 from routes import dashboard
 from routes.chatbot import router as chatbot_router
+from routes.workflow_triggers import router as triggers_router
 from scheduler import start_scheduler
 from security import check_content, sanitize_input, get_daily_limit
 import os
@@ -95,6 +96,7 @@ app.include_router(forms.router, prefix="/forms")
 app.include_router(webhook.router, prefix="/webhook")
 app.include_router(dashboard.router, prefix="/dashboard")
 app.include_router(chatbot_router, prefix="/chatbot")
+app.include_router(triggers_router)
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -115,6 +117,11 @@ def home():
 @app.get("/dashboard")
 def dashboard_page():
     return FileResponse("static/dashboard.html")
+
+# ✅ Visual workflow builder
+@app.get("/builder")
+def builder_page():
+    return FileResponse("static/workflow_builder.html")
 
 @app.get("/privacy")
 def privacy():
