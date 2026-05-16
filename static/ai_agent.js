@@ -59,7 +59,7 @@ async function api(path, opts = {}) {
 function buildGalaxy() {
   const galaxy = document.getElementById("galaxy");
   if (!galaxy) return;
-  const colors = ["#f472b6", "#e879f9", "#ffffff"];
+  const colors = ["#C50022", "#ff4060", "#ffffff"];
   const frag = document.createDocumentFragment();
   for (let i = 0; i < 80; i++) {
     const star = document.createElement("div");
@@ -113,7 +113,7 @@ function setSpeechBubble(text) {
 function burstConfetti() {
   const container = document.getElementById("confettiContainer");
   if (!container) return;
-  const colors = ["#f472b6", "#e879f9", "#ffffff", "#fde047"];
+  const colors = ["#C50022", "#ff4060", "#ffffff", "#fde047"];
   for (let i = 0; i < 30; i++) {
     const p = document.createElement("div");
     p.className = "confetti-piece";

@@ -68,12 +68,12 @@
         <svg class="avatar-svg" viewBox="0 0 200 260" xmlns="http://www.w3.org/2000/svg" id="avatarSvg">
           <defs>
             <linearGradient id="bodyGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" stop-color="#f472b6" />
-              <stop offset="100%" stop-color="#e879f9" />
+              <stop offset="0%" stop-color="#C50022" />
+              <stop offset="100%" stop-color="#C50022" />
             </linearGradient>
             <radialGradient id="headGrad" cx="50%" cy="40%" r="60%">
-              <stop offset="0%" stop-color="#fbcfe8" />
-              <stop offset="100%" stop-color="#f472b6" />
+              <stop offset="0%" stop-color="#ff4060" />
+              <stop offset="100%" stop-color="#C50022" />
             </radialGradient>
             <clipPath id="headClip">
               <circle cx="100" cy="80" r="48" />
@@ -97,13 +97,13 @@
 
           <!-- Mini laptop (working state) -->
           <g class="mini-laptop" id="miniLaptop">
-            <rect x="78" y="178" width="44" height="28" rx="3" fill="#1a0a25" stroke="#f472b6" stroke-width="1.5"/>
-            <rect x="82" y="182" width="36" height="18" rx="1" fill="#e879f9" opacity="0.5"/>
+            <rect x="78" y="178" width="44" height="28" rx="3" fill="#000000" stroke="#C50022" stroke-width="1.5"/>
+            <rect x="82" y="182" width="36" height="18" rx="1" fill="#C50022" opacity="0.5"/>
           </g>
 
           <!-- Head -->
           <g class="head" id="headGroup">
-            <circle cx="100" cy="80" r="48" fill="url(#headGrad)" stroke="#f472b6" stroke-width="2"/>
+            <circle cx="100" cy="80" r="48" fill="url(#headGrad)" stroke="#C50022" stroke-width="2"/>
 
             <!-- Avatar photo overlay (if uploaded) -->
             <image id="avatarPhoto" href="" x="52" y="32" width="96" height="96" clip-path="url(#headClip)" preserveAspectRatio="xMidYMid slice" style="display:none;"/>
@@ -113,12 +113,12 @@
 
             <!-- Eyes (hidden when photo is set) -->
             <g class="eyes" id="eyesGroup" style="display:none;">
-              <ellipse class="eye eye-left"  cx="84"  cy="76" rx="5" ry="6" fill="#1a0a25"/>
-              <ellipse class="eye eye-right" cx="116" cy="76" rx="5" ry="6" fill="#1a0a25"/>
+              <ellipse class="eye eye-left"  cx="84"  cy="76" rx="5" ry="6" fill="#000000"/>
+              <ellipse class="eye eye-right" cx="116" cy="76" rx="5" ry="6" fill="#000000"/>
             </g>
 
             <!-- Mouth (hidden when photo is set) -->
-            <path id="mouth" class="mouth-neutral" d="M 84 100 Q 100 108 116 100" stroke="#1a0a25" stroke-width="2.5" fill="none" stroke-linecap="round" style="display:none;"/>
+            <path id="mouth" class="mouth-neutral" d="M 84 100 Q 100 108 116 100" stroke="#000000" stroke-width="2.5" fill="none" stroke-linecap="round" style="display:none;"/>
           </g>
         </svg>
       </div>

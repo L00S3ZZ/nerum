@@ -20,7 +20,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['patient_name', 'doctor', 'appointment_date', 'appointment_time', 'reminded', 'visit_status'],
     columnLabels: { patient_name: 'Patient Name', doctor: 'Doctor', appointment_date: 'Date', appointment_time: 'Time', reminded: 'Reminded', visit_status: 'Status' },
     statusOptions: ['Scheduled', 'Completed', 'Cancelled', 'No Show'],
-    statusColors: { 'Scheduled': '#818cf8', 'Completed': '#34d399', 'Cancelled': '#ff8a7a', 'No Show': '#fbbf24' },
+    statusColors: { 'Scheduled': '#C50022', 'Completed': '#34d399', 'Cancelled': '#ff8a7a', 'No Show': '#fbbf24' },
     use_cases: [
       { id: 'appointment', label: '📅 Appointment Reminder', condition_field: 'reminded', condition_value: 'No', message: 'Dear {name}, your appointment with Dr. {doctor} is on {appointment_date} at {appointment_time}. Please arrive 10 minutes early.' },
       { id: 'followup', label: '🔄 Follow-up Reminder', condition_field: 'visit_status', condition_value: 'Completed', message: 'Dear {name}, Dr. {doctor} recommends a follow-up visit. Please call us to schedule your next appointment.' },
@@ -32,7 +32,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['customer_name', 'order_id', 'product', 'amount', 'payment_status', 'delivery_date'],
     columnLabels: { customer_name: 'Customer', order_id: 'Order ID', product: 'Product', amount: 'Amount', payment_status: 'Payment', delivery_date: 'Delivery Date' },
     statusOptions: ['Pending', 'Paid', 'Shipped', 'Delivered', 'Cancelled'],
-    statusColors: { 'Pending': '#fbbf24', 'Paid': '#818cf8', 'Shipped': '#2AABEE', 'Delivered': '#34d399', 'Cancelled': '#ff8a7a' },
+    statusColors: { 'Pending': '#fbbf24', 'Paid': '#C50022', 'Shipped': '#2AABEE', 'Delivered': '#34d399', 'Cancelled': '#ff8a7a' },
     use_cases: [
       { id: 'payment_reminder', label: '💰 Payment Reminder', condition_field: 'payment_status', condition_value: 'Pending', message: 'Dear {name}, your payment of ₹{amount} for order #{order_id} ({product}) is pending. Please pay to avoid cancellation.' },
       { id: 'order_confirm', label: '📦 Order Confirmation', condition_field: 'payment_status', condition_value: 'Paid', message: 'Dear {name}, your order #{order_id} for {product} is confirmed! Total: ₹{amount}. Expected delivery: {delivery_date}.' },
@@ -45,7 +45,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['customer_name', 'order_id', 'items', 'amount', 'order_status', 'table_no'],
     columnLabels: { customer_name: 'Customer', order_id: 'Order ID', items: 'Items', amount: 'Amount', order_status: 'Status', table_no: 'Table' },
     statusOptions: ['Pending', 'Preparing', 'Ready', 'Delivered', 'Cancelled'],
-    statusColors: { 'Pending': '#fbbf24', 'Preparing': '#818cf8', 'Ready': '#34d399', 'Delivered': '#2AABEE', 'Cancelled': '#ff8a7a' },
+    statusColors: { 'Pending': '#fbbf24', 'Preparing': '#C50022', 'Ready': '#34d399', 'Delivered': '#2AABEE', 'Cancelled': '#ff8a7a' },
     use_cases: [
       { id: 'order_ready', label: '🍽️ Order Ready', condition_field: 'order_status', condition_value: 'Ready', message: 'Dear {name}, your order #{order_id} is ready! Items: {items}. Total: ₹{amount}. Table: {table_no}.' },
       { id: 'order_confirm', label: '✅ Order Confirmed', condition_field: 'order_status', condition_value: 'Pending', message: 'Dear {name}, your order #{order_id} has been received! Items: {items}. Total: ₹{amount}. We\'ll notify you when ready.' },
@@ -57,7 +57,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['client_name', 'property', 'emi_amount', 'emi_due_date', 'emi_status', 'agent_name'],
     columnLabels: { client_name: 'Client Name', property: 'Property', emi_amount: 'EMI Amount', emi_due_date: 'Due Date', emi_status: 'Status', agent_name: 'Agent' },
     statusOptions: ['Pending', 'Paid', 'Overdue', 'Scheduled'],
-    statusColors: { 'Pending': '#fbbf24', 'Paid': '#34d399', 'Overdue': '#ff8a7a', 'Scheduled': '#818cf8' },
+    statusColors: { 'Pending': '#fbbf24', 'Paid': '#34d399', 'Overdue': '#ff8a7a', 'Scheduled': '#C50022' },
     use_cases: [
       { id: 'emi_reminder', label: '💰 EMI Reminder', condition_field: 'emi_status', condition_value: 'Pending', message: 'Dear {name}, your EMI of ₹{emi_amount} for {property} is due on {emi_due_date}. Please ensure timely payment to avoid penalties.' },
       { id: 'overdue', label: '⚠️ Overdue Alert', condition_field: 'emi_status', condition_value: 'Overdue', message: 'Dear {name}, your EMI of ₹{emi_amount} for {property} is overdue! Please contact {agent_name} immediately to avoid legal action.' },
@@ -69,7 +69,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['member_name', 'membership_type', 'expiry_date', 'amount', 'membership_status', 'trainer'],
     columnLabels: { member_name: 'Member Name', membership_type: 'Plan', expiry_date: 'Expiry Date', amount: 'Amount', membership_status: 'Status', trainer: 'Trainer' },
     statusOptions: ['Active', 'Expiring', 'Expired', 'Paused'],
-    statusColors: { 'Active': '#34d399', 'Expiring': '#fbbf24', 'Expired': '#ff8a7a', 'Paused': '#818cf8' },
+    statusColors: { 'Active': '#34d399', 'Expiring': '#fbbf24', 'Expired': '#ff8a7a', 'Paused': '#C50022' },
     use_cases: [
       { id: 'membership', label: '💳 Membership Expiry', condition_field: 'membership_status', condition_value: 'Expiring', message: 'Dear {name}, your {membership_type} membership expires on {expiry_date}. Renew now at ₹{amount} to continue your fitness journey!' },
       { id: 'expired', label: '❌ Membership Expired', condition_field: 'membership_status', condition_value: 'Expired', message: 'Dear {name}, your gym membership has expired. Renew at ₹{amount} and get back on track with trainer {trainer}!' },
@@ -81,7 +81,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['employee_name', 'department', 'task_name', 'deadline', 'task_status', 'priority'],
     columnLabels: { employee_name: 'Employee', department: 'Department', task_name: 'Task', deadline: 'Deadline', task_status: 'Status', priority: 'Priority' },
     statusOptions: ['Pending', 'In Progress', 'Completed', 'Overdue'],
-    statusColors: { 'Pending': '#fbbf24', 'In Progress': '#818cf8', 'Completed': '#34d399', 'Overdue': '#ff8a7a' },
+    statusColors: { 'Pending': '#fbbf24', 'In Progress': '#C50022', 'Completed': '#34d399', 'Overdue': '#ff8a7a' },
     use_cases: [
       { id: 'deadline', label: '⏰ Task Deadline', condition_field: 'task_status', condition_value: 'Pending', message: 'Hi {name}, the deadline for "{task_name}" is {deadline}. Current status: {task_status}. Please update your progress.' },
       { id: 'overdue', label: '🚨 Overdue Task', condition_field: 'task_status', condition_value: 'Overdue', message: 'Hi {name}, "{task_name}" is overdue since {deadline}! Please complete it urgently or escalate to your manager.' },
@@ -93,7 +93,7 @@ const BUSINESS_TEMPLATES = {
     columns: ['contact_name', 'category', 'amount', 'status', 'due_date', 'notes'],
     columnLabels: { contact_name: 'Name', category: 'Category', amount: 'Amount', status: 'Status', due_date: 'Due Date', notes: 'Notes' },
     statusOptions: ['Pending', 'Done', 'Skip', 'Active'],
-    statusColors: { 'Pending': '#fbbf24', 'Done': '#34d399', 'Skip': '#818cf8', 'Active': '#e879f9' },
+    statusColors: { 'Pending': '#fbbf24', 'Done': '#34d399', 'Skip': '#C50022', 'Active': '#C50022' },
     use_cases: [
       { id: 'custom', label: '⚡ Custom Message', condition_field: 'status', condition_value: 'Pending', message: 'Dear {name}, {notes}. Please contact us if you have any questions.' },
     ]
@@ -109,9 +109,9 @@ async function showSmartLists() {
   const content = document.getElementById('main-content');
   const isDark = document.body.classList.contains('dark');
   const bg = isDark ? 'rgba(255,255,255,0.03)' : 'rgba(255,255,255,0.7)';
-  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(109,40,217,0.15)';
-  const color = isDark ? '#fff' : '#1a0533';
-  const muted = isDark ? 'rgba(255,255,255,0.4)' : '#6d28d9';
+  const border = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(197,0,34,0.15)';
+  const color = isDark ? '#fff' : '#000000';
+  const muted = isDark ? 'rgba(255,255,255,0.4)' : '#a0001b';
 
   // Hide all pages
   ['main-content','billing-content','settings-content','history-content','workflows-content','smartlists-content'].forEach(id => {
@@ -139,10 +139,10 @@ async function renderSmartListsHome(page) {
 
   page.innerHTML = `<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
     <div>
-      <div style="font-size:20px;font-weight:800;color:${isDark?'#fff':'#1a0533'}">Smart Lists 📋</div>
-      <div style="font-size:12px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-top:2px">Auto-send messages based on your data</div>
+      <div style="font-size:20px;font-weight:800;color:${isDark?'#fff':'#000000'}">Smart Lists 📋</div>
+      <div style="font-size:12px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-top:2px">Auto-send messages based on your data</div>
     </div>
-    <button onclick="showCreateListModal()" style="padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">+ New List</button>
+    <button onclick="showCreateListModal()" style="padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#C50022,#C50022);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">+ New List</button>
   </div>
   <div id="lists-container"><div style="text-align:center;padding:40px;opacity:0.4">Loading...</div></div>`;
 
@@ -154,11 +154,11 @@ async function renderSmartListsHome(page) {
 
     if (lists.length === 0) {
       container.innerHTML = `
-        <div style="text-align:center;padding:60px 20px;background:${isDark?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.5)'};border-radius:20px;border:1px dashed ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'}">
+        <div style="text-align:center;padding:60px 20px;background:${isDark?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.5)'};border-radius:20px;border:1px dashed ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'}">
           <div style="font-size:48px;margin-bottom:16px">📋</div>
-          <div style="font-size:16px;font-weight:700;color:${isDark?'#fff':'#1a0533'};margin-bottom:8px">No Smart Lists yet</div>
-          <div style="font-size:13px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:24px">Create a list for your school, clinic, shop or any business</div>
-          <button onclick="showCreateListModal()" style="padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Create First List →</button>
+          <div style="font-size:16px;font-weight:700;color:${isDark?'#fff':'#000000'};margin-bottom:8px">No Smart Lists yet</div>
+          <div style="font-size:13px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:24px">Create a list for your school, clinic, shop or any business</div>
+          <button onclick="showCreateListModal()" style="padding:12px 28px;border-radius:12px;background:linear-gradient(135deg,#C50022,#C50022);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit">Create First List →</button>
         </div>`;
       return;
     }
@@ -171,9 +171,9 @@ async function renderSmartListsHome(page) {
         const total = l.stats?.total || 0;
         const pct = total > 0 ? Math.round((done/total)*100) : 0;
         return `
-        <div style="background:${isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.7)'};border:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(109,40,217,0.15)'};border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s"
-          onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(232,121,249,0.3)'"
-          onmouseout="this.style.transform='';this.style.borderColor='${isDark?'rgba(255,255,255,0.08)':'rgba(109,40,217,0.15)'}'"
+        <div style="background:${isDark?'rgba(255,255,255,0.04)':'rgba(255,255,255,0.7)'};border:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(197,0,34,0.15)'};border-radius:16px;padding:20px;cursor:pointer;transition:all 0.2s"
+          onmouseover="this.style.transform='translateY(-2px)';this.style.borderColor='rgba(197,0,34,0.3)'"
+          onmouseout="this.style.transform='';this.style.borderColor='${isDark?'rgba(255,255,255,0.08)':'rgba(197,0,34,0.15)'}'"
           onclick="openList(${l.id})">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
             <div style="font-size:22px">${tmpl.label.split(' ')[0]}</div>
@@ -183,18 +183,18 @@ async function renderSmartListsHome(page) {
               ${l.telegram_enabled ? '<span style="font-size:12px">✈️</span>' : ''}
             </div>
           </div>
-          <div style="font-size:14px;font-weight:700;color:${isDark?'#fff':'#1a0533'};margin-bottom:4px">${l.name}</div>
-          <div style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:14px">${tmpl.label.substring(3)} · ${l.schedule_time} daily</div>
+          <div style="font-size:14px;font-weight:700;color:${isDark?'#fff':'#000000'};margin-bottom:4px">${l.name}</div>
+          <div style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:14px">${tmpl.label.substring(3)} · ${l.schedule_time} daily</div>
           <div style="display:flex;justify-content:space-between;margin-bottom:8px">
             <span style="font-size:11px;color:#ff8a7a">⏳ ${pending} pending</span>
             <span style="font-size:11px;color:#34d399">✅ ${done} done</span>
-            <span style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'}">Total: ${total}</span>
+            <span style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'}">Total: ${total}</span>
           </div>
-          <div style="height:4px;border-radius:10px;background:${isDark?'rgba(255,255,255,0.08)':'rgba(109,40,217,0.1)'}">
-            <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#e879f9,#34d399);width:${pct}%"></div>
+          <div style="height:4px;border-radius:10px;background:${isDark?'rgba(255,255,255,0.08)':'rgba(197,0,34,0.1)'}">
+            <div style="height:100%;border-radius:10px;background:linear-gradient(90deg,#C50022,#34d399);width:${pct}%"></div>
           </div>
           <div style="display:flex;justify-content:space-between;margin-top:12px">
-            <span style="font-size:10px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'}">Last run: ${l.last_run ? new Date(l.last_run).toLocaleDateString() : 'Never'}</span>
+            <span style="font-size:10px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'}">Last run: ${l.last_run ? new Date(l.last_run).toLocaleDateString() : 'Never'}</span>
             <span style="font-size:10px;padding:2px 8px;border-radius:20px;background:${l.is_active?'rgba(52,211,153,0.1)':'rgba(255,80,80,0.1)'};color:${l.is_active?'#34d399':'#ff8a7a'}">${l.is_active?'Active':'Paused'}</span>
           </div>
         </div>`;
@@ -226,14 +226,14 @@ async function openList(listId) {
     page.innerHTML = `
       <!-- Header -->
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px">
-        <button onclick="showSmartLists()" style="padding:8px 16px;border-radius:10px;background:${isDark?'rgba(255,255,255,0.06)':'rgba(109,40,217,0.08)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'};font-size:12px;cursor:pointer;font-family:inherit">← Back</button>
+        <button onclick="showSmartLists()" style="padding:8px 16px;border-radius:10px;background:${isDark?'rgba(255,255,255,0.06)':'rgba(197,0,34,0.08)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'};font-size:12px;cursor:pointer;font-family:inherit">← Back</button>
         <div style="flex:1">
-          <div style="font-size:18px;font-weight:800;color:${isDark?'#fff':'#1a0533'}">${tmpl.label.split(' ')[0]} ${lst.name}</div>
-          <div style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'}">${tmpl.label.substring(3)} · Auto-sends at ${lst.schedule_time} daily</div>
+          <div style="font-size:18px;font-weight:800;color:${isDark?'#fff':'#000000'}">${tmpl.label.split(' ')[0]} ${lst.name}</div>
+          <div style="font-size:11px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'}">${tmpl.label.substring(3)} · Auto-sends at ${lst.schedule_time} daily</div>
         </div>
         <div style="display:flex;gap:8px">
           <button onclick="runListNow(${listId})" style="padding:10px 16px;border-radius:12px;background:rgba(52,211,153,0.1);border:1px solid rgba(52,211,153,0.2);color:#34d399;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">▶ Send Now</button>
-          <button onclick="showAddRecordModal(${listId})" style="padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add Row</button>
+          <button onclick="showAddRecordModal(${listId})" style="padding:10px 20px;border-radius:12px;background:linear-gradient(135deg,#C50022,#C50022);border:none;color:#fff;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">+ Add Row</button>
         </div>
       </div>
 
@@ -247,28 +247,28 @@ async function openList(listId) {
           <div style="font-size:22px;font-weight:800;color:#34d399">${records.filter(r=>r.status==='done').length}</div>
           <div style="font-size:10px;color:#34d399;margin-top:2px">Done</div>
         </div>
-        <div style="background:${isDark?'rgba(129,140,248,0.08)':'rgba(129,140,248,0.05)'};border:1px solid rgba(129,140,248,0.15);border-radius:12px;padding:14px;text-align:center">
-          <div style="font-size:22px;font-weight:800;color:#818cf8">${records.length}</div>
-          <div style="font-size:10px;color:#818cf8;margin-top:2px">Total</div>
+        <div style="background:${isDark?'rgba(197,0,34,0.08)':'rgba(197,0,34,0.05)'};border:1px solid rgba(197,0,34,0.15);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:#C50022">${records.length}</div>
+          <div style="font-size:10px;color:#C50022;margin-top:2px">Total</div>
         </div>
-        <div style="background:${isDark?'rgba(232,121,249,0.08)':'rgba(232,121,249,0.05)'};border:1px solid rgba(232,121,249,0.15);border-radius:12px;padding:14px;text-align:center">
-          <div style="font-size:22px;font-weight:800;color:#e879f9">${records.reduce((s,r)=>s+r.message_count,0)}</div>
-          <div style="font-size:10px;color:#e879f9;margin-top:2px">Messages Sent</div>
+        <div style="background:${isDark?'rgba(197,0,34,0.08)':'rgba(197,0,34,0.05)'};border:1px solid rgba(197,0,34,0.15);border-radius:12px;padding:14px;text-align:center">
+          <div style="font-size:22px;font-weight:800;color:#C50022">${records.reduce((s,r)=>s+r.message_count,0)}</div>
+          <div style="font-size:10px;color:#C50022;margin-top:2px">Messages Sent</div>
         </div>
       </div>
 
       <!-- Table -->
-      <div style="background:${isDark?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.7)'};border:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(109,40,217,0.15)'};border-radius:16px;overflow:hidden">
+      <div style="background:${isDark?'rgba(255,255,255,0.03)':'rgba(255,255,255,0.7)'};border:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(197,0,34,0.15)'};border-radius:16px;overflow:hidden">
         <div style="overflow-x:auto">
           <table style="width:100%;border-collapse:collapse">
             <thead>
-              <tr style="border-bottom:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(109,40,217,0.1)'}">
-                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">Name</th>
-                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">Phone</th>
-                ${columns.map(col => `<th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">${tmpl.columnLabels[col] || col}</th>`).join('')}
-                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">Status</th>
-                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">Last Sent</th>
-                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};font-weight:600">Actions</th>
+              <tr style="border-bottom:1px solid ${isDark?'rgba(255,255,255,0.08)':'rgba(197,0,34,0.1)'}">
+                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">Name</th>
+                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">Phone</th>
+                ${columns.map(col => `<th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">${tmpl.columnLabels[col] || col}</th>`).join('')}
+                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">Status</th>
+                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">Last Sent</th>
+                <th style="padding:12px 14px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};font-weight:600">Actions</th>
               </tr>
             </thead>
             <tbody id="records-tbody">
@@ -278,22 +278,22 @@ async function openList(listId) {
                 </td></tr>` :
                 records.map(r => {
                   const fields = r.fields || {};
-                  const statusColor = tmpl.statusColors[r.status] || '#818cf8';
-                  return `<tr style="border-bottom:1px solid ${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.06)'};transition:background 0.15s"
-                    onmouseover="this.style.background='${isDark?'rgba(255,255,255,0.02)':'rgba(109,40,217,0.03)'}'"
+                  const statusColor = tmpl.statusColors[r.status] || '#C50022';
+                  return `<tr style="border-bottom:1px solid ${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.06)'};transition:background 0.15s"
+                    onmouseover="this.style.background='${isDark?'rgba(255,255,255,0.02)':'rgba(197,0,34,0.03)'}'"
                     onmouseout="this.style.background=''">
-                    <td style="padding:12px 14px;font-size:12px;font-weight:600;color:${isDark?'#fff':'#1a0533'}">${r.name}</td>
-                    <td style="padding:12px 14px;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'}">${r.phone}</td>
-                    ${columns.map(col => `<td style="padding:12px 14px;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'}">${fields[col] || '—'}</td>`).join('')}
+                    <td style="padding:12px 14px;font-size:12px;font-weight:600;color:${isDark?'#fff':'#000000'}">${r.name}</td>
+                    <td style="padding:12px 14px;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'}">${r.phone}</td>
+                    ${columns.map(col => `<td style="padding:12px 14px;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'}">${fields[col] || '—'}</td>`).join('')}
                     <td style="padding:12px 14px">
                       <select onchange="updateRecordStatus(${r.id}, this.value)" style="padding:4px 8px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid ${statusColor};background:${statusColor}20;color:${statusColor};cursor:pointer;outline:none;font-family:inherit">
                         ${tmpl.statusOptions.map(s => `<option value="${s}" ${r.status===s?'selected':''}>${s}</option>`).join('')}
                       </select>
                     </td>
-                    <td style="padding:12px 14px;font-size:11px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'}">${r.last_message_sent ? new Date(r.last_message_sent).toLocaleDateString() + ' ' + new Date(r.last_message_sent).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—'}</td>
+                    <td style="padding:12px 14px;font-size:11px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'}">${r.last_message_sent ? new Date(r.last_message_sent).toLocaleDateString() + ' ' + new Date(r.last_message_sent).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—'}</td>
                     <td style="padding:12px 14px">
                       <div style="display:flex;gap:6px">
-                        <button onclick="showEditRecordModal(${r.id})" style="padding:4px 10px;border-radius:8px;background:rgba(129,140,248,0.1);border:1px solid rgba(129,140,248,0.2);color:#818cf8;font-size:10px;cursor:pointer;font-family:inherit">Edit</button>
+                        <button onclick="showEditRecordModal(${r.id})" style="padding:4px 10px;border-radius:8px;background:rgba(197,0,34,0.1);border:1px solid rgba(197,0,34,0.2);color:#C50022;font-size:10px;cursor:pointer;font-family:inherit">Edit</button>
                         <button onclick="deleteRecord(${listId}, ${r.id})" style="padding:4px 10px;border-radius:8px;background:rgba(255,80,80,0.1);border:1px solid rgba(255,80,80,0.2);color:#ff8a7a;font-size:10px;cursor:pointer;font-family:inherit">Del</button>
                       </div>
                     </td>
@@ -321,63 +321,63 @@ function showCreateListModal() {
   ).join('');
 
   modal.innerHTML = `
-    <div style="width:100%;max-width:520px;margin:20px;background:${isDark?'#0d0020':'#fff'};border:1px solid rgba(232,121,249,0.2);border-radius:20px;padding:28px;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease">
+    <div style="width:100%;max-width:520px;margin:20px;background:${isDark?'#000000':'#fff'};border:1px solid rgba(197,0,34,0.2);border-radius:20px;padding:28px;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <div style="font-size:16px;font-weight:800;color:${isDark?'#fff':'#1a0533'}">Create Smart List</div>
+        <div style="font-size:16px;font-weight:800;color:${isDark?'#fff':'#000000'}">Create Smart List</div>
         <button onclick="document.getElementById('create-list-modal').remove()" style="background:transparent;border:none;cursor:pointer;font-size:20px;opacity:0.5;color:inherit">✕</button>
       </div>
 
       <!-- Step 1: Business Type -->
       <div style="margin-bottom:16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">What type of business?</div>
-        <select id="cl-business-type" onchange="updateUseCases()" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">What type of business?</div>
+        <select id="cl-business-type" onchange="updateUseCases()" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit">
           ${businessOptions}
         </select>
       </div>
 
       <!-- Step 2: Use Case -->
       <div style="margin-bottom:16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">What do you want to send?</div>
-        <select id="cl-use-case" onchange="updateMessageTemplate()" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit">
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">What do you want to send?</div>
+        <select id="cl-use-case" onchange="updateMessageTemplate()" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit">
         </select>
       </div>
 
       <!-- List Name -->
       <div style="margin-bottom:16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">List Name</div>
-        <input id="cl-name" placeholder="e.g. Class 8 Fee Tracker" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit"/>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">List Name</div>
+        <input id="cl-name" placeholder="e.g. Class 8 Fee Tracker" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit"/>
       </div>
 
       <!-- Message Template -->
       <div style="margin-bottom:16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">Message Template</div>
-        <textarea id="cl-message" rows="4" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:12px;outline:none;font-family:inherit;resize:none;line-height:1.6"></textarea>
-        <div style="font-size:10px;color:${isDark?'rgba(255,255,255,0.3)':'#6d28d9'};margin-top:4px">Use {name}, {phone} and column names in curly braces</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">Message Template</div>
+        <textarea id="cl-message" rows="4" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:12px;outline:none;font-family:inherit;resize:none;line-height:1.6"></textarea>
+        <div style="font-size:10px;color:${isDark?'rgba(255,255,255,0.3)':'#a0001b'};margin-top:4px">Use {name}, {phone} and column names in curly braces</div>
       </div>
 
       <!-- Schedule -->
       <div style="margin-bottom:16px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">Auto-send time (daily)</div>
-        <input id="cl-time" type="time" value="17:00" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit"/>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">Auto-send time (daily)</div>
+        <input id="cl-time" type="time" value="17:00" style="width:100%;padding:12px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit"/>
       </div>
 
       <!-- Send via -->
       <div style="margin-bottom:24px">
-        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:8px;font-weight:600">Send via</div>
+        <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:8px;font-weight:600">Send via</div>
         <div style="display:flex;gap:10px">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'}">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'}">
             <input type="checkbox" id="cl-whatsapp" checked/> 💬 WhatsApp
           </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'}">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'}">
             <input type="checkbox" id="cl-email"/> 📧 Email
           </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#6d28d9'}">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:12px;color:${isDark?'rgba(255,255,255,0.6)':'#a0001b'}">
             <input type="checkbox" id="cl-telegram"/> ✈️ Telegram
           </label>
         </div>
       </div>
 
-      <button onclick="createList()" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
+      <button onclick="createList()" style="width:100%;padding:14px;border-radius:12px;background:linear-gradient(135deg,#C50022,#C50022);border:none;color:#fff;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit">
         Create Smart List →
       </button>
     </div>`;
@@ -459,32 +459,32 @@ function showAddRecordModal(listId) {
   modal.style.cssText = `position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:5000;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px)`;
 
   modal.innerHTML = `
-    <div style="width:100%;max-width:480px;margin:20px;background:${isDark?'#0d0020':'#fff'};border:1px solid rgba(129,140,248,0.2);border-radius:20px;padding:28px;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease">
+    <div style="width:100%;max-width:480px;margin:20px;background:${isDark?'#000000':'#fff'};border:1px solid rgba(197,0,34,0.2);border-radius:20px;padding:28px;max-height:85vh;overflow-y:auto;animation:slideUp 0.3s ease">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <div style="font-size:15px;font-weight:800;color:${isDark?'#fff':'#1a0533'}">Add New Row</div>
+        <div style="font-size:15px;font-weight:800;color:${isDark?'#fff':'#000000'}">Add New Row</div>
         <button onclick="document.getElementById('add-record-modal').remove()" style="background:transparent;border:none;cursor:pointer;font-size:20px;opacity:0.5;color:inherit">✕</button>
       </div>
       <div style="display:flex;flex-direction:column;gap:12px">
         <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:6px;font-weight:600">Name *</div>
-          <input id="ar-name" placeholder="Full name" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit"/>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:6px;font-weight:600">Name *</div>
+          <input id="ar-name" placeholder="Full name" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit"/>
         </div>
         <div>
-          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:6px;font-weight:600">WhatsApp Number *</div>
-          <input id="ar-phone" placeholder="+91 98765 43210" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit"/>
+          <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:6px;font-weight:600">WhatsApp Number *</div>
+          <input id="ar-phone" placeholder="+91 98765 43210" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit"/>
         </div>
         ${columns.map(col => `
           <div>
-            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#6d28d9'};margin-bottom:6px;font-weight:600">${tmpl.columnLabels[col] || col}</div>
+            <div style="font-size:10px;text-transform:uppercase;letter-spacing:1px;color:${isDark?'rgba(255,255,255,0.4)':'#a0001b'};margin-bottom:6px;font-weight:600">${tmpl.columnLabels[col] || col}</div>
             ${col.endsWith('_status') || col === 'status' || col === 'reminded' ? `
-              <select id="ar-${col}" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit">
+              <select id="ar-${col}" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit">
                 ${tmpl.statusOptions.map(s => `<option value="${s}">${s}</option>`).join('')}
               </select>` : `
-              <input id="ar-${col}" placeholder="${tmpl.columnLabels[col] || col}" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(109,40,217,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(109,40,217,0.2)'};color:${isDark?'#fff':'#1a0533'};font-size:13px;outline:none;font-family:inherit"/>`}
+              <input id="ar-${col}" placeholder="${tmpl.columnLabels[col] || col}" style="width:100%;padding:11px 14px;border-radius:12px;background:${isDark?'rgba(255,255,255,0.05)':'rgba(197,0,34,0.05)'};border:1px solid ${isDark?'rgba(255,255,255,0.1)':'rgba(197,0,34,0.2)'};color:${isDark?'#fff':'#000000'};font-size:13px;outline:none;font-family:inherit"/>`}
           </div>
         `).join('')}
       </div>
-      <button onclick="saveRecord(${listId})" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#e879f9,#818cf8);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:20px">
+      <button onclick="saveRecord(${listId})" style="width:100%;padding:13px;border-radius:12px;background:linear-gradient(135deg,#C50022,#C50022);border:none;color:#fff;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;margin-top:20px">
         Add Row ✓
       </button>
     </div>`;

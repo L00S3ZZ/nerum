@@ -123,14 +123,11 @@
     let stars = [];
     let W, H;
 
-    // Pink, purple, indigo, violet, white — matching dashboard palette
+    // Red palette: white, primary red, lighter red
     const COLORS = [
       [255,255,255],
-      [232,121,249],
-      [129,140,248],
-      [167,139,250],
-      [244,114,182],
-      [255,77,222],
+      [197,0,34],
+      [255,64,96],
     ];
 
     const resize = () => {
