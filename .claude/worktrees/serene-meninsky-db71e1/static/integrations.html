@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nerum · Integrations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #C50022;
+    --indigo: #C50022;
+    --green: #34d399;
+    --pink: #C50022;
+    --violet: #ff4060;
+    --bg: #08000f;
+    --card: rgba(255,255,255,0.03);
+    --card-border: rgba(197,0,34,0.25);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --sidebar-w: 220px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  .galaxy { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.18) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(197,0,34,0.14) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.12) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(197,0,34,0.10) 0%,transparent 55%),#08000f;
+    pointer-events:none; }
+
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+  /* ── SIDEBAR ── */
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-text { font-size:18px; font-weight:700; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .nav-section { padding:14px 10px 4px; }
+  .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+  .nav-item.active { background:rgba(197,0,34,0.15); color:var(--purple); border-color:rgba(197,0,34,0.2); }
+  .nav-icon { font-size:15px; width:18px; text-align:center; }
+  .nav-badge { margin-left:auto; background:var(--purple); color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 7px; }
+  .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
+  .ai-core-pill { background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+  .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; }
+  .user-plan { font-size:11px; color:var(--purple); }
+
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+
+  /* ── TOPBAR ── */
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(8,0,15,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .search-bar { flex:1; max-width:360px; display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; font-size:13px; }
+  .search-bar input { background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13px; width:100%; }
+  .search-bar input::placeholder { color:var(--muted); }
+  .status-pill { display:flex; align-items:center; gap:7px; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); border-radius:20px; padding:6px 12px; font-size:12px; color:var(--green); font-weight:500; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .token-pill { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--card-border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--muted); }
+  .token-bar { width:60px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
+  .token-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--purple),var(--indigo)); transition:width 0.5s; }
+  .notif-btn { width:36px; height:36px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; }
+  .new-btn { display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.3); }
+  .new-btn:hover { opacity:0.88; transform:translateY(-1px); }
+
+  /* ── CONTENT ── */
+  .content { padding:28px; flex:1; }
+  .section-header { margin-bottom:24px; }
+  .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
+  .page-title { font-size:32px; font-weight:700; line-height:1; }
+  .page-title .accent { color:var(--purple); }
+  .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:560px; }
+
+  /* ── BUTTONS ── */
+  .btn-ghost { display:inline-flex; align-items:center; gap:7px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; color:var(--text); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--purple); color:var(--purple); }
+  .btn-primary { display:inline-flex; align-items:center; gap:7px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 18px rgba(197,0,34,0.25); }
+  .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-primary[disabled], .btn-primary:disabled { opacity:0.4; cursor:not-allowed; box-shadow:none; transform:none; }
+  .btn-disabled { display:inline-flex; align-items:center; gap:7px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.08); border-radius:10px; padding:8px 16px; color:var(--muted); font-size:13px; font-weight:600; font-family:inherit; cursor:not-allowed; }
+  .btn-link { background:none; border:none; color:var(--purple); font-family:inherit; font-size:12px; cursor:pointer; padding:0; }
+  .btn-link:hover { text-decoration:underline; }
+
+  /* ── SEARCH + FILTERS ── */
+  .int-search { display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-border); border-radius:12px; padding:10px 16px; max-width:520px; margin-bottom:16px; }
+  .int-search input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:14px; }
+  .int-search input::placeholder { color:var(--muted); }
+  .filter-row { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:24px; }
+  .filter-chip { background:var(--card); border:1px solid var(--card-border); border-radius:20px; padding:7px 14px; color:var(--muted); font-size:12.5px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .filter-chip:hover { color:var(--text); border-color:rgba(197,0,34,0.4); }
+  .filter-chip.active { background:rgba(197,0,34,0.15); color:var(--purple); border-color:rgba(197,0,34,0.4); }
+
+  /* ── INTEGRATION CARDS ── */
+  .int-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; }
+  @media (max-width: 900px) { .int-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width: 600px) { .int-grid { grid-template-columns:1fr; } }
+  .int-card { position:relative; background:var(--card); border:1px solid var(--card-border); border-radius:16px; padding:20px; display:flex; flex-direction:column; gap:14px; transition:all 0.2s; min-height:170px; }
+  .int-card:hover { border-color:rgba(197,0,34,0.35); transform:translateY(-2px); }
+  .int-card.coming-soon { opacity:0.65; }
+  .int-card.coming-soon:hover { transform:none; border-color:var(--card-border); }
+  .int-head { display:flex; align-items:flex-start; gap:12px; }
+  .int-logo { width:40px; height:40px; border-radius:10px; background:rgba(255,255,255,0.04); display:flex; align-items:center; justify-content:center; flex-shrink:0; font-size:22px; }
+  .int-logo img { width:28px; height:28px; object-fit:contain; }
+  .int-meta { flex:1; min-width:0; }
+  .int-name { font-size:15px; font-weight:600; margin-bottom:2px; }
+  .int-desc { font-size:12px; color:var(--muted); line-height:1.4; }
+  .int-status-badge { position:absolute; top:14px; right:14px; font-size:10px; font-weight:600; border-radius:20px; padding:3px 9px; letter-spacing:0.3px; }
+  .int-status-badge.connected { background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.3); }
+  .int-status-badge.coming { background:rgba(255,255,255,0.06); color:var(--muted); border:1px solid rgba(255,255,255,0.08); }
+  .int-actions { margin-top:auto; display:flex; gap:8px; align-items:center; }
+  .int-actions .btn-primary, .int-actions .btn-disabled { width:100%; justify-content:center; }
+  .int-disconnect-link { font-size:11px; color:var(--muted); background:none; border:none; cursor:pointer; padding:6px 0; font-family:inherit; }
+  .int-disconnect-link:hover { color:#f87171; text-decoration:underline; }
+
+  /* ── MODAL ── */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(4px); z-index:300; display:none; align-items:center; justify-content:center; }
+  .modal-overlay.open { display:flex; }
+  .modal { background:#000000; border:1px solid var(--card-border); border-radius:20px; padding:28px; width:520px; max-width:95vw; max-height:90vh; overflow-y:auto; }
+  .modal-title { font-size:20px; font-weight:700; margin-bottom:6px; }
+  .modal-sub { font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .form-group { margin-bottom:14px; }
+  .form-label { font-size:11px; color:var(--muted); margin-bottom:6px; display:block; text-transform:uppercase; letter-spacing:0.8px; font-weight:600; }
+  .form-input { width:100%; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:11px 14px; color:var(--text); font-family:inherit; font-size:13px; outline:none; transition:border-color 0.2s; }
+  .form-input:focus { border-color:var(--purple); }
+  .form-input.error { border-color:#f87171; }
+  .form-error { font-size:11px; color:#f87171; margin-top:4px; display:none; }
+  .form-error.show { display:block; }
+  select.form-input option { background:#000000; }
+  .pw-wrap { position:relative; }
+  .pw-toggle { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; color:var(--muted); cursor:pointer; font-size:14px; padding:4px; }
+  .pw-toggle:hover { color:var(--text); }
+  .modal-actions { display:flex; gap:10px; margin-top:22px; justify-content:flex-end; }
+
+  /* ── STEPPER ── */
+  .stepper { display:flex; align-items:center; justify-content:center; gap:10px; margin-bottom:20px; }
+  .step-dot { width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.06); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:600; color:var(--muted); }
+  .step-dot.active { background:linear-gradient(135deg,var(--purple),var(--indigo)); color:#fff; border-color:var(--purple); box-shadow:0 0 12px rgba(197,0,34,0.4); }
+  .step-dot.done { background:rgba(52,211,153,0.15); color:var(--green); border-color:rgba(52,211,153,0.3); }
+  .step-line { width:36px; height:1px; background:var(--card-border); }
+  .step-line.done { background:var(--green); }
+
+  /* ── TERMS SCROLL ── */
+  .terms-scroll { max-height:280px; overflow-y:auto; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:12px; padding:16px 18px; margin-bottom:14px; font-size:13px; line-height:1.6; color:var(--muted); }
+  .terms-scroll h4 { color:var(--text); font-size:13px; font-weight:600; margin:10px 0 6px; }
+  .terms-scroll h4:first-child { margin-top:0; }
+  .terms-scroll a { color:var(--purple); text-decoration:none; }
+  .terms-scroll a:hover { text-decoration:underline; }
+  .terms-scroll ul { list-style:none; padding-left:0; margin:6px 0; }
+  .terms-scroll li { padding:3px 0 3px 16px; position:relative; }
+  .terms-scroll li::before { content:'•'; position:absolute; left:0; color:var(--purple); }
+  .terms-check { display:flex; align-items:flex-start; gap:10px; padding:10px 0; font-size:13px; color:var(--text); cursor:pointer; user-select:none; }
+  .terms-check input { margin-top:3px; accent-color:var(--purple); width:16px; height:16px; cursor:pointer; }
+
+  /* ── SUCCESS STEP ── */
+  .success-check { width:80px; height:80px; border-radius:50%; background:rgba(52,211,153,0.15); border:2px solid var(--green); display:flex; align-items:center; justify-content:center; margin:0 auto 18px; font-size:42px; color:var(--green); animation:popIn 0.4s ease; }
+  @keyframes popIn { from {transform:scale(0); opacity:0;} 60% {transform:scale(1.1);} to {transform:scale(1); opacity:1;} }
+
+  /* ── TEST RESULT ── */
+  .test-result { padding:12px 14px; border-radius:10px; font-size:13px; margin-top:12px; display:none; }
+  .test-result.show { display:block; }
+  .test-result.success { background:rgba(52,211,153,0.12); border:1px solid rgba(52,211,153,0.3); color:var(--green); }
+  .test-result.error { background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.3); color:#f87171; }
+
+  /* ── GUIDE STEPS ── */
+  .guide-step { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,0.05); }
+  .guide-step:last-child { border-bottom:none; }
+  .guide-num { width:24px; height:24px; border-radius:50%; background:rgba(197,0,34,0.15); color:var(--purple); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+  .guide-text { font-size:13px; line-height:1.5; }
+  .guide-note { font-size:12px; color:var(--muted); background:rgba(251,191,36,0.08); border:1px solid rgba(251,191,36,0.2); border-radius:10px; padding:10px 12px; margin-top:14px; }
+
+  /* ── TOAST ── */
+  .toast { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#000000; border:1px solid var(--purple); border-radius:12px; padding:12px 20px; font-size:13px; color:var(--text); z-index:500; display:none; box-shadow:0 8px 30px rgba(197,0,34,0.3); }
+  .toast.show { display:block; }
+  .toast.error { border-color:#f87171; }
+
+  /* ── EMPTY/LOADING ── */
+  .empty { text-align:center; padding:60px 20px; color:var(--muted); grid-column:1/-1; }
+  .empty-icon { font-size:42px; margin-bottom:12px; }
+  .spinner { width:24px; height:24px; border:2px solid rgba(197,0,34,0.3); border-top-color:var(--purple); border-radius:50%; animation:spin 0.8s linear infinite; display:inline-block; vertical-align:middle; }
+  @keyframes spin { to{transform:rotate(360deg);} }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(197,0,34,0.3); border-radius:3px; }
+</style>
+</head>
+<body>
+
+<div class="galaxy"></div>
+<div class="toast" id="toast"></div>
+
+<!-- ══════ MODAL: TERMS ACCEPTANCE ══════ -->
+<div class="modal-overlay" id="terms-modal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-title">Welcome to Nerum 👋</div>
+    <div class="modal-sub">Before you continue, please read and accept the following terms.</div>
+    <div class="terms-scroll">
+      <h4>Nerum Policies</h4>
+      <ul>
+        <li><a href="/terms" target="_blank">Nerum Terms of Service</a></li>
+        <li><a href="/privacy" target="_blank">Nerum Privacy Policy</a></li>
+      </ul>
+      <h4>Third-party Platform Policies</h4>
+      <ul>
+        <li>Meta / WhatsApp Business Policy</li>
+        <li>Google API Services User Data Policy</li>
+        <li>Telegram Terms of Service</li>
+        <li>Razorpay Terms of Service</li>
+        <li>All other platforms you choose to connect</li>
+      </ul>
+      <p style="margin-top:12px;">By accepting, you agree to comply with the terms of all platforms you connect through Nerum. You are responsible for ensuring your use of connected platforms complies with their policies.</p>
+    </div>
+    <label class="terms-check">
+      <input type="checkbox" id="terms-checkbox" onchange="onTermsCheckboxChange()">
+      <span>I have read and agree to all the above Terms and Policies.</span>
+    </label>
+    <div class="modal-actions">
+      <button class="btn-primary" id="terms-accept-btn" disabled onclick="acceptTerms()">Accept &amp; Continue</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ MODAL: WHATSAPP CONNECT (3 STEPS) ══════ -->
+<div class="modal-overlay" id="whatsapp-modal">
+  <div class="modal">
+
+    <!-- Step 1: Credentials -->
+    <div id="wa-step-1">
+      <div class="stepper">
+        <div class="step-dot active">1</div>
+        <div class="step-line"></div>
+        <div class="step-dot">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
+      </div>
+      <div class="modal-title">Connect WhatsApp Business</div>
+      <div class="modal-sub">Enter your Meta Cloud API credentials.</div>
+
+      <div class="form-group">
+        <label class="form-label">Phone Number ID</label>
+        <input class="form-input" id="wa-phone-id" inputmode="numeric" placeholder="e.g. 1234567890">
+        <div class="form-error" id="wa-phone-id-err">This field is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">WhatsApp Business Account ID</label>
+        <input class="form-input" id="wa-waba-id" inputmode="numeric" placeholder="e.g. 0987654321">
+        <div class="form-error" id="wa-waba-id-err">This field is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Permanent Access Token</label>
+        <div class="pw-wrap">
+          <input class="form-input" id="wa-token" type="password" placeholder="EAAxxxxxxxxxxxxxxxx" style="padding-right:40px;">
+          <button class="pw-toggle" type="button" onclick="togglePwVisibility('wa-token', this)">👁</button>
+        </div>
+        <div class="form-error" id="wa-token-err">This field is required.</div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Display Name</label>
+        <input class="form-input" id="wa-display" placeholder="Your business name">
+        <div class="form-error" id="wa-display-err">This field is required.</div>
+      </div>
+
+      <button class="btn-link" onclick="openGuide()">How to get these? →</button>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeWhatsAppModal()">Cancel</button>
+        <button class="btn-primary" onclick="waNext1()">Next →</button>
+      </div>
+    </div>
+
+    <!-- Step 2: Test -->
+    <div id="wa-step-2" style="display:none;">
+      <div class="stepper">
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">2</div>
+        <div class="step-line"></div>
+        <div class="step-dot">3</div>
+      </div>
+      <div class="modal-title">Test Your Connection</div>
+      <div class="modal-sub">Enter your personal WhatsApp number to receive a test message.</div>
+
+      <div class="form-group">
+        <label class="form-label">Country Code</label>
+        <select class="form-input" id="wa-country">
+          <option value="+91" selected>+91 India</option>
+          <option value="+1">+1 USA / Canada</option>
+          <option value="+44">+44 United Kingdom</option>
+          <option value="+61">+61 Australia</option>
+          <option value="+971">+971 UAE</option>
+          <option value="+65">+65 Singapore</option>
+          <option value="+966">+966 Saudi Arabia</option>
+          <option value="+49">+49 Germany</option>
+          <option value="+33">+33 France</option>
+          <option value="+81">+81 Japan</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Phone Number</label>
+        <input class="form-input" id="wa-test-phone" inputmode="numeric" placeholder="e.g. 9876543210">
+        <div class="form-error" id="wa-test-phone-err">Please enter a phone number.</div>
+      </div>
+
+      <button class="btn-primary" id="wa-send-test" onclick="sendTest()" style="width:100%;justify-content:center;">Send Test Message</button>
+      <div class="test-result" id="wa-test-result"></div>
+
+      <div style="text-align:center;margin-top:14px;">
+        <button class="btn-link" onclick="skipTest()">Skip &amp; Connect Anyway →</button>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="waBackTo1()">← Back</button>
+      </div>
+    </div>
+
+    <!-- Step 3: Success -->
+    <div id="wa-step-3" style="display:none;">
+      <div class="stepper">
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot done">✓</div>
+        <div class="step-line done"></div>
+        <div class="step-dot active">3</div>
+      </div>
+      <div style="text-align:center;padding:14px 0 0;">
+        <div class="success-check">✓</div>
+        <div class="modal-title" style="text-align:center;">WhatsApp Connected! 🎉</div>
+        <div class="modal-sub" style="text-align:center;">Your WhatsApp Business account is now connected to Nerum.</div>
+        <div style="font-size:13px;color:var(--muted);margin-top:10px;">Phone Number ID: <strong id="wa-connected-id" style="color:var(--text);font-family:'JetBrains Mono',monospace;">—</strong></div>
+      </div>
+      <div class="modal-actions" style="justify-content:center;margin-top:24px;">
+        <button class="btn-primary" onclick="finishWhatsAppConnect()">Done</button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══════ MODAL: WHATSAPP GUIDE ══════ -->
+<div class="modal-overlay" id="whatsapp-guide-modal">
+  <div class="modal" style="width:560px;">
+    <div class="modal-title">How to get your WhatsApp API credentials</div>
+    <div class="modal-sub">Follow these steps in the Meta Developer console.</div>
+    <div style="margin-top:6px;">
+      <div class="guide-step"><div class="guide-num">1</div><div class="guide-text">Go to <a href="https://developers.facebook.com" target="_blank" style="color:var(--purple);">developers.facebook.com</a>.</div></div>
+      <div class="guide-step"><div class="guide-num">2</div><div class="guide-text">Click <strong>My Apps</strong> → select your app (or <strong>Create App</strong> → choose Business type).</div></div>
+      <div class="guide-step"><div class="guide-num">3</div><div class="guide-text">Click <strong>Use cases</strong> → <strong>Customize</strong> on WhatsApp.</div></div>
+      <div class="guide-step"><div class="guide-num">4</div><div class="guide-text">Click <strong>API Setup</strong> in the left sidebar.</div></div>
+      <div class="guide-step"><div class="guide-num">5</div><div class="guide-text">Under the <strong>From</strong> dropdown → add your business phone number.</div></div>
+      <div class="guide-step"><div class="guide-num">6</div><div class="guide-text">Click <strong>Generate access token</strong> → copy it.</div></div>
+      <div class="guide-step"><div class="guide-num">7</div><div class="guide-text">Copy the <strong>Phone Number ID</strong> shown below.</div></div>
+      <div class="guide-step"><div class="guide-num">8</div><div class="guide-text">Copy the <strong>WhatsApp Business Account ID</strong> shown below.</div></div>
+      <div class="guide-step"><div class="guide-num">9</div><div class="guide-text">Paste all three in Nerum → Done!</div></div>
+    </div>
+    <div class="guide-note">⚠ Your number must never have been used on regular WhatsApp before.</div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeGuide()">← Back</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════ LAYOUT ══════ -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-icon">N</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="logo-text">Nerum</span>
+          <span class="beta-tag">BETA</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">v2.4.1 · online</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">⬡</span> Overview</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">⚡</span> Workflows</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">✦</span> AI Builder</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">≡</span> Smart Lists</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Connect</div>
+      <div class="nav-item active"><span class="nav-icon">⬡</span> Integrations</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">↗</span> Analytics</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">◷</span> History</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">⚙</span> Settings</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">◈</span> Billing</div>
+      <div class="nav-item" onclick="goto('/dashboard')"><span class="nav-icon">?</span> Help</div>
+    </div>
+    <div class="sidebar-footer">
+      <div class="ai-core-pill">
+        <div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:0.8px;">✦ AI CORE</div>
+        <div style="font-size:12px;margin-top:2px;">Nerum-X · <span style="color:var(--green)">running</span></div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar" id="user-avatar">N</div>
+        <div style="flex:1;min-width:0;">
+          <div class="user-name" id="user-name-sidebar">Loading...</div>
+          <div class="user-plan" id="user-plan-sidebar">Free</div>
+        </div>
+        <span style="color:var(--muted);font-size:14px;cursor:pointer;" onclick="logout()">↪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <div class="search-bar">
+        <span style="color:var(--muted);">🔍</span>
+        <input type="text" placeholder="Search workflows, runs...">
+        <span style="margin-left:auto;font-size:11px;color:var(--muted);background:rgba(255,255,255,0.08);padding:2px 7px;border-radius:5px;">⌘K</span>
+      </div>
+      <div class="status-pill"><div class="status-dot"></div>AI CORE · online</div>
+      <div class="token-pill">
+        <div class="token-bar"><div class="token-fill" id="topbar-token-bar" style="width:0%"></div></div>
+        <span id="topbar-tokens" style="color:var(--text);font-weight:600;">—</span>
+        <span id="topbar-limit" style="color:var(--muted);">/ 1000</span>
+      </div>
+      <div class="notif-btn">🔔</div>
+      <button class="new-btn" onclick="goto('/dashboard')">✦ New workflow</button>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+
+      <div class="section-header">
+        <div class="breadcrumb">SYSTEM / INTEGRATIONS</div>
+        <h1 class="page-title">Integrations</h1>
+        <p class="page-sub">Connect your apps to power your workflows.</p>
+      </div>
+
+      <div class="int-search">
+        <span style="color:var(--muted);">🔍</span>
+        <input type="text" id="int-search-input" placeholder="Search integrations..." oninput="applyFilters()">
+      </div>
+
+      <div class="filter-row" id="filter-row">
+        <button class="filter-chip active" data-filter="all" onclick="setFilter('all',this)">All</button>
+        <button class="filter-chip" data-filter="connected" onclick="setFilter('connected',this)">Connected</button>
+        <button class="filter-chip" data-filter="communication" onclick="setFilter('communication',this)">Communication</button>
+        <button class="filter-chip" data-filter="social" onclick="setFilter('social',this)">Social</button>
+        <button class="filter-chip" data-filter="productivity" onclick="setFilter('productivity',this)">Productivity</button>
+        <button class="filter-chip" data-filter="business" onclick="setFilter('business',this)">Business</button>
+      </div>
+
+      <div class="int-grid" id="int-grid">
+        <div class="empty"><span class="spinner"></span> Loading integrations...</div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const API = '';
+let token = localStorage.getItem('nerum_token');
+let currentFilter = 'all';
+let connectedSet = new Set();
+let waCreds = { phone_number_id:'', waba_id:'', access_token:'', display_name:'' };
+
+// ── AUTH GUARD ───────────────────────────────────────────────────────────────
+if (!token) { window.location.href = '/'; }
+
+// ── INTEGRATIONS CATALOG ─────────────────────────────────────────────────────
+const INTEGRATIONS = [
+  // Available (Connect button)
+  { key:'whatsapp', name:'WhatsApp', icon:'https://cdn.simpleicons.org/whatsapp/25D366', desc:'Send WhatsApp messages to your customers', category:'communication', status:'available' },
+  { key:'gmail', name:'Gmail', icon:'https://cdn.simpleicons.org/gmail/EA4335', desc:'Send and receive emails via Gmail', category:'communication', status:'available' },
+  { key:'telegram', name:'Telegram', icon:'https://cdn.simpleicons.org/telegram/26A5E4', desc:'Send messages via your Telegram bot', category:'communication', status:'available' },
+  { key:'sheets', name:'Google Sheets', icon:'https://cdn.simpleicons.org/googlesheets/34A853', desc:'Read and write Google Sheets data', category:'productivity', status:'available' },
+  { key:'forms', name:'Google Forms', icon:'https://cdn.simpleicons.org/googleforms/7248B9', desc:'Trigger workflows from form submissions', category:'productivity', status:'available' },
+  { key:'razorpay', name:'Razorpay', icon:'https://cdn.simpleicons.org/razorpay/072EE5', desc:'Payment triggers and notifications', category:'business', status:'available' },
+  // Coming Soon
+  { key:'slack', name:'Slack', icon:'https://cdn.simpleicons.org/slack/4A154B', desc:'Send messages to Slack channels', category:'communication', status:'coming_soon' },
+  { key:'instagram', name:'Instagram', icon:'https://cdn.simpleicons.org/instagram/E4405F', desc:'Post and manage Instagram content', category:'social', status:'coming_soon' },
+  { key:'facebook', name:'Facebook', icon:'https://cdn.simpleicons.org/facebook/1877F2', desc:'Manage Facebook page posts', category:'social', status:'coming_soon' },
+  { key:'x', name:'Twitter / X', icon:'https://cdn.simpleicons.org/x/ffffff', desc:'Post tweets and monitor mentions', category:'social', status:'coming_soon' },
+  { key:'linkedin', name:'LinkedIn', icon:'https://cdn.simpleicons.org/linkedin/0A66C2', desc:'Post to your LinkedIn page', category:'social', status:'coming_soon' },
+  { key:'youtube', name:'YouTube', icon:'https://cdn.simpleicons.org/youtube/FF0000', desc:'Upload and manage YouTube videos', category:'social', status:'coming_soon' },
+  { key:'notion', name:'Notion', icon:'https://cdn.simpleicons.org/notion/ffffff', desc:'Create and update Notion pages', category:'productivity', status:'coming_soon' },
+  { key:'trello', name:'Trello', icon:'https://cdn.simpleicons.org/trello/0052CC', desc:'Manage Trello boards and cards', category:'productivity', status:'coming_soon' },
+  { key:'googlecalendar', name:'Google Calendar', icon:'https://cdn.simpleicons.org/googlecalendar/4285F4', desc:'Create and manage calendar events', category:'productivity', status:'coming_soon' },
+  { key:'googledrive', name:'Google Drive', icon:'https://cdn.simpleicons.org/googledrive/4285F4', desc:'Upload and manage Drive files', category:'productivity', status:'coming_soon' },
+  { key:'shopify', name:'Shopify', icon:'https://cdn.simpleicons.org/shopify/96BF48', desc:'Manage orders and products', category:'business', status:'coming_soon' },
+  { key:'zoho', name:'Zoho CRM', icon:'https://cdn.simpleicons.org/zoho/E42527', desc:'Manage CRM contacts and deals', category:'business', status:'coming_soon' },
+  { key:'hubspot', name:'HubSpot', icon:'https://cdn.simpleicons.org/hubspot/FF7A59', desc:'Marketing and CRM automation', category:'business', status:'coming_soon' },
+  { key:'sms', name:'SMS (MSG91)', emoji:'📱', desc:'Send SMS to Indian phone numbers', category:'communication', status:'coming_soon' },
+];
+
+// ── API HELPER ───────────────────────────────────────────────────────────────
+async function api(path, options = {}) {
+  const res = await fetch(API + path, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+      ...(options.headers || {})
+    }
+  });
+  if (res.status === 401) { logout(); return null; }
+  try { return await res.json(); } catch { return null; }
+}
+
+function showToast(msg, isError = false) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (isError ? ' error' : '');
+  setTimeout(() => t.className = 'toast', 3000);
+}
+
+function logout() {
+  localStorage.removeItem('nerum_token');
+  window.location.href = '/';
+}
+
+function goto(path) { window.location.href = path; }
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+async function init() {
+  const me = await api('/auth/me');
+  if (me) {
+    if (me.name) {
+      const initials = me.name.split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+      document.getElementById('user-avatar').textContent = initials || 'N';
+      document.getElementById('user-name-sidebar').textContent = me.name;
+    }
+    if (me.plan) document.getElementById('user-plan-sidebar').textContent = me.plan.charAt(0).toUpperCase()+me.plan.slice(1);
+    if (typeof me.tokens_used === 'number') {
+      document.getElementById('topbar-tokens').textContent = me.tokens_used;
+      if (me.token_limit) {
+        document.getElementById('topbar-limit').textContent = '/ ' + me.token_limit;
+        const pct = Math.min(100, (me.tokens_used / me.token_limit) * 100);
+        document.getElementById('topbar-token-bar').style.width = pct + '%';
+      }
+    }
+    if (!me.terms_accepted) {
+      document.getElementById('terms-modal').classList.add('open');
+    }
+  }
+
+  const list = await api('/integrations');
+  if (list && list.integrations) {
+    connectedSet = new Set(list.integrations.filter(i=>i.is_active).map(i=>i.integration_type));
+  }
+  renderGrid();
+}
+
+// ── RENDER ───────────────────────────────────────────────────────────────────
+function renderGrid() {
+  const q = (document.getElementById('int-search-input').value || '').toLowerCase().trim();
+  const grid = document.getElementById('int-grid');
+  const filtered = INTEGRATIONS.filter(int => {
+    if (q && !(int.name.toLowerCase().includes(q) || int.desc.toLowerCase().includes(q))) return false;
+    if (currentFilter === 'all') return true;
+    if (currentFilter === 'connected') return connectedSet.has(int.key);
+    return int.category === currentFilter;
+  });
+
+  if (filtered.length === 0) {
+    grid.innerHTML = '<div class="empty"><div class="empty-icon">🔍</div>No integrations match your filters.</div>';
+    return;
+  }
+
+  grid.innerHTML = filtered.map(int => {
+    const isConnected = connectedSet.has(int.key);
+    const isComing = int.status === 'coming_soon';
+    let badge = '';
+    if (isConnected) badge = '<div class="int-status-badge connected">Connected ✓</div>';
+    else if (isComing) badge = '<div class="int-status-badge coming">Coming Soon</div>';
+
+    const logoHtml = int.emoji
+      ? `<div class="int-logo">${int.emoji}</div>`
+      : `<div class="int-logo"><img src="${int.icon}" alt="${int.name}" loading="lazy" onerror="this.style.display='none'"></div>`;
+
+    let action;
+    if (isConnected) {
+      action = `
+        <div class="int-actions" style="flex-direction:column;align-items:stretch;gap:4px;">
+          <button class="btn-disabled" style="width:100%;justify-content:center;color:var(--green);background:rgba(52,211,153,0.1);border-color:rgba(52,211,153,0.25);">Connected</button>
+          <button class="int-disconnect-link" onclick="disconnect('${int.key}','${int.name.replace(/'/g,"\\'")}')">Disconnect</button>
+        </div>`;
+    } else if (isComing) {
+      action = `<div class="int-actions"><button class="btn-disabled">Coming Soon</button></div>`;
+    } else {
+      const handler = int.key === 'whatsapp' ? 'openWhatsAppModal()' : `showToast('${int.name} connect flow coming soon!')`;
+      action = `<div class="int-actions"><button class="btn-primary" onclick="${handler}">Connect</button></div>`;
+    }
+
+    return `
+      <div class="int-card${isComing ? ' coming-soon' : ''}" data-key="${int.key}">
+        ${badge}
+        <div class="int-head">
+          ${logoHtml}
+          <div class="int-meta">
+            <div class="int-name">${int.name}</div>
+            <div class="int-desc">${int.desc}</div>
+          </div>
+        </div>
+        ${action}
+      </div>`;
+  }).join('');
+}
+
+function setFilter(filter, btn) {
+  currentFilter = filter;
+  document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid();
+}
+
+function applyFilters() { renderGrid(); }
+
+// ── TERMS MODAL ──────────────────────────────────────────────────────────────
+function onTermsCheckboxChange() {
+  document.getElementById('terms-accept-btn').disabled = !document.getElementById('terms-checkbox').checked;
+}
+
+async function acceptTerms() {
+  const btn = document.getElementById('terms-accept-btn');
+  btn.disabled = true;
+  btn.textContent = 'Saving...';
+  const res = await api('/terms/accept', {
+    method: 'POST',
+    body: JSON.stringify({ version: 'v1.0' })
+  });
+  if (res && res.success) {
+    document.getElementById('terms-modal').classList.remove('open');
+    showToast('Welcome to Nerum 🎉');
+  } else {
+    btn.disabled = false;
+    btn.textContent = 'Accept & Continue';
+    showToast('Could not save your acceptance. Try again.', true);
+  }
+}
+
+// ── WHATSAPP MODAL ───────────────────────────────────────────────────────────
+function openWhatsAppModal() {
+  // Reset
+  waCreds = { phone_number_id:'', waba_id:'', access_token:'', display_name:'' };
+  ['wa-phone-id','wa-waba-id','wa-token','wa-display','wa-test-phone'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+    const errEl = document.getElementById(id+'-err'); if (errEl) errEl.classList.remove('show');
+    if (el) el.classList.remove('error');
+  });
+  document.getElementById('wa-test-result').className = 'test-result';
+  document.getElementById('wa-test-result').textContent = '';
+  showWaStep(1);
+  document.getElementById('whatsapp-modal').classList.add('open');
+}
+
+function closeWhatsAppModal() {
+  document.getElementById('whatsapp-modal').classList.remove('open');
+}
+
+function showWaStep(n) {
+  document.getElementById('wa-step-1').style.display = n === 1 ? '' : 'none';
+  document.getElementById('wa-step-2').style.display = n === 2 ? '' : 'none';
+  document.getElementById('wa-step-3').style.display = n === 3 ? '' : 'none';
+}
+
+function togglePwVisibility(id, btn) {
+  const el = document.getElementById(id);
+  if (el.type === 'password') { el.type = 'text'; btn.textContent = '🙈'; }
+  else { el.type = 'password'; btn.textContent = '👁'; }
+}
+
+function waNext1() {
+  const fields = [
+    { id:'wa-phone-id', key:'phone_number_id' },
+    { id:'wa-waba-id', key:'waba_id' },
+    { id:'wa-token', key:'access_token' },
+    { id:'wa-display', key:'display_name' },
+  ];
+  let ok = true;
+  fields.forEach(f => {
+    const el = document.getElementById(f.id);
+    const err = document.getElementById(f.id + '-err');
+    const v = (el.value || '').trim();
+    if (!v) {
+      el.classList.add('error');
+      err.classList.add('show');
+      ok = false;
+    } else {
+      el.classList.remove('error');
+      err.classList.remove('show');
+      waCreds[f.key] = v;
+    }
+  });
+  if (!ok) return;
+  showWaStep(2);
+}
+
+function waBackTo1() { showWaStep(1); }
+
+async function sendTest() {
+  const errEl = document.getElementById('wa-test-phone-err');
+  const phoneEl = document.getElementById('wa-test-phone');
+  const phone = (phoneEl.value || '').trim();
+  if (!phone) {
+    phoneEl.classList.add('error');
+    errEl.classList.add('show');
+    return;
+  }
+  phoneEl.classList.remove('error');
+  errEl.classList.remove('show');
+
+  const country = document.getElementById('wa-country').value;
+  const fullNumber = (country + phone).replace(/[^\d+]/g,'');
+
+  const btn = document.getElementById('wa-send-test');
+  const resultBox = document.getElementById('wa-test-result');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner" style="width:14px;height:14px;border-width:2px;"></span> Sending...';
+  resultBox.className = 'test-result';
+  resultBox.textContent = '';
+
+  const res = await api('/integrations/whatsapp/test', {
+    method: 'POST',
+    body: JSON.stringify({
+      phone_number_id: waCreds.phone_number_id,
+      access_token: waCreds.access_token,
+      test_number: fullNumber,
+    })
+  });
+
+  btn.disabled = false;
+  btn.textContent = 'Send Test Message';
+
+  if (res && res.success) {
+    resultBox.className = 'test-result show success';
+    resultBox.textContent = '✓ Test message sent! Check your WhatsApp.';
+    setTimeout(() => { saveAndShowSuccess(); }, 800);
+  } else {
+    resultBox.className = 'test-result show error';
+    resultBox.textContent = '✗ Failed: ' + (res && res.error ? res.error : 'Could not send test message.');
+  }
+}
+
+async function skipTest() {
+  await saveAndShowSuccess();
+}
+
+async function saveAndShowSuccess() {
+  const res = await api('/integrations/whatsapp', {
+    method: 'POST',
+    body: JSON.stringify(waCreds)
+  });
+  if (res && res.success) {
+    document.getElementById('wa-connected-id').textContent = waCreds.phone_number_id;
+    showWaStep(3);
+    connectedSet.add('whatsapp');
+  } else {
+    showToast('Failed to save credentials. Try again.', true);
+  }
+}
+
+function finishWhatsAppConnect() {
+  closeWhatsAppModal();
+  renderGrid();
+  showToast('WhatsApp connected!');
+}
+
+// ── DISCONNECT ───────────────────────────────────────────────────────────────
+async function disconnect(key, name) {
+  if (!confirm('Disconnect ' + name + '? You can reconnect anytime.')) return;
+  const res = await fetch(API + '/integrations/' + key, {
+    method: 'DELETE',
+    headers: { 'Authorization': `Bearer ${token}` }
+  });
+  if (res.ok) {
+    connectedSet.delete(key);
+    renderGrid();
+    showToast(name + ' disconnected');
+  } else {
+    showToast('Failed to disconnect ' + name, true);
+  }
+}
+
+// ── GUIDE MODAL ──────────────────────────────────────────────────────────────
+function openGuide() { document.getElementById('whatsapp-guide-modal').classList.add('open'); }
+function closeGuide() { document.getElementById('whatsapp-guide-modal').classList.remove('open'); }
+
+// ── BLOCK TERMS MODAL FROM CLOSING ON OVERLAY CLICK / ESC ────────────────────
+document.getElementById('terms-modal').addEventListener('click', function(e){ e.stopPropagation(); });
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape') {
+    // Don't close terms modal — only close other modals
+    if (document.getElementById('terms-modal').classList.contains('open')) return;
+    document.getElementById('whatsapp-modal').classList.remove('open');
+    document.getElementById('whatsapp-guide-modal').classList.remove('open');
+  }
+});
+// Allow whatsapp/guide modals to close on overlay click
+document.getElementById('whatsapp-modal').addEventListener('click', function(e){
+  if (e.target === this) closeWhatsAppModal();
+});
+document.getElementById('whatsapp-guide-modal').addEventListener('click', function(e){
+  if (e.target === this) closeGuide();
+});
+
+init();
+</script>
+</body>
+</html>

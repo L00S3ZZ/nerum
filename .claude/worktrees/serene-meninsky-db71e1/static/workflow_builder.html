@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nerum · Workflow Builder</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/workflow_builder.css" />
+  <script>
+    if (!localStorage.getItem('nerum_token')) {
+      window.location.href = '/';
+    }
+  </script>
+</head>
+<body>
+  <button id="sidebarToggle" class="wb-hamburger" aria-label="Toggle sidebar">
+    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+      <line x1="3" y1="5" x2="17" y2="5"/>
+      <line x1="3" y1="10" x2="17" y2="10"/>
+      <line x1="3" y1="15" x2="17" y2="15"/>
+    </svg>
+  </button>
+
+  <aside id="wbSidebar" class="wb-sidebar">
+    <div class="wb-sidebar-brand">
+      <span class="wb-brand-mark">◆</span>
+      <span class="wb-brand-text">Nerum</span>
+    </div>
+
+    <div class="wb-nav-section">
+      <div class="wb-nav-label">Main</div>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">⬡</span> Overview</a>
+      <a class="wb-nav-item active" href="/dashboard"><span class="wb-nav-icon">⚡</span> Workflows</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">✦</span> AI Builder</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">≡</span> Smart Lists</a>
+    </div>
+
+    <div class="wb-nav-section">
+      <div class="wb-nav-label">Connect</div>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">⬡</span> Integrations</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">↗</span> Analytics</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">◷</span> History</a>
+    </div>
+
+    <div class="wb-nav-section">
+      <div class="wb-nav-label">Account</div>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">⚙</span> Settings</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">◈</span> Billing</a>
+      <a class="wb-nav-item" href="/dashboard"><span class="wb-nav-icon">?</span> Help</a>
+    </div>
+  </aside>
+
+  <header class="wb-topbar">
+    <input id="wbName" class="wb-name-input" placeholder="Untitled Workflow" maxlength="100" />
+    <div class="wb-topbar-actions">
+      <span id="wbStatusPill" class="wb-status-pill">Draft</span>
+      <button id="wbSaveBtn" class="wb-btn wb-btn-ghost">Save</button>
+      <button id="wbRunBtn" class="wb-btn wb-btn-primary">Run</button>
+    </div>
+  </header>
+
+  <main id="wbCanvas" class="wb-canvas">
+    <svg id="wbConnections" class="wb-connections"></svg>
+    <div id="wbNodes" class="wb-nodes"></div>
+    <div id="wbEmptyState" class="wb-empty">
+      <div class="wb-empty-title">Start your workflow</div>
+      <div class="wb-empty-sub">Pick a trigger to kick things off — or describe it in the chat below.</div>
+      <button id="wbAddTriggerBtn" class="wb-btn wb-btn-primary">+ Add Trigger</button>
+    </div>
+    <button id="wbAddActionFab" class="wb-fab" hidden>+ Add Action</button>
+  </main>
+
+  <div id="wbChatBar" class="wb-chat">
+    <input id="wbChatInput" class="wb-chat-input" placeholder="Describe your automation in Tamil or English..." />
+    <button id="wbChatSend" class="wb-btn wb-btn-primary wb-chat-send">Send</button>
+    <span id="wbChatTyping" class="wb-chat-typing" hidden>Neru is thinking…</span>
+  </div>
+
+  <!-- Trigger picker modal -->
+  <div id="wbTriggerModal" class="wb-modal" hidden>
+    <div class="wb-modal-overlay" data-close="trigger"></div>
+    <div class="wb-modal-box">
+      <div class="wb-modal-head">
+        <div class="wb-modal-title">Choose a trigger</div>
+        <button class="wb-modal-close" data-close="trigger" aria-label="Close">×</button>
+      </div>
+      <div class="wb-category-tabs" id="wbCategoryTabs"></div>
+      <div class="wb-trigger-grid" id="wbTriggerGrid"></div>
+      <div class="wb-trigger-form" id="wbTriggerForm" hidden></div>
+    </div>
+  </div>
+
+  <!-- Action picker modal (minimal stub) -->
+  <div id="wbActionModal" class="wb-modal" hidden>
+    <div class="wb-modal-overlay" data-close="action"></div>
+    <div class="wb-modal-box">
+      <div class="wb-modal-head">
+        <div class="wb-modal-title">Choose an action</div>
+        <button class="wb-modal-close" data-close="action" aria-label="Close">×</button>
+      </div>
+      <div class="wb-trigger-grid" id="wbActionGrid">
+        <div class="wb-trigger-card" data-action-kind="whatsapp_send"><div class="wb-trigger-icon">⚇</div><div class="wb-trigger-label">Send WhatsApp</div><div class="wb-trigger-desc">Send a WhatsApp message via Meta Cloud.</div></div>
+        <div class="wb-trigger-card" data-action-kind="email_send"><div class="wb-trigger-icon">✉</div><div class="wb-trigger-label">Send Email</div><div class="wb-trigger-desc">Send an email via Gmail.</div></div>
+        <div class="wb-trigger-card" data-action-kind="telegram_send"><div class="wb-trigger-icon">✈</div><div class="wb-trigger-label">Send Telegram</div><div class="wb-trigger-desc">Send a Telegram message.</div></div>
+        <div class="wb-trigger-card" data-action-kind="sheets_append"><div class="wb-trigger-icon">▦</div><div class="wb-trigger-label">Append to Sheet</div><div class="wb-trigger-desc">Append a row to a Google Sheet.</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="wbToast" class="wb-toast" hidden></div>
+
+  <script src="/static/workflow_builder.js" defer></script>
+</body>
+</html>
