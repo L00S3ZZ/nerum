@@ -104,7 +104,7 @@
   function render(cfg) {
     var root = document.createElement("div");
     root.id = "nerum-cb-root";
-    var color = cfg.brand_color || "#f472b6";
+    var color = cfg.brand_color || "#C50022";
     var name = cfg.bot_name || "Assistant";
     var company = cfg.company_name || "";
     var welcome = cfg.welcome_message || "Hi! How can I help you?";

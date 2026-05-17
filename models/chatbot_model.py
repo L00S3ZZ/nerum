@@ -11,7 +11,7 @@ class UserChatbot(Base):
     bot_name = Column(String)
     company_name = Column(String)
     logo_url = Column(String, nullable=True)
-    brand_color = Column(String, default="#f472b6")
+    brand_color = Column(String, default="#C50022")
     welcome_message = Column(String, default="Hi! How can I help you?")
     bot_type = Column(String, default="nonai")  # nonai / ai
     ai_engine = Column(String, nullable=True)  # claude / gpt / gemini
