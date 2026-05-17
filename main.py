@@ -20,6 +20,7 @@ from routes import forms
 from routes import webhook
 from routes import dashboard
 from routes.chatbot import router as chatbot_router
+from routes.chatbot_builder import router as chatbot_builder_router
 from routes.workflow_triggers import router as triggers_router
 from routes.integrations import router as integrations_router
 from routes.terms import router as terms_router
@@ -98,6 +99,7 @@ app.include_router(forms.router, prefix="/forms")
 app.include_router(webhook.router, prefix="/webhook")
 app.include_router(dashboard.router, prefix="/dashboard")
 app.include_router(chatbot_router, prefix="/chatbot")
+app.include_router(chatbot_builder_router, prefix="/chatbots", tags=["chatbot-builder"])
 app.include_router(triggers_router)
 app.include_router(integrations_router, prefix="/integrations/api", tags=["integrations"])
 app.include_router(terms_router, prefix="/terms", tags=["terms"])
@@ -148,6 +150,23 @@ async def data_deletion():
 @limiter.limit("10/minute")
 def admin_page(request: Request):
     return FileResponse("static/admin.html")
+
+# ✅ Chatbot builder pages
+@app.get("/chatbot-builder")
+def chatbot_builder_page():
+    return FileResponse("static/chatbot_builder.html")
+
+@app.get("/chat/{embed_id}")
+def chatbot_hosted_page(embed_id: str):
+    return FileResponse("static/chatbot_page.html")
+
+@app.get("/widget/{embed_id}.js")
+def chatbot_widget_js(embed_id: str):
+    return FileResponse("static/chatbot_widget.js", media_type="application/javascript")
+
+@app.get("/chatbot-setup")
+def chatbot_setup_page():
+    return FileResponse("static/chatbot_setup.html")
 
 @app.on_event("startup")
 async def startup_event():

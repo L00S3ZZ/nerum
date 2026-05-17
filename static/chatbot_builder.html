@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nerum · Chatbot</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #C50022;
+    --indigo: #C50022;
+    --green: #34d399;
+    --pink: #f472b6;
+    --pink-soft: rgba(244,114,182,0.15);
+    --pink-border: rgba(244,114,182,0.35);
+    --violet: #ff4060;
+    --bg: #0a0010;
+    --card: rgba(255,255,255,0.03);
+    --card-border: rgba(197,0,34,0.25);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --sidebar-w: 220px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  .galaxy { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(244,114,182,0.10) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(197,0,34,0.12) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(244,114,182,0.08) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(197,0,34,0.08) 0%,transparent 55%),#0a0010;
+    pointer-events:none; }
+
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(10,0,16,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-text { font-size:18px; font-weight:700; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .nav-section { padding:14px 10px 4px; }
+  .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+  .nav-item.active { background:var(--pink-soft); color:var(--pink); border-color:var(--pink-border); }
+  .nav-icon { font-size:15px; width:18px; text-align:center; }
+  .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
+  .ai-core-pill { background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+  .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; }
+  .user-plan { font-size:11px; color:var(--pink); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(10,0,16,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .search-bar-top { flex:1; max-width:360px; display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; font-size:13px; }
+  .search-bar-top input { background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13px; width:100%; }
+  .search-bar-top input::placeholder { color:var(--muted); }
+  .status-pill { display:flex; align-items:center; gap:7px; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); border-radius:20px; padding:6px 12px; font-size:12px; color:var(--green); font-weight:500; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .notif-btn { width:36px; height:36px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; transition:all 0.2s; }
+  .notif-btn:hover { border-color:var(--pink); }
+  .new-btn { display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,var(--pink),#ec4899); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(244,114,182,0.3); text-decoration:none; }
+  .new-btn:hover { opacity:0.9; transform:translateY(-1px); }
+
+  /* CONTENT */
+  .content { padding:28px; flex:1; max-width:1280px; width:100%; margin:0 auto; }
+
+  /* HEADER */
+  .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:16px; }
+  .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
+  .page-title { font-size:32px; font-weight:700; line-height:1; }
+  .page-title .accent { color:var(--pink); }
+  .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:560px; }
+
+  /* SECTION */
+  .section { margin-bottom:42px; }
+  .section-label { font-size:12px; font-weight:700; color:var(--pink); letter-spacing:1.4px; text-transform:uppercase; margin-bottom:10px; }
+  .section-title { font-size:22px; font-weight:700; margin-bottom:14px; }
+
+  /* BOT GRID */
+  .bots-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:18px; }
+  .bot-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; transition:all 0.2s; }
+  .bot-card:hover { border-color:var(--pink-border); transform:translateY(-2px); box-shadow:0 8px 30px rgba(244,114,182,0.12); }
+  .bot-head { display:flex; align-items:center; gap:10px; }
+  .bot-logo { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:15px; flex-shrink:0; overflow:hidden; }
+  .bot-logo img { width:100%; height:100%; object-fit:cover; }
+  .bot-info { flex:1; min-width:0; }
+  .bot-name { font-size:14px; font-weight:600; line-height:1.2; }
+  .bot-company { font-size:12px; color:var(--muted); margin-top:2px; }
+  .bot-type-badge { font-size:10px; font-weight:700; padding:3px 8px; border-radius:5px; letter-spacing:0.4px; text-transform:uppercase; }
+  .badge-ai { background:rgba(244,114,182,0.15); color:var(--pink); border:1px solid var(--pink-border); }
+  .badge-nonai { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid rgba(255,255,255,0.1); }
+  .bot-stats { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted); }
+  .usage-bar-wrap { flex:1; }
+  .usage-bar { height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; margin-top:4px; }
+  .usage-fill { height:100%; background:linear-gradient(90deg,var(--pink),#ec4899); border-radius:3px; transition:width 0.3s; }
+  .bot-actions { display:flex; gap:8px; }
+  .btn-ghost { display:flex; align-items:center; justify-content:center; gap:6px; flex:1; background:var(--card); border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--pink); color:var(--pink); }
+  .btn-danger { background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.3); color:#f87171; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-danger:hover { background:rgba(248,113,113,0.22); }
+
+  .empty-state { text-align:center; padding:50px 20px; background:var(--card); border:1px dashed var(--card-border); border-radius:14px; }
+  .empty-state .icon { font-size:42px; margin-bottom:10px; }
+  .empty-state .text { color:var(--muted); font-size:14px; }
+
+  /* CREATE PANEL */
+  .builder-panel { background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:26px; }
+  .steps-row { display:flex; gap:10px; margin-bottom:22px; }
+  .step-chip { flex:1; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; font-size:13px; color:var(--muted); font-weight:500; display:flex; align-items:center; gap:8px; }
+  .step-chip.active { background:var(--pink-soft); border-color:var(--pink-border); color:var(--pink); }
+  .step-chip .num { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
+  .step-chip.active .num { background:var(--pink); color:#fff; }
+
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px) { .form-grid { grid-template-columns:1fr; } }
+  .form-field { margin-bottom:14px; }
+  .form-label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; letter-spacing:0.3px; }
+  .form-input, .form-textarea, .form-select { width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:13px; font-family:inherit; outline:none; transition:border-color 0.2s; }
+  .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--pink); }
+  .form-textarea { min-height:120px; resize:vertical; font-family:'JetBrains Mono',monospace; }
+  .form-color { width:60px; height:38px; padding:2px; cursor:pointer; }
+
+  .toggle-row { display:flex; gap:10px; margin-bottom:16px; }
+  .toggle-pill { flex:1; padding:14px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center; }
+  .toggle-pill:hover { border-color:var(--pink-border); }
+  .toggle-pill.active { background:var(--pink-soft); border-color:var(--pink-border); }
+  .toggle-pill .t-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
+  .toggle-pill .t-sub { font-size:11px; color:var(--muted); }
+
+  .qa-pair { background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:12px; margin-bottom:10px; }
+  .qa-remove { float:right; background:none; border:none; color:#f87171; cursor:pointer; font-size:14px; padding:0 6px; }
+
+  .tabs-row { display:flex; gap:6px; margin-bottom:12px; }
+  .tab-btn { padding:8px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; color:var(--muted); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .tab-btn:hover { color:var(--text); }
+  .tab-btn.active { background:var(--pink-soft); color:var(--pink); border-color:var(--pink-border); }
+
+  .preview-bubble { display:inline-flex; align-items:center; gap:10px; padding:14px 18px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.4); margin:18px 0; color:#fff; }
+  .preview-msg { background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text); max-width:300px; }
+
+  .btn-primary { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--pink),#ec4899); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(244,114,182,0.28); }
+  .btn-primary:hover { opacity:0.92; transform:translateY(-1px); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+  .step-actions { display:flex; gap:10px; justify-content:space-between; margin-top:18px; }
+
+  /* PRICING */
+  .pricing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
+  @media (max-width:1000px) { .pricing-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:580px)  { .pricing-grid { grid-template-columns:1fr; } }
+  .plan-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; transition:all 0.2s; }
+  .plan-card:hover { border-color:var(--pink-border); transform:translateY(-2px); }
+  .plan-card.featured { border-color:var(--pink-border); box-shadow:0 0 24px rgba(244,114,182,0.18); }
+  .plan-name { font-size:15px; font-weight:700; color:var(--pink); letter-spacing:0.4px; text-transform:uppercase; }
+  .plan-price { font-size:32px; font-weight:700; }
+  .plan-price .sub { font-size:13px; font-weight:400; color:var(--muted); }
+  .plan-features { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; flex:1; }
+  .plan-features li { font-size:13px; color:var(--text); padding-left:18px; position:relative; }
+  .plan-features li::before { content:"✓"; position:absolute; left:0; color:var(--pink); font-weight:700; }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { width:100%; max-width:560px; background:#100018; border:1px solid var(--pink-border); border-radius:18px; padding:28px; box-shadow:0 0 60px rgba(244,114,182,0.2); max-height:90vh; overflow-y:auto; }
+  .modal-title { font-size:20px; font-weight:700; margin-bottom:8px; }
+  .modal-sub { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
+  .modal-close { float:right; cursor:pointer; color:var(--muted); font-size:18px; background:none; border:none; padding:0; }
+  .code-block { background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:10px; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#f4f4f5; word-break:break-all; line-height:1.6; position:relative; margin-bottom:12px; }
+  .copy-btn { position:absolute; top:8px; right:8px; background:var(--pink-soft); border:1px solid var(--pink-border); color:var(--pink); border-radius:6px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .copy-btn:hover { background:var(--pink); color:#fff; }
+  .copy-btn.copied { background:var(--green); color:#fff; border-color:var(--green); }
+  .modal-link-row { display:flex; gap:10px; margin-top:14px; flex-wrap:wrap; }
+  .link-btn { display:inline-flex; align-items:center; gap:6px; padding:9px 14px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); color:var(--text); font-size:13px; font-weight:500; text-decoration:none; transition:all 0.2s; }
+  .link-btn:hover { border-color:var(--pink); color:var(--pink); }
+
+  .toast { position:fixed; bottom:24px; right:24px; background:#100018; border:1px solid var(--pink-border); padding:12px 18px; border-radius:10px; font-size:13px; box-shadow:0 8px 30px rgba(0,0,0,0.5); z-index:500; opacity:0; transform:translateY(20px); transition:all 0.25s; }
+  .toast.show { opacity:1; transform:translateY(0); }
+  .toast.error { border-color:rgba(248,113,113,0.5); }
+</style>
+</head>
+<body>
+<div class="galaxy"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-icon">N</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="logo-text">Nerum</span>
+          <span class="beta-tag">BETA</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">v2.4.1 · online</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⬡</span> Overview</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚡</span> Workflows</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">✦</span> AI Builder</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">≡</span> Smart Lists</a>
+      <a class="nav-item active" href="/chatbot-builder"><span class="nav-icon">🤖</span> Chatbot</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Connect</div>
+      <a class="nav-item" href="/integrations"><span class="nav-icon">⬡</span> Integrations</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">↗</span> Analytics</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◷</span> History</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚙</span> Settings</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◈</span> Billing</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">?</span> Help</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="ai-core-pill">
+        <div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:0.8px;">✦ AI CORE</div>
+        <div style="font-size:12px;margin-top:2px;">Nerum-X · <span style="color:var(--green)">running</span></div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar" id="user-avatar">··</div>
+        <div style="flex:1;min-width:0;">
+          <div class="user-name" id="user-name-sidebar">Loading...</div>
+          <div class="user-plan" id="user-plan-sidebar">—</div>
+        </div>
+        <span style="color:var(--muted);font-size:14px;cursor:pointer;" onclick="logout()">↪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search-bar-top">
+        <span style="color:var(--muted);">🔍</span>
+        <input type="text" placeholder="Search chatbots...">
+      </div>
+      <div class="status-pill"><div class="status-dot"></div>AI CORE · online</div>
+      <div class="notif-btn">🔔</div>
+      <a class="new-btn" href="/chatbot-setup">📘 Setup Guide</a>
+    </div>
+
+    <div class="content">
+      <div class="section-header">
+        <div>
+          <div class="breadcrumb">Main · Chatbot</div>
+          <div class="page-title">Chat<span class="accent">bot</span></div>
+          <div class="page-sub">Build a branded chatbot for your website. Choose Non-AI Q&A or wire up Claude, GPT-4o Mini, or Gemini Pro with your own API key.</div>
+        </div>
+      </div>
+
+      <!-- SECTION A: MY CHATBOTS -->
+      <div class="section">
+        <div class="section-label">A · Your Chatbots</div>
+        <div class="section-title">My Chatbots</div>
+        <div id="bots-list">
+          <div class="empty-state"><div class="icon">🤖</div><div class="text">Loading chatbots...</div></div>
+        </div>
+      </div>
+
+      <!-- SECTION B: CREATE -->
+      <div class="section">
+        <div class="section-label">B · Create</div>
+        <div class="section-title">Create New Chatbot</div>
+        <div class="builder-panel">
+          <div class="steps-row">
+            <div class="step-chip active" data-step-chip="1"><div class="num">1</div> Basic Info</div>
+            <div class="step-chip" data-step-chip="2"><div class="num">2</div> Bot Type</div>
+            <div class="step-chip" data-step-chip="3"><div class="num">3</div> Preview & Create</div>
+          </div>
+
+          <!-- STEP 1 -->
+          <div data-step="1">
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Company name</label>
+                <input class="form-input" id="f-company" placeholder="Acme Coffee Co.">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Bot name</label>
+                <input class="form-input" id="f-botname" placeholder="Brew Buddy" value="Assistant">
+              </div>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Welcome message</label>
+              <input class="form-input" id="f-welcome" value="Hi! How can I help you?">
+            </div>
+            <div class="form-grid">
+              <div class="form-field">
+                <label class="form-label">Brand color</label>
+                <input class="form-input form-color" type="color" id="f-color" value="#f472b6">
+              </div>
+              <div class="form-field">
+                <label class="form-label">Logo URL (optional)</label>
+                <input class="form-input" id="f-logo" placeholder="https://example.com/logo.png">
+              </div>
+            </div>
+            <div class="step-actions">
+              <span></span>
+              <button class="btn-primary" onclick="goStep(2)">Next →</button>
+            </div>
+          </div>
+
+          <!-- STEP 2 -->
+          <div data-step="2" style="display:none;">
+            <div class="form-label" style="margin-bottom:8px;">Bot type</div>
+            <div class="toggle-row">
+              <div class="toggle-pill active" data-type="nonai" onclick="setBotType('nonai')">
+                <div class="t-title">Non-AI · Q&A</div>
+                <div class="t-sub">Free · Pre-defined answers</div>
+              </div>
+              <div class="toggle-pill" data-type="ai" onclick="setBotType('ai')">
+                <div class="t-title">AI Powered</div>
+                <div class="t-sub">Claude · GPT · Gemini</div>
+              </div>
+            </div>
+
+            <!-- NON-AI Q&A -->
+            <div id="nonai-panel">
+              <div class="form-label">Q&A pairs (at least 1)</div>
+              <div id="qa-list"></div>
+              <button class="btn-ghost" style="display:inline-flex;width:auto;padding:8px 14px;" onclick="addQA()">+ Add another Q&A</button>
+            </div>
+
+            <!-- AI -->
+            <div id="ai-panel" style="display:none;">
+              <div class="form-grid">
+                <div class="form-field">
+                  <label class="form-label">AI engine</label>
+                  <select class="form-select" id="f-engine">
+                    <option value="claude">Claude (Haiku 4.5)</option>
+                    <option value="gpt">GPT-4o Mini</option>
+                    <option value="gemini">Gemini Pro</option>
+                  </select>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">API key</label>
+                  <input class="form-input" type="password" id="f-apikey" placeholder="sk-... / AIza...">
+                </div>
+              </div>
+              <div class="form-label" style="margin-top:6px;">Knowledge source</div>
+              <div class="tabs-row">
+                <button class="tab-btn active" data-tab="url" onclick="setTab('url')">🌐 Website URL</button>
+                <button class="tab-btn" data-tab="text" onclick="setTab('text')">📝 Paste Text</button>
+              </div>
+              <div id="tab-url">
+                <div class="form-field">
+                  <label class="form-label">Website URL</label>
+                  <div style="display:flex;gap:8px;">
+                    <input class="form-input" id="f-url" placeholder="https://yoursite.com" style="flex:1;">
+                    <button class="btn-ghost" style="flex:0 0 auto;padding:8px 16px;" onclick="fetchUrl()">Fetch</button>
+                  </div>
+                  <div id="fetch-status" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
+                </div>
+              </div>
+              <div id="tab-text" style="display:none;">
+                <div class="form-field">
+                  <label class="form-label">Knowledge content</label>
+                  <textarea class="form-textarea" id="f-text" placeholder="Paste any content the bot should know about..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="step-actions">
+              <button class="btn-ghost" style="flex:0 0 auto;padding:9px 18px;" onclick="goStep(1)">← Back</button>
+              <button class="btn-primary" onclick="goStep(3)">Next →</button>
+            </div>
+          </div>
+
+          <!-- STEP 3 -->
+          <div data-step="3" style="display:none;">
+            <div class="form-label">Preview</div>
+            <div id="preview-area" style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:14px; padding:24px; margin-bottom:14px;">
+              <div class="preview-bubble" id="preview-bubble" style="background:#f472b6;">
+                <span id="preview-init" style="font-weight:700;">A</span>
+                <span id="preview-name">Assistant</span>
+              </div>
+              <div class="preview-msg" id="preview-msg">Hi! How can I help you?</div>
+              <div style="font-size:11px;color:var(--muted);margin-top:10px;">This is how your bot bubble will appear on customer sites.</div>
+            </div>
+            <div class="step-actions">
+              <button class="btn-ghost" style="flex:0 0 auto;padding:9px 18px;" onclick="goStep(2)">← Back</button>
+              <button class="btn-primary" id="create-btn" onclick="createBot()">✦ Create Chatbot</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SECTION C: PRICING -->
+      <div class="section">
+        <div class="section-label">C · Pricing</div>
+        <div class="section-title">Plans</div>
+        <div class="pricing-grid">
+          <div class="plan-card">
+            <div class="plan-name">Free</div>
+            <div class="plan-price">₹0 <span class="sub">/forever</span></div>
+            <ul class="plan-features">
+              <li>1 chatbot</li>
+              <li>50 chats / month</li>
+              <li>Non-AI only</li>
+              <li>Nerum branding</li>
+            </ul>
+          </div>
+          <div class="plan-card featured">
+            <div class="plan-name">Starter</div>
+            <div class="plan-price">₹699 <span class="sub">/month</span></div>
+            <ul class="plan-features">
+              <li>1 AI chatbot</li>
+              <li>1,000 chats / month</li>
+              <li>All AI engines</li>
+              <li>PDF text knowledge</li>
+            </ul>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Pro</div>
+            <div class="plan-price">₹1,299 <span class="sub">/month</span></div>
+            <ul class="plan-features">
+              <li>3 chatbots</li>
+              <li>5,000 chats / month</li>
+              <li>Website scraping</li>
+              <li>Custom branding</li>
+            </ul>
+          </div>
+          <div class="plan-card">
+            <div class="plan-name">Agency</div>
+            <div class="plan-price">₹2,799 <span class="sub">/month</span></div>
+            <ul class="plan-features">
+              <li>10 chatbots</li>
+              <li>20,000 chats / month</li>
+              <li>White label</li>
+              <li>Priority support</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- EMBED MODAL -->
+<div class="modal-overlay" id="embed-modal">
+  <div class="modal">
+    <button class="modal-close" onclick="closeEmbed()">×</button>
+    <div class="modal-title">🎉 Your Chatbot Is Live</div>
+    <div class="modal-sub">Add the bot to your site with the script tag below, or share the hosted link directly.</div>
+
+    <div class="form-label">Embed script (paste before <code>&lt;/body&gt;</code>)</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyText(this, document.getElementById('embed-script').textContent)">Copy</button>
+      <span id="embed-script"></span>
+    </div>
+
+    <div class="form-label">Hosted page link</div>
+    <div class="code-block">
+      <button class="copy-btn" onclick="copyText(this, document.getElementById('embed-link').textContent)">Copy</button>
+      <span id="embed-link"></span>
+    </div>
+
+    <div class="modal-link-row">
+      <a class="link-btn" id="embed-open-link" href="#" target="_blank">↗ Open Hosted Chat</a>
+      <a class="link-btn" href="/chatbot-setup" target="_blank">📘 Setup Guide</a>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const API_BASE = window.location.origin;
+const TOKEN = localStorage.getItem("token") || localStorage.getItem("auth_token") || "";
+
+let currentStep = 1;
+let botType = "nonai";
+let knowledgeTab = "url";
+let qaPairs = [{question:"", answer:""}];
+
+function authHeaders() {
+  const h = {"Content-Type":"application/json"};
+  if (TOKEN) h["Authorization"] = "Bearer " + TOKEN;
+  return h;
+}
+
+function toast(msg, isError=false) {
+  const el = document.getElementById("toast");
+  el.textContent = msg;
+  el.classList.toggle("error", isError);
+  el.classList.add("show");
+  setTimeout(()=>el.classList.remove("show"), 3000);
+}
+
+async function loadUser() {
+  try {
+    const r = await fetch(API_BASE + "/auth/me", {headers:authHeaders()});
+    if (!r.ok) return;
+    const u = await r.json();
+    document.getElementById("user-name-sidebar").textContent = u.name || u.email || "User";
+    document.getElementById("user-plan-sidebar").textContent = (u.plan || "Free").charAt(0).toUpperCase() + (u.plan || "Free").slice(1);
+    const init = (u.name || u.email || "U").substring(0,2).toUpperCase();
+    document.getElementById("user-avatar").textContent = init;
+  } catch (e) { /* ignore */ }
+}
+
+function logout() {
+  localStorage.removeItem("token");
+  localStorage.removeItem("auth_token");
+  window.location.href = "/";
+}
+
+async function loadBots() {
+  const wrap = document.getElementById("bots-list");
+  try {
+    const r = await fetch(API_BASE + "/chatbots/my-chatbots", {headers:authHeaders()});
+    if (!r.ok) throw new Error("Failed");
+    const data = await r.json();
+    if (!data.chatbots.length) {
+      wrap.innerHTML = '<div class="empty-state"><div class="icon">🤖</div><div class="text">No chatbots yet — create your first one below.</div></div>';
+      return;
+    }
+    wrap.innerHTML = '<div class="bots-grid">' + data.chatbots.map(b => `
+      <div class="bot-card">
+        <div class="bot-head">
+          <div class="bot-logo" style="background:${b.brand_color || '#f472b6'};">${b.logo_url ? `<img src="${b.logo_url}" alt="">` : (b.bot_name || 'A').charAt(0).toUpperCase()}</div>
+          <div class="bot-info">
+            <div class="bot-name">${escapeHtml(b.bot_name || 'Unnamed')}</div>
+            <div class="bot-company">${escapeHtml(b.company_name || '—')}</div>
+          </div>
+          <span class="bot-type-badge ${b.bot_type === 'ai' ? 'badge-ai' : 'badge-nonai'}">${b.bot_type === 'ai' ? 'AI' : 'Non-AI'}</span>
+        </div>
+        <div class="bot-stats">
+          <span>💬 ${b.chat_count || 0} all-time</span>
+        </div>
+        <div>
+          <div style="font-size:11px;color:var(--muted);">Monthly usage: ${b.monthly_chat_count || 0} / ${b.chat_limit || 50}</div>
+          <div class="usage-bar"><div class="usage-fill" style="width:${Math.min(100,(b.monthly_chat_count||0)/(b.chat_limit||50)*100)}%"></div></div>
+        </div>
+        <div class="bot-actions">
+          <button class="btn-ghost" onclick='showEmbed(${JSON.stringify(b.embed_id)})'>📋 Get Embed Code</button>
+          <button class="btn-danger" onclick='deleteBot(${b.id})'>Delete</button>
+        </div>
+      </div>
+    `).join('') + '</div>';
+  } catch (e) {
+    wrap.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><div class="text">Could not load chatbots. Sign in to continue.</div></div>';
+  }
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+async function deleteBot(id) {
+  if (!confirm("Delete this chatbot? This cannot be undone.")) return;
+  try {
+    const r = await fetch(API_BASE + "/chatbots/" + id, {method:"DELETE", headers:authHeaders()});
+    if (!r.ok) throw new Error();
+    toast("Chatbot deleted");
+    loadBots();
+  } catch (e) {
+    toast("Delete failed", true);
+  }
+}
+
+function showEmbed(embedId) {
+  const script = `<script src="${window.location.origin}/widget/${embedId}.js"><\/script>`;
+  const link = `${window.location.origin}/chat/${embedId}`;
+  document.getElementById("embed-script").textContent = script;
+  document.getElementById("embed-link").textContent = link;
+  document.getElementById("embed-open-link").href = link;
+  document.getElementById("embed-modal").classList.add("open");
+}
+
+function closeEmbed() {
+  document.getElementById("embed-modal").classList.remove("open");
+}
+
+function copyText(btn, txt) {
+  navigator.clipboard.writeText(txt).then(() => {
+    btn.classList.add("copied");
+    const orig = btn.textContent;
+    btn.textContent = "✓ Copied";
+    setTimeout(() => { btn.classList.remove("copied"); btn.textContent = orig; }, 1600);
+  });
+}
+
+function goStep(n) {
+  currentStep = n;
+  document.querySelectorAll("[data-step]").forEach(el => el.style.display = "none");
+  document.querySelector(`[data-step="${n}"]`).style.display = "block";
+  document.querySelectorAll(".step-chip").forEach((c,i) => c.classList.toggle("active", i+1 <= n));
+  if (n === 3) updatePreview();
+}
+
+function setBotType(t) {
+  botType = t;
+  document.querySelectorAll(".toggle-pill").forEach(p => p.classList.toggle("active", p.dataset.type === t));
+  document.getElementById("nonai-panel").style.display = t === "nonai" ? "block" : "none";
+  document.getElementById("ai-panel").style.display = t === "ai" ? "block" : "none";
+}
+
+function setTab(t) {
+  knowledgeTab = t;
+  document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
+  document.getElementById("tab-url").style.display = t === "url" ? "block" : "none";
+  document.getElementById("tab-text").style.display = t === "text" ? "block" : "none";
+}
+
+function renderQA() {
+  const wrap = document.getElementById("qa-list");
+  wrap.innerHTML = qaPairs.map((p,i) => `
+    <div class="qa-pair">
+      ${qaPairs.length > 1 ? `<button class="qa-remove" onclick="removeQA(${i})">×</button>` : ''}
+      <div class="form-field" style="margin-bottom:8px;">
+        <label class="form-label">Question ${i+1}</label>
+        <input class="form-input" value="${escapeHtml(p.question)}" oninput="qaPairs[${i}].question = this.value">
+      </div>
+      <div class="form-field" style="margin-bottom:0;">
+        <label class="form-label">Answer</label>
+        <input class="form-input" value="${escapeHtml(p.answer)}" oninput="qaPairs[${i}].answer = this.value">
+      </div>
+    </div>
+  `).join('');
+}
+
+function addQA() {
+  qaPairs.push({question:"", answer:""});
+  renderQA();
+}
+
+function removeQA(i) {
+  qaPairs.splice(i, 1);
+  renderQA();
+}
+
+async function fetchUrl() {
+  const url = document.getElementById("f-url").value.trim();
+  const status = document.getElementById("fetch-status");
+  if (!url) { status.textContent = "Enter a URL first."; return; }
+  status.textContent = "Fetching...";
+  try {
+    const r = await fetch(API_BASE + "/chatbots/scrape?url=" + encodeURIComponent(url), {headers:authHeaders()});
+    if (!r.ok) { const e = await r.json().catch(()=>({detail:"Failed"})); throw new Error(e.detail || "Failed"); }
+    const data = await r.json();
+    document.getElementById("f-text").value = data.content;
+    status.textContent = `✓ Fetched ${data.content.length} characters. Switch to Paste Text to review/edit.`;
+    status.style.color = "var(--green)";
+  } catch (e) {
+    status.textContent = "✗ " + (e.message || "Could not fetch URL");
+    status.style.color = "#f87171";
+  }
+}
+
+function updatePreview() {
+  const name = document.getElementById("f-botname").value || "Assistant";
+  const color = document.getElementById("f-color").value;
+  const welcome = document.getElementById("f-welcome").value || "Hi! How can I help you?";
+  document.getElementById("preview-bubble").style.background = color;
+  document.getElementById("preview-name").textContent = name;
+  document.getElementById("preview-init").textContent = name.charAt(0).toUpperCase();
+  document.getElementById("preview-msg").textContent = welcome;
+}
+
+async function createBot() {
+  const btn = document.getElementById("create-btn");
+  btn.disabled = true;
+  btn.textContent = "Creating...";
+  const payload = {
+    bot_name: document.getElementById("f-botname").value || "Assistant",
+    company_name: document.getElementById("f-company").value || "",
+    welcome_message: document.getElementById("f-welcome").value || "Hi! How can I help you?",
+    brand_color: document.getElementById("f-color").value,
+    logo_url: document.getElementById("f-logo").value || null,
+    bot_type: botType,
+  };
+  if (botType === "nonai") {
+    payload.qa_pairs = qaPairs.filter(p => p.question.trim());
+    if (!payload.qa_pairs.length) { toast("Add at least 1 Q&A pair", true); btn.disabled = false; btn.textContent = "✦ Create Chatbot"; return; }
+  } else {
+    payload.ai_engine = document.getElementById("f-engine").value;
+    payload.api_key = document.getElementById("f-apikey").value;
+    if (!payload.api_key) { toast("API key required for AI bots", true); btn.disabled = false; btn.textContent = "✦ Create Chatbot"; return; }
+    payload.knowledge_type = knowledgeTab;
+    payload.knowledge_content = document.getElementById("f-text").value || "";
+  }
+  try {
+    const r = await fetch(API_BASE + "/chatbots/create", {method:"POST", headers:authHeaders(), body:JSON.stringify(payload)});
+    if (!r.ok) { const e = await r.json().catch(()=>({detail:"Failed"})); throw new Error(e.detail || "Failed"); }
+    const data = await r.json();
+    toast("Chatbot created!");
+    showEmbed(data.embed_id);
+    loadBots();
+    // reset form
+    qaPairs = [{question:"", answer:""}]; renderQA();
+    document.getElementById("f-company").value = "";
+    document.getElementById("f-apikey").value = "";
+    document.getElementById("f-text").value = "";
+    document.getElementById("f-url").value = "";
+    goStep(1);
+  } catch (e) {
+    toast(e.message || "Failed to create", true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "✦ Create Chatbot";
+  }
+}
+
+// init
+renderQA();
+loadUser();
+loadBots();
+["f-botname","f-color","f-welcome"].forEach(id => {
+  document.getElementById(id).addEventListener("input", updatePreview);
+});
+</script>
+</body>
+</html>

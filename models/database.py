@@ -177,6 +177,9 @@ class UserIntegration(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_used_at = Column(DateTime, nullable=True)
 
+# Register chatbot-builder tables (user_chatbots, chatbot_conversations)
+from models.chatbot_model import UserChatbot, ChatbotConversation  # noqa: E402,F401
+
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")
 
