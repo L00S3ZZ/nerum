@@ -99,8 +99,8 @@ app.include_router(webhook.router, prefix="/webhook")
 app.include_router(dashboard.router, prefix="/dashboard")
 app.include_router(chatbot_router, prefix="/chatbot")
 app.include_router(triggers_router)
-app.include_router(integrations_router, prefix="/integrations/api", tags=["integrations"])
-app.include_router(terms_router, prefix="/terms", tags=["terms"])
+app.include_router(integrations_router, prefix="/integrations")
+app.include_router(terms_router, prefix="/terms")
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
@@ -122,10 +122,6 @@ def home():
 def dashboard_page():
     return FileResponse("static/dashboard.html")
 
-@app.get("/integrations")
-def integrations_page():
-    return FileResponse("static/integrations.html")
-
 # ✅ Visual workflow builder
 @app.get("/builder")
 def builder_page():
@@ -138,6 +134,10 @@ def privacy():
 @app.get("/terms")
 def terms():
     return FileResponse("static/terms.html")
+
+@app.get("/integrations")
+def integrations_page():
+    return FileResponse("static/integrations.html")
 
 @app.get("/data-deletion")
 async def data_deletion():
