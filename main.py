@@ -131,6 +131,10 @@ def privacy():
 def terms():
     return FileResponse("static/terms.html")
 
+@app.get("/data-deletion")
+async def data_deletion():
+    return FileResponse("static/data-deletion.html")
+
 # ✅ Admin page — heavily rate limited
 @app.get("/admin-panel")
 @limiter.limit("10/minute")
