@@ -155,7 +155,7 @@ class AIAgentConversation(Base):
     workflow_id = Column(Integer, nullable=True)
     preview = Column(String, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)    
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")

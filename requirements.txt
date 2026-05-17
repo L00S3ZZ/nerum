@@ -13,7 +13,6 @@ bcrypt==4.0.1
 httpx
 twilio
 authlib
-httpx
 razorpay
 psycopg2-binary
 slowapi
