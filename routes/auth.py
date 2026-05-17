@@ -62,6 +62,8 @@ def user_to_dict(user):
         "token_limit": limit,
         "two_fa_enabled": bool(getattr(user, "two_fa_enabled", False)),
         "is_verified": bool(getattr(user, "is_verified", True)),
+        "terms_accepted": bool(getattr(user, "terms_accepted", False)),
+        "terms_version": getattr(user, "terms_version", "1.0"),
     }
 
 def create_token(data: dict):

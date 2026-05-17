@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nerum · Integrations</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #C50022;
+    --indigo: #C50022;
+    --green: #34d399;
+    --pink: #C50022;
+    --violet: #ff4060;
+    --bg: #08000f;
+    --card: rgba(255,255,255,0.03);
+    --card-border: rgba(197,0,34,0.25);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --sidebar-w: 220px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  .galaxy { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.18) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(197,0,34,0.14) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.12) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(197,0,34,0.10) 0%,transparent 55%),#08000f;
+    pointer-events:none; }
+
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-text { font-size:18px; font-weight:700; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .nav-section { padding:14px 10px 4px; }
+  .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+  .nav-item.active { background:rgba(197,0,34,0.15); color:var(--purple); border-color:rgba(197,0,34,0.2); }
+  .nav-icon { font-size:15px; width:18px; text-align:center; }
+  .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
+  .ai-core-pill { background:rgba(52,211,153,0.08); border:1px solid rgba(52,211,153,0.2); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+  .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; }
+  .user-plan { font-size:11px; color:var(--purple); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(8,0,15,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .search-bar-top { flex:1; max-width:360px; display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; font-size:13px; }
+  .search-bar-top input { background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13px; width:100%; }
+  .search-bar-top input::placeholder { color:var(--muted); }
+  .status-pill { display:flex; align-items:center; gap:7px; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); border-radius:20px; padding:6px 12px; font-size:12px; color:var(--green); font-weight:500; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .token-pill { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--card-border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--muted); }
+  .token-bar { width:60px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
+  .token-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,var(--purple),var(--indigo)); transition:width 0.5s; }
+  .notif-btn { width:36px; height:36px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; transition:all 0.2s; }
+  .notif-btn:hover { border-color:var(--purple); }
+  .new-btn { display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.3); text-decoration:none; }
+  .new-btn:hover { opacity:0.88; transform:translateY(-1px); }
+
+  /* CONTENT */
+  .content { padding:28px; flex:1; max-width:1280px; width:100%; margin:0 auto; }
+
+  /* HEADER */
+  .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:16px; }
+  .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
+  .page-title { font-size:32px; font-weight:700; line-height:1; }
+  .page-title .accent { color:var(--purple); }
+  .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:480px; }
+
+  /* CONTROLS BAR */
+  .controls-bar { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-bottom:24px; }
+  .grid-search { flex:1; min-width:240px; max-width:360px; display:flex; align-items:center; gap:10px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:9px 14px; font-size:13px; }
+  .grid-search input { flex:1; background:none; border:none; outline:none; color:var(--text); font-family:inherit; font-size:13px; }
+  .grid-search input::placeholder { color:var(--muted); }
+  .filter-chip { background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; color:var(--text); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .filter-chip:hover { border-color:var(--purple); color:var(--purple); }
+  .filter-chip.active { background:rgba(197,0,34,0.15); color:var(--purple); border-color:rgba(197,0,34,0.4); }
+
+  /* GRID */
+  .integrations-grid { display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; }
+  @media (max-width:1100px) { .integrations-grid { grid-template-columns:repeat(2, 1fr); } }
+  @media (max-width:680px)  { .integrations-grid { grid-template-columns:1fr; } }
+
+  .int-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:20px; display:flex; flex-direction:column; gap:14px; transition:all 0.2s; min-height:180px; }
+  .int-card:hover { border-color:rgba(197,0,34,0.5); transform:translateY(-2px); box-shadow:0 8px 30px rgba(197,0,34,0.12); }
+  .int-card.clickable { cursor:pointer; }
+  .int-head { display:flex; align-items:center; gap:14px; }
+  .int-icon { width:44px; height:44px; border-radius:10px; background:rgba(255,255,255,0.05); display:flex; align-items:center; justify-content:center; flex-shrink:0; padding:8px; border:1px solid rgba(255,255,255,0.08); }
+  .int-icon img { width:100%; height:100%; object-fit:contain; }
+  .int-icon .emoji { font-size:22px; }
+  .int-name { font-size:15px; font-weight:600; line-height:1.2; }
+  .int-desc { font-size:13px; color:var(--muted); line-height:1.5; flex:1; }
+  .int-footer { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .badge { font-size:11px; font-weight:600; padding:4px 10px; border-radius:6px; letter-spacing:0.3px; }
+  .badge-connected { background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.3); }
+  .badge-active    { background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.3); }
+  .badge-soon      { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid rgba(255,255,255,0.08); }
+  .badge-available { background:rgba(197,0,34,0.12); color:var(--purple); border:1px solid rgba(197,0,34,0.3); }
+  .connect-btn { background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:8px; padding:7px 14px; color:#fff; font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 14px rgba(197,0,34,0.25); }
+  .connect-btn:hover { opacity:0.9; transform:translateY(-1px); }
+
+  /* MODAL */
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
+  .modal-overlay.open { display:flex; }
+  .modal { width:100%; max-width:520px; background:#0a0312; border:1px solid var(--card-border); border-radius:18px; padding:28px; box-shadow:0 0 60px rgba(197,0,34,0.2); max-height:90vh; overflow-y:auto; }
+  .modal-title { font-size:20px; font-weight:700; margin-bottom:8px; }
+  .modal-sub { font-size:13px; color:var(--muted); margin-bottom:20px; line-height:1.5; }
+  .modal-actions { display:flex; gap:10px; justify-content:flex-end; margin-top:22px; }
+  .btn-ghost { background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:9px 16px; color:var(--text); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-ghost:hover { border-color:var(--purple); color:var(--purple); }
+  .btn-primary { background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:9px 18px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 18px rgba(197,0,34,0.25); }
+  .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+
+  .step-pill-row { display:flex; gap:6px; margin-bottom:18px; }
+  .step-pill { flex:1; height:4px; background:rgba(255,255,255,0.08); border-radius:2px; transition:background 0.2s; }
+  .step-pill.active { background:var(--purple); box-shadow:0 0 10px rgba(197,0,34,0.6); }
+
+  .instruction-list { list-style:none; padding:0; margin:0 0 8px; }
+  .instruction-list li { padding:10px 12px 10px 36px; position:relative; font-size:13px; color:var(--text); border-bottom:1px solid rgba(255,255,255,0.05); line-height:1.5; }
+  .instruction-list li::before { content:counter(step); counter-increment:step; position:absolute; left:10px; top:10px; width:20px; height:20px; border-radius:50%; background:rgba(197,0,34,0.15); color:var(--purple); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; border:1px solid rgba(197,0,34,0.3); }
+  .instruction-list { counter-reset:step; }
+  .ext-link { color:var(--purple); text-decoration:none; font-weight:500; }
+  .ext-link:hover { text-decoration:underline; }
+
+  .form-field { margin-bottom:14px; }
+  .form-label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; letter-spacing:0.3px; }
+  .form-input { width:100%; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:13px; font-family:'JetBrains Mono',monospace; outline:none; transition:border-color 0.2s; }
+  .form-input:focus { border-color:var(--purple); }
+
+  .test-status { padding:18px; border-radius:12px; background:var(--card); border:1px solid var(--card-border); text-align:center; }
+  .test-status .spinner { width:32px; height:32px; border:3px solid rgba(255,255,255,0.1); border-top-color:var(--purple); border-radius:50%; animation:spin 0.7s linear infinite; margin:0 auto 12px; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .test-status.success { border-color:rgba(52,211,153,0.4); background:rgba(52,211,153,0.06); }
+  .test-status.error { border-color:rgba(248,113,113,0.4); background:rgba(248,113,113,0.06); }
+  .test-status-icon { font-size:36px; margin-bottom:8px; }
+  .test-status-title { font-size:15px; font-weight:600; margin-bottom:4px; }
+  .test-status-msg { font-size:12px; color:var(--muted); }
+
+  .terms-body { font-size:13px; color:var(--text); line-height:1.6; max-height:240px; overflow-y:auto; padding:14px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; margin-bottom:14px; }
+  .terms-body strong { color:var(--purple); }
+</style>
+</head>
+<body>
+<div class="galaxy"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-icon">N</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="logo-text">Nerum</span>
+          <span class="beta-tag">BETA</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">v2.4.1 · online</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⬡</span> Overview</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚡</span> Workflows</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">✦</span> AI Builder</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">≡</span> Smart Lists</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Connect</div>
+      <a class="nav-item active" href="/integrations"><span class="nav-icon">⬡</span> Integrations</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">↗</span> Analytics</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◷</span> History</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚙</span> Settings</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◈</span> Billing</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">?</span> Help</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="ai-core-pill">
+        <div style="font-size:10px;color:var(--green);font-weight:700;letter-spacing:0.8px;">✦ AI CORE</div>
+        <div style="font-size:12px;margin-top:2px;">Nerum-X · <span style="color:var(--green)">running</span></div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar" id="user-avatar">··</div>
+        <div style="flex:1;min-width:0;">
+          <div class="user-name" id="user-name-sidebar">Loading...</div>
+          <div class="user-plan" id="user-plan-sidebar">—</div>
+        </div>
+        <span style="color:var(--muted);font-size:14px;cursor:pointer;" onclick="logout()">↪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <div class="search-bar-top">
+        <span style="color:var(--muted);">🔍</span>
+        <input type="text" placeholder="Search workflows, runs...">
+      </div>
+      <div class="status-pill"><div class="status-dot"></div>AI CORE · online</div>
+      <div class="token-pill">
+        <div class="token-bar"><div class="token-fill" id="topbar-token-bar" style="width:0%"></div></div>
+        <span id="topbar-tokens" style="color:var(--text);font-weight:600;">—</span>
+        <span id="topbar-limit" style="color:var(--muted);">/ 1000</span>
+      </div>
+      <div class="notif-btn">🔔</div>
+      <a class="new-btn" href="/dashboard">✦ New workflow</a>
+    </div>
+
+    <div class="content">
+      <div class="section-header">
+        <div>
+          <div class="breadcrumb">Connect</div>
+          <div class="page-title">Integ<span class="accent">rations</span></div>
+          <div class="page-sub">Connect your tools and unlock automations. Bring your own credentials or use Nerum's sandbox.</div>
+        </div>
+      </div>
+
+      <div class="controls-bar">
+        <div class="grid-search">
+          <span style="color:var(--muted);">🔍</span>
+          <input type="text" id="search-input" placeholder="Search integrations...">
+        </div>
+        <button class="filter-chip active" data-filter="all">All</button>
+        <button class="filter-chip" data-filter="connected">Connected</button>
+        <button class="filter-chip" data-filter="available">Available</button>
+        <button class="filter-chip" data-filter="soon">Coming Soon</button>
+      </div>
+
+      <div class="integrations-grid" id="integrations-grid"></div>
+    </div>
+  </main>
+</div>
+
+<!-- WHATSAPP BUSINESS MODAL -->
+<div class="modal-overlay" id="wa-modal">
+  <div class="modal">
+    <div class="step-pill-row">
+      <div class="step-pill" data-pill="1"></div>
+      <div class="step-pill" data-pill="2"></div>
+      <div class="step-pill" data-pill="3"></div>
+    </div>
+
+    <!-- STEP 1 -->
+    <div data-step="1">
+      <div class="modal-title">Connect WhatsApp Business</div>
+      <div class="modal-sub">You'll need three values from your Meta for Developers app. Follow these steps to grab them, then continue.</div>
+      <ol class="instruction-list">
+        <li>Go to <a class="ext-link" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> and open your WhatsApp Business app (or create one).</li>
+        <li>Under <strong>WhatsApp → API Setup</strong>, copy your <strong>Phone Number ID</strong> and <strong>WhatsApp Business Account ID (WABA ID)</strong>.</li>
+        <li>Generate a <strong>permanent Access Token</strong> via System Users in Business Settings (temporary tokens expire after 24 hours).</li>
+        <li>Make sure your phone number is verified and a recipient is added for testing.</li>
+      </ol>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="closeWaModal()">Cancel</button>
+        <button class="btn-primary" onclick="waStep(2)">Continue →</button>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div data-step="2" style="display:none;">
+      <div class="modal-title">Enter your credentials</div>
+      <div class="modal-sub">Stored encrypted (AES-256-GCM) on Nerum's servers. Only you can use them.</div>
+      <div class="form-field">
+        <label class="form-label">Phone Number ID</label>
+        <input class="form-input" id="wa-phone" type="text" placeholder="e.g. 109876543210987" autocomplete="off">
+      </div>
+      <div class="form-field">
+        <label class="form-label">WhatsApp Business Account ID (WABA ID)</label>
+        <input class="form-input" id="wa-waba" type="text" placeholder="e.g. 234567890123456" autocomplete="off">
+      </div>
+      <div class="form-field">
+        <label class="form-label">Access Token</label>
+        <input class="form-input" id="wa-token" type="password" placeholder="EAAJ..." autocomplete="off">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" onclick="waStep(1)">← Back</button>
+        <button class="btn-primary" onclick="waStep(3)">Test connection</button>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div data-step="3" style="display:none;">
+      <div class="modal-title">Verifying credentials</div>
+      <div class="modal-sub">Calling Meta's Graph API to confirm your token and Phone Number ID are valid.</div>
+      <div class="test-status" id="wa-test-status">
+        <div class="spinner"></div>
+        <div class="test-status-title">Testing connection...</div>
+        <div class="test-status-msg">This usually takes 2-3 seconds.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-ghost" id="wa-back-btn" onclick="waStep(2)" style="display:none;">← Back</button>
+        <button class="btn-ghost" id="wa-close-btn" onclick="closeWaModal()" style="display:none;">Close</button>
+        <button class="btn-primary" id="wa-save-btn" onclick="saveWhatsapp()" style="display:none;">Save & Connect</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TERMS MODAL -->
+<div class="modal-overlay" id="terms-modal">
+  <div class="modal">
+    <div class="modal-title">Accept Nerum's Terms</div>
+    <div class="modal-sub">Before connecting any integration, please review and accept how we handle your credentials and data.</div>
+    <div class="terms-body">
+      By connecting an integration to Nerum, you agree that: <strong>(1)</strong> credentials you provide (API keys, access tokens, OAuth grants) are encrypted at rest using AES-256-GCM and used only to execute workflows you create; <strong>(2)</strong> Nerum will not access third-party services on your behalf outside the scope of your active workflows; <strong>(3)</strong> you remain solely responsible for complying with the terms of each connected service (Meta, Google, Razorpay, etc.); <strong>(4)</strong> you may disconnect any integration at any time, which immediately revokes Nerum's stored credentials. Full terms at <a class="ext-link" href="/terms" target="_blank">nerum.in/terms</a>.
+    </div>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="window.location.href='/dashboard'">Cancel</button>
+      <button class="btn-primary" onclick="acceptTerms()">I Accept</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOKEN_KEY = 'nerum_token';
+const TERMS_KEY = 'nerum_terms_accepted_v1';
+
+function getToken() { return localStorage.getItem(TOKEN_KEY); }
+function authHeaders() {
+  const t = getToken();
+  return t ? { 'Authorization': 'Bearer ' + t, 'Content-Type': 'application/json' } : { 'Content-Type': 'application/json' };
+}
+function logout() {
+  localStorage.removeItem(TOKEN_KEY);
+  window.location.href = '/';
+}
+
+// ── Cards data ──────────────────────────────────────────────────────────────
+const INTEGRATIONS = [
+  { id:'gmail',           name:'Gmail',             icon:'gmail',          emoji:'✉',  desc:'Send emails via Resend API',          status:'connected', tag:'Email' },
+  { id:'whatsapp_twilio', name:'WhatsApp (Twilio)', icon:'whatsapp',       emoji:'💬', desc:'Sandbox messaging via Twilio',        status:'connected', tag:'Messaging' },
+  { id:'gsheets',         name:'Google Sheets',     icon:'googlesheets',   emoji:'📊', desc:'Read/write spreadsheets',             status:'connected', tag:'Data' },
+  { id:'telegram',        name:'Telegram',          icon:'telegram',       emoji:'📨', desc:'@nerum_bot — instant notifications',  status:'connected', tag:'Messaging' },
+  { id:'gforms',          name:'Google Forms',      icon:'googleforms',    emoji:'📝', desc:'Webhook trigger on submission',       status:'connected', tag:'Trigger' },
+  { id:'razorpay',        name:'Razorpay',          icon:'razorpay',       emoji:'💳', desc:'Payments + webhooks',                 status:'connected', tag:'Payments' },
+  { id:'webhook',         name:'Custom Webhook',    icon:null,             emoji:'🔗', desc:'Any external service via HTTP',       status:'active',    tag:'Generic' },
+  { id:'whatsapp_business', name:'WhatsApp Business', icon:'whatsapp',     emoji:'💚', desc:'Meta direct API — bring your own',    status:'available', tag:'Messaging', connect:true },
+  { id:'sms_msg91',       name:'SMS MSG91',         icon:null,             emoji:'📱', desc:'Bulk SMS for India',                  status:'soon',      tag:'Messaging' },
+  { id:'slack',           name:'Slack',             icon:'slack',          emoji:'💼', desc:'Team notifications',                  status:'soon',      tag:'Team' },
+  { id:'notion',          name:'Notion',            icon:'notion',         emoji:'📓', desc:'Database sync',                       status:'soon',      tag:'Data' },
+  { id:'zoho',            name:'Zoho CRM',          icon:'zoho',           emoji:'🏢', desc:'Indian CRM',                          status:'soon',      tag:'CRM' },
+  { id:'shopify',         name:'Shopify',           icon:'shopify',        emoji:'🛒', desc:'Ecommerce triggers',                  status:'soon',      tag:'Ecommerce' },
+  { id:'instagram',       name:'Instagram',         icon:'instagram',      emoji:'📸', desc:'DM automation',                       status:'soon',      tag:'Social' },
+  { id:'linkedin',        name:'LinkedIn',          icon:'linkedin',       emoji:'💼', desc:'Lead generation',                     status:'soon',      tag:'Social' },
+  { id:'tally',           name:'Tally',             icon:null,             emoji:'📒', desc:'Indian accounting',                   status:'soon',      tag:'Finance' },
+  { id:'shiprocket',      name:'Shiprocket',        icon:null,             emoji:'📦', desc:'Logistics for India',                 status:'soon',      tag:'Logistics' },
+  { id:'indiamart',       name:'IndiaMART',         icon:null,             emoji:'🛍', desc:'Lead capture from IndiaMART',         status:'soon',      tag:'Leads' },
+  { id:'justdial',        name:'JustDial',          icon:null,             emoji:'📞', desc:'Local business leads',                status:'soon',      tag:'Leads' },
+  { id:'gcal',            name:'Google Calendar',   icon:'googlecalendar', emoji:'📅', desc:'Schedule-based triggers',             status:'soon',      tag:'Trigger' },
+];
+
+const STATUS_LABEL = {
+  connected: { text:'Connected',   cls:'badge-connected' },
+  active:    { text:'Active',      cls:'badge-active' },
+  available: { text:'Available',   cls:'badge-available' },
+  soon:      { text:'Coming Soon', cls:'badge-soon' },
+};
+
+// ── Render ──────────────────────────────────────────────────────────────────
+function renderCards(filter='all', query='') {
+  const grid = document.getElementById('integrations-grid');
+  const q = (query||'').trim().toLowerCase();
+  let shown = 0;
+  grid.innerHTML = INTEGRATIONS.map(it => {
+    const matchesFilter =
+      filter === 'all' ||
+      (filter === 'connected' && it.status === 'connected') ||
+      (filter === 'available' && (it.status === 'available' || it.status === 'active')) ||
+      (filter === 'soon'      && it.status === 'soon');
+    const matchesQuery = !q || it.name.toLowerCase().includes(q) || it.tag.toLowerCase().includes(q) || it.desc.toLowerCase().includes(q);
+    if (!matchesFilter || !matchesQuery) return '';
+    shown++;
+    const badge = STATUS_LABEL[it.status];
+    const iconHtml = it.icon
+      ? `<img src="https://cdn.simpleicons.org/${it.icon}/white" alt="${it.name}" onerror="this.outerHTML='<span class=&quot;emoji&quot;>${it.emoji}</span>'">`
+      : `<span class="emoji">${it.emoji}</span>`;
+    const cta = it.connect && it.status !== 'connected'
+      ? `<button class="connect-btn" data-card="${it.id}">Connect</button>`
+      : `<span class="badge ${badge.cls}" data-badge="${it.id}">${badge.text}</span>`;
+    const clickable = it.connect ? 'clickable' : '';
+    return `
+      <div class="int-card ${clickable}" data-card-root="${it.id}" data-status="${it.status}" data-name="${it.name}">
+        <div class="int-head">
+          <div class="int-icon">${iconHtml}</div>
+          <div>
+            <div class="int-name">${it.name}</div>
+            <div style="font-size:11px;color:var(--muted);letter-spacing:0.4px;text-transform:uppercase;margin-top:3px;">${it.tag}</div>
+          </div>
+        </div>
+        <div class="int-desc">${it.desc}</div>
+        <div class="int-footer">
+          ${cta}
+        </div>
+      </div>
+    `;
+  }).join('') || `<div style="grid-column:1/-1;text-align:center;padding:40px;color:var(--muted);">No integrations match your filters.</div>`;
+
+  // wire up Connect buttons & clickable cards
+  document.querySelectorAll('.connect-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.card;
+      if (id === 'whatsapp_business') openWaModal();
+    });
+  });
+  document.querySelectorAll('.int-card.clickable').forEach(card => {
+    card.addEventListener('click', () => {
+      const id = card.dataset.cardRoot;
+      if (id === 'whatsapp_business') openWaModal();
+    });
+  });
+}
+
+// ── Filters / search ────────────────────────────────────────────────────────
+let activeFilter = 'all';
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+    activeFilter = chip.dataset.filter;
+    renderCards(activeFilter, document.getElementById('search-input').value);
+  });
+});
+document.getElementById('search-input').addEventListener('input', (e) => {
+  renderCards(activeFilter, e.target.value);
+});
+
+// ── WhatsApp Business modal flow ────────────────────────────────────────────
+function openWaModal() {
+  if (!termsAccepted()) { openTermsModal(); return; }
+  resetWaModal();
+  document.getElementById('wa-modal').classList.add('open');
+}
+function closeWaModal() {
+  document.getElementById('wa-modal').classList.remove('open');
+}
+function resetWaModal() {
+  waStep(1);
+  document.getElementById('wa-phone').value = '';
+  document.getElementById('wa-waba').value = '';
+  document.getElementById('wa-token').value = '';
+}
+function waStep(n) {
+  for (let i=1; i<=3; i++) {
+    document.querySelector(`[data-step="${i}"]`).style.display = (i === n ? 'block' : 'none');
+    document.querySelector(`[data-pill="${i}"]`).classList.toggle('active', i <= n);
+  }
+  if (n === 3) runWaTest();
+}
+
+async function runWaTest() {
+  const phone = document.getElementById('wa-phone').value.trim();
+  const waba  = document.getElementById('wa-waba').value.trim();
+  const token = document.getElementById('wa-token').value.trim();
+
+  const statusEl = document.getElementById('wa-test-status');
+  const backBtn  = document.getElementById('wa-back-btn');
+  const closeBtn = document.getElementById('wa-close-btn');
+  const saveBtn  = document.getElementById('wa-save-btn');
+
+  backBtn.style.display = 'none';
+  closeBtn.style.display = 'none';
+  saveBtn.style.display = 'none';
+  statusEl.className = 'test-status';
+  statusEl.innerHTML = `<div class="spinner"></div><div class="test-status-title">Testing connection...</div><div class="test-status-msg">Calling Meta Graph API.</div>`;
+
+  if (!phone || !waba || !token) {
+    statusEl.className = 'test-status error';
+    statusEl.innerHTML = `<div class="test-status-icon">⚠</div><div class="test-status-title">Missing fields</div><div class="test-status-msg">All three credentials are required.</div>`;
+    backBtn.style.display = 'inline-block';
+    return;
+  }
+
+  try {
+    const r = await fetch('/integrations/whatsapp/test', {
+      method:'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ phone_number_id: phone, waba_id: waba, access_token: token })
+    });
+    if (r.status === 401) { logout(); return; }
+    if (r.ok) {
+      statusEl.className = 'test-status success';
+      statusEl.innerHTML = `<div class="test-status-icon" style="color:var(--green);">✓</div><div class="test-status-title">Connection verified</div><div class="test-status-msg">Meta accepted your credentials.</div>`;
+      saveBtn.style.display = 'inline-block';
+    } else {
+      const data = await r.json().catch(() => ({}));
+      statusEl.className = 'test-status error';
+      statusEl.innerHTML = `<div class="test-status-icon" style="color:#f87171;">✗</div><div class="test-status-title">Verification failed</div><div class="test-status-msg">${(data.detail || 'Invalid credentials')}</div>`;
+      backBtn.style.display = 'inline-block';
+    }
+  } catch (err) {
+    statusEl.className = 'test-status error';
+    statusEl.innerHTML = `<div class="test-status-icon" style="color:#f87171;">✗</div><div class="test-status-title">Network error</div><div class="test-status-msg">${err.message || 'Could not reach Nerum'}</div>`;
+    backBtn.style.display = 'inline-block';
+  }
+}
+
+async function saveWhatsapp() {
+  const phone = document.getElementById('wa-phone').value.trim();
+  const waba  = document.getElementById('wa-waba').value.trim();
+  const token = document.getElementById('wa-token').value.trim();
+  const saveBtn = document.getElementById('wa-save-btn');
+  saveBtn.disabled = true;
+  saveBtn.textContent = 'Saving...';
+  try {
+    const r = await fetch('/integrations/whatsapp', {
+      method:'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ phone_number_id: phone, waba_id: waba, access_token: token })
+    });
+    if (r.status === 401) { logout(); return; }
+    if (r.ok) {
+      markWhatsappConnected();
+      closeWaModal();
+    } else {
+      const data = await r.json().catch(() => ({}));
+      alert('Failed to save: ' + (data.detail || r.status));
+    }
+  } catch (e) {
+    alert('Network error: ' + e.message);
+  } finally {
+    saveBtn.disabled = false;
+    saveBtn.textContent = 'Save & Connect';
+  }
+}
+
+function markWhatsappConnected() {
+  const item = INTEGRATIONS.find(i => i.id === 'whatsapp_business');
+  if (item) item.status = 'connected';
+  renderCards(activeFilter, document.getElementById('search-input').value);
+}
+
+// ── Terms ───────────────────────────────────────────────────────────────────
+function termsAccepted() { return !!localStorage.getItem(TERMS_KEY); }
+function openTermsModal() { document.getElementById('terms-modal').classList.add('open'); }
+function closeTermsModal() { document.getElementById('terms-modal').classList.remove('open'); }
+async function acceptTerms() {
+  try {
+    const r = await fetch('/terms/accept', { method:'POST', headers: authHeaders() });
+    if (r.status === 401) { logout(); return; }
+    // even if backend hiccups, we still cache locally — modal is best-effort UX
+    localStorage.setItem(TERMS_KEY, '1');
+    closeTermsModal();
+  } catch (e) {
+    localStorage.setItem(TERMS_KEY, '1');
+    closeTermsModal();
+  }
+}
+
+// ── Auth bootstrap ──────────────────────────────────────────────────────────
+async function loadUser() {
+  if (!getToken()) { window.location.href = '/'; return; }
+  try {
+    const r = await fetch('/auth/me', { headers: authHeaders() });
+    if (r.status === 401) { logout(); return; }
+    if (!r.ok) return;
+    const u = await r.json();
+    const name = u.name || u.email || 'User';
+    document.getElementById('user-name-sidebar').textContent = name;
+    document.getElementById('user-plan-sidebar').textContent = (u.plan || 'free').replace(/^\w/, c => c.toUpperCase());
+    const initials = name.split(/\s+/).map(s => s[0]).slice(0,2).join('').toUpperCase() || 'U';
+    document.getElementById('user-avatar').textContent = initials;
+    if (typeof u.tokens_used === 'number' && typeof u.token_limit === 'number') {
+      document.getElementById('topbar-tokens').textContent = u.tokens_used;
+      document.getElementById('topbar-limit').textContent = '/ ' + u.token_limit;
+      const pct = Math.min(100, (u.tokens_used / Math.max(1, u.token_limit)) * 100);
+      document.getElementById('topbar-token-bar').style.width = pct + '%';
+    }
+    // sync server-side terms acceptance into localStorage if true
+    if (u.terms_accepted) localStorage.setItem(TERMS_KEY, '1');
+  } catch (e) {
+    // soft-fail; page still renders
+  }
+}
+
+async function loadConnectedState() {
+  if (!getToken()) return;
+  try {
+    const r = await fetch('/integrations', { headers: authHeaders() });
+    if (!r.ok) return;
+    const data = await r.json();
+    const types = (data.integrations || []).filter(i => i.is_active).map(i => i.type);
+    if (types.includes('whatsapp_business')) {
+      const item = INTEGRATIONS.find(i => i.id === 'whatsapp_business');
+      if (item) item.status = 'connected';
+      renderCards(activeFilter, document.getElementById('search-input').value);
+    }
+  } catch (e) {}
+}
+
+// ── Boot ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', async () => {
+  renderCards();
+  await loadUser();
+  await loadConnectedState();
+  if (!termsAccepted()) openTermsModal();
+});
+</script>
+</body>
+</html>
