@@ -21,6 +21,7 @@ from routes import webhook
 from routes import dashboard
 from routes.chatbot import router as chatbot_router
 from routes.chatbot_builder import router as chatbot_builder_router
+from routes.website_builder import router as website_router, serve_site
 from routes.workflow_triggers import router as triggers_router
 from routes.integrations import router as integrations_router
 from routes.terms import router as terms_router
@@ -100,6 +101,8 @@ app.include_router(webhook.router, prefix="/webhook")
 app.include_router(dashboard.router, prefix="/dashboard")
 app.include_router(chatbot_router, prefix="/chatbot")
 app.include_router(chatbot_builder_router, prefix="/chatbots", tags=["chatbot-builder"])
+app.include_router(website_router)
+app.add_api_route("/s/{slug}", serve_site, methods=["GET"])
 app.include_router(triggers_router)
 app.include_router(integrations_router, prefix="/integrations/api", tags=["integrations"])
 app.include_router(terms_router, prefix="/terms", tags=["terms"])
@@ -155,6 +158,11 @@ def admin_page(request: Request):
 @app.get("/chatbot-builder")
 def chatbot_builder_page():
     return FileResponse("static/chatbot_builder.html")
+
+# ✅ Website builder page
+@app.get("/website-builder")
+def website_builder_page():
+    return FileResponse("static/website_builder.html")
 
 @app.get("/chat/{embed_id}")
 def chatbot_hosted_page(embed_id: str):

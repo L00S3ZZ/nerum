@@ -177,6 +177,32 @@ class UserIntegration(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     last_used_at = Column(DateTime, nullable=True)
 
+# ✅ Website Builder
+class UserWebsite(Base):
+    __tablename__ = "user_websites"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    slug = Column(String, unique=True, nullable=False)
+    plan_tier = Column(String, default="free")
+    template_id = Column(String, nullable=False)
+    business_name = Column(String, default="")
+    tagline = Column(String, default="")
+    phone = Column(String, default="")
+    email = Column(String, default="")
+    address = Column(String, default="")
+    services = Column(Text, default="")
+    brand_color = Column(String, default="#C50022")
+    logo_url = Column(String, default="")
+    logo_data = Column(Text, default="")
+    chatbot_embed_id = Column(String, default="")
+    published_html = Column(Text, default="")
+    is_published = Column(Boolean, default=False)
+    is_active = Column(Boolean, default=True)
+    expires_at = Column(DateTime, nullable=True)
+    views = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
 # Register chatbot-builder tables (user_chatbots, chatbot_conversations)
 from models.chatbot_model import UserChatbot, ChatbotConversation  # noqa: E402,F401
 
@@ -246,6 +272,46 @@ try:
             _conn.commit()
 except Exception as _e:
     print(f"Chatbot migration note: {_e}")
+
+# Migration: backfill user_websites columns for existing installs
+try:
+    import sqlalchemy as _sa
+    _insp = _sa.inspect(engine)
+    if "user_websites" in _insp.get_table_names():
+        _existing_w = {c["name"] for c in _insp.get_columns("user_websites")}
+        _website_migrations = [
+            ("user_id", "INTEGER"),
+            ("slug", "VARCHAR"),
+            ("plan_tier", "VARCHAR"),
+            ("template_id", "VARCHAR"),
+            ("business_name", "VARCHAR"),
+            ("tagline", "VARCHAR"),
+            ("phone", "VARCHAR"),
+            ("email", "VARCHAR"),
+            ("address", "VARCHAR"),
+            ("services", "TEXT"),
+            ("brand_color", "VARCHAR"),
+            ("logo_url", "VARCHAR"),
+            ("logo_data", "TEXT"),
+            ("chatbot_embed_id", "VARCHAR"),
+            ("published_html", "TEXT"),
+            ("is_published", "BOOLEAN"),
+            ("is_active", "BOOLEAN"),
+            ("expires_at", "DATETIME"),
+            ("views", "INTEGER"),
+            ("created_at", "DATETIME"),
+            ("updated_at", "DATETIME"),
+        ]
+        with engine.connect() as _conn:
+            for _col, _typ in _website_migrations:
+                if _col not in _existing_w:
+                    try:
+                        _conn.execute(text(f"ALTER TABLE user_websites ADD COLUMN {_col} {_typ}"))
+                    except Exception as _e:
+                        print(f"website col {_col}: {_e}")
+            _conn.commit()
+except Exception as _e:
+    print(f"Website migration note: {_e}")
 
 # ✅ Migrations
 try:

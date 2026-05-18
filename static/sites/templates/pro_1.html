@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{business_name}}</title>
+<meta name="description" content="{{tagline}}">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:'Inter',sans-serif;background:#0a0010;color:#ffffff;line-height:1.6;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:{{brand_color}};color:#fff}
+
+  .display{font-family:'Playfair Display',serif}
+
+  .top-nav{position:fixed;top:0;left:0;right:0;z-index:100;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(10,0,16,0.9),transparent);backdrop-filter:blur(10px)}
+  .top-nav .brand{display:flex;align-items:center;gap:12px;font-size:18px;font-weight:600;letter-spacing:0.5px}
+  .top-nav .logo{width:38px;height:38px;border-radius:10px;background:{{brand_color}};display:flex;align-items:center;justify-content:center;font-weight:800;overflow:hidden;color:#fff}
+  .top-nav .logo img{width:100%;height:100%;object-fit:cover}
+  .top-nav .nav-cta{padding:10px 22px;background:{{brand_color}};border-radius:30px;font-size:13px;font-weight:600;letter-spacing:0.5px;transition:transform 0.2s}
+  .top-nav .nav-cta:hover{transform:translateY(-2px)}
+
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px;overflow:hidden}
+  #particleCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:1}
+  .hero-overlay{position:absolute;inset:0;background:radial-gradient(circle at center,transparent 0%,#0a0010 80%);z-index:2;pointer-events:none}
+  .hero-content{position:relative;z-index:3;text-align:center;max-width:1100px}
+  .hero-eyebrow{font-size:11px;letter-spacing:8px;color:{{brand_color}};text-transform:uppercase;margin-bottom:24px;font-weight:600}
+  .hero h1{font-size:clamp(50px,9vw,120px);font-weight:900;line-height:0.95;letter-spacing:-3px;margin-bottom:30px}
+  .hero h1 .word{display:inline-block;overflow:hidden;padding:0 8px}
+  .hero h1 .word span{display:inline-block}
+  .hero h1 .accent{font-style:italic;color:{{brand_color}}}
+  .hero p{font-size:clamp(15px,1.6vw,19px);color:rgba(255,255,255,0.7);max-width:580px;margin:0 auto 40px;font-weight:300;letter-spacing:0.5px}
+  .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:16px 38px;border-radius:50px;font-weight:600;font-size:13px;letter-spacing:1.2px;text-transform:uppercase;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.3s;font-family:inherit}
+  .btn-fill{background:{{brand_color}};color:#fff;box-shadow:0 8px 32px rgba(197,0,34,0.4)}
+  .btn-fill:hover{transform:translateY(-3px);box-shadow:0 12px 40px rgba(197,0,34,0.6)}
+  .btn-line{background:transparent;color:#fff;border:1.5px solid rgba(255,255,255,0.25)}
+  .btn-line:hover{border-color:{{brand_color}};color:{{brand_color}}}
+  .scroll-cue{position:absolute;bottom:30px;left:50%;transform:translateX(-50%);z-index:3;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);writing-mode:vertical-rl;text-orientation:mixed;animation:scrollPulse 2.5s ease-in-out infinite}
+  @keyframes scrollPulse{0%,100%{opacity:0.4;transform:translateX(-50%) translateY(0)}50%{opacity:1;transform:translateX(-50%) translateY(8px)}}
+
+  /* Pinned scroll section */
+  .pinned-section{position:relative;height:300vh}
+  .pinned-inner{position:sticky;top:0;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .pinned-bg{position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,{{brand_color_light}},transparent 60%);opacity:0.5}
+  .pinned-content{position:relative;z-index:2;text-align:center;padding:0 24px;max-width:900px}
+  .pinned-tag{font-size:11px;letter-spacing:6px;color:{{brand_color}};text-transform:uppercase;margin-bottom:24px;font-weight:600}
+  .pinned-h{font-size:clamp(40px,7vw,84px);font-weight:800;letter-spacing:-2px;line-height:1.05;font-family:'Playfair Display',serif}
+  .pinned-h em{color:{{brand_color}};font-style:italic}
+
+  /* 3D services */
+  .services-section{padding:140px 24px;max-width:1300px;margin:0 auto}
+  .services-head{margin-bottom:80px;text-align:center}
+  .services-head .tag{font-size:11px;letter-spacing:6px;color:{{brand_color}};text-transform:uppercase;margin-bottom:14px;font-weight:600}
+  .services-head h2{font-size:clamp(36px,5vw,64px);font-weight:800;letter-spacing:-2px;font-family:'Playfair Display',serif}
+  .services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;perspective:1200px}
+  .service-card{position:relative;background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.08);border-radius:24px;padding:40px 32px;transform-style:preserve-3d;transition:transform 0.4s cubic-bezier(.4,0,.2,1),border-color 0.3s;cursor:pointer;backdrop-filter:blur(10px)}
+  .service-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,{{brand_color}},transparent);opacity:0;transition:opacity 0.3s}
+  .service-card:hover{border-color:{{brand_color}}}
+  .service-card:hover::before{opacity:1}
+  .service-card .glyph{font-size:32px;color:{{brand_color}};margin-bottom:20px;font-family:'Playfair Display',serif;font-weight:900}
+  .service-card h3{font-size:22px;font-weight:700;margin-bottom:14px;letter-spacing:-0.5px;font-family:'Playfair Display',serif}
+  .service-card p{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.7}
+
+  /* Parallax section */
+  .parallax{position:relative;height:60vh;overflow:hidden;display:flex;align-items:center;justify-content:center}
+  .parallax-bg{position:absolute;inset:-20%;background:linear-gradient(135deg,{{brand_color}} 0%,#000 100%);will-change:transform}
+  .parallax-bg::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 30%,rgba(10,0,16,0.7) 70%)}
+  .parallax-content{position:relative;z-index:2;text-align:center;padding:0 24px}
+  .parallax-content h3{font-size:clamp(32px,5vw,56px);font-weight:800;font-family:'Playfair Display',serif;letter-spacing:-1.5px;margin-bottom:14px}
+  .parallax-content p{font-size:15px;color:rgba(255,255,255,0.8);max-width:520px;margin:0 auto}
+
+  /* Stats */
+  .stats{padding:120px 24px;max-width:1200px;margin:0 auto;text-align:center}
+  .stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:30px;margin-top:50px}
+  .stat{position:relative;padding:30px 20px;border-top:1px solid rgba(255,255,255,0.08)}
+  .stat-num{font-size:clamp(48px,6vw,80px);font-weight:900;color:{{brand_color}};line-height:1;font-family:'Playfair Display',serif;margin-bottom:10px}
+  .stat-lbl{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.5);text-transform:uppercase;font-weight:500}
+
+  /* Contact */
+  .contact{padding:120px 24px;background:linear-gradient(180deg,#0a0010,#06000a)}
+  .contact-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center}
+  @media(max-width:780px){.contact-inner{grid-template-columns:1fr}}
+  .contact-left h2{font-size:clamp(36px,5vw,64px);font-weight:800;font-family:'Playfair Display',serif;letter-spacing:-2px;margin-bottom:18px;line-height:1.05}
+  .contact-left h2 em{color:{{brand_color}};font-style:italic}
+  .contact-left p{color:rgba(255,255,255,0.6);font-size:16px;margin-bottom:30px}
+  .contact-info{display:grid;gap:14px}
+  .info-row{padding:18px 22px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.06);border-radius:14px;transition:all 0.3s}
+  .info-row:hover{border-color:{{brand_color}};background:rgba(197,0,34,0.06)}
+  .info-row .lbl{font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;margin-bottom:6px}
+  .info-row .val{font-size:16px;font-weight:500;word-break:break-word}
+  .info-row .val a{color:#fff}
+
+  .contact-right{padding:40px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:24px}
+  .contact-right h3{font-size:24px;font-weight:700;font-family:'Playfair Display',serif;margin-bottom:24px}
+  .fld{margin-bottom:16px}
+  .fld label{display:block;font-size:10px;letter-spacing:2px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:8px}
+  .fld input,.fld textarea{width:100%;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:14px;color:#fff;font-family:inherit;font-size:14px;outline:none;transition:border-color 0.3s}
+  .fld input:focus,.fld textarea:focus{border-color:{{brand_color}}}
+  .fld textarea{min-height:100px;resize:vertical}
+  .submit-btn{width:100%;padding:16px;background:{{brand_color}};color:#fff;border:none;border-radius:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;font-size:13px;cursor:pointer;font-family:inherit;transition:transform 0.2s}
+  .submit-btn:hover{transform:translateY(-2px)}
+
+  footer{padding:50px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.06)}
+  footer .name{font-size:32px;font-weight:800;font-family:'Playfair Display',serif;margin-bottom:10px;letter-spacing:-1px}
+  footer .copy{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <div class="brand">
+    <div class="logo">{{logo_url}}</div>
+    <span>{{business_name}}</span>
+  </div>
+  <a class="nav-cta" href="{{whatsapp_link}}" target="_blank">Get in Touch</a>
+</nav>
+
+<section class="hero">
+  <canvas id="particleCanvas"></canvas>
+  <div class="hero-overlay"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow" id="heroEyebrow">— Premium Experience —</div>
+    <h1 class="display" id="heroTitle">
+      <span class="word"><span>{{business_name}}</span></span><br>
+      <span class="word"><span class="accent">{{tagline}}</span></span>
+    </h1>
+    <p id="heroSub">Crafted with care. Delivered with precision. Welcome to a finer way of doing business.</p>
+    <div class="hero-cta" id="heroCta">
+      <a href="{{whatsapp_link}}" target="_blank" class="btn btn-fill">Begin Journey →</a>
+      <a href="#services" class="btn btn-line">Explore Services</a>
+    </div>
+  </div>
+  <div class="scroll-cue">SCROLL</div>
+</section>
+
+<section class="pinned-section" id="pinnedSection">
+  <div class="pinned-inner">
+    <div class="pinned-bg"></div>
+    <div class="pinned-content">
+      <div class="pinned-tag">— Our Promise —</div>
+      <h2 class="pinned-h" id="pinnedHeadline">We don't just <em>serve</em>. <br>We deliver <em>experiences</em>.</h2>
+    </div>
+  </div>
+</section>
+
+<section class="services-section" id="services">
+  <div class="services-head">
+    <div class="tag">— What We Offer —</div>
+    <h2 class="display">Our Services</h2>
+  </div>
+  <div class="services-grid" id="servicesGrid">
+    {{services_cards}}
+  </div>
+</section>
+
+<section class="parallax">
+  <div class="parallax-bg" id="parallaxBg"></div>
+  <div class="parallax-content">
+    <h3 class="display">Quality you can feel.</h3>
+    <p>Every interaction matters. Every detail counts.</p>
+  </div>
+</section>
+
+<section class="stats">
+  <div class="services-head">
+    <div class="tag">— By the numbers —</div>
+    <h2 class="display">A track record of excellence</h2>
+  </div>
+  <div class="stats-grid">
+    <div class="stat"><div class="stat-num" data-c="1200">0</div><div class="stat-lbl">Projects Delivered</div></div>
+    <div class="stat"><div class="stat-num" data-c="98">0</div><div class="stat-lbl">% Satisfaction</div></div>
+    <div class="stat"><div class="stat-num" data-c="15">0</div><div class="stat-lbl">Years Excellence</div></div>
+    <div class="stat"><div class="stat-num" data-c="50">0</div><div class="stat-lbl">Awards Won</div></div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="contact-inner">
+    <div class="contact-left">
+      <h2 class="display">Let's <em>create</em><br>something special.</h2>
+      <p>Tell us about your project. We respond within hours.</p>
+      <div class="contact-info">
+        <div class="info-row"><div class="lbl">Phone</div><div class="val"><a href="tel:{{phone}}">{{phone}}</a></div></div>
+        <div class="info-row"><div class="lbl">Email</div><div class="val"><a href="mailto:{{email}}">{{email}}</a></div></div>
+        <div class="info-row"><div class="lbl">Visit</div><div class="val">{{address}}</div></div>
+      </div>
+    </div>
+    <div class="contact-right">
+      <h3 class="display">Send a message</h3>
+      <form onsubmit="event.preventDefault();window.open('{{whatsapp_link}}','_blank')">
+        <div class="fld"><label>Name</label><input type="text" required></div>
+        <div class="fld"><label>Phone</label><input type="tel" required></div>
+        <div class="fld"><label>Message</label><textarea required></textarea></div>
+        <button class="submit-btn" type="submit">Send via WhatsApp</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="name display">{{business_name}}</div>
+  <div class="copy">© {{year}} · ALL RIGHTS RESERVED</div>
+  {{nerum_branding}}
+</footer>
+
+<script>
+  // ─── Particle canvas ────────────────────────────────────────────
+  const canvas = document.getElementById('particleCanvas');
+  const ctx = canvas.getContext('2d');
+  let particles = [];
+  function resize() {
+    canvas.width = canvas.offsetWidth * devicePixelRatio;
+    canvas.height = canvas.offsetHeight * devicePixelRatio;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function hexToRgb(hex) {
+    const m = hex.replace('#','').match(/.{1,2}/g);
+    if (!m || m.length < 3) return [197, 0, 34];
+    return [parseInt(m[0],16), parseInt(m[1],16), parseInt(m[2],16)];
+  }
+  const [r,g,b] = hexToRgb('{{brand_color}}');
+
+  for (let i = 0; i < 90; i++) {
+    particles.push({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3,
+      r: Math.random() * 2 + 0.5,
+      a: Math.random() * 0.5 + 0.3,
+    });
+  }
+
+  function loop() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    particles.forEach(p => {
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.x < 0) p.x = canvas.width;
+      if (p.x > canvas.width) p.x = 0;
+      if (p.y < 0) p.y = canvas.height;
+      if (p.y > canvas.height) p.y = 0;
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, p.r * devicePixelRatio, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(${r},${g},${b},${p.a})`;
+      ctx.fill();
+    });
+    // Connect close particles
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const dist = Math.sqrt(dx*dx + dy*dy);
+        if (dist < 120 * devicePixelRatio) {
+          ctx.beginPath();
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.strokeStyle = `rgba(${r},${g},${b},${(1 - dist/(120*devicePixelRatio)) * 0.15})`;
+          ctx.stroke();
+        }
+      }
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+
+  // ─── GSAP setup ─────────────────────────────────────────────────
+  if (window.gsap) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Hero text reveal
+    gsap.from('#heroEyebrow', { y: 30, opacity: 0, duration: 1, delay: 0.2, ease: 'power3.out' });
+    gsap.from('#heroTitle .word span', { y: 120, opacity: 0, duration: 1.2, delay: 0.4, stagger: 0.15, ease: 'power4.out' });
+    gsap.from('#heroSub', { y: 20, opacity: 0, duration: 1, delay: 1.2, ease: 'power3.out' });
+    gsap.from('#heroCta .btn', { y: 20, opacity: 0, duration: 0.8, delay: 1.5, stagger: 0.1, ease: 'power3.out' });
+
+    // Pinned scroll
+    ScrollTrigger.create({
+      trigger: '#pinnedSection',
+      start: 'top top',
+      end: 'bottom bottom',
+      pin: '.pinned-inner',
+      scrub: 0.5,
+    });
+    gsap.to('#pinnedHeadline', {
+      scrollTrigger: { trigger: '#pinnedSection', start: 'top top', end: 'bottom bottom', scrub: 1 },
+      scale: 1.1, opacity: 0.4, ease: 'none'
+    });
+
+    // Service card stagger reveal
+    gsap.from('#servicesGrid .service-card', {
+      scrollTrigger: { trigger: '#servicesGrid', start: 'top 80%' },
+      y: 60, opacity: 0, duration: 0.9, stagger: 0.12, ease: 'power3.out'
+    });
+
+    // Parallax
+    gsap.to('#parallaxBg', {
+      scrollTrigger: { trigger: '.parallax', start: 'top bottom', end: 'bottom top', scrub: 0.5 },
+      y: '-30%', ease: 'none'
+    });
+
+    // Stats counter
+    ScrollTrigger.create({
+      trigger: '.stats', start: 'top 70%',
+      onEnter: () => {
+        document.querySelectorAll('.stat-num').forEach(el => {
+          const target = parseInt(el.dataset.c || 0);
+          gsap.to(el, {
+            innerText: target, duration: 2, snap: { innerText: 1 }, ease: 'power2.out',
+            onUpdate: function() {
+              el.textContent = Math.floor(this.targets()[0].innerText) + (target === 98 ? '%' : '+');
+            }
+          });
+        });
+      }
+    });
+  }
+
+  // ─── 3D card tilt on services ──────────────────────────────────
+  document.querySelectorAll('#servicesGrid .service-card').forEach(card => {
+    // Add a glyph
+    if (!card.querySelector('.glyph')) {
+      const g = document.createElement('div');
+      g.className = 'glyph';
+      g.textContent = '✦';
+      card.insertBefore(g, card.firstChild);
+    }
+    card.addEventListener('mousemove', e => {
+      const r = card.getBoundingClientRect();
+      const x = (e.clientX - r.left) / r.width - 0.5;
+      const y = (e.clientY - r.top) / r.height - 0.5;
+      card.style.transform = `rotateY(${x * 12}deg) rotateX(${-y * 12}deg) translateZ(20px)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'rotateY(0) rotateX(0) translateZ(0)';
+    });
+  });
+</script>
+
+</body>
+</html>

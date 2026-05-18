@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{business_name}}</title>
+<meta name="description" content="{{tagline}}">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{font-family:'Space Grotesk',sans-serif;background:#050008;color:#fff;line-height:1.5;overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  ::selection{background:{{brand_color}};color:#fff}
+
+  /* Morphing blob hero */
+  .hero{position:relative;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:80px 24px;overflow:hidden}
+  .blob{position:absolute;border-radius:50%;filter:blur(60px);opacity:0.55;animation:morph 18s ease-in-out infinite;pointer-events:none}
+  .blob.b1{width:520px;height:520px;background:{{brand_color}};top:-100px;left:-100px;animation-delay:0s}
+  .blob.b2{width:420px;height:420px;background:#4a00b4;bottom:-100px;right:-50px;animation-delay:6s}
+  .blob.b3{width:340px;height:340px;background:{{brand_color}};top:40%;left:40%;animation-delay:12s;opacity:0.4}
+  @keyframes morph{
+    0%,100%{border-radius:42% 58% 60% 40% / 50% 38% 62% 50%;transform:scale(1) translate(0,0)}
+    33%{border-radius:62% 38% 40% 60% / 38% 60% 40% 62%;transform:scale(1.1) translate(40px,-30px)}
+    66%{border-radius:50% 50% 60% 40% / 60% 42% 58% 40%;transform:scale(0.95) translate(-30px,40px)}
+  }
+  .hero-grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.04) 1px,transparent 1px);background-size:60px 60px;mask-image:radial-gradient(circle at center,#000 30%,transparent 70%);-webkit-mask-image:radial-gradient(circle at center,#000 30%,transparent 70%)}
+  .hero-content{position:relative;z-index:2;text-align:center;max-width:1100px}
+  .top-bar{position:fixed;top:0;left:0;right:0;z-index:50;padding:24px 40px;display:flex;align-items:center;justify-content:space-between;background:linear-gradient(180deg,rgba(5,0,8,0.95),transparent)}
+  .brand-pill{display:flex;align-items:center;gap:12px;padding:8px 16px 8px 8px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:50px;backdrop-filter:blur(20px)}
+  .brand-pill .logo{width:32px;height:32px;border-radius:50%;background:{{brand_color}};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;overflow:hidden}
+  .brand-pill .logo img{width:100%;height:100%;object-fit:cover}
+  .brand-pill .name{font-size:14px;font-weight:600;letter-spacing:0.5px}
+  .top-cta{padding:12px 24px;background:{{brand_color}};border-radius:30px;font-size:13px;font-weight:600;transition:transform 0.2s}
+  .top-cta:hover{transform:scale(1.05)}
+
+  .hero-eyebrow{display:inline-flex;align-items:center;gap:10px;padding:8px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:50px;font-size:12px;letter-spacing:2px;text-transform:uppercase;font-weight:500;margin-bottom:30px;backdrop-filter:blur(20px)}
+  .hero-eyebrow .dot{width:8px;height:8px;background:{{brand_color}};border-radius:50%;box-shadow:0 0 12px {{brand_color}}}
+  .hero h1{font-size:clamp(54px,10vw,140px);font-weight:700;line-height:0.92;letter-spacing:-4px;margin-bottom:30px}
+  .hero h1 .gradient{background:linear-gradient(135deg,{{brand_color}},#fff 60%,{{brand_color}});-webkit-background-clip:text;background-clip:text;color:transparent}
+  .hero p{font-size:clamp(15px,1.8vw,20px);color:rgba(255,255,255,0.65);max-width:600px;margin:0 auto 40px;font-weight:300}
+  .hero-cta{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{padding:18px 36px;border-radius:50px;font-weight:600;font-size:13px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:10px;transition:all 0.3s;font-family:inherit}
+  .btn-glow{background:{{brand_color}};color:#fff;box-shadow:0 0 40px rgba(197,0,34,0.4)}
+  .btn-glow:hover{transform:translateY(-3px);box-shadow:0 10px 50px rgba(197,0,34,0.6)}
+  .btn-glass{background:rgba(255,255,255,0.06);color:#fff;border:1px solid rgba(255,255,255,0.15);backdrop-filter:blur(10px)}
+  .btn-glass:hover{background:rgba(255,255,255,0.1)}
+
+  /* Floating 3D elements */
+  .floaters{position:absolute;inset:0;pointer-events:none;perspective:1000px;transform-style:preserve-3d}
+  .floater{position:absolute;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:18px;backdrop-filter:blur(10px);animation:floatY 6s ease-in-out infinite}
+  .floater.f1{top:18%;left:8%;width:80px;height:80px;animation-delay:0s;transform:rotateX(20deg) rotateY(-20deg)}
+  .floater.f2{top:25%;right:10%;width:60px;height:60px;animation-delay:2s;transform:rotateX(-15deg) rotateY(15deg)}
+  .floater.f3{bottom:18%;left:14%;width:50px;height:50px;animation-delay:4s;transform:rotateX(10deg) rotateY(20deg)}
+  .floater.f4{bottom:25%;right:8%;width:90px;height:90px;animation-delay:3s;transform:rotateX(-20deg) rotateY(-10deg)}
+  @keyframes floatY{0%,100%{transform:translateY(0) rotateX(20deg) rotateY(-20deg)}50%{transform:translateY(-30px) rotateX(20deg) rotateY(-20deg)}}
+
+  /* Horizontal scroll experience */
+  .h-experience{position:relative;height:400vh;background:#050008}
+  .h-pin{position:sticky;top:0;height:100vh;overflow:hidden;display:flex;align-items:center}
+  .h-track{display:flex;align-items:center;padding:0 10vw;will-change:transform;gap:40px}
+  .h-panel{flex:0 0 70vw;height:70vh;border-radius:32px;padding:60px;display:flex;flex-direction:column;justify-content:flex-end;position:relative;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
+  .h-panel.p1{background:linear-gradient(135deg,{{brand_color}},#000)}
+  .h-panel.p2{background:linear-gradient(135deg,#4a00b4,#050008)}
+  .h-panel.p3{background:linear-gradient(135deg,#000,{{brand_color}})}
+  .h-panel.p4{background:linear-gradient(135deg,#0a0014,#250014)}
+  .h-num{position:absolute;top:40px;right:40px;font-size:140px;font-weight:800;opacity:0.12;line-height:1}
+  .h-panel h3{font-size:clamp(34px,5vw,64px);font-weight:700;letter-spacing:-2px;margin-bottom:14px;line-height:1.05;max-width:600px}
+  .h-panel p{font-size:16px;color:rgba(255,255,255,0.7);max-width:560px}
+  .h-progress{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:3}
+  .h-prog{width:36px;height:3px;background:rgba(255,255,255,0.2);border-radius:2px;transition:background 0.3s}
+  .h-prog.active{background:{{brand_color}}}
+
+  /* 3D flip cards */
+  .services-sec{padding:140px 24px;max-width:1300px;margin:0 auto}
+  .sec-head{text-align:center;margin-bottom:70px}
+  .sec-tag{font-size:11px;letter-spacing:6px;color:{{brand_color}};text-transform:uppercase;margin-bottom:14px;font-weight:600}
+  .sec-h{font-size:clamp(38px,6vw,72px);font-weight:700;letter-spacing:-2px;line-height:1}
+  .sec-h .gradient{background:linear-gradient(135deg,{{brand_color}},#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .flip-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:24px;perspective:1500px}
+  .flip-card{position:relative;height:300px;perspective:1500px;cursor:pointer}
+  .flip-inner{position:absolute;inset:0;transition:transform 0.7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+  .flip-card:hover .flip-inner{transform:rotateY(180deg)}
+  .flip-face{position:absolute;inset:0;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:24px;padding:36px;display:flex;flex-direction:column;justify-content:center;border:1px solid rgba(255,255,255,0.08)}
+  .flip-front{background:linear-gradient(135deg,rgba(255,255,255,0.04),rgba(255,255,255,0.01));backdrop-filter:blur(10px)}
+  .flip-back{background:linear-gradient(135deg,{{brand_color}},#000);transform:rotateY(180deg)}
+  .flip-front h3{font-size:24px;font-weight:700;margin-bottom:14px;letter-spacing:-0.5px}
+  .flip-front .hint{font-size:11px;letter-spacing:3px;color:rgba(255,255,255,0.4);text-transform:uppercase;position:absolute;bottom:30px;left:36px}
+  .flip-back h3{font-size:22px;font-weight:700;margin-bottom:12px}
+  .flip-back p{font-size:14px;color:rgba(255,255,255,0.85);line-height:1.6}
+
+  /* CTA banner */
+  .cta-banner{margin:80px 24px;padding:80px 40px;border-radius:36px;background:linear-gradient(135deg,{{brand_color}} 0%,#000 100%);text-align:center;position:relative;overflow:hidden;max-width:1200px;margin:80px auto}
+  .cta-banner::before{content:'';position:absolute;inset:-50%;background:conic-gradient(from 0deg,transparent 0%,rgba(255,255,255,0.08) 50%,transparent 100%);animation:spin 12s linear infinite}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .cta-inner{position:relative;z-index:2}
+  .cta-banner h2{font-size:clamp(32px,5vw,56px);font-weight:700;letter-spacing:-1.5px;margin-bottom:14px;line-height:1.05}
+  .cta-banner p{color:rgba(255,255,255,0.85);font-size:16px;margin-bottom:30px;max-width:600px;margin-left:auto;margin-right:auto}
+
+  /* Contact */
+  .contact-sec{padding:120px 24px;max-width:1100px;margin:0 auto}
+  .contact-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px;margin-top:50px}
+  .c-box{padding:30px;background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:20px;transition:all 0.3s}
+  .c-box:hover{transform:translateY(-4px);border-color:{{brand_color}};background:rgba(197,0,34,0.05)}
+  .c-box .ico{width:50px;height:50px;border-radius:14px;background:{{brand_color_light}};display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:18px}
+  .c-box .lbl{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:6px;font-weight:600}
+  .c-box .val{font-size:15px;font-weight:500;word-break:break-word}
+
+  footer{padding:60px 24px;text-align:center;border-top:1px solid rgba(255,255,255,0.06);background:#030005}
+  footer .big{font-size:clamp(48px,8vw,120px);font-weight:800;letter-spacing:-3px;line-height:1;margin-bottom:14px;background:linear-gradient(135deg,{{brand_color}},#fff);-webkit-background-clip:text;background-clip:text;color:transparent}
+  footer .small{font-size:12px;color:rgba(255,255,255,0.4);letter-spacing:1px}
+</style>
+</head>
+<body>
+
+<nav class="top-bar">
+  <div class="brand-pill">
+    <div class="logo">{{logo_url}}</div>
+    <div class="name">{{business_name}}</div>
+  </div>
+  <a class="top-cta" href="{{whatsapp_link}}" target="_blank">Connect →</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="blob b1"></div>
+  <div class="blob b2"></div>
+  <div class="blob b3"></div>
+  <div class="floaters">
+    <div class="floater f1"></div>
+    <div class="floater f2"></div>
+    <div class="floater f3"></div>
+    <div class="floater f4"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-eyebrow"><span class="dot"></span>Available now</div>
+    <h1 id="heroH1"><span class="gradient">{{business_name}}</span></h1>
+    <p>{{tagline}}</p>
+    <div class="hero-cta">
+      <a href="{{whatsapp_link}}" target="_blank" class="btn btn-glow">Start a conversation →</a>
+      <a href="#services" class="btn btn-glass">Discover more</a>
+    </div>
+  </div>
+</section>
+
+<section class="h-experience">
+  <div class="h-pin">
+    <div class="h-track" id="hTrack">
+      <div class="h-panel p1">
+        <div class="h-num">01</div>
+        <h3>We start with you.</h3>
+        <p>Every great service begins with understanding. We listen first, plan second, deliver third.</p>
+      </div>
+      <div class="h-panel p2">
+        <div class="h-num">02</div>
+        <h3>Crafted with care.</h3>
+        <p>No shortcuts. No corners cut. Just honest work, done right the first time.</p>
+      </div>
+      <div class="h-panel p3">
+        <div class="h-num">03</div>
+        <h3>Delivered on time.</h3>
+        <p>We respect your time as much as our own. Every project is a promise we keep.</p>
+      </div>
+      <div class="h-panel p4">
+        <div class="h-num">04</div>
+        <h3>Built for the long run.</h3>
+        <p>We're not here for the quick win. We're here to be your trusted partner for years to come.</p>
+      </div>
+    </div>
+    <div class="h-progress" id="hProgress">
+      <div class="h-prog active"></div>
+      <div class="h-prog"></div>
+      <div class="h-prog"></div>
+      <div class="h-prog"></div>
+    </div>
+  </div>
+</section>
+
+<section class="services-sec" id="services">
+  <div class="sec-head">
+    <div class="sec-tag">— Services —</div>
+    <h2 class="sec-h">Hover to reveal</h2>
+  </div>
+  <div class="flip-grid" id="flipGrid">
+    {{services_cards}}
+  </div>
+</section>
+
+<section class="cta-banner">
+  <div class="cta-inner">
+    <h2>Ready to begin?</h2>
+    <p>Let's create something extraordinary together. We're just a message away.</p>
+    <a href="{{whatsapp_link}}" target="_blank" class="btn btn-glass">Message us now →</a>
+  </div>
+</section>
+
+<section class="contact-sec" id="contact">
+  <div class="sec-head">
+    <div class="sec-tag">— Get in touch —</div>
+    <h2 class="sec-h"><span class="gradient">Let's talk.</span></h2>
+  </div>
+  <div class="contact-grid">
+    <div class="c-box">
+      <div class="ico">📞</div>
+      <div class="lbl">Phone</div>
+      <div class="val"><a href="tel:{{phone}}">{{phone}}</a></div>
+    </div>
+    <div class="c-box">
+      <div class="ico">✉️</div>
+      <div class="lbl">Email</div>
+      <div class="val"><a href="mailto:{{email}}">{{email}}</a></div>
+    </div>
+    <div class="c-box">
+      <div class="ico">📍</div>
+      <div class="lbl">Visit Us</div>
+      <div class="val">{{address}}</div>
+    </div>
+    <div class="c-box">
+      <div class="ico">💬</div>
+      <div class="lbl">WhatsApp</div>
+      <div class="val"><a href="{{whatsapp_link}}" target="_blank">Chat Now</a></div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="big">{{business_name}}</div>
+  <div class="small">© {{year}} · CRAFTED WITH CARE</div>
+  {{nerum_branding}}
+</footer>
+
+<script>
+  // ─── Convert service cards to flip cards ─────────────────────────
+  document.querySelectorAll('#flipGrid .service-card').forEach((card, i) => {
+    const original = card.cloneNode(true);
+    const title = original.querySelector('h3') ? original.querySelector('h3').textContent : 'Service';
+    const desc = original.querySelector('p') ? original.querySelector('p').textContent : 'Professional service tailored for you.';
+    card.className = 'flip-card';
+    card.innerHTML = `
+      <div class="flip-inner">
+        <div class="flip-face flip-front">
+          <h3>${title}</h3>
+          <div class="hint">↻ Hover to flip</div>
+        </div>
+        <div class="flip-face flip-back">
+          <h3>${title}</h3>
+          <p>${desc}</p>
+        </div>
+      </div>`;
+  });
+
+  // ─── GSAP ───────────────────────────────────────────────────────
+  if (window.gsap) {
+    gsap.registerPlugin(ScrollTrigger);
+
+    // Horizontal pinned scroll
+    const track = document.getElementById('hTrack');
+    if (track) {
+      const panels = track.querySelectorAll('.h-panel');
+      const totalWidth = track.scrollWidth;
+      const viewW = window.innerWidth;
+      const distance = totalWidth - viewW + 40;
+
+      gsap.to(track, {
+        x: -distance,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.h-experience',
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 1,
+          onUpdate: (self) => {
+            const p = self.progress;
+            const idx = Math.min(panels.length - 1, Math.floor(p * panels.length));
+            document.querySelectorAll('.h-prog').forEach((el, i) => {
+              el.classList.toggle('active', i <= idx);
+            });
+          }
+        }
+      });
+    }
+
+    // Hero reveal
+    gsap.from('#heroH1', { y: 80, opacity: 0, duration: 1.2, ease: 'power4.out' });
+    gsap.from('.hero p', { y: 30, opacity: 0, duration: 1, delay: 0.3, ease: 'power3.out' });
+    gsap.from('.hero-cta .btn', { y: 30, opacity: 0, duration: 0.8, delay: 0.6, stagger: 0.1, ease: 'power3.out' });
+
+    // Flip cards reveal
+    gsap.from('#flipGrid .flip-card', {
+      scrollTrigger: { trigger: '#flipGrid', start: 'top 80%' },
+      y: 60, opacity: 0, duration: 0.8, stagger: 0.1, ease: 'power3.out'
+    });
+  }
+</script>
+
+{{chatbot_script}}
+</body>
+</html>

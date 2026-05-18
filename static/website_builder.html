@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nerum · Website Builder</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #C50022;
+    --indigo: #C50022;
+    --green: #34d399;
+    --pink: #C50022;
+    --pink-soft: rgba(197,0,34,0.15);
+    --pink-border: rgba(197,0,34,0.35);
+    --violet: #ff4060;
+    --bg: #08000f;
+    --card: rgba(255,255,255,0.03);
+    --card-border: rgba(197,0,34,0.25);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --sidebar-w: 220px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+
+  .galaxy { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.18) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(197,0,34,0.14) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.12) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(197,0,34,0.10) 0%,transparent 55%),#08000f;
+    pointer-events:none; }
+
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-text { font-size:18px; font-weight:700; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .nav-section { padding:14px 10px 4px; }
+  .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+  .nav-item.active { background:var(--pink-soft); color:var(--pink); border-color:var(--pink-border); }
+  .nav-icon { font-size:15px; width:18px; text-align:center; }
+  .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
+  .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; }
+  .user-plan { font-size:11px; color:var(--pink); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(8,0,15,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .topbar h1 { font-size:18px; font-weight:700; }
+  .topbar .plan-pill { margin-left:auto; padding:6px 14px; background:var(--pink-soft); color:var(--pink); border:1px solid var(--pink-border); border-radius:20px; font-size:12px; font-weight:600; }
+
+  .content { padding:28px; flex:1; max-width:1500px; width:100%; margin:0 auto; }
+
+  /* HEADER */
+  .page-head { margin-bottom:24px; }
+  .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
+  .page-title { font-size:30px; font-weight:700; line-height:1.1; }
+  .page-title .accent { color:var(--pink); }
+  .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:600px; }
+
+  /* SPLIT LAYOUT */
+  .split { display:grid; grid-template-columns:1fr 540px; gap:24px; align-items:flex-start; }
+  @media (max-width:1180px) { .split { grid-template-columns:1fr; } }
+
+  .panel { background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:24px; margin-bottom:20px; }
+
+  /* STEPS */
+  .steps-row { display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; }
+  .step-chip { flex:1; min-width:120px; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; font-size:12.5px; color:var(--muted); font-weight:500; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s; }
+  .step-chip:hover { background:rgba(255,255,255,0.05); }
+  .step-chip.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+  .step-chip.completed { background:var(--pink-soft); border-color:var(--pink-border); color:var(--pink); }
+  .step-chip .num { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+  .step-chip.active .num { background:rgba(255,255,255,0.2); }
+  .step-chip.completed .num { background:var(--pink); color:#fff; }
+
+  .step-panel { display:none; }
+  .step-panel.active { display:block; }
+
+  .section-label { font-size:12px; font-weight:700; color:var(--pink); letter-spacing:1.4px; text-transform:uppercase; margin-bottom:10px; }
+  .section-title { font-size:20px; font-weight:700; margin-bottom:14px; }
+
+  /* TEMPLATES GRID */
+  .tmpl-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:14px; }
+  .tmpl-card { background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; overflow:hidden; cursor:pointer; transition:all 0.2s; position:relative; }
+  .tmpl-card:hover { border-color:var(--pink-border); transform:translateY(-2px); }
+  .tmpl-card.selected { border-color:var(--pink); box-shadow:0 0 0 2px var(--pink-soft); }
+  .tmpl-card.locked { opacity:0.55; cursor:not-allowed; }
+  .tmpl-thumb { aspect-ratio:1.4; background:linear-gradient(135deg,var(--purple),#000); display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:800; color:#fff; letter-spacing:1px; position:relative; }
+  .tmpl-thumb.t-free { background:linear-gradient(135deg,#666,#222); }
+  .tmpl-thumb.t-starter { background:linear-gradient(135deg,#0066ff,#001a4d); }
+  .tmpl-thumb.t-starter_plus { background:linear-gradient(135deg,#10b981,#064e3b); }
+  .tmpl-thumb.t-pro { background:linear-gradient(135deg,var(--purple),#000); }
+  .tmpl-thumb.t-pro_plus { background:linear-gradient(135deg,#a855f7,#3b0764); }
+  .tmpl-meta { padding:10px 12px; }
+  .tmpl-name { font-size:13px; font-weight:600; margin-bottom:2px; }
+  .tmpl-desc { font-size:11px; color:var(--muted); line-height:1.4; }
+  .tmpl-lock-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.65); display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; backdrop-filter:blur(2px); }
+  .tier-badge { position:absolute; top:8px; right:8px; padding:3px 8px; background:rgba(0,0,0,0.6); color:#fff; font-size:9px; font-weight:700; border-radius:4px; text-transform:uppercase; letter-spacing:0.5px; }
+
+  /* FORMS */
+  .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+  @media (max-width:720px) { .form-grid { grid-template-columns:1fr; } }
+  .form-field { margin-bottom:14px; }
+  .form-label { display:block; font-size:12px; color:var(--muted); margin-bottom:6px; font-weight:500; letter-spacing:0.3px; }
+  .form-input, .form-textarea, .form-select { width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:13px; font-family:inherit; outline:none; transition:border-color 0.2s; }
+  .form-input:focus, .form-textarea:focus { border-color:var(--pink); }
+  .form-textarea { min-height:80px; resize:vertical; }
+  .sub-label { font-size:11px; color:var(--muted); margin-top:4px; }
+  .slug-row { display:flex; align-items:center; gap:6px; }
+  .slug-prefix { font-size:13px; color:var(--muted); font-family:'JetBrains Mono',monospace; }
+  .slug-status { font-size:11px; margin-top:6px; font-weight:600; }
+  .slug-status.ok { color:var(--green); }
+  .slug-status.bad { color:#f87171; }
+
+  /* SERVICE TAGS */
+  .tag-input-row { display:flex; gap:6px; }
+  .tag-input-row .form-input { flex:1; }
+  .tag-add-btn { padding:0 16px; background:var(--pink); color:#fff; border:none; border-radius:10px; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; }
+  .service-tags { display:flex; flex-wrap:wrap; gap:6px; margin-top:10px; }
+  .service-tag { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; background:var(--pink-soft); border:1px solid var(--pink-border); border-radius:20px; color:var(--pink); font-size:12px; font-weight:500; }
+  .service-tag .x { cursor:pointer; opacity:0.7; font-weight:700; }
+  .service-tag .x:hover { opacity:1; }
+
+  /* COLOR PICKER */
+  .color-row { display:flex; align-items:center; gap:10px; }
+  .color-swatch-btn { width:36px; height:36px; border-radius:10px; cursor:pointer; border:1px solid var(--card-border); position:relative; overflow:hidden; flex-shrink:0; }
+  .color-swatch-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .color-hex { flex:1; max-width:140px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; }
+
+  /* LOGO */
+  .logo-preview { width:60px; height:60px; border-radius:12px; background:rgba(255,255,255,0.05); border:1px dashed var(--card-border); display:flex; align-items:center; justify-content:center; color:var(--muted); overflow:hidden; flex-shrink:0; }
+  .logo-preview img { width:100%; height:100%; object-fit:cover; }
+  .logo-controls { flex:1; }
+  .logo-row { display:flex; gap:12px; align-items:flex-start; }
+  .file-btn { display:inline-block; padding:8px 14px; background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:8px; font-size:12px; font-weight:500; cursor:pointer; }
+  .file-btn:hover { background:rgba(255,255,255,0.08); }
+  .file-btn input { display:none; }
+
+  /* BUTTONS */
+  .btn-ghost { display:inline-flex; align-items:center; justify-content:center; gap:6px; background:transparent; border:1px solid var(--pink-border); border-radius:10px; padding:8px 14px; color:var(--pink); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-ghost:hover { background:var(--pink-soft); }
+  .btn-ghost.danger { color:#f87171; border-color:rgba(248,113,113,0.4); }
+  .btn-ghost.danger:hover { background:rgba(248,113,113,0.12); }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.3); }
+  .btn-primary:hover { opacity:0.92; transform:translateY(-1px); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-primary.full { width:100%; padding:14px; font-size:15px; }
+  .btn-small { padding:6px 12px; font-size:12px; font-weight:500; border-radius:8px; border:none; background:rgba(197,0,34,0.15); color:var(--pink); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-small:hover { background:rgba(197,0,34,0.25); }
+
+  /* PREVIEW PANEL */
+  .preview-panel { position:sticky; top:84px; background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:18px; }
+  .preview-head { display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; }
+  .preview-head h3 { font-size:14px; font-weight:600; }
+  .device-toggle { display:flex; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:3px; gap:2px; }
+  .device-btn { background:none; border:none; padding:5px 10px; color:var(--muted); cursor:pointer; font-size:11px; font-weight:600; border-radius:5px; font-family:inherit; }
+  .device-btn.active { background:var(--pink); color:#fff; }
+  .preview-frame-wrap { position:relative; background:#000; border-radius:12px; overflow:hidden; border:1px solid var(--card-border); transition:width 0.3s; margin:0 auto; }
+  .preview-frame-wrap.desktop { width:100%; aspect-ratio:16/10; }
+  .preview-frame-wrap.mobile { width:300px; aspect-ratio:9/16; }
+  .preview-frame { width:100%; height:100%; border:0; background:#fff; }
+  .preview-overlay { position:absolute; inset:0; background:rgba(0,0,0,0.65); display:none; align-items:center; justify-content:center; color:#fff; font-size:13px; font-weight:600; backdrop-filter:blur(4px); }
+  .preview-overlay.show { display:flex; }
+  .preview-empty { display:flex; align-items:center; justify-content:center; color:var(--muted); font-size:13px; text-align:center; padding:40px 20px; min-height:200px; }
+
+  /* TABLE */
+  .table-wrap { overflow-x:auto; }
+  table { width:100%; border-collapse:collapse; }
+  th, td { text-align:left; padding:10px 12px; font-size:13px; border-bottom:1px solid var(--card-border); }
+  th { color:var(--muted); font-size:11px; font-weight:600; letter-spacing:0.8px; text-transform:uppercase; }
+  td a { color:var(--pink); text-decoration:none; }
+  td a:hover { text-decoration:underline; }
+  .status-pill-tbl { display:inline-block; padding:3px 8px; border-radius:5px; font-size:10px; font-weight:700; letter-spacing:0.4px; text-transform:uppercase; }
+  .status-published { background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.3); }
+  .status-expired { background:rgba(248,113,113,0.15); color:#f87171; border:1px solid rgba(248,113,113,0.3); }
+
+  /* MODAL */
+  .modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.7); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; z-index:200; padding:20px; }
+  .modal-bg.show { display:flex; }
+  .modal { background:#0f0018; border:1px solid var(--card-border); border-radius:18px; padding:30px; max-width:500px; width:100%; max-height:90vh; overflow-y:auto; }
+  .modal h2 { font-size:22px; margin-bottom:8px; }
+  .modal p { font-size:13px; color:var(--muted); margin-bottom:18px; }
+  .modal .url-display { background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:10px; padding:12px; font-family:'JetBrains Mono',monospace; font-size:12px; word-break:break-all; margin-bottom:12px; }
+  .modal .copy-row { display:flex; gap:8px; margin-bottom:14px; }
+  .modal .copy-row input { flex:1; background:rgba(255,255,255,0.04); border:1px solid var(--card-border); border-radius:8px; padding:10px; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:11px; }
+  .modal .qr-box { text-align:center; margin:14px 0; }
+  .modal .qr-box img { max-width:180px; border-radius:10px; background:#fff; padding:8px; }
+  .modal .modal-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:16px; }
+  .upgrade-icon { font-size:42px; text-align:center; margin-bottom:10px; }
+
+  /* TOAST */
+  .toast { position:fixed; bottom:20px; right:20px; background:#0f0018; border:1px solid var(--pink-border); border-radius:10px; padding:12px 18px; color:#fff; font-size:13px; z-index:300; opacity:0; transform:translateY(10px); transition:all 0.3s; pointer-events:none; }
+  .toast.show { opacity:1; transform:translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="galaxy"></div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-icon">N</div>
+      <div>
+        <div class="logo-text">Nerum</div>
+      </div>
+      <span class="beta-tag">BETA</span>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⬡</span> Overview</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚡</span> Workflows</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">✦</span> AI Builder</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">≡</span> Smart Lists</a>
+      <a class="nav-item" href="/chatbot-builder"><span class="nav-icon">🤖</span> Chatbot</a>
+      <a class="nav-item active" href="/website-builder"><span class="nav-icon">🌐</span> Website</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Connect</div>
+      <a class="nav-item" href="/integrations"><span class="nav-icon">⬡</span> Integrations</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">↗</span> Analytics</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◷</span> History</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚙</span> Settings</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◈</span> Billing</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">?</span> Help</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-pill">
+        <div class="avatar" id="avatar-letter">U</div>
+        <div style="flex:1;min-width:0">
+          <div class="user-name" id="user-name-sidebar">Loading...</div>
+          <div class="user-plan" id="user-plan-sidebar">—</div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <h1>🌐 Website Builder</h1>
+      <div class="plan-pill" id="planPill">Free</div>
+    </div>
+
+    <div class="content">
+      <div class="page-head">
+        <div class="breadcrumb">Dashboard › Website Builder</div>
+        <div class="page-title">Build a beautiful <span class="accent">website</span> in minutes</div>
+        <div class="page-sub">Choose a template, fill your business details, and publish. Live on <code style="color:var(--pink)">nerum.in/s/your-slug</code>.</div>
+      </div>
+
+      <div class="split">
+        <!-- LEFT: BUILDER -->
+        <div>
+          <div class="panel">
+            <div class="steps-row">
+              <div class="step-chip active" data-step="1"><div class="num">1</div> Choose Template</div>
+              <div class="step-chip" data-step="2"><div class="num">2</div> Business Details</div>
+              <div class="step-chip" data-step="3"><div class="num">3</div> Preview & Publish</div>
+            </div>
+
+            <!-- STEP 1 -->
+            <div class="step-panel active" id="step-1">
+              <div class="section-label">Step 1</div>
+              <div class="section-title">Pick a design</div>
+              <p class="sub-label" style="margin-bottom:14px">Templates matching your current plan are unlocked. Upgrade to access more.</p>
+              <div class="tmpl-grid" id="tmplGrid">
+                <div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading templates...</div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:18px">
+                <button class="btn-primary" onclick="goStep(2)">Next: Business Details →</button>
+              </div>
+            </div>
+
+            <!-- STEP 2 -->
+            <div class="step-panel" id="step-2">
+              <div class="section-label">Step 2</div>
+              <div class="section-title">Your business details</div>
+
+              <div class="form-grid">
+                <div class="form-field">
+                  <label class="form-label">Business name *</label>
+                  <input type="text" class="form-input" id="f-business_name" placeholder="My Awesome Cafe">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Tagline / slogan</label>
+                  <input type="text" class="form-input" id="f-tagline" placeholder="The best coffee in town">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Phone number *</label>
+                  <input type="tel" class="form-input" id="f-phone" placeholder="9876543210">
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Email</label>
+                  <input type="email" class="form-input" id="f-email" placeholder="hello@mybusiness.com">
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">Address</label>
+                <textarea class="form-textarea" id="f-address" placeholder="Street, City, State, Pin"></textarea>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">Services</label>
+                <div class="tag-input-row">
+                  <input type="text" class="form-input" id="f-service-input" placeholder="e.g. Coffee, Pastries...">
+                  <button class="tag-add-btn" onclick="addService()">Add</button>
+                </div>
+                <div class="service-tags" id="serviceTags"></div>
+              </div>
+
+              <div class="form-grid">
+                <div class="form-field">
+                  <label class="form-label">Brand color</label>
+                  <div class="color-row">
+                    <div class="color-swatch-btn" id="colorSwatch" style="background:#C50022">
+                      <input type="color" id="f-brand_color" value="#C50022">
+                    </div>
+                    <input type="text" class="form-input color-hex" id="f-brand_color_hex" value="#C50022" maxlength="7">
+                  </div>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Chatbot embed ID (optional)</label>
+                  <input type="text" class="form-input" id="f-chatbot_embed_id" placeholder="Link an existing chatbot">
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">Logo</label>
+                <div class="logo-row">
+                  <div class="logo-preview" id="logoPreview">No logo</div>
+                  <div class="logo-controls">
+                    <label class="file-btn">
+                      📁 Upload Image
+                      <input type="file" accept="image/*" id="f-logo-file">
+                    </label>
+                    <div style="margin-top:8px"><input type="text" class="form-input" id="f-logo_url" placeholder="Or paste image URL"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">Your URL *</label>
+                <div class="slug-row">
+                  <span class="slug-prefix">nerum.in/s/</span>
+                  <input type="text" class="form-input" id="f-slug" placeholder="my-cafe" maxlength="50">
+                </div>
+                <div class="slug-status" id="slugStatus"></div>
+                <div class="sub-label">Lowercase letters, numbers, and hyphens only (3-50 chars).</div>
+              </div>
+
+              <div style="display:flex;justify-content:space-between;margin-top:18px">
+                <button class="btn-ghost" onclick="goStep(1)">← Back</button>
+                <button class="btn-primary" onclick="goStep(3)">Next: Preview →</button>
+              </div>
+            </div>
+
+            <!-- STEP 3 -->
+            <div class="step-panel" id="step-3">
+              <div class="section-label">Step 3</div>
+              <div class="section-title">Review and publish</div>
+              <p style="color:var(--muted);font-size:13px;margin-bottom:16px">Your live preview is on the right. Click below to publish your site.</p>
+              <div id="reviewSummary" style="background:rgba(255,255,255,0.03);border:1px solid var(--card-border);border-radius:12px;padding:16px;margin-bottom:16px;font-size:13px;line-height:1.8"></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px">
+                <button class="btn-ghost" onclick="goStep(2)">← Back</button>
+                <button class="btn-primary" id="publishBtn" onclick="publishSite()">🚀 Publish Website</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- MY WEBSITES -->
+          <div class="panel">
+            <div class="section-label">Your Sites</div>
+            <div class="section-title" style="display:flex;justify-content:space-between;align-items:center">
+              My Websites
+              <button class="btn-small" onclick="loadMyWebsites()">↻ Refresh</button>
+            </div>
+            <div class="table-wrap" id="websitesTable">
+              <div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: PREVIEW -->
+        <div>
+          <div class="preview-panel">
+            <div class="preview-head">
+              <h3>Live Preview</h3>
+              <div class="device-toggle">
+                <button class="device-btn active" id="dev-desktop" onclick="setDevice('desktop')">🖥 Desktop</button>
+                <button class="device-btn" id="dev-mobile" onclick="setDevice('mobile')">📱 Mobile</button>
+              </div>
+            </div>
+            <div class="preview-frame-wrap desktop" id="previewWrap">
+              <iframe class="preview-frame" id="previewFrame" srcdoc=""></iframe>
+              <div class="preview-overlay" id="previewOverlay">Generating preview...</div>
+            </div>
+            <div id="previewEmpty" class="preview-empty">Select a template and fill in details to see the live preview.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- UPGRADE MODAL -->
+<div class="modal-bg" id="upgradeModal">
+  <div class="modal">
+    <div class="upgrade-icon">🔒</div>
+    <h2>Upgrade Required</h2>
+    <p id="upgradeText">This template is part of a higher plan. Upgrade to unlock more designs and remove the 30-day expiry.</p>
+    <div class="modal-actions">
+      <button class="btn-ghost" onclick="closeUpgrade()">Close</button>
+      <a class="btn-primary" href="https://nerum.in/billing" style="text-decoration:none">View Plans →</a>
+    </div>
+  </div>
+</div>
+
+<!-- SUCCESS MODAL -->
+<div class="modal-bg" id="successModal">
+  <div class="modal">
+    <div class="upgrade-icon">🎉</div>
+    <h2>Website Published!</h2>
+    <p>Your site is live. Share the link below.</p>
+    <div class="copy-row">
+      <input type="text" id="successUrl" readonly>
+      <button class="btn-small" onclick="copyVal('successUrl')">Copy</button>
+    </div>
+    <div class="copy-row">
+      <input type="text" id="successEmbed" readonly>
+      <button class="btn-small" onclick="copyVal('successEmbed')">Copy Embed</button>
+    </div>
+    <div class="qr-box" id="qrBox"></div>
+    <div class="modal-actions">
+      <a class="btn-primary" id="successOpen" target="_blank">Open Site</a>
+      <button class="btn-ghost" id="successWhatsapp">Share on WhatsApp</button>
+      <button class="btn-ghost" onclick="closeSuccess()">Close</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const TOKEN = localStorage.getItem('token') || localStorage.getItem('access_token') || '';
+const HDR = { 'Content-Type':'application/json', 'Authorization':'Bearer '+TOKEN };
+
+const state = {
+  templates: { available: [], locked: [] },
+  user_plan: 'free',
+  selected_template: null,
+  services: [],
+  logo_data: '',
+  editingId: null,
+  slugAvailable: false,
+  slugCheckTimer: null,
+  previewTimer: null,
+  websites: [],
+};
+
+// ─── Bootstrapping ──────────────────────────────────────────
+async function init() {
+  await loadUser();
+  await loadTemplates();
+  await loadMyWebsites();
+  bindForm();
+}
+
+async function loadUser() {
+  try {
+    const res = await fetch('/auth/me', { headers: HDR });
+    if (!res.ok) {
+      if (res.status === 401) { window.location.href = '/'; return; }
+      return;
+    }
+    const u = await res.json();
+    document.getElementById('user-name-sidebar').textContent = u.name || u.email || 'User';
+    document.getElementById('avatar-letter').textContent = (u.name || u.email || 'U')[0].toUpperCase();
+    const plan = (u.plan || 'free');
+    document.getElementById('user-plan-sidebar').textContent = plan.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase());
+    document.getElementById('planPill').textContent = plan.replace('_',' ').replace(/\b\w/g, c => c.toUpperCase()) + ' Plan';
+  } catch(e) { console.error(e); }
+}
+
+async function loadTemplates() {
+  try {
+    const res = await fetch('/websites/templates', { headers: HDR });
+    if (!res.ok) {
+      document.getElementById('tmplGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#f87171;font-size:13px">Could not load templates.</div>';
+      return;
+    }
+    const data = await res.json();
+    state.templates = data;
+    state.user_plan = data.user_plan;
+    renderTemplates();
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+function renderTemplates() {
+  const grid = document.getElementById('tmplGrid');
+  const all = [...state.templates.available, ...state.templates.locked];
+  grid.innerHTML = all.map(t => {
+    const tier = t.plan_tier;
+    const tierClass = 't-'+tier;
+    const locked = t.locked === true;
+    const selected = state.selected_template === t.id ? 'selected' : '';
+    return `
+      <div class="tmpl-card ${locked?'locked':''} ${selected}" data-tid="${t.id}" data-tier="${tier}" data-locked="${locked}">
+        <div class="tmpl-thumb ${tierClass}">
+          ${tier.toUpperCase().replace('_','+')}
+          <div class="tier-badge">${tier.replace('_plus','+').replace('_',' ')}</div>
+          ${locked ? '<div class="tmpl-lock-overlay">🔒</div>' : ''}
+        </div>
+        <div class="tmpl-meta">
+          <div class="tmpl-name">${t.name}</div>
+          <div class="tmpl-desc">${t.description}</div>
+        </div>
+      </div>`;
+  }).join('');
+
+  grid.querySelectorAll('.tmpl-card').forEach(card => {
+    card.addEventListener('click', () => {
+      if (card.dataset.locked === 'true') {
+        document.getElementById('upgradeText').textContent =
+          `This is a ${card.dataset.tier.replace('_',' ')} template. Upgrade to unlock.`;
+        document.getElementById('upgradeModal').classList.add('show');
+        return;
+      }
+      state.selected_template = card.dataset.tid;
+      document.querySelectorAll('.tmpl-card').forEach(c => c.classList.remove('selected'));
+      card.classList.add('selected');
+      schedulePreview();
+    });
+  });
+}
+
+// ─── Step navigation ────────────────────────────────────────
+function goStep(n) {
+  if (n === 2 && !state.selected_template) {
+    showToast('Please pick a template first');
+    return;
+  }
+  if (n === 3) {
+    const bn = document.getElementById('f-business_name').value.trim();
+    const ph = document.getElementById('f-phone').value.trim();
+    const sl = document.getElementById('f-slug').value.trim();
+    if (!bn || !ph || !sl) { showToast('Business name, phone and slug are required'); return; }
+    if (!state.slugAvailable) { showToast('This URL is not available'); return; }
+    updateReviewSummary();
+  }
+  document.querySelectorAll('.step-chip').forEach(c => {
+    const i = parseInt(c.dataset.step);
+    c.classList.toggle('active', i === n);
+    c.classList.toggle('completed', i < n);
+  });
+  document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('step-'+n).classList.add('active');
+  schedulePreview();
+}
+
+document.querySelectorAll('.step-chip').forEach(c => {
+  c.addEventListener('click', () => goStep(parseInt(c.dataset.step)));
+});
+
+function updateReviewSummary() {
+  const v = collectForm();
+  const tmpl = state.selected_template || '—';
+  document.getElementById('reviewSummary').innerHTML = `
+    <div><strong>Template:</strong> ${tmpl}</div>
+    <div><strong>Business:</strong> ${escapeHtml(v.business_name)}</div>
+    <div><strong>Tagline:</strong> ${escapeHtml(v.tagline) || '—'}</div>
+    <div><strong>Phone:</strong> ${escapeHtml(v.phone)}</div>
+    <div><strong>Email:</strong> ${escapeHtml(v.email) || '—'}</div>
+    <div><strong>URL:</strong> <code style="color:var(--pink)">nerum.in/s/${escapeHtml(v.slug)}</code></div>
+    <div><strong>Services:</strong> ${state.services.length} added</div>
+    <div><strong>Brand color:</strong> <span style="display:inline-block;width:12px;height:12px;border-radius:3px;background:${v.brand_color};vertical-align:middle"></span> ${v.brand_color}</div>
+  `;
+}
+
+// ─── Form bindings ──────────────────────────────────────────
+function bindForm() {
+  ['f-business_name','f-tagline','f-phone','f-email','f-address','f-brand_color_hex','f-logo_url','f-chatbot_embed_id']
+    .forEach(id => document.getElementById(id).addEventListener('input', () => {
+      schedulePreview();
+      if (id === 'f-business_name') autoSlug();
+    }));
+
+  const slug = document.getElementById('f-slug');
+  slug.addEventListener('input', () => {
+    slug.value = slug.value.toLowerCase().replace(/[^a-z0-9-]/g,'').slice(0,50);
+    if (state.slugCheckTimer) clearTimeout(state.slugCheckTimer);
+    state.slugCheckTimer = setTimeout(checkSlug, 400);
+  });
+
+  const colorInput = document.getElementById('f-brand_color');
+  const colorHex = document.getElementById('f-brand_color_hex');
+  const colorSwatch = document.getElementById('colorSwatch');
+  colorInput.addEventListener('input', () => {
+    colorHex.value = colorInput.value.toUpperCase();
+    colorSwatch.style.background = colorInput.value;
+    schedulePreview();
+  });
+  colorHex.addEventListener('input', () => {
+    const v = colorHex.value;
+    if (/^#[0-9A-Fa-f]{6}$/.test(v)) {
+      colorInput.value = v;
+      colorSwatch.style.background = v;
+      schedulePreview();
+    }
+  });
+
+  document.getElementById('f-logo-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    if (file.size > 600000) {
+      showToast('Logo too large (max ~600KB)');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      state.logo_data = reader.result;
+      document.getElementById('logoPreview').innerHTML = `<img src="${reader.result}" alt="">`;
+      schedulePreview();
+    };
+    reader.readAsDataURL(file);
+  });
+
+  document.getElementById('f-logo_url').addEventListener('input', (e) => {
+    if (e.target.value && !state.logo_data) {
+      document.getElementById('logoPreview').innerHTML = `<img src="${e.target.value}" alt="" onerror="this.parentElement.innerHTML='No logo'">`;
+    }
+  });
+
+  document.getElementById('f-service-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') { e.preventDefault(); addService(); }
+  });
+}
+
+function autoSlug() {
+  const slug = document.getElementById('f-slug');
+  if (slug.dataset.touched === 'true') return;
+  const bn = document.getElementById('f-business_name').value.trim().toLowerCase();
+  const s = bn.replace(/[^a-z0-9\s-]/g,'').trim().replace(/\s+/g,'-').slice(0,50);
+  slug.value = s;
+  checkSlug();
+}
+document.getElementById('f-slug').addEventListener('focus', e => e.target.dataset.touched = 'true');
+
+async function checkSlug() {
+  const slug = document.getElementById('f-slug').value.trim();
+  const status = document.getElementById('slugStatus');
+  if (!slug || slug.length < 3) {
+    status.textContent = ''; state.slugAvailable = false; return;
+  }
+  status.textContent = 'Checking...'; status.className = 'slug-status';
+  try {
+    const res = await fetch('/websites/check-slug/'+encodeURIComponent(slug), { headers: HDR });
+    const data = await res.json();
+    if (data.available) {
+      status.textContent = '✓ Available — nerum.in/s/'+slug;
+      status.className = 'slug-status ok';
+      state.slugAvailable = true;
+    } else {
+      status.textContent = '✗ This URL is taken';
+      status.className = 'slug-status bad';
+      state.slugAvailable = false;
+    }
+  } catch(e) {
+    status.textContent = 'Could not check';
+    state.slugAvailable = false;
+  }
+}
+
+// ─── Services ──────────────────────────────────────────────
+function addService() {
+  const input = document.getElementById('f-service-input');
+  const v = input.value.trim();
+  if (!v) return;
+  if (state.services.includes(v)) { input.value=''; return; }
+  state.services.push(v);
+  input.value = '';
+  renderServices();
+  schedulePreview();
+}
+
+function removeService(idx) {
+  state.services.splice(idx,1);
+  renderServices();
+  schedulePreview();
+}
+
+function renderServices() {
+  document.getElementById('serviceTags').innerHTML = state.services.map((s,i) => `
+    <span class="service-tag">${escapeHtml(s)} <span class="x" onclick="removeService(${i})">×</span></span>
+  `).join('');
+}
+
+// ─── Preview ────────────────────────────────────────────────
+function collectForm() {
+  return {
+    template_id: state.selected_template,
+    business_name: document.getElementById('f-business_name').value.trim(),
+    tagline: document.getElementById('f-tagline').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    email: document.getElementById('f-email').value.trim(),
+    address: document.getElementById('f-address').value.trim(),
+    services: JSON.stringify(state.services),
+    brand_color: document.getElementById('f-brand_color_hex').value.trim() || '#C50022',
+    logo_url: document.getElementById('f-logo_url').value.trim(),
+    logo_data: state.logo_data,
+    chatbot_embed_id: document.getElementById('f-chatbot_embed_id').value.trim(),
+    slug: document.getElementById('f-slug').value.trim(),
+  };
+}
+
+function schedulePreview() {
+  if (state.previewTimer) clearTimeout(state.previewTimer);
+  state.previewTimer = setTimeout(runPreview, 500);
+}
+
+async function runPreview() {
+  if (!state.selected_template) {
+    document.getElementById('previewEmpty').style.display = 'flex';
+    document.getElementById('previewWrap').style.display = 'none';
+    return;
+  }
+  document.getElementById('previewEmpty').style.display = 'none';
+  document.getElementById('previewWrap').style.display = 'block';
+  document.getElementById('previewOverlay').classList.add('show');
+  const body = collectForm();
+  try {
+    const res = await fetch('/websites/preview', {
+      method:'POST',
+      headers: HDR,
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      document.getElementById('previewOverlay').textContent = 'Preview failed.';
+      return;
+    }
+    const data = await res.json();
+    document.getElementById('previewFrame').srcdoc = data.html;
+  } catch(e) {
+    console.error(e);
+  } finally {
+    setTimeout(() => document.getElementById('previewOverlay').classList.remove('show'), 200);
+  }
+}
+
+function setDevice(d) {
+  document.getElementById('previewWrap').classList.remove('desktop','mobile');
+  document.getElementById('previewWrap').classList.add(d);
+  document.getElementById('dev-desktop').classList.toggle('active', d==='desktop');
+  document.getElementById('dev-mobile').classList.toggle('active', d==='mobile');
+}
+
+// ─── Publish ────────────────────────────────────────────────
+async function publishSite() {
+  const btn = document.getElementById('publishBtn');
+  const body = collectForm();
+  if (!body.template_id || !body.business_name || !body.phone || !body.slug) {
+    showToast('Missing required fields');
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Publishing...';
+  try {
+    const url = state.editingId ? `/websites/${state.editingId}` : '/websites/create';
+    const method = state.editingId ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: HDR,
+      body: JSON.stringify(body)
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      showToast(err.detail || 'Publish failed');
+      btn.disabled = false; btn.textContent = '🚀 Publish Website';
+      return;
+    }
+    const data = await res.json();
+    showSuccess(data);
+    state.editingId = null;
+    loadMyWebsites();
+  } catch(e) {
+    showToast('Network error');
+  } finally {
+    btn.disabled = false; btn.textContent = '🚀 Publish Website';
+  }
+}
+
+function showSuccess(data) {
+  document.getElementById('successUrl').value = data.url;
+  document.getElementById('successEmbed').value = data.embed_code || `<iframe src="${data.url}" style="width:100%;height:100vh;border:0"></iframe>`;
+  document.getElementById('successOpen').href = data.url;
+
+  const waBtn = document.getElementById('successWhatsapp');
+  waBtn.onclick = () => {
+    const msg = encodeURIComponent('Check out my new website: ' + data.url);
+    window.open(`https://wa.me/?text=${msg}`, '_blank');
+  };
+
+  document.getElementById('qrBox').innerHTML = '<div style="color:var(--muted);font-size:12px">Generating QR...</div>';
+  fetch(`/websites/generate-qr/${data.id}`, { method:'POST', headers: HDR })
+    .then(r => r.json())
+    .then(qd => {
+      document.getElementById('qrBox').innerHTML = `<img src="${qd.qr}" alt="QR Code">`;
+    })
+    .catch(() => { document.getElementById('qrBox').innerHTML = ''; });
+
+  document.getElementById('successModal').classList.add('show');
+}
+
+function closeSuccess() { document.getElementById('successModal').classList.remove('show'); }
+function closeUpgrade() { document.getElementById('upgradeModal').classList.remove('show'); }
+
+// ─── My Websites Table ─────────────────────────────────────
+async function loadMyWebsites() {
+  try {
+    const res = await fetch('/websites/my-websites', { headers: HDR });
+    if (!res.ok) return;
+    const data = await res.json();
+    state.websites = data.websites || [];
+    renderWebsitesTable();
+  } catch(e) { console.error(e); }
+}
+
+function renderWebsitesTable() {
+  const wrap = document.getElementById('websitesTable');
+  if (!state.websites.length) {
+    wrap.innerHTML = '<div style="text-align:center;padding:30px;color:var(--muted);font-size:13px">No websites yet. Build your first one above!</div>';
+    return;
+  }
+  wrap.innerHTML = `
+    <table>
+      <thead>
+        <tr><th>Name</th><th>Template</th><th>URL</th><th>Views</th><th>Status</th><th>Expires</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        ${state.websites.map(w => `
+          <tr>
+            <td>${escapeHtml(w.business_name || '—')}</td>
+            <td><code style="font-size:11px;color:var(--muted)">${w.template_id}</code></td>
+            <td><a href="${w.url}" target="_blank">${w.slug}</a></td>
+            <td>${w.views || 0}</td>
+            <td>${w.is_published ? '<span class="status-pill-tbl status-published">Live</span>' : '<span class="status-pill-tbl status-expired">Draft</span>'}</td>
+            <td>${w.expires_at ? new Date(w.expires_at).toLocaleDateString() : '—'}</td>
+            <td>
+              <button class="btn-small" onclick="editWebsite(${w.id})">Edit</button>
+              <button class="btn-small" onclick="showQR(${w.id}, '${w.url}')">QR</button>
+              <button class="btn-small" style="background:rgba(248,113,113,0.15);color:#f87171" onclick="deleteWebsite(${w.id})">×</button>
+            </td>
+          </tr>`).join('')}
+      </tbody>
+    </table>
+  `;
+}
+
+function editWebsite(id) {
+  const w = state.websites.find(x => x.id === id);
+  if (!w) return;
+  state.editingId = id;
+  state.selected_template = w.template_id;
+  document.getElementById('f-business_name').value = w.business_name || '';
+  document.getElementById('f-tagline').value = w.tagline || '';
+  document.getElementById('f-phone').value = w.phone || '';
+  document.getElementById('f-email').value = w.email || '';
+  document.getElementById('f-address').value = w.address || '';
+  document.getElementById('f-brand_color').value = w.brand_color || '#C50022';
+  document.getElementById('f-brand_color_hex').value = w.brand_color || '#C50022';
+  document.getElementById('colorSwatch').style.background = w.brand_color || '#C50022';
+  document.getElementById('f-logo_url').value = w.logo_url || '';
+  state.logo_data = w.logo_data || '';
+  if (w.logo_data || w.logo_url) {
+    document.getElementById('logoPreview').innerHTML = `<img src="${w.logo_data || w.logo_url}" alt="">`;
+  }
+  document.getElementById('f-chatbot_embed_id').value = w.chatbot_embed_id || '';
+  document.getElementById('f-slug').value = w.slug;
+  state.slugAvailable = true;
+  try { state.services = JSON.parse(w.services || '[]'); } catch { state.services = []; }
+  renderServices();
+  renderTemplates();
+  goStep(1);
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  showToast('Editing — make changes and republish');
+}
+
+async function deleteWebsite(id) {
+  if (!confirm('Delete this website? This action cannot be undone.')) return;
+  try {
+    const res = await fetch(`/websites/${id}`, { method:'DELETE', headers: HDR });
+    if (!res.ok) { showToast('Delete failed'); return; }
+    showToast('Website deleted');
+    loadMyWebsites();
+  } catch(e) { showToast('Delete failed'); }
+}
+
+async function showQR(id, url) {
+  document.getElementById('successUrl').value = url;
+  document.getElementById('successEmbed').value = `<iframe src="${url}" style="width:100%;height:100vh;border:0"></iframe>`;
+  document.getElementById('successOpen').href = url;
+  document.getElementById('successWhatsapp').onclick = () => {
+    window.open(`https://wa.me/?text=${encodeURIComponent('Check out my website: ' + url)}`, '_blank');
+  };
+  document.getElementById('qrBox').innerHTML = '<div style="color:var(--muted);font-size:12px">Loading QR...</div>';
+  try {
+    const res = await fetch(`/websites/generate-qr/${id}`, { method:'POST', headers: HDR });
+    const qd = await res.json();
+    document.getElementById('qrBox').innerHTML = `<img src="${qd.qr}" alt="QR">`;
+  } catch(e) {
+    document.getElementById('qrBox').innerHTML = '';
+  }
+  document.getElementById('successModal').classList.add('show');
+}
+
+// ─── Utils ──────────────────────────────────────────────────
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+function copyVal(id) {
+  const el = document.getElementById(id);
+  el.select();
+  document.execCommand('copy');
+  showToast('Copied to clipboard!');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+init();
+</script>
+
+</body>
+</html>
