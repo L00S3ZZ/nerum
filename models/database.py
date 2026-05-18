@@ -183,6 +183,70 @@ from models.chatbot_model import UserChatbot, ChatbotConversation  # noqa: E402,
 Base.metadata.create_all(bind=engine)
 print("✅ All tables created/verified!")
 
+# Migration: backfill new user_chatbots columns for existing installs
+try:
+    import sqlalchemy as _sa
+    _insp = _sa.inspect(engine)
+    if "user_chatbots" in _insp.get_table_names():
+        _existing = {c["name"] for c in _insp.get_columns("user_chatbots")}
+        _chatbot_migrations = [
+            ("input_placeholder", "VARCHAR"),
+            ("bot_status", "VARCHAR"),
+            ("bot_initials", "VARCHAR"),
+            ("header_color", "VARCHAR"),
+            ("user_bubble_color", "VARCHAR"),
+            ("bot_bubble_bg", "VARCHAR"),
+            ("bot_bubble_text", "VARCHAR"),
+            ("chat_bg", "VARCHAR"),
+            ("send_button_color", "VARCHAR"),
+            ("font_family", "VARCHAR"),
+            ("font_size", "INTEGER"),
+            ("corner_radius", "INTEGER"),
+            ("bubble_shape", "VARCHAR"),
+            ("header_style", "VARCHAR"),
+            ("chat_width", "INTEGER"),
+            ("chat_height", "INTEGER"),
+            ("logo_data_url", "TEXT"),
+            ("logo_shape", "VARCHAR"),
+            ("logo_in_header", "BOOLEAN"),
+            ("logo_in_messages", "BOOLEAN"),
+            ("logo_in_launcher", "BOOLEAN"),
+            ("logo_header_size", "INTEGER"),
+            ("logo_msg_size", "INTEGER"),
+            ("launcher_size", "INTEGER"),
+            ("launcher_color", "VARCHAR"),
+            ("launcher_shape", "VARCHAR"),
+            ("launcher_position", "VARCHAR"),
+            ("launcher_animation", "VARCHAR"),
+            ("greeting_text", "VARCHAR"),
+            ("show_badge", "BOOLEAN"),
+            ("language", "VARCHAR"),
+            ("auto_open", "BOOLEAN"),
+            ("auto_open_delay", "INTEGER"),
+            ("sound_enabled", "BOOLEAN"),
+            ("typing_indicator", "BOOLEAN"),
+            ("show_timestamps", "BOOLEAN"),
+            ("allow_upload", "BOOLEAN"),
+            ("collect_email", "BOOLEAN"),
+            ("show_quick_replies", "BOOLEAN"),
+            ("show_branding", "BOOLEAN"),
+            ("business_hours_only", "BOOLEAN"),
+            ("offline_message", "VARCHAR"),
+            ("response_delay", "FLOAT"),
+            ("input_mode", "VARCHAR"),
+            ("flow_json", "TEXT"),
+        ]
+        with engine.connect() as _conn:
+            for _col, _typ in _chatbot_migrations:
+                if _col not in _existing:
+                    try:
+                        _conn.execute(text(f"ALTER TABLE user_chatbots ADD COLUMN {_col} {_typ}"))
+                    except Exception as _e:
+                        print(f"chatbot col {_col}: {_e}")
+            _conn.commit()
+except Exception as _e:
+    print(f"Chatbot migration note: {_e}")
+
 # ✅ Migrations
 try:
     with engine.connect() as conn:

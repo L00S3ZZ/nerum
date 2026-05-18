@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Nerum · Chatbot</title>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
     --purple: #C50022;
@@ -69,7 +69,7 @@
   .new-btn:hover { opacity:0.9; transform:translateY(-1px); }
 
   /* CONTENT */
-  .content { padding:28px; flex:1; max-width:1280px; width:100%; margin:0 auto; }
+  .content { padding:28px; flex:1; max-width:1400px; width:100%; margin:0 auto; }
 
   /* HEADER */
   .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; flex-wrap:wrap; gap:16px; }
@@ -88,7 +88,7 @@
   .bot-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:18px; display:flex; flex-direction:column; gap:12px; transition:all 0.2s; }
   .bot-card:hover { border-color:var(--pink-border); transform:translateY(-2px); box-shadow:0 8px 30px rgba(197,0,34,0.12); }
   .bot-head { display:flex; align-items:center; gap:10px; }
-  .bot-logo { width:36px; height:36px; border-radius:8px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:15px; flex-shrink:0; overflow:hidden; }
+  .bot-logo { width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700; font-size:15px; flex-shrink:0; overflow:hidden; }
   .bot-logo img { width:100%; height:100%; object-fit:cover; }
   .bot-info { flex:1; min-width:0; }
   .bot-name { font-size:14px; font-weight:600; line-height:1.2; }
@@ -97,27 +97,42 @@
   .badge-ai { background:rgba(197,0,34,0.15); color:var(--pink); border:1px solid var(--pink-border); }
   .badge-nonai { background:rgba(255,255,255,0.05); color:var(--muted); border:1px solid rgba(255,255,255,0.1); }
   .bot-stats { display:flex; align-items:center; gap:10px; font-size:12px; color:var(--muted); }
-  .usage-bar-wrap { flex:1; }
   .usage-bar { height:5px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; margin-top:4px; }
   .usage-fill { height:100%; background:linear-gradient(90deg,var(--purple),var(--indigo)); border-radius:3px; transition:width 0.3s; }
   .bot-actions { display:flex; gap:8px; }
-  .btn-ghost { display:flex; align-items:center; justify-content:center; gap:6px; flex:1; background:var(--card); border:1px solid var(--card-border); border-radius:8px; padding:8px 10px; color:var(--text); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-ghost:hover { border-color:var(--pink); color:var(--pink); }
-  .btn-danger { background:rgba(248,113,113,0.12); border:1px solid rgba(248,113,113,0.3); color:#f87171; border-radius:8px; padding:8px 12px; font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-danger:hover { background:rgba(248,113,113,0.22); }
-
   .empty-state { text-align:center; padding:50px 20px; background:var(--card); border:1px dashed var(--card-border); border-radius:14px; }
   .empty-state .icon { font-size:42px; margin-bottom:10px; }
   .empty-state .text { color:var(--muted); font-size:14px; }
 
-  /* CREATE PANEL */
-  .builder-panel { background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:26px; }
-  .steps-row { display:flex; gap:10px; margin-bottom:22px; }
-  .step-chip { flex:1; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; font-size:13px; color:var(--muted); font-weight:500; display:flex; align-items:center; gap:8px; }
-  .step-chip.active { background:var(--pink-soft); border-color:var(--pink-border); color:var(--pink); }
-  .step-chip .num { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.08); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; }
-  .step-chip.active .num { background:var(--pink); color:#fff; }
+  /* BUTTONS */
+  .btn-ghost { display:inline-flex; align-items:center; justify-content:center; gap:6px; background:transparent; border:1px solid var(--pink-border); border-radius:10px; padding:8px 14px; color:var(--pink); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-ghost:hover { background:var(--pink-soft); }
+  .btn-ghost.danger { color:#f87171; border-color:rgba(248,113,113,0.4); }
+  .btn-ghost.danger:hover { background:rgba(248,113,113,0.12); }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.3); }
+  .btn-primary:hover { opacity:0.92; transform:translateY(-1px); }
+  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .btn-primary.full { width:100%; padding:14px; font-size:15px; }
+  .btn-small { padding:6px 12px; font-size:12px; font-weight:500; border-radius:8px; border:none; background:rgba(197,0,34,0.15); color:var(--pink); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-small:hover { background:rgba(197,0,34,0.25); }
+  .x-btn { background:none; border:none; color:#f87171; cursor:pointer; font-size:16px; padding:0 6px; line-height:1; }
 
+  /* BUILDER PANEL */
+  .builder-wrap { display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:flex-start; }
+  @media (max-width:1100px) { .builder-wrap { grid-template-columns:1fr; } }
+  .builder-panel { background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:24px; }
+
+  /* STEP CHIPS */
+  .steps-row { display:flex; gap:8px; margin-bottom:22px; flex-wrap:wrap; }
+  .step-chip { flex:1; min-width:120px; padding:10px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; font-size:12.5px; color:var(--muted); font-weight:500; display:flex; align-items:center; gap:8px; cursor:pointer; transition:all 0.2s; }
+  .step-chip:hover { background:rgba(255,255,255,0.05); }
+  .step-chip.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+  .step-chip.completed { background:var(--pink-soft); border-color:var(--pink-border); color:var(--pink); }
+  .step-chip .num { width:22px; height:22px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0; }
+  .step-chip.active .num { background:rgba(255,255,255,0.2); }
+  .step-chip.completed .num { background:var(--pink); color:#fff; }
+
+  /* FORMS */
   .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
   @media (max-width:720px) { .form-grid { grid-template-columns:1fr; } }
   .form-field { margin-bottom:14px; }
@@ -125,54 +140,211 @@
   .form-input, .form-textarea, .form-select { width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:10px 14px; color:var(--text); font-size:13px; font-family:inherit; outline:none; transition:border-color 0.2s; }
   .form-input:focus, .form-textarea:focus, .form-select:focus { border-color:var(--pink); }
   .form-textarea { min-height:120px; resize:vertical; font-family:'JetBrains Mono',monospace; }
-  .form-color { width:60px; height:38px; padding:2px; cursor:pointer; }
+  .form-input[type="number"] { font-family:'JetBrains Mono',monospace; }
+  .form-select { appearance:none; background-image: url("data:image/svg+xml;utf8,<svg fill='%23ffffff80' height='18' viewBox='0 0 24 24' width='18' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>"); background-repeat:no-repeat; background-position:right 10px center; padding-right:36px; }
 
-  .toggle-row { display:flex; gap:10px; margin-bottom:16px; }
+  .sub-label { font-size:11px; color:var(--muted); margin-top:4px; }
+
+  /* SLIDER */
+  .slider-row { display:flex; align-items:center; gap:12px; }
+  .slider-row input[type="range"] { flex:1; appearance:none; height:5px; background:rgba(255,255,255,0.1); border-radius:3px; outline:none; }
+  .slider-row input[type="range"]::-webkit-slider-thumb { appearance:none; width:16px; height:16px; border-radius:50%; background:var(--pink); cursor:pointer; box-shadow:0 0 6px rgba(197,0,34,0.5); }
+  .slider-row input[type="range"]::-moz-range-thumb { width:16px; height:16px; border-radius:50%; background:var(--pink); cursor:pointer; border:none; }
+  .slider-val { min-width:42px; text-align:right; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--pink); font-weight:600; }
+
+  /* CHIP ROW (multi-button) */
+  .chip-row { display:flex; flex-wrap:wrap; gap:6px; }
+  .chip-btn { padding:8px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; color:var(--text); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .chip-btn:hover { background:rgba(255,255,255,0.06); border-color:var(--pink-border); }
+  .chip-btn.active { background:var(--pink); border-color:var(--pink); color:#fff; }
+  .chip-row.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:6px; }
+
+  /* TOGGLE PILLS — bot type */
+  .toggle-row { display:flex; gap:10px; margin-bottom:14px; }
   .toggle-pill { flex:1; padding:14px 16px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:12px; cursor:pointer; transition:all 0.2s; text-align:center; }
   .toggle-pill:hover { border-color:var(--pink-border); }
-  .toggle-pill.active { background:var(--pink-soft); border-color:var(--pink-border); }
+  .toggle-pill.active { background:var(--pink-soft); border-color:var(--pink); }
   .toggle-pill .t-title { font-size:14px; font-weight:600; color:var(--text); margin-bottom:2px; }
   .toggle-pill .t-sub { font-size:11px; color:var(--muted); }
 
-  .qa-pair { background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:12px; margin-bottom:10px; }
-  .qa-remove { float:right; background:none; border:none; color:#f87171; cursor:pointer; font-size:14px; padding:0 6px; }
+  /* SWATCHES */
+  .swatch-row { display:flex; flex-wrap:wrap; gap:8px; }
+  .swatch { width:28px; height:28px; border-radius:8px; cursor:pointer; border:2px solid transparent; transition:all 0.15s; position:relative; }
+  .swatch:hover { transform:scale(1.1); }
+  .swatch.active { border-color:#ffffff; box-shadow:0 0 0 2px rgba(255,255,255,0.15); }
 
+  /* CUSTOM COLOR */
+  .color-row { display:flex; align-items:center; gap:10px; }
+  .color-swatch-btn { width:36px; height:36px; border-radius:10px; cursor:pointer; border:1px solid var(--card-border); position:relative; overflow:hidden; flex-shrink:0; }
+  .color-swatch-btn input { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .color-hex { width:120px; font-family:'JetBrains Mono',monospace; text-transform:uppercase; }
+
+  .advanced-toggle { background:none; border:none; color:var(--pink); font-size:12px; font-weight:600; cursor:pointer; font-family:inherit; padding:0; margin:8px 0; }
+  .advanced-toggle:hover { text-decoration:underline; }
+  .advanced-panel { display:none; padding:12px; background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:10px; margin-bottom:8px; }
+  .advanced-panel.open { display:block; }
+  .adv-row { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .adv-row label { font-size:12px; color:var(--muted); flex:1; }
+
+  /* QA PAIRS */
+  .qa-pair { background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:10px; padding:12px; margin-bottom:10px; position:relative; }
+  .qa-x { position:absolute; top:8px; right:8px; }
+
+  /* TABS */
   .tabs-row { display:flex; gap:6px; margin-bottom:12px; }
   .tab-btn { padding:8px 14px; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; color:var(--muted); font-size:12px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .tab-btn:hover { color:var(--text); }
   .tab-btn.active { background:var(--pink-soft); color:var(--pink); border-color:var(--pink-border); }
 
-  .preview-bubble { display:inline-flex; align-items:center; gap:10px; padding:14px 18px; border-radius:14px; box-shadow:0 8px 24px rgba(0,0,0,0.4); margin:18px 0; color:#fff; }
-  .preview-msg { background:rgba(255,255,255,0.06); border:1px solid var(--card-border); border-radius:10px; padding:12px 14px; font-size:13px; color:var(--text); max-width:300px; }
+  /* FLOW BUILDER */
+  .flow-wrap { margin-top:14px; }
+  .flow-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .flow-head .title { font-size:14px; font-weight:600; }
+  .flow-head .badge { font-size:10px; padding:3px 8px; border-radius:5px; background:var(--pink-soft); color:var(--pink); border:1px solid var(--pink-border); font-weight:600; letter-spacing:0.3px; }
+  .flow-node { background:rgba(0,0,0,0.25); border:1px solid var(--card-border); border-radius:12px; padding:14px; margin-bottom:12px; }
+  .flow-node-head { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
+  .flow-node-head .lab { font-size:11px; font-weight:700; color:var(--pink); letter-spacing:1px; text-transform:uppercase; flex:1; }
+  .flow-question { width:100%; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:9px 12px; color:var(--text); font-size:13px; font-family:inherit; outline:none; resize:vertical; min-height:42px; margin-bottom:10px; }
+  .flow-question:focus { border-color:var(--pink); }
+  .flow-options { display:flex; flex-direction:column; gap:6px; }
+  .flow-opt { display:flex; align-items:center; gap:6px; }
+  .flow-opt-row { display:flex; align-items:center; gap:6px; width:100%; }
+  .flow-opt-input { flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:8px; padding:8px 12px; color:var(--text); font-size:12.5px; font-family:inherit; outline:none; }
+  .flow-opt-input:focus { border-color:var(--pink); }
+  .flow-arrow { color:var(--muted); font-size:14px; flex-shrink:0; }
+  .flow-expand { background:none; border:1px solid var(--card-border); width:24px; height:24px; border-radius:6px; color:var(--muted); cursor:pointer; font-family:inherit; flex-shrink:0; font-size:12px; padding:0; }
+  .flow-expand:hover { color:var(--pink); border-color:var(--pink-border); }
+  .flow-expand.open { color:var(--pink); border-color:var(--pink); transform:rotate(90deg); }
+  .flow-subs { margin-left:18px; padding-left:14px; border-left:2px solid var(--pink-border); margin-top:8px; }
+  .flow-subs-title { font-size:11px; color:var(--muted); margin-bottom:6px; }
+  .flow-sub { display:flex; align-items:center; gap:6px; margin-bottom:6px; }
+  .flow-sub-arrow { color:var(--pink); font-size:13px; flex-shrink:0; }
 
-  .btn-primary { display:inline-flex; align-items:center; gap:8px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.28); }
-  .btn-primary:hover { opacity:0.92; transform:translateY(-1px); }
-  .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  /* LOGO UPLOAD */
+  .upload-zone { border:2px dashed var(--card-border); border-radius:14px; padding:30px 20px; text-align:center; cursor:pointer; transition:all 0.2s; position:relative; overflow:hidden; }
+  .upload-zone:hover { border-color:var(--pink); background:rgba(197,0,34,0.04); }
+  .upload-zone input[type="file"] { position:absolute; inset:0; opacity:0; cursor:pointer; }
+  .upload-icon { font-size:32px; margin-bottom:6px; opacity:0.7; }
+  .upload-text { font-size:13px; color:var(--text); font-weight:500; margin-bottom:4px; }
+  .upload-sub { font-size:11px; color:var(--muted); }
+  .upload-preview { display:flex; align-items:center; gap:14px; }
+  .upload-preview img { width:64px; height:64px; object-fit:cover; border-radius:10px; }
+  .upload-preview .meta { flex:1; text-align:left; }
+  .upload-preview .name { font-size:13px; font-weight:500; }
+  .upload-preview .size { font-size:11px; color:var(--muted); margin-top:2px; }
 
-  .step-actions { display:flex; gap:10px; justify-content:space-between; margin-top:18px; }
+  .size-preview-row { display:flex; align-items:flex-end; justify-content:space-around; gap:14px; padding:18px; background:rgba(0,0,0,0.2); border-radius:12px; border:1px solid var(--card-border); margin-top:12px; }
+  .size-preview-col { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .size-preview-col .lab { font-size:10.5px; color:var(--muted); }
+  .size-preview-col .logo-mini { display:flex; align-items:center; justify-content:center; overflow:hidden; color:#fff; font-weight:700; }
+  .size-preview-col .logo-mini img { width:100%; height:100%; object-fit:cover; }
+
+  /* PLACEMENT ROWS */
+  .place-row { display:flex; align-items:center; gap:12px; padding:12px; border:1px solid var(--card-border); border-radius:10px; background:rgba(255,255,255,0.02); margin-bottom:8px; }
+  .place-icon { width:36px; height:36px; background:var(--pink-soft); border:1px solid var(--pink-border); border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+  .place-info { flex:1; min-width:0; }
+  .place-info .name { font-size:13px; font-weight:600; }
+  .place-info .desc { font-size:11.5px; color:var(--muted); margin-top:2px; }
+
+  /* TOGGLE SWITCH */
+  .switch { position:relative; width:38px; height:22px; flex-shrink:0; cursor:pointer; }
+  .switch input { opacity:0; width:0; height:0; }
+  .switch .track { position:absolute; inset:0; background:rgba(255,255,255,0.1); border-radius:11px; transition:0.2s; }
+  .switch .knob { position:absolute; top:3px; left:3px; width:16px; height:16px; background:#fff; border-radius:50%; transition:0.2s; }
+  .switch input:checked + .track { background:var(--pink); }
+  .switch input:checked + .track .knob { transform:translateX(16px); }
+
+  .behavior-row { display:flex; align-items:center; gap:12px; padding:12px 14px; border:1px solid var(--card-border); border-radius:10px; background:rgba(255,255,255,0.02); margin-bottom:8px; }
+  .behavior-info { flex:1; min-width:0; }
+  .behavior-info .name { font-size:13px; font-weight:600; }
+  .behavior-info .desc { font-size:11.5px; color:var(--muted); margin-top:2px; }
+
+  /* STEP CONTENT */
+  .step-section { display:none; }
+  .step-section.active { display:block; animation:fadeIn 0.25s ease; }
+  @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .substep { background:rgba(255,255,255,0.02); border:1px solid var(--card-border); border-radius:12px; padding:16px; margin-bottom:14px; }
+  .substep-title { font-size:14px; font-weight:600; margin-bottom:12px; display:flex; align-items:center; gap:8px; }
+  .substep-title .num { width:22px; height:22px; border-radius:50%; background:var(--pink-soft); border:1px solid var(--pink-border); display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; color:var(--pink); }
+
+  .step-actions { display:flex; gap:10px; justify-content:space-between; margin-top:20px; }
+
+  /* PREVIEW PANEL — right column */
+  .preview-col { position:sticky; top:88px; }
+  .preview-frame { background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:16px; padding:20px; }
+  .preview-frame .preview-label { font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px; margin-bottom:12px; text-align:center; }
+  .preview-window { background:#fff; border-radius:14px; overflow:hidden; box-shadow:0 12px 40px rgba(0,0,0,0.5); position:relative; }
+  .preview-launcher-wrap { display:flex; justify-content:flex-end; align-items:center; gap:10px; margin-top:16px; }
+  .preview-greeting { background:#fff; color:#111; padding:7px 12px; border-radius:14px; font-size:12px; box-shadow:0 4px 14px rgba(0,0,0,0.3); }
+  .preview-launcher { color:#fff; display:flex; align-items:center; justify-content:center; font-weight:700; overflow:hidden; position:relative; box-shadow:0 6px 20px rgba(0,0,0,0.4); cursor:pointer; }
+  .preview-launcher img { width:100%; height:100%; object-fit:cover; }
+  .preview-launcher .badge-dot { position:absolute; top:2px; right:2px; width:10px; height:10px; background:#ef4444; border-radius:50%; border:2px solid #fff; }
+  @keyframes pBounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+  @keyframes pPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.06)} }
+  @keyframes pShake { 0%,100%{transform:rotate(0)} 25%{transform:rotate(-6deg)} 75%{transform:rotate(6deg)} }
+  .preview-launcher.anim-bounce { animation:pBounce 1.6s infinite ease-in-out; }
+  .preview-launcher.anim-pulse { animation:pPulse 1.6s infinite ease-in-out; }
+  .preview-launcher.anim-shake { animation:pShake 1.4s infinite ease-in-out; }
+
+  .pw-header { display:flex; align-items:center; gap:10px; padding:12px 14px; color:#fff; }
+  .pw-header .logo { display:flex; align-items:center; justify-content:center; font-weight:700; font-size:13px; color:#fff; overflow:hidden; flex-shrink:0; background:rgba(255,255,255,0.25); }
+  .pw-header .logo img { width:100%; height:100%; object-fit:cover; }
+  .pw-header .info { flex:1; min-width:0; }
+  .pw-header .name { font-size:13px; font-weight:600; }
+  .pw-header .stat { font-size:10.5px; opacity:0.85; }
+  .pw-header .close { opacity:0.8; font-size:18px; cursor:pointer; }
+  .pw-msgs { padding:12px; display:flex; flex-direction:column; gap:8px; min-height:200px; max-height:340px; overflow-y:auto; }
+  .pw-msg-row { display:flex; gap:6px; align-items:flex-end; }
+  .pw-msg-row.user { justify-content:flex-end; }
+  .pw-msg { padding:8px 12px; max-width:80%; word-wrap:break-word; line-height:1.4; }
+  .pw-msg.bot { background:#f1f5f9; color:#111; }
+  .pw-msg.user { color:#fff; }
+  .pw-msg-logo { width:22px; height:22px; display:flex; align-items:center; justify-content:center; font-weight:700; font-size:11px; color:#fff; overflow:hidden; flex-shrink:0; }
+  .pw-msg-logo img { width:100%; height:100%; object-fit:cover; }
+  .pw-time { font-size:10px; color:#94a3b8; margin-top:2px; padding:0 4px; }
+  .pw-typing { display:inline-flex; gap:3px; padding:8px 12px; background:#f1f5f9; }
+  .pw-typing span { width:5px; height:5px; background:#94a3b8; border-radius:50%; animation:pDot 1.2s infinite ease-in-out; }
+  .pw-typing span:nth-child(2) { animation-delay:0.15s; }
+  .pw-typing span:nth-child(3) { animation-delay:0.3s; }
+  @keyframes pDot { 0%,80%,100% { transform:scale(0.5); opacity:0.4; } 40% { transform:scale(1); opacity:1; } }
+
+  .pw-quick { padding:0 12px 8px; display:flex; gap:6px; flex-wrap:wrap; }
+  .pw-quick-btn { padding:5px 10px; border-radius:14px; background:#fff; font-size:11px; color:#111; cursor:pointer; }
+
+  .pw-input { display:flex; gap:6px; padding:8px 10px; background:#f8fafc; border-top:1px solid #e2e8f0; align-items:center; }
+  .pw-input .clip { color:#94a3b8; cursor:pointer; font-size:15px; }
+  .pw-input .fake { flex:1; background:#fff; border:1px solid #e2e8f0; border-radius:8px; padding:8px 12px; color:#94a3b8; font-size:11.5px; }
+  .pw-input .send { width:30px; height:30px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; }
+
+  .pw-branding { font-size:10px; color:#94a3b8; text-align:center; padding:5px; background:#fff; border-top:1px solid #f1f5f9; }
 
   /* PRICING */
   .pricing-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:18px; }
-  @media (max-width:1000px) { .pricing-grid { grid-template-columns:repeat(2,1fr); } }
+  @media (max-width:1100px) { .pricing-grid { grid-template-columns:repeat(2,1fr); } }
   @media (max-width:580px)  { .pricing-grid { grid-template-columns:1fr; } }
-  .plan-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; transition:all 0.2s; }
+  .plan-card { background:var(--card); border:1px solid var(--card-border); border-radius:14px; padding:22px; display:flex; flex-direction:column; gap:14px; transition:all 0.2s; position:relative; }
   .plan-card:hover { border-color:var(--pink-border); transform:translateY(-2px); }
-  .plan-card.featured { border-color:var(--pink-border); box-shadow:0 0 24px rgba(197,0,34,0.18); }
-  .plan-name { font-size:15px; font-weight:700; color:var(--pink); letter-spacing:0.4px; text-transform:uppercase; }
-  .plan-price { font-size:32px; font-weight:700; }
+  .plan-card.featured { border-color:var(--pink); box-shadow:0 0 24px rgba(197,0,34,0.18); }
+  .plan-badge { position:absolute; top:14px; right:14px; font-size:10px; font-weight:700; padding:4px 10px; border-radius:6px; letter-spacing:0.4px; text-transform:uppercase; }
+  .plan-badge.green { background:rgba(52,211,153,0.15); color:var(--green); border:1px solid rgba(52,211,153,0.3); }
+  .plan-badge.red { background:var(--pink-soft); color:var(--pink); border:1px solid var(--pink-border); }
+  .plan-name { font-size:14px; font-weight:700; color:var(--pink); letter-spacing:0.4px; text-transform:uppercase; }
+  .plan-price { font-size:30px; font-weight:700; }
   .plan-price .sub { font-size:13px; font-weight:400; color:var(--muted); }
   .plan-features { list-style:none; padding:0; margin:0; display:flex; flex-direction:column; gap:6px; flex:1; }
-  .plan-features li { font-size:13px; color:var(--text); padding-left:18px; position:relative; }
+  .plan-features li { font-size:12.5px; color:var(--text); padding-left:18px; position:relative; line-height:1.4; }
   .plan-features li::before { content:"✓"; position:absolute; left:0; color:var(--pink); font-weight:700; }
+  .plan-features li.muted { color:var(--muted); }
+  .plan-features li.muted::before { content:"·"; }
 
   /* MODAL */
   .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.75); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; z-index:300; padding:20px; }
   .modal-overlay.open { display:flex; }
-  .modal { width:100%; max-width:560px; background:#0a0312; border:1px solid var(--pink-border); border-radius:18px; padding:28px; box-shadow:0 0 60px rgba(197,0,34,0.2); max-height:90vh; overflow-y:auto; }
+  .modal { width:100%; max-width:560px; background:#0a0312; border:1px solid var(--pink-border); border-radius:18px; padding:28px; box-shadow:0 0 60px rgba(197,0,34,0.2); max-height:90vh; overflow-y:auto; position:relative; }
   .modal-title { font-size:20px; font-weight:700; margin-bottom:8px; }
   .modal-sub { font-size:13px; color:var(--muted); margin-bottom:18px; line-height:1.5; }
-  .modal-close { float:right; cursor:pointer; color:var(--muted); font-size:18px; background:none; border:none; padding:0; }
-  .code-block { background:rgba(0,0,0,0.4); border:1px solid var(--card-border); border-radius:10px; padding:14px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#f4f4f5; word-break:break-all; line-height:1.6; position:relative; margin-bottom:12px; }
+  .modal-close { position:absolute; top:14px; right:18px; cursor:pointer; color:var(--muted); font-size:22px; background:none; border:none; padding:0; line-height:1; }
+  .code-block { background:rgba(0,0,0,0.5); border:1px solid var(--card-border); border-radius:10px; padding:14px 50px 14px 14px; font-family:'JetBrains Mono',monospace; font-size:12px; color:#f4f4f5; word-break:break-all; line-height:1.6; position:relative; margin-bottom:12px; }
   .copy-btn { position:absolute; top:8px; right:8px; background:var(--pink-soft); border:1px solid var(--pink-border); color:var(--pink); border-radius:6px; padding:4px 10px; font-size:11px; font-weight:600; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .copy-btn:hover { background:var(--pink); color:#fff; }
   .copy-btn.copied { background:var(--green); color:#fff; border-color:var(--green); }
@@ -183,6 +355,19 @@
   .toast { position:fixed; bottom:24px; right:24px; background:#0a0312; border:1px solid var(--pink-border); padding:12px 18px; border-radius:10px; font-size:13px; box-shadow:0 8px 30px rgba(0,0,0,0.5); z-index:500; opacity:0; transform:translateY(20px); transition:all 0.25s; }
   .toast.show { opacity:1; transform:translateY(0); }
   .toast.error { border-color:rgba(248,113,113,0.5); }
+
+  .summary-row { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; }
+  .summary-chip { background:var(--card); border:1px solid var(--card-border); padding:6px 12px; border-radius:8px; font-size:11.5px; color:var(--text); display:flex; align-items:center; gap:6px; }
+  .summary-chip .k { color:var(--muted); }
+  .summary-color-dot { width:12px; height:12px; border-radius:50%; display:inline-block; border:1px solid rgba(255,255,255,0.2); }
+
+  .api-note { font-size:11.5px; color:var(--muted); padding:8px 12px; background:rgba(52,211,153,0.06); border:1px solid rgba(52,211,153,0.2); border-radius:8px; margin-top:6px; }
+
+  .extract-row { display:flex; gap:8px; align-items:stretch; }
+  .extract-row input { flex:1; }
+  .extract-status { font-size:11.5px; color:var(--muted); margin-top:6px; }
+  .extract-status.ok { color:var(--green); }
+  .extract-status.err { color:#f87171; }
 </style>
 </head>
 <body>
@@ -258,138 +443,296 @@
         </div>
       </div>
 
-      <!-- SECTION A: MY CHATBOTS -->
+      <!-- SECTION A -->
       <div class="section">
         <div class="section-label">A · Your Chatbots</div>
         <div class="section-title">My Chatbots</div>
-        <div id="bots-list">
-          <div class="empty-state"><div class="icon">🤖</div><div class="text">Loading chatbots...</div></div>
-        </div>
+        <div id="bots-list"><div class="empty-state"><div class="icon">🤖</div><div class="text">Loading chatbots...</div></div></div>
       </div>
 
-      <!-- SECTION B: CREATE -->
+      <!-- SECTION B -->
       <div class="section">
         <div class="section-label">B · Create</div>
         <div class="section-title">Create New Chatbot</div>
-        <div class="builder-panel">
-          <div class="steps-row">
-            <div class="step-chip active" data-step-chip="1"><div class="num">1</div> Basic Info</div>
-            <div class="step-chip" data-step-chip="2"><div class="num">2</div> Bot Type</div>
-            <div class="step-chip" data-step-chip="3"><div class="num">3</div> Preview & Create</div>
-          </div>
 
-          <!-- STEP 1 -->
-          <div data-step="1">
-            <div class="form-grid">
-              <div class="form-field">
-                <label class="form-label">Company name</label>
-                <input class="form-input" id="f-company" placeholder="Acme Coffee Co.">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Bot name</label>
-                <input class="form-input" id="f-botname" placeholder="Brew Buddy" value="Assistant">
-              </div>
-            </div>
-            <div class="form-field">
-              <label class="form-label">Welcome message</label>
-              <input class="form-input" id="f-welcome" value="Hi! How can I help you?">
-            </div>
-            <div class="form-grid">
-              <div class="form-field">
-                <label class="form-label">Brand color</label>
-                <input class="form-input form-color" type="color" id="f-color" value="#C50022">
-              </div>
-              <div class="form-field">
-                <label class="form-label">Logo URL (optional)</label>
-                <input class="form-input" id="f-logo" placeholder="https://example.com/logo.png">
-              </div>
-            </div>
-            <div class="step-actions">
-              <span></span>
-              <button class="btn-primary" onclick="goStep(2)">Next →</button>
-            </div>
-          </div>
-
-          <!-- STEP 2 -->
-          <div data-step="2" style="display:none;">
-            <div class="form-label" style="margin-bottom:8px;">Bot type</div>
-            <div class="toggle-row">
-              <div class="toggle-pill active" data-type="nonai" onclick="setBotType('nonai')">
-                <div class="t-title">Non-AI · Q&A</div>
-                <div class="t-sub">Free · Pre-defined answers</div>
-              </div>
-              <div class="toggle-pill" data-type="ai" onclick="setBotType('ai')">
-                <div class="t-title">AI Powered</div>
-                <div class="t-sub">Claude · GPT · Gemini</div>
-              </div>
+        <div class="builder-wrap">
+          <!-- LEFT COLUMN: BUILDER -->
+          <div class="builder-panel">
+            <div class="steps-row">
+              <div class="step-chip active" data-chip="1" onclick="goStep(1)"><div class="num">1</div> Branding</div>
+              <div class="step-chip" data-chip="2" onclick="goStep(2)"><div class="num">2</div> Bot Type</div>
+              <div class="step-chip" data-chip="3" onclick="goStep(3)"><div class="num">3</div> Logo</div>
+              <div class="step-chip" data-chip="4" onclick="goStep(4)"><div class="num">4</div> Behavior</div>
+              <div class="step-chip" data-chip="5" onclick="goStep(5)"><div class="num">5</div> Preview &amp; Create</div>
             </div>
 
-            <!-- NON-AI Q&A -->
-            <div id="nonai-panel">
-              <div class="form-label">Q&A pairs (at least 1)</div>
-              <div id="qa-list"></div>
-              <button class="btn-ghost" style="display:inline-flex;width:auto;padding:8px 14px;" onclick="addQA()">+ Add another Q&A</button>
-            </div>
+            <!-- STEP 1: BRANDING -->
+            <div class="step-section active" data-step="1">
+              <div class="substep">
+                <div class="substep-title"><div class="num">i</div> Basic Info</div>
+                <div class="form-grid">
+                  <div class="form-field"><label class="form-label">Company name</label><input class="form-input" id="f-company" placeholder="Acme Coffee Co."></div>
+                  <div class="form-field"><label class="form-label">Bot name</label><input class="form-input" id="f-botname" placeholder="My Bot" value="Assistant"></div>
+                </div>
+                <div class="form-field"><label class="form-label">Welcome message</label><input class="form-input" id="f-welcome" value="Hi! How can I help you today? 👋"></div>
+                <div class="form-field"><label class="form-label">Input placeholder text</label><input class="form-input" id="f-placeholder" value="Type a message..."></div>
+                <div class="form-field" style="margin-bottom:0;"><label class="form-label">Bot tagline / status</label><input class="form-input" id="f-status" value="Online now"></div>
+              </div>
 
-            <!-- AI -->
-            <div id="ai-panel" style="display:none;">
-              <div class="form-grid">
+              <div class="substep">
+                <div class="substep-title"><div class="num">🎨</div> Brand Color</div>
                 <div class="form-field">
-                  <label class="form-label">AI engine</label>
-                  <select class="form-select" id="f-engine">
-                    <option value="claude">Claude (Haiku 4.5)</option>
-                    <option value="gpt">GPT-4o Mini</option>
-                    <option value="gemini">Gemini Pro</option>
+                  <label class="form-label">Auto-extract from your website</label>
+                  <div class="extract-row">
+                    <input class="form-input" id="f-extract-url" placeholder="https://yoursite.com">
+                    <button class="btn-ghost" id="extract-btn" onclick="extractColor()">Extract Color</button>
+                  </div>
+                  <div class="extract-status" id="extract-status"></div>
+                </div>
+                <div class="form-field">
+                  <label class="form-label">Or pick a template</label>
+                  <div class="swatch-row" id="swatch-row"></div>
+                </div>
+                <div class="form-field" style="margin-bottom:0;">
+                  <label class="form-label">Or enter custom hex</label>
+                  <div class="color-row">
+                    <div class="color-swatch-btn" id="color-swatch-btn" style="background:#C50022;"><input type="color" id="f-color-picker" value="#C50022"></div>
+                    <input class="form-input color-hex" id="f-color-hex" value="#C50022" maxlength="7">
+                  </div>
+                </div>
+                <button class="advanced-toggle" onclick="toggleAdv()">▾ Advanced color overrides</button>
+                <div class="advanced-panel" id="adv-panel">
+                  <div class="adv-row"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-header-color"></div><input class="form-input color-hex" id="f-header-hex" placeholder="#hex" maxlength="7"><label>Header background</label></div>
+                  <div class="adv-row"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-user-color"></div><input class="form-input color-hex" id="f-user-hex" placeholder="#hex" maxlength="7"><label>User bubble color</label></div>
+                  <div class="adv-row"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-bot-bg"></div><input class="form-input color-hex" id="f-bot-bg-hex" placeholder="#hex" maxlength="7"><label>Bot bubble background</label></div>
+                  <div class="adv-row"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-bot-text"></div><input class="form-input color-hex" id="f-bot-text-hex" placeholder="#hex" maxlength="7"><label>Bot bubble text color</label></div>
+                  <div class="adv-row"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-chat-bg"></div><input class="form-input color-hex" id="f-chat-bg-hex" placeholder="#hex" maxlength="7"><label>Chat area background</label></div>
+                  <div class="adv-row" style="margin-bottom:0;"><div class="color-swatch-btn" style="background:transparent;"><input type="color" id="f-send-color"></div><input class="form-input color-hex" id="f-send-hex" placeholder="#hex" maxlength="7"><label>Send button color</label></div>
+                </div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">Aa</div> Font</div>
+                <div class="form-field"><label class="form-label">Font family</label><div class="chip-row" id="font-row"></div></div>
+                <div class="form-field" style="margin-bottom:0;"><label class="form-label">Font size <span class="slider-val" id="font-size-val">13</span></label><div class="slider-row"><input type="range" id="f-font-size" min="11" max="17" value="13"></div></div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">▢</div> Shape &amp; Size</div>
+                <div class="form-field"><label class="form-label">Corner radius <span class="slider-val" id="corner-val">14</span></label><div class="slider-row"><input type="range" id="f-corner" min="0" max="28" value="14"></div></div>
+                <div class="form-field"><label class="form-label">Bubble shape</label><div class="chip-row"><button class="chip-btn active" data-bubble="rounded">Rounded</button><button class="chip-btn" data-bubble="pill">Pill</button><button class="chip-btn" data-bubble="square">Square</button></div></div>
+                <div class="form-field"><label class="form-label">Header style</label><div class="chip-row"><button class="chip-btn active" data-headstyle="solid">Solid</button><button class="chip-btn" data-headstyle="gradient">Gradient</button><button class="chip-btn" data-headstyle="minimal">Minimal</button></div></div>
+                <div class="form-grid">
+                  <div class="form-field"><label class="form-label">Chat width <span class="slider-val" id="cw-val">320</span></label><div class="slider-row"><input type="range" id="f-chat-width" min="260" max="420" value="320"></div></div>
+                  <div class="form-field" style="margin-bottom:0;"><label class="form-label">Chat height <span class="slider-val" id="ch-val">480</span></label><div class="slider-row"><input type="range" id="f-chat-height" min="300" max="620" value="480"></div></div>
+                </div>
+              </div>
+
+              <div class="step-actions"><span></span><button class="btn-primary" onclick="goStep(2)">Next →</button></div>
+            </div>
+
+            <!-- STEP 2: BOT TYPE -->
+            <div class="step-section" data-step="2">
+              <div class="substep">
+                <div class="substep-title"><div class="num">⌨</div> Input Mode</div>
+                <div class="chip-row" id="input-mode-row">
+                  <button class="chip-btn" data-mode="selectable">🔘 Selectable</button>
+                  <button class="chip-btn active" data-mode="typing">⌨️ Typing</button>
+                  <button class="chip-btn" data-mode="both">🔀 Both</button>
+                </div>
+                <div class="sub-label">Typing = visitors type. Selectable = pick from buttons only. Both = either.</div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">🤖</div> Bot Type</div>
+                <div class="toggle-row">
+                  <div class="toggle-pill active" data-type="nonai" onclick="setBotType('nonai')">
+                    <div class="t-title">Non-AI · Q&amp;A</div>
+                    <div class="t-sub">Free · Pre-defined answers</div>
+                  </div>
+                  <div class="toggle-pill" data-type="ai" onclick="setBotType('ai')">
+                    <div class="t-title">AI Powered</div>
+                    <div class="t-sub">Claude · GPT · Gemini (Starter+)</div>
+                  </div>
+                </div>
+
+                <div id="nonai-panel">
+                  <label class="form-label">Q&amp;A pairs (at least 1)</label>
+                  <div id="qa-list"></div>
+                  <button class="btn-small" onclick="addQA()">+ Add another Q&amp;A</button>
+                </div>
+
+                <div id="ai-panel" style="display:none;">
+                  <div class="form-grid">
+                    <div class="form-field"><label class="form-label">AI engine</label>
+                      <select class="form-select" id="f-engine">
+                        <option value="claude">Claude (Haiku 4.5)</option>
+                        <option value="gpt">GPT-4o Mini</option>
+                        <option value="gemini">Gemini Pro</option>
+                      </select>
+                    </div>
+                    <div class="form-field"><label class="form-label">Your API key (BYOK)</label><input class="form-input" type="password" id="f-apikey" placeholder="sk-..."></div>
+                  </div>
+                  <div class="api-note">🔒 Your API key is encrypted with AES-256-GCM and never shared.</div>
+                  <label class="form-label" style="margin-top:14px;">Knowledge source</label>
+                  <div class="tabs-row">
+                    <button class="tab-btn active" data-tab="url">🌐 Website URL</button>
+                    <button class="tab-btn" data-tab="text">📝 Paste Text</button>
+                  </div>
+                  <div id="tab-url">
+                    <div class="form-field" style="margin-bottom:6px;">
+                      <div style="display:flex;gap:8px;">
+                        <input class="form-input" id="f-knowledge-url" placeholder="https://yoursite.com" style="flex:1;">
+                        <button class="btn-ghost" onclick="fetchUrl()" id="fetch-btn">Fetch</button>
+                      </div>
+                    </div>
+                    <div id="fetch-status" class="extract-status"></div>
+                  </div>
+                  <div id="tab-text" style="display:none;">
+                    <div class="form-field" style="margin-bottom:0;"><textarea class="form-textarea" id="f-knowledge-text" placeholder="Paste your FAQ, services, pricing, policies..."></textarea><div class="sub-label" id="char-count">0 characters</div></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="substep" id="flow-builder-wrap" style="display:none;">
+                <div class="flow-head">
+                  <div class="title">Conversation Flow</div>
+                  <div class="badge">Visual Builder</div>
+                </div>
+                <div id="flow-nodes"></div>
+                <button class="btn-small" onclick="addFlowNode()">+ Add another question block</button>
+              </div>
+
+              <div class="step-actions"><button class="btn-ghost" onclick="goStep(1)">← Back</button><button class="btn-primary" onclick="goStep(3)">Next →</button></div>
+            </div>
+
+            <!-- STEP 3: LOGO -->
+            <div class="step-section" data-step="3">
+              <div class="substep">
+                <div class="substep-title"><div class="num">⬆</div> Upload Logo</div>
+                <div class="upload-zone" id="upload-zone">
+                  <input type="file" id="f-logo-file" accept="image/*">
+                  <div id="upload-default">
+                    <div class="upload-icon">📁</div>
+                    <div class="upload-text">Click to upload logo</div>
+                    <div class="upload-sub">PNG, SVG, JPG, WebP. Transparent PNG recommended.</div>
+                  </div>
+                  <div class="upload-preview" id="upload-preview" style="display:none;">
+                    <img id="logo-thumb" src="" alt="">
+                    <div class="meta"><div class="name" id="logo-fname">image.png</div><div class="size" id="logo-fsize">—</div></div>
+                    <button class="btn-ghost danger" onclick="removeLogo(event)">Remove</button>
+                  </div>
+                </div>
+                <div class="form-field" style="margin-top:14px; margin-bottom:0;">
+                  <label class="form-label">Or use a URL</label>
+                  <div style="display:flex;gap:8px;">
+                    <input class="form-input" id="f-logo-url-input" placeholder="https://example.com/logo.png" style="flex:1;">
+                    <button class="btn-ghost" onclick="useLogoUrl()">Use URL</button>
+                  </div>
+                </div>
+                <div class="size-preview-row" id="size-preview" style="display:none;">
+                  <div class="size-preview-col"><div class="logo-mini" id="sp-msg" style="width:20px;height:20px;font-size:9px;"></div><div class="lab">Messages</div></div>
+                  <div class="size-preview-col"><div class="logo-mini" id="sp-head" style="width:32px;height:32px;font-size:13px;"></div><div class="lab">Header</div></div>
+                  <div class="size-preview-col"><div class="logo-mini" id="sp-launch" style="width:48px;height:48px;font-size:18px;"></div><div class="lab">Launcher</div></div>
+                </div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">📍</div> Placement</div>
+                <div class="place-row"><div class="place-icon">🪟</div><div class="place-info"><div class="name">Chat header</div><div class="desc">Beside bot name at the top of the chat</div></div><label class="switch"><input type="checkbox" id="f-logo-header" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="place-row"><div class="place-icon">💬</div><div class="place-info"><div class="name">Bot messages</div><div class="desc">Small logo beside every bot reply bubble</div></div><label class="switch"><input type="checkbox" id="f-logo-messages" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="place-row"><div class="place-icon">🚀</div><div class="place-info"><div class="name">Floating launcher</div><div class="desc">Logo fills the launcher button on your site</div></div><label class="switch"><input type="checkbox" id="f-logo-launcher" checked><span class="track"><span class="knob"></span></span></label></div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">◯</div> Shape &amp; Size</div>
+                <div class="form-field"><label class="form-label">Logo shape</label><div class="chip-row"><button class="chip-btn active" data-logoshape="circle">Circle</button><button class="chip-btn" data-logoshape="rounded">Rounded</button><button class="chip-btn" data-logoshape="square">Square</button></div></div>
+                <div class="form-field"><label class="form-label">Header logo size <span class="slider-val" id="lh-val">32</span></label><div class="slider-row"><input type="range" id="f-lh-size" min="24" max="48" value="32"></div></div>
+                <div class="form-field"><label class="form-label">Message logo size <span class="slider-val" id="lm-val">22</span></label><div class="slider-row"><input type="range" id="f-lm-size" min="16" max="36" value="22"></div></div>
+                <div class="form-field" style="margin-bottom:0;"><label class="form-label">Launcher button size <span class="slider-val" id="ll-val">52</span></label><div class="slider-row"><input type="range" id="f-ll-size" min="40" max="72" value="52"></div></div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">Aa</div> Fallback Initials</div>
+                <div class="form-field" style="margin-bottom:0;"><label class="form-label">Used when no logo is set</label><input class="form-input" id="f-initials" maxlength="2" value="A" style="max-width:120px;text-transform:uppercase;font-weight:700;text-align:center;"></div>
+              </div>
+
+              <div class="step-actions"><button class="btn-ghost" onclick="goStep(2)">← Back</button><button class="btn-primary" onclick="goStep(4)">Next →</button></div>
+            </div>
+
+            <!-- STEP 4: BEHAVIOR -->
+            <div class="step-section" data-step="4">
+              <div class="substep">
+                <div class="substep-title"><div class="num">🌐</div> Language</div>
+                <div class="form-field" style="margin-bottom:0;">
+                  <label class="form-label">Chat language</label>
+                  <select class="form-select" id="f-language">
+                    <option value="en">English</option>
+                    <option value="ta">Tamil</option>
+                    <option value="hi">Hindi</option>
+                    <option value="te">Telugu</option>
+                    <option value="kn">Kannada</option>
+                    <option value="ml">Malayalam</option>
+                    <option value="mr">Marathi</option>
                   </select>
                 </div>
-                <div class="form-field">
-                  <label class="form-label">API key</label>
-                  <input class="form-input" type="password" id="f-apikey" placeholder="sk-... / AIza...">
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">⚙</div> Behavior</div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Auto-open on page load</div><div class="desc">Chat opens automatically when site loads</div></div><label class="switch"><input type="checkbox" id="f-auto-open"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row" id="auto-delay-row" style="display:none;"><div class="behavior-info"><div class="name">Auto-open delay (seconds)</div><div class="desc">How long to wait before opening</div></div><input class="form-input" type="number" id="f-auto-delay" min="1" max="10" value="3" style="width:80px;"></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Sound notification</div><div class="desc">Play a chime when bot replies</div></div><label class="switch"><input type="checkbox" id="f-sound"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Typing indicator</div><div class="desc">Show … animation while bot thinks</div></div><label class="switch"><input type="checkbox" id="f-typing" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Show timestamps</div><div class="desc">Display time on each message</div></div><label class="switch"><input type="checkbox" id="f-timestamps"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Allow file upload</div><div class="desc">Users can send images and documents</div></div><label class="switch"><input type="checkbox" id="f-upload"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Collect email before chat</div><div class="desc">Show name + email form before chat starts</div></div><label class="switch"><input type="checkbox" id="f-collect-email"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Show quick reply buttons</div><div class="desc">Pre-set option buttons above the input</div></div><label class="switch"><input type="checkbox" id="f-quick" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Show "Powered by Nerum" branding</div><div class="desc">Watermark at bottom of chat window</div></div><label class="switch"><input type="checkbox" id="f-branding" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row"><div class="behavior-info"><div class="name">Restrict to business hours</div><div class="desc">Show offline message outside working hours</div></div><label class="switch"><input type="checkbox" id="f-business-hours"><span class="track"><span class="knob"></span></span></label></div>
+                <div class="behavior-row" id="offline-row" style="display:none;"><div class="behavior-info" style="width:100%;"><div class="name">Offline message</div><input class="form-input" id="f-offline-msg" value="We are currently offline. Leave a message!" style="margin-top:6px;"></div></div>
+              </div>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">⏱</div> Response Delay</div>
+                <div class="form-field" style="margin-bottom:0;">
+                  <label class="form-label">Simulated thinking time <span class="slider-val" id="delay-val">1.0s</span></label>
+                  <div class="slider-row"><input type="range" id="f-response-delay" min="0" max="50" value="10"></div>
+                  <div class="sub-label">Simulated thinking time before bot replies</div>
                 </div>
               </div>
-              <div class="form-label" style="margin-top:6px;">Knowledge source</div>
-              <div class="tabs-row">
-                <button class="tab-btn active" data-tab="url" onclick="setTab('url')">🌐 Website URL</button>
-                <button class="tab-btn" data-tab="text" onclick="setTab('text')">📝 Paste Text</button>
+
+              <div class="substep">
+                <div class="substep-title"><div class="num">🚀</div> Launcher</div>
+                <div class="form-field"><label class="form-label">Greeting bubble text</label><input class="form-input" id="f-greeting" value="Need help?"><div class="sub-label">Leave empty to hide bubble</div></div>
+                <div class="behavior-row" style="margin-bottom:14px;"><div class="behavior-info"><div class="name">Show notification badge dot</div><div class="desc">Red dot on the launcher button</div></div><label class="switch"><input type="checkbox" id="f-badge" checked><span class="track"><span class="knob"></span></span></label></div>
+                <div class="form-field"><label class="form-label">Launcher animation</label><div class="chip-row"><button class="chip-btn" data-anim="None">None</button><button class="chip-btn active" data-anim="Bounce">Bounce</button><button class="chip-btn" data-anim="Pulse">Pulse</button><button class="chip-btn" data-anim="Shake">Shake</button></div></div>
+                <div class="form-field" style="margin-bottom:0;"><label class="form-label">Launcher position</label><div class="chip-row grid-2"><button class="chip-btn active" data-pos="Bottom Right">Bottom Right</button><button class="chip-btn" data-pos="Bottom Left">Bottom Left</button><button class="chip-btn" data-pos="Top Right">Top Right</button><button class="chip-btn" data-pos="Top Left">Top Left</button></div></div>
               </div>
-              <div id="tab-url">
-                <div class="form-field">
-                  <label class="form-label">Website URL</label>
-                  <div style="display:flex;gap:8px;">
-                    <input class="form-input" id="f-url" placeholder="https://yoursite.com" style="flex:1;">
-                    <button class="btn-ghost" style="flex:0 0 auto;padding:8px 16px;" onclick="fetchUrl()">Fetch</button>
-                  </div>
-                  <div id="fetch-status" style="font-size:12px;color:var(--muted);margin-top:6px;"></div>
-                </div>
-              </div>
-              <div id="tab-text" style="display:none;">
-                <div class="form-field">
-                  <label class="form-label">Knowledge content</label>
-                  <textarea class="form-textarea" id="f-text" placeholder="Paste any content the bot should know about..."></textarea>
-                </div>
-              </div>
+
+              <div class="step-actions"><button class="btn-ghost" onclick="goStep(3)">← Back</button><button class="btn-primary" onclick="goStep(5)">Next →</button></div>
             </div>
 
-            <div class="step-actions">
-              <button class="btn-ghost" style="flex:0 0 auto;padding:9px 18px;" onclick="goStep(1)">← Back</button>
-              <button class="btn-primary" onclick="goStep(3)">Next →</button>
+            <!-- STEP 5: PREVIEW & CREATE -->
+            <div class="step-section" data-step="5">
+              <div class="substep">
+                <div class="substep-title"><div class="num">✓</div> Summary</div>
+                <div class="summary-row" id="summary-row"></div>
+              </div>
+              <div class="substep" style="margin-bottom:0;">
+                <div class="substep-title"><div class="num">✦</div> Create</div>
+                <button class="btn-primary full" id="create-btn" onclick="createBot()">✦ Create Chatbot</button>
+              </div>
+              <div class="step-actions"><button class="btn-ghost" onclick="goStep(4)">← Back</button><span></span></div>
             </div>
           </div>
 
-          <!-- STEP 3 -->
-          <div data-step="3" style="display:none;">
-            <div class="form-label">Preview</div>
-            <div id="preview-area" style="background:rgba(0,0,0,0.3); border:1px solid var(--card-border); border-radius:14px; padding:24px; margin-bottom:14px;">
-              <div class="preview-bubble" id="preview-bubble" style="background:#C50022;">
-                <span id="preview-init" style="font-weight:700;">A</span>
-                <span id="preview-name">Assistant</span>
-              </div>
-              <div class="preview-msg" id="preview-msg">Hi! How can I help you?</div>
-              <div style="font-size:11px;color:var(--muted);margin-top:10px;">This is how your bot bubble will appear on customer sites.</div>
-            </div>
-            <div class="step-actions">
-              <button class="btn-ghost" style="flex:0 0 auto;padding:9px 18px;" onclick="goStep(2)">← Back</button>
-              <button class="btn-primary" id="create-btn" onclick="createBot()">✦ Create Chatbot</button>
+          <!-- RIGHT COLUMN: PREVIEW -->
+          <div class="preview-col">
+            <div class="preview-frame">
+              <div class="preview-label">Live preview</div>
+              <div class="preview-window" id="preview-window" style="width:300px;"></div>
+              <div class="preview-launcher-wrap" id="preview-launcher-wrap"></div>
             </div>
           </div>
         </div>
@@ -401,44 +744,65 @@
         <div class="section-title">Plans</div>
         <div class="pricing-grid">
           <div class="plan-card">
+            <div class="plan-badge green">30-Day AI Trial</div>
             <div class="plan-name">Free</div>
             <div class="plan-price">₹0 <span class="sub">/forever</span></div>
             <ul class="plan-features">
               <li>1 chatbot</li>
-              <li>50 chats / month</li>
-              <li>Non-AI only</li>
-              <li>Nerum branding</li>
+              <li>100 chats / month</li>
+              <li>Non-AI Q&amp;A forever</li>
+              <li>AI features 30-day trial only</li>
+              <li class="muted">Nerum branding</li>
+              <li class="muted">No custom branding</li>
+              <li class="muted">No website scraping</li>
             </ul>
+            <button class="btn-ghost" disabled style="opacity:0.7;">Current Plan</button>
           </div>
           <div class="plan-card featured">
+            <div class="plan-badge red">Most Popular</div>
             <div class="plan-name">Starter</div>
-            <div class="plan-price">₹699 <span class="sub">/month</span></div>
+            <div class="plan-price">₹999 <span class="sub">/month</span></div>
             <ul class="plan-features">
               <li>1 AI chatbot</li>
-              <li>1,000 chats / month</li>
-              <li>All AI engines</li>
-              <li>PDF text knowledge</li>
+              <li>500 chats / month</li>
+              <li>All AI engines (Claude, GPT, Gemini)</li>
+              <li>BYOK — your own API key</li>
+              <li>Paste text knowledge base</li>
+              <li>AES-256 encrypted keys</li>
+              <li class="muted">No custom branding</li>
+              <li class="muted">No website scraping</li>
             </ul>
+            <a class="btn-primary" href="/billing" style="text-decoration:none;text-align:center;">Upgrade →</a>
           </div>
           <div class="plan-card">
             <div class="plan-name">Pro</div>
-            <div class="plan-price">₹1,299 <span class="sub">/month</span></div>
+            <div class="plan-price">₹2,499 <span class="sub">/month</span></div>
             <ul class="plan-features">
               <li>3 chatbots</li>
-              <li>5,000 chats / month</li>
-              <li>Website scraping</li>
-              <li>Custom branding</li>
+              <li>2,000 chats / month</li>
+              <li>All AI engines</li>
+              <li>Website URL scraping</li>
+              <li>Custom branding — no Nerum logo</li>
+              <li>PDF text knowledge</li>
+              <li>Analytics</li>
+              <li>Priority support</li>
             </ul>
+            <a class="btn-ghost" href="/billing" style="text-decoration:none;text-align:center;">Upgrade →</a>
           </div>
           <div class="plan-card">
             <div class="plan-name">Agency</div>
-            <div class="plan-price">₹2,799 <span class="sub">/month</span></div>
+            <div class="plan-price">₹5,999 <span class="sub">/month</span></div>
             <ul class="plan-features">
               <li>10 chatbots</li>
-              <li>20,000 chats / month</li>
-              <li>White label</li>
-              <li>Priority support</li>
+              <li>10,000 chats / month</li>
+              <li>All AI engines</li>
+              <li>White label — your brand</li>
+              <li>Website scraping + PDF</li>
+              <li>Client sub-accounts</li>
+              <li>Dedicated support</li>
+              <li>Custom integrations</li>
             </ul>
+            <a class="btn-ghost" href="/billing" style="text-decoration:none;text-align:center;">Upgrade →</a>
           </div>
         </div>
       </div>
@@ -453,19 +817,10 @@
     <button class="modal-close" onclick="closeEmbed()">×</button>
     <div class="modal-title">🎉 Your Chatbot Is Live</div>
     <div class="modal-sub">Add the bot to your site with the script tag below, or share the hosted link directly.</div>
-
-    <div class="form-label">Embed script (paste before <code>&lt;/body&gt;</code>)</div>
-    <div class="code-block">
-      <button class="copy-btn" onclick="copyText(this, document.getElementById('embed-script').textContent)">Copy</button>
-      <span id="embed-script"></span>
-    </div>
-
+    <div class="form-label">Embed script (paste before &lt;/body&gt;)</div>
+    <div class="code-block"><button class="copy-btn" onclick="copyText(this, document.getElementById('embed-script').textContent)">Copy</button><span id="embed-script"></span></div>
     <div class="form-label">Hosted page link</div>
-    <div class="code-block">
-      <button class="copy-btn" onclick="copyText(this, document.getElementById('embed-link').textContent)">Copy</button>
-      <span id="embed-link"></span>
-    </div>
-
+    <div class="code-block"><button class="copy-btn" onclick="copyText(this, document.getElementById('embed-link').textContent)">Copy</button><span id="embed-link"></span></div>
     <div class="modal-link-row">
       <a class="link-btn" id="embed-open-link" href="#" target="_blank">↗ Open Hosted Chat</a>
       <a class="link-btn" href="/chatbot-setup" target="_blank">📘 Setup Guide</a>
@@ -476,93 +831,184 @@
 <div class="toast" id="toast"></div>
 
 <script>
-const API_BASE = window.location.origin;
+"use strict";
+
+// ─── AUTH ───
 const TOKEN = localStorage.getItem("nerum_token") || localStorage.getItem("token") || localStorage.getItem("auth_token") || "";
-
-let currentStep = 1;
-let botType = "nonai";
-let knowledgeTab = "url";
-let qaPairs = [{question:"", answer:""}];
-
-function authHeaders() {
-  const h = {"Content-Type":"application/json"};
-  if (TOKEN) h["Authorization"] = "Bearer " + TOKEN;
-  return h;
+function authHeaders() { return { "Content-Type": "application/json", "Authorization": "Bearer " + TOKEN }; }
+function logout() {
+  ["nerum_token","token","auth_token"].forEach(k => localStorage.removeItem(k));
+  window.location.href = "/";
 }
 
-function toast(msg, isError=false) {
+// ─── STATE ───
+const state = {
+  step: 1,
+  bot_name: "Assistant",
+  company_name: "",
+  welcome_message: "Hi! How can I help you today? 👋",
+  input_placeholder: "Type a message...",
+  bot_status: "Online now",
+  brand_color: "#C50022",
+  header_color: null,
+  user_bubble_color: null,
+  bot_bubble_bg: null,
+  bot_bubble_text: null,
+  chat_bg: null,
+  send_button_color: null,
+  font_family: "System",
+  font_size: 13,
+  corner_radius: 14,
+  bubble_shape: "rounded",
+  header_style: "solid",
+  chat_width: 320,
+  chat_height: 480,
+  input_mode: "typing",
+  bot_type: "nonai",
+  ai_engine: "claude",
+  api_key: "",
+  knowledge_type: "url",
+  knowledge_content: "",
+  qa_pairs: [{question:"", answer:""}],
+  flow: [{question:"How can we help?", options:[{label:"Get a quote", reply:"Tell us about your project.", subs:[]}]}],
+  logo_url: null,
+  logo_data_url: null,
+  logo_shape: "circle",
+  logo_in_header: true,
+  logo_in_messages: true,
+  logo_in_launcher: true,
+  logo_header_size: 32,
+  logo_msg_size: 22,
+  launcher_size: 52,
+  bot_initials: "A",
+  launcher_color: null,
+  launcher_shape: "circle",
+  launcher_position: "Bottom Right",
+  launcher_animation: "Bounce",
+  greeting_text: "Need help?",
+  show_badge: true,
+  language: "en",
+  auto_open: false,
+  auto_open_delay: 3,
+  sound_enabled: false,
+  typing_indicator: true,
+  show_timestamps: false,
+  allow_upload: false,
+  collect_email: false,
+  show_quick_replies: true,
+  show_branding: true,
+  business_hours_only: false,
+  offline_message: "We are currently offline. Leave a message!",
+  response_delay: 1.0,
+};
+
+const SWATCHES = ["#C50022","#2563eb","#7c3aed","#059669","#d97706","#dc2626","#db2777","#0891b2","#16a34a","#ea580c","#1e293b","#374151","#111827","#6366f1","#f59e0b"];
+const FONTS = ["System","Inter","Georgia","Courier New","Trebuchet MS"];
+const FONT_STACKS = {
+  "System": "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+  "Inter": "Inter, sans-serif",
+  "Georgia": "Georgia, serif",
+  "Courier New": "'Courier New', monospace",
+  "Trebuchet MS": "'Trebuchet MS', sans-serif",
+};
+const PLACEHOLDERS = {
+  en: "Type a message...",
+  ta: "உங்கள் செய்தியை தட்டச்சு செய்யுங்கள்...",
+  hi: "संदेश लिखें...",
+  te: "మీ సందేశాన్ని టైప్ చేయండి...",
+  kn: "ನಿಮ್ಮ ಸಂದೇಶ ಟೈಪ್ ಮಾಡಿ...",
+  ml: "സന്ദേശം ടൈപ്പ് ചെയ്യൂ...",
+  mr: "संदेश टाइप करा...",
+};
+
+// ─── HELPERS ───
+function esc(s) {
+  return String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function toast(msg, isErr=false) {
   const el = document.getElementById("toast");
   el.textContent = msg;
-  el.classList.toggle("error", isError);
+  el.classList.toggle("error", isErr);
   el.classList.add("show");
-  setTimeout(()=>el.classList.remove("show"), 3000);
+  setTimeout(() => el.classList.remove("show"), 3000);
 }
+function isHex(v) { return /^#[0-9a-fA-F]{6}$/.test(v); }
+function withAlpha(hex, alpha) {
+  if (!isHex(hex)) return hex;
+  const a = Math.round(alpha * 255).toString(16).padStart(2, "0");
+  return hex + a;
+}
+function shapeRadius(shape, n) {
+  if (shape === "circle") return "50%";
+  if (shape === "rounded") return (n || 10) + "px";
+  if (shape === "square") return "3px";
+  if (shape === "pill") return "20px";
+  return "12px";
+}
+function bubbleRadius(shape) {
+  return shape === "pill" ? "20px" : shape === "square" ? "3px" : "12px";
+}
+function fontStack(name) { return FONT_STACKS[name] || FONT_STACKS["System"]; }
 
+// ─── USER ───
 async function loadUser() {
   try {
-    const r = await fetch(API_BASE + "/auth/me", {headers:authHeaders()});
+    const r = await fetch("/auth/me", {headers: authHeaders()});
     if (!r.ok) return;
     const u = await r.json();
     document.getElementById("user-name-sidebar").textContent = u.name || u.email || "User";
     document.getElementById("user-plan-sidebar").textContent = (u.plan || "Free").charAt(0).toUpperCase() + (u.plan || "Free").slice(1);
-    const init = (u.name || u.email || "U").substring(0,2).toUpperCase();
-    document.getElementById("user-avatar").textContent = init;
-  } catch (e) { /* ignore */ }
+    document.getElementById("user-avatar").textContent = (u.name || u.email || "U").substring(0, 2).toUpperCase();
+  } catch (e) {}
 }
 
-function logout() {
-  localStorage.removeItem("nerum_token");
-  localStorage.removeItem("token");
-  localStorage.removeItem("auth_token");
-  window.location.href = "/";
-}
-
+// ─── SECTION A: BOTS LIST ───
 async function loadBots() {
   const wrap = document.getElementById("bots-list");
   try {
-    const r = await fetch(API_BASE + "/chatbots/my-chatbots", {headers:authHeaders()});
-    if (!r.ok) throw new Error("Failed");
+    const r = await fetch("/chatbots/my-chatbots", {headers: authHeaders()});
+    if (!r.ok) throw new Error("Unauthorized");
     const data = await r.json();
     if (!data.chatbots.length) {
       wrap.innerHTML = '<div class="empty-state"><div class="icon">🤖</div><div class="text">No chatbots yet — create your first one below.</div></div>';
       return;
     }
-    wrap.innerHTML = '<div class="bots-grid">' + data.chatbots.map(b => `
-      <div class="bot-card">
-        <div class="bot-head">
-          <div class="bot-logo" style="background:${b.brand_color || '#C50022'};">${b.logo_url ? `<img src="${b.logo_url}" alt="">` : (b.bot_name || 'A').charAt(0).toUpperCase()}</div>
-          <div class="bot-info">
-            <div class="bot-name">${escapeHtml(b.bot_name || 'Unnamed')}</div>
-            <div class="bot-company">${escapeHtml(b.company_name || '—')}</div>
+    wrap.innerHTML = '<div class="bots-grid">' + data.chatbots.map(b => {
+      const logoSrc = b.logo_data_url || b.logo_url;
+      const radius = shapeRadius(b.logo_shape || "circle", 10);
+      const initials = b.bot_initials || (b.bot_name || "A").charAt(0).toUpperCase();
+      const logoHtml = logoSrc
+        ? `<img src="${esc(logoSrc)}" alt="" style="border-radius:${radius};">`
+        : `<div style="width:100%;height:100%;background:${esc(b.brand_color || '#C50022')};border-radius:${radius};display:flex;align-items:center;justify-content:center;">${esc(initials)}</div>`;
+      const pct = Math.min(100, ((b.monthly_chat_count || 0) / (b.chat_limit || 50)) * 100);
+      return `
+        <div class="bot-card">
+          <div class="bot-head">
+            <div class="bot-logo">${logoHtml}</div>
+            <div class="bot-info"><div class="bot-name">${esc(b.bot_name || "Unnamed")}</div><div class="bot-company">${esc(b.company_name || "—")}</div></div>
+            <span class="bot-type-badge ${b.bot_type === 'ai' ? 'badge-ai' : 'badge-nonai'}">${b.bot_type === 'ai' ? 'AI' : 'Non-AI'}</span>
           </div>
-          <span class="bot-type-badge ${b.bot_type === 'ai' ? 'badge-ai' : 'badge-nonai'}">${b.bot_type === 'ai' ? 'AI' : 'Non-AI'}</span>
+          <div class="bot-stats"><span>💬 ${b.chat_count || 0} all-time</span></div>
+          <div>
+            <div style="font-size:11px;color:var(--muted);">Monthly: ${b.monthly_chat_count || 0} / ${b.chat_limit || 50}</div>
+            <div class="usage-bar"><div class="usage-fill" style="width:${pct}%"></div></div>
+          </div>
+          <div class="bot-actions">
+            <button class="btn-ghost" style="flex:1;" onclick='showEmbed(${JSON.stringify(b.embed_id)})'>📋 Get Embed Code</button>
+            <button class="btn-ghost danger" onclick='deleteBot(${b.id})'>Delete</button>
+          </div>
         </div>
-        <div class="bot-stats">
-          <span>💬 ${b.chat_count || 0} all-time</span>
-        </div>
-        <div>
-          <div style="font-size:11px;color:var(--muted);">Monthly usage: ${b.monthly_chat_count || 0} / ${b.chat_limit || 50}</div>
-          <div class="usage-bar"><div class="usage-fill" style="width:${Math.min(100,(b.monthly_chat_count||0)/(b.chat_limit||50)*100)}%"></div></div>
-        </div>
-        <div class="bot-actions">
-          <button class="btn-ghost" onclick='showEmbed(${JSON.stringify(b.embed_id)})'>📋 Get Embed Code</button>
-          <button class="btn-danger" onclick='deleteBot(${b.id})'>Delete</button>
-        </div>
-      </div>
-    `).join('') + '</div>';
+      `;
+    }).join("") + "</div>";
   } catch (e) {
     wrap.innerHTML = '<div class="empty-state"><div class="icon">⚠️</div><div class="text">Could not load chatbots. Sign in to continue.</div></div>';
   }
 }
 
-function escapeHtml(s) {
-  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
 async function deleteBot(id) {
   if (!confirm("Delete this chatbot? This cannot be undone.")) return;
   try {
-    const r = await fetch(API_BASE + "/chatbots/" + id, {method:"DELETE", headers:authHeaders()});
+    const r = await fetch("/chatbots/" + id, {method: "DELETE", headers: authHeaders()});
     if (!r.ok) throw new Error();
     toast("Chatbot deleted");
     loadBots();
@@ -579,132 +1025,487 @@ function showEmbed(embedId) {
   document.getElementById("embed-open-link").href = link;
   document.getElementById("embed-modal").classList.add("open");
 }
-
-function closeEmbed() {
-  document.getElementById("embed-modal").classList.remove("open");
-}
-
+function closeEmbed() { document.getElementById("embed-modal").classList.remove("open"); }
 function copyText(btn, txt) {
   navigator.clipboard.writeText(txt).then(() => {
     btn.classList.add("copied");
-    const orig = btn.textContent;
+    const o = btn.textContent;
     btn.textContent = "✓ Copied";
-    setTimeout(() => { btn.classList.remove("copied"); btn.textContent = orig; }, 1600);
+    setTimeout(() => { btn.classList.remove("copied"); btn.textContent = o; }, 1600);
   });
 }
 
+// ─── STEPS ───
 function goStep(n) {
-  currentStep = n;
-  document.querySelectorAll("[data-step]").forEach(el => el.style.display = "none");
-  document.querySelector(`[data-step="${n}"]`).style.display = "block";
-  document.querySelectorAll(".step-chip").forEach((c,i) => c.classList.toggle("active", i+1 <= n));
-  if (n === 3) updatePreview();
+  state.step = n;
+  document.querySelectorAll(".step-section").forEach(s => s.classList.remove("active"));
+  const sec = document.querySelector(`.step-section[data-step="${n}"]`);
+  if (sec) sec.classList.add("active");
+  document.querySelectorAll(".step-chip").forEach(c => {
+    const i = parseInt(c.dataset.chip, 10);
+    c.classList.toggle("active", i === n);
+    c.classList.toggle("completed", i < n);
+  });
+  if (n === 5) renderSummary();
+  window.scrollTo({top: document.querySelector(".builder-panel").offsetTop - 90, behavior: "smooth"});
 }
 
+// ─── SWATCHES ───
+function buildSwatches() {
+  const row = document.getElementById("swatch-row");
+  row.innerHTML = SWATCHES.map(c => `<div class="swatch" data-c="${c}" style="background:${c};" onclick="pickSwatch('${c}')"></div>`).join("");
+  highlightSwatch();
+}
+function pickSwatch(c) {
+  state.brand_color = c;
+  document.getElementById("f-color-hex").value = c.toUpperCase();
+  document.getElementById("f-color-picker").value = c;
+  document.getElementById("color-swatch-btn").style.background = c;
+  highlightSwatch();
+  renderPreview();
+}
+function highlightSwatch() {
+  document.querySelectorAll(".swatch").forEach(s => s.classList.toggle("active", s.dataset.c.toLowerCase() === state.brand_color.toLowerCase()));
+}
+
+// ─── ADVANCED ───
+function toggleAdv() {
+  document.getElementById("adv-panel").classList.toggle("open");
+}
+
+// ─── FONTS ───
+function buildFonts() {
+  const row = document.getElementById("font-row");
+  row.innerHTML = FONTS.map(f => `<button class="chip-btn ${f === state.font_family ? 'active' : ''}" data-font="${f}" style="font-family:${fontStack(f)};">${f}</button>`).join("");
+  row.querySelectorAll(".chip-btn").forEach(b => b.addEventListener("click", () => {
+    state.font_family = b.dataset.font;
+    row.querySelectorAll(".chip-btn").forEach(x => x.classList.toggle("active", x === b));
+    renderPreview();
+  }));
+}
+
+// ─── BOT TYPE ───
 function setBotType(t) {
-  botType = t;
-  document.querySelectorAll(".toggle-pill").forEach(p => p.classList.toggle("active", p.dataset.type === t));
+  state.bot_type = t;
+  document.querySelectorAll('.toggle-pill').forEach(p => p.classList.toggle("active", p.dataset.type === t));
   document.getElementById("nonai-panel").style.display = t === "nonai" ? "block" : "none";
   document.getElementById("ai-panel").style.display = t === "ai" ? "block" : "none";
+  renderPreview();
 }
 
-function setTab(t) {
-  knowledgeTab = t;
+// ─── QA ───
+function renderQA() {
+  const wrap = document.getElementById("qa-list");
+  wrap.innerHTML = state.qa_pairs.map((p, i) => `
+    <div class="qa-pair">
+      ${state.qa_pairs.length > 1 ? `<button class="x-btn qa-x" onclick="removeQA(${i})">×</button>` : ''}
+      <div class="form-field" style="margin-bottom:8px;"><label class="form-label">Question ${i+1}</label><input class="form-input" value="${esc(p.question)}" oninput="state.qa_pairs[${i}].question = this.value"></div>
+      <div class="form-field" style="margin-bottom:0;"><label class="form-label">Answer</label><input class="form-input" value="${esc(p.answer)}" oninput="state.qa_pairs[${i}].answer = this.value"></div>
+    </div>
+  `).join("");
+}
+function addQA() { state.qa_pairs.push({question:"", answer:""}); renderQA(); }
+function removeQA(i) { state.qa_pairs.splice(i,1); renderQA(); }
+
+// ─── KNOWLEDGE TABS ───
+function setKnowledgeTab(t) {
+  state.knowledge_type = t;
   document.querySelectorAll(".tab-btn").forEach(b => b.classList.toggle("active", b.dataset.tab === t));
   document.getElementById("tab-url").style.display = t === "url" ? "block" : "none";
   document.getElementById("tab-text").style.display = t === "text" ? "block" : "none";
 }
-
-function renderQA() {
-  const wrap = document.getElementById("qa-list");
-  wrap.innerHTML = qaPairs.map((p,i) => `
-    <div class="qa-pair">
-      ${qaPairs.length > 1 ? `<button class="qa-remove" onclick="removeQA(${i})">×</button>` : ''}
-      <div class="form-field" style="margin-bottom:8px;">
-        <label class="form-label">Question ${i+1}</label>
-        <input class="form-input" value="${escapeHtml(p.question)}" oninput="qaPairs[${i}].question = this.value">
-      </div>
-      <div class="form-field" style="margin-bottom:0;">
-        <label class="form-label">Answer</label>
-        <input class="form-input" value="${escapeHtml(p.answer)}" oninput="qaPairs[${i}].answer = this.value">
-      </div>
-    </div>
-  `).join('');
-}
-
-function addQA() {
-  qaPairs.push({question:"", answer:""});
-  renderQA();
-}
-
-function removeQA(i) {
-  qaPairs.splice(i, 1);
-  renderQA();
-}
-
 async function fetchUrl() {
-  const url = document.getElementById("f-url").value.trim();
+  const url = document.getElementById("f-knowledge-url").value.trim();
   const status = document.getElementById("fetch-status");
-  if (!url) { status.textContent = "Enter a URL first."; return; }
+  const btn = document.getElementById("fetch-btn");
+  if (!url) { status.textContent = "Enter a URL first."; status.className = "extract-status err"; return; }
   status.textContent = "Fetching...";
+  status.className = "extract-status";
+  btn.disabled = true;
   try {
-    const r = await fetch(API_BASE + "/chatbots/scrape?url=" + encodeURIComponent(url), {headers:authHeaders()});
+    const r = await fetch("/chatbots/scrape?url=" + encodeURIComponent(url), {headers: authHeaders()});
     if (!r.ok) { const e = await r.json().catch(()=>({detail:"Failed"})); throw new Error(e.detail || "Failed"); }
     const data = await r.json();
-    document.getElementById("f-text").value = data.content;
-    status.textContent = `✓ Fetched ${data.content.length} characters. Switch to Paste Text to review/edit.`;
-    status.style.color = "var(--green)";
+    document.getElementById("f-knowledge-text").value = data.content;
+    state.knowledge_content = data.content;
+    document.getElementById("char-count").textContent = data.content.length + " characters";
+    setKnowledgeTab("text");
+    status.textContent = `✓ Fetched ${data.content.length} characters.`;
+    status.className = "extract-status ok";
   } catch (e) {
     status.textContent = "✗ " + (e.message || "Could not fetch URL");
-    status.style.color = "#f87171";
+    status.className = "extract-status err";
+  } finally {
+    btn.disabled = false;
   }
 }
 
-function updatePreview() {
-  const name = document.getElementById("f-botname").value || "Assistant";
-  const color = document.getElementById("f-color").value;
-  const welcome = document.getElementById("f-welcome").value || "Hi! How can I help you?";
-  document.getElementById("preview-bubble").style.background = color;
-  document.getElementById("preview-name").textContent = name;
-  document.getElementById("preview-init").textContent = name.charAt(0).toUpperCase();
-  document.getElementById("preview-msg").textContent = welcome;
+// ─── COLOR EXTRACT ───
+async function extractColor() {
+  const url = document.getElementById("f-extract-url").value.trim();
+  const status = document.getElementById("extract-status");
+  const btn = document.getElementById("extract-btn");
+  if (!url) { status.textContent = "Enter a URL."; status.className = "extract-status err"; return; }
+  btn.disabled = true;
+  const orig = btn.textContent;
+  btn.textContent = "Extracting...";
+  status.textContent = "";
+  try {
+    const r = await fetch("/chatbots/extract-color?url=" + encodeURIComponent(url), {headers: authHeaders()});
+    const data = await r.json();
+    if (data.color) {
+      pickSwatch(data.color);
+      status.textContent = `✓ Extracted ${data.color}`;
+      status.className = "extract-status ok";
+    } else {
+      status.textContent = "Could not extract. Pick manually below.";
+      status.className = "extract-status err";
+    }
+  } catch (e) {
+    status.textContent = "Could not extract. Pick manually below.";
+    status.className = "extract-status err";
+  } finally {
+    btn.disabled = false;
+    btn.textContent = orig;
+  }
 }
 
+// ─── LOGO ───
+function handleLogoFile(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.logo_data_url = e.target.result;
+    state.logo_url = null;
+    document.getElementById("logo-thumb").src = e.target.result;
+    document.getElementById("logo-fname").textContent = file.name;
+    document.getElementById("logo-fsize").textContent = Math.round(file.size / 1024) + " KB";
+    document.getElementById("upload-default").style.display = "none";
+    document.getElementById("upload-preview").style.display = "flex";
+    document.getElementById("size-preview").style.display = "flex";
+    renderSizePreview();
+    renderPreview();
+  };
+  reader.readAsDataURL(file);
+}
+function useLogoUrl() {
+  const url = document.getElementById("f-logo-url-input").value.trim();
+  if (!url) return;
+  state.logo_url = url;
+  state.logo_data_url = null;
+  document.getElementById("logo-thumb").src = url;
+  document.getElementById("logo-fname").textContent = "From URL";
+  document.getElementById("logo-fsize").textContent = url;
+  document.getElementById("upload-default").style.display = "none";
+  document.getElementById("upload-preview").style.display = "flex";
+  document.getElementById("size-preview").style.display = "flex";
+  renderSizePreview();
+  renderPreview();
+}
+function removeLogo(ev) {
+  if (ev) ev.stopPropagation();
+  state.logo_url = null;
+  state.logo_data_url = null;
+  document.getElementById("upload-default").style.display = "block";
+  document.getElementById("upload-preview").style.display = "none";
+  document.getElementById("size-preview").style.display = "none";
+  document.getElementById("f-logo-file").value = "";
+  renderPreview();
+}
+function renderSizePreview() {
+  const src = state.logo_data_url || state.logo_url;
+  const radius = shapeRadius(state.logo_shape, 8);
+  const inner = src ? `<img src="${esc(src)}" style="border-radius:${radius};">` : `<div style="width:100%;height:100%;background:${state.brand_color};border-radius:${radius};display:flex;align-items:center;justify-content:center;">${esc(state.bot_initials || "A")}</div>`;
+  ["sp-msg","sp-head","sp-launch"].forEach(id => { const el = document.getElementById(id); if (el) el.innerHTML = inner; });
+}
+
+// ─── FLOW BUILDER ───
+function renderFlow() {
+  const wrap = document.getElementById("flow-nodes");
+  if (!wrap) return;
+  wrap.innerHTML = state.flow.map((node, ni) => `
+    <div class="flow-node">
+      <div class="flow-node-head">
+        <div class="lab">Bot asks · Block ${ni+1}</div>
+        ${state.flow.length > 1 ? `<button class="x-btn" onclick="removeFlowNode(${ni})">×</button>` : ''}
+      </div>
+      <textarea class="flow-question" oninput="state.flow[${ni}].question = this.value; renderPreview()">${esc(node.question)}</textarea>
+      <div class="flow-options">
+        ${node.options.map((opt, oi) => `
+          <div class="flow-opt">
+            <div class="flow-opt-row">
+              <button class="flow-expand ${opt._expanded ? 'open' : ''}" onclick="toggleSub(${ni},${oi})">▸</button>
+              <input class="flow-opt-input" placeholder="Option label" value="${esc(opt.label)}" oninput="state.flow[${ni}].options[${oi}].label = this.value; renderPreview()">
+              <span class="flow-arrow">→</span>
+              <input class="flow-opt-input" placeholder="Bot reply" value="${esc(opt.reply)}" oninput="state.flow[${ni}].options[${oi}].reply = this.value; renderPreview()">
+              <button class="x-btn" onclick="removeOpt(${ni},${oi})">×</button>
+            </div>
+            ${opt._expanded ? `
+              <div class="flow-subs" style="width:100%;">
+                <div class="flow-subs-title">Sub-options shown after user picks <strong>${esc(opt.label || 'this option')}</strong></div>
+                ${(opt.subs || []).map((sub, si) => `
+                  <div class="flow-sub">
+                    <span class="flow-sub-arrow">↳</span>
+                    <input class="flow-opt-input" placeholder="Sub-label" value="${esc(sub.label)}" oninput="state.flow[${ni}].options[${oi}].subs[${si}].label = this.value; renderPreview()">
+                    <span class="flow-arrow">→</span>
+                    <input class="flow-opt-input" placeholder="Sub-reply" value="${esc(sub.reply)}" oninput="state.flow[${ni}].options[${oi}].subs[${si}].reply = this.value; renderPreview()">
+                    <button class="x-btn" onclick="removeSub(${ni},${oi},${si})">×</button>
+                  </div>
+                `).join("")}
+                <button class="btn-small" onclick="addSub(${ni},${oi})">+ Add sub-option</button>
+              </div>
+            ` : ''}
+          </div>
+        `).join("")}
+        <button class="btn-small" onclick="addOpt(${ni})">+ Add option</button>
+      </div>
+    </div>
+  `).join("");
+}
+function addFlowNode() { state.flow.push({question:"What can I help with?", options:[{label:"Get started", reply:"Great!", subs:[]}]}); renderFlow(); renderPreview(); }
+function removeFlowNode(i) { state.flow.splice(i,1); renderFlow(); renderPreview(); }
+function addOpt(ni) { state.flow[ni].options.push({label:"", reply:"", subs:[]}); renderFlow(); renderPreview(); }
+function removeOpt(ni, oi) { state.flow[ni].options.splice(oi,1); renderFlow(); renderPreview(); }
+function toggleSub(ni, oi) { state.flow[ni].options[oi]._expanded = !state.flow[ni].options[oi]._expanded; renderFlow(); }
+function addSub(ni, oi) { if (!state.flow[ni].options[oi].subs) state.flow[ni].options[oi].subs = []; state.flow[ni].options[oi].subs.push({label:"", reply:""}); renderFlow(); renderPreview(); }
+function removeSub(ni, oi, si) { state.flow[ni].options[oi].subs.splice(si,1); renderFlow(); renderPreview(); }
+function updateFlowVisibility() {
+  document.getElementById("flow-builder-wrap").style.display = (state.input_mode === "selectable" || state.input_mode === "both") ? "block" : "none";
+}
+
+// ─── PREVIEW ───
+function previewLogoHtml(size, where) {
+  const src = state.logo_data_url || state.logo_url;
+  const radius = shapeRadius(state.logo_shape, 8);
+  const inLauncher = where === "launcher";
+  const inHeader = where === "header";
+  const inMsg = where === "msg";
+  const enabled = (inLauncher && state.logo_in_launcher) || (inHeader && state.logo_in_header) || (inMsg && state.logo_in_messages);
+  if (src && enabled) {
+    return `<img src="${esc(src)}" style="width:${size}px;height:${size}px;border-radius:${radius};object-fit:cover;display:block;">`;
+  }
+  return `<div style="width:${size}px;height:${size}px;border-radius:${radius};background:${state.brand_color};display:flex;align-items:center;justify-content:center;font-weight:700;font-size:${Math.max(10,size*0.4)}px;color:#fff;">${esc(state.bot_initials || "A")}</div>`;
+}
+
+function getHeaderStyle() {
+  const base = state.header_color || state.brand_color;
+  if (state.header_style === "gradient") return `linear-gradient(135deg, ${base}, ${withAlpha(base, 0.8)})`;
+  if (state.header_style === "minimal") return `#1f1f29`;
+  return base;
+}
+
+function renderPreview() {
+  const w = document.getElementById("preview-window");
+  if (!w) return;
+  const brand = state.brand_color;
+  const fontCss = fontStack(state.font_family);
+  const fs = state.font_size + "px";
+  const corner = state.corner_radius + "px";
+  const bubR = bubbleRadius(state.bubble_shape);
+  const headerStyle = getHeaderStyle();
+  const headerBorder = state.header_style === "minimal" ? `3px solid ${brand}` : "none";
+  const userBubble = state.user_bubble_color || brand;
+  const botBg = state.bot_bubble_bg || "#f1f5f9";
+  const botText = state.bot_bubble_text || "#111111";
+  const chatBg = state.chat_bg || "#ffffff";
+  const sendBg = state.send_button_color || brand;
+  const placeholderTxt = PLACEHOLDERS[state.language] || state.input_placeholder || "Type a message...";
+
+  w.style.borderRadius = corner;
+  w.style.width = Math.min(state.chat_width, 300) + "px"; // clamp inside the preview frame
+  w.style.fontFamily = fontCss;
+  w.style.fontSize = fs;
+
+  // Header
+  let headerHtml = `<div class="pw-header" style="background:${headerStyle};border-bottom:${headerBorder};">`;
+  if (state.logo_in_header) {
+    headerHtml += `<div class="logo" style="width:${state.logo_header_size}px;height:${state.logo_header_size}px;border-radius:${shapeRadius(state.logo_shape, 6)};">${previewLogoHtml(state.logo_header_size, "header").replace(/<div [^>]+>([^<]+)<\/div>/, '$1').replace(/<img[^>]+>/, m => m.replace('display:block;', ''))}</div>`;
+  }
+  headerHtml += `<div class="info"><div class="name">${esc(state.bot_name || "Assistant")}</div><div class="stat">${esc(state.bot_status || "Online")}</div></div><div class="close">×</div></div>`;
+
+  // Messages
+  const msgs = [];
+  msgs.push(buildBotRow(state.welcome_message || "Hi!", botBg, botText, bubR));
+  if (state.input_mode === "selectable" || state.input_mode === "both") {
+    // show flow first question
+    if (state.flow.length) {
+      const first = state.flow[0];
+      msgs.push(buildBotRow(first.question, botBg, botText, bubR));
+      msgs.push(`<div class="pw-quick">${first.options.slice(0,4).map(o => `<div class="pw-quick-btn" style="border:1px solid ${brand};color:${brand};background:#fff;">${esc(o.label || "Option")}</div>`).join("")}</div>`);
+    }
+  } else {
+    // typing-only: show a user bubble + bot reply
+    msgs.push(`<div class="pw-msg-row user"><div class="pw-msg user" style="background:${userBubble};border-radius:${bubR};${state.bubble_shape !== 'pill' ? 'border-bottom-right-radius:4px;' : ''}">Hi there!</div></div>`);
+    if (state.show_timestamps) msgs.push(`<div class="pw-time" style="text-align:right;">10:24</div>`);
+    msgs.push(buildBotRow("Sure! What can I help you with?", botBg, botText, bubR));
+  }
+  if (state.typing_indicator) {
+    msgs.push(`<div class="pw-msg-row"><div class="pw-typing" style="border-radius:${bubR};">${'<span></span>'.repeat(3)}</div></div>`);
+  }
+  if (state.show_quick_replies && state.input_mode === "typing") {
+    msgs.push(`<div class="pw-quick"><div class="pw-quick-btn" style="border:1px solid ${brand};color:${brand};">Hours</div><div class="pw-quick-btn" style="border:1px solid ${brand};color:${brand};">Pricing</div><div class="pw-quick-btn" style="border:1px solid ${brand};color:${brand};">Contact</div></div>`);
+  }
+
+  const msgsHtml = `<div class="pw-msgs" style="background:${chatBg};">${msgs.join("")}</div>`;
+
+  // Input
+  const inputDisabled = state.input_mode === "selectable";
+  const inputPlaceholder = inputDisabled ? "Choose an option above..." : placeholderTxt;
+  const inputHtml = `<div class="pw-input">${state.allow_upload ? '<span class="clip">📎</span>' : ''}<div class="fake">${esc(inputPlaceholder)}</div><div class="send" style="background:${sendBg};">➤</div></div>`;
+
+  const brandingHtml = state.show_branding ? `<div class="pw-branding">Powered by Nerum</div>` : "";
+
+  w.innerHTML = headerHtml + msgsHtml + inputHtml + brandingHtml;
+
+  // Launcher
+  const launcherWrap = document.getElementById("preview-launcher-wrap");
+  const launcherColor = state.launcher_color || brand;
+  const launcherSize = state.launcher_size;
+  const launcherRadius = shapeRadius(state.launcher_shape, 12);
+  const launcherSrc = state.logo_data_url || state.logo_url;
+  const showLogoInLauncher = state.logo_in_launcher && launcherSrc;
+  const launcherContent = showLogoInLauncher
+    ? `<img src="${esc(launcherSrc)}" style="width:100%;height:100%;object-fit:cover;">`
+    : esc(state.bot_initials || "A");
+  const animClass = state.launcher_animation === "Bounce" ? "anim-bounce"
+                  : state.launcher_animation === "Pulse" ? "anim-pulse"
+                  : state.launcher_animation === "Shake" ? "anim-shake" : "";
+  const greeting = state.greeting_text ? `<div class="preview-greeting">${esc(state.greeting_text)}</div>` : "";
+  launcherWrap.innerHTML = `
+    ${greeting}
+    <div class="preview-launcher ${animClass}" style="width:${launcherSize}px;height:${launcherSize}px;border-radius:${launcherRadius};background:${showLogoInLauncher ? '#fff' : launcherColor};font-size:${Math.max(14, launcherSize*0.4)}px;">
+      ${launcherContent}
+      ${state.show_badge ? '<div class="badge-dot"></div>' : ''}
+    </div>
+  `;
+}
+
+function buildBotRow(text, bg, color, radius) {
+  const src = state.logo_data_url || state.logo_url;
+  const showLogo = state.logo_in_messages && src;
+  const lh = state.logo_msg_size;
+  const lr = shapeRadius(state.logo_shape, 6);
+  const logo = showLogo
+    ? `<div class="pw-msg-logo" style="width:${lh}px;height:${lh}px;border-radius:${lr};"><img src="${esc(src)}" alt=""></div>`
+    : (state.logo_in_messages ? `<div class="pw-msg-logo" style="width:${lh}px;height:${lh}px;border-radius:${lr};background:${state.brand_color};">${esc(state.bot_initials || "A")}</div>` : '');
+  const time = state.show_timestamps ? `<div class="pw-time">10:23</div>` : '';
+  return `<div class="pw-msg-row">${logo}<div><div class="pw-msg bot" style="background:${bg};color:${color};border-radius:${radius};${state.bubble_shape !== 'pill' ? 'border-bottom-left-radius:4px;' : ''}">${esc(text)}</div>${time}</div></div>`;
+}
+
+// ─── SUMMARY ───
+function renderSummary() {
+  const wrap = document.getElementById("summary-row");
+  if (!wrap) return;
+  const enabled = [];
+  if (state.auto_open) enabled.push("Auto-open");
+  if (state.sound_enabled) enabled.push("Sound");
+  if (state.typing_indicator) enabled.push("Typing");
+  if (state.show_timestamps) enabled.push("Timestamps");
+  if (state.allow_upload) enabled.push("Upload");
+  if (state.collect_email) enabled.push("Collect email");
+  if (state.show_quick_replies) enabled.push("Quick replies");
+  if (state.show_branding) enabled.push("Branding");
+  if (state.business_hours_only) enabled.push("Business hours");
+
+  const logoLabel = state.logo_data_url ? "Uploaded" : (state.logo_url ? "URL" : "Initials");
+
+  wrap.innerHTML = `
+    <div class="summary-chip"><span class="k">Bot:</span> ${esc(state.bot_name)}</div>
+    <div class="summary-chip"><span class="k">Type:</span> ${state.bot_type === "ai" ? "AI · " + state.ai_engine : "Non-AI Q&A"}</div>
+    <div class="summary-chip"><span class="k">Input:</span> ${state.input_mode}</div>
+    <div class="summary-chip"><span class="k">Language:</span> ${state.language}</div>
+    <div class="summary-chip"><span class="k">Logo:</span> ${logoLabel}</div>
+    <div class="summary-chip"><span class="k">Color:</span> <span class="summary-color-dot" style="background:${state.brand_color};"></span> ${state.brand_color}</div>
+    ${enabled.length ? `<div class="summary-chip"><span class="k">On:</span> ${enabled.join(", ")}</div>` : ''}
+  `;
+}
+
+// ─── CREATE ───
 async function createBot() {
   const btn = document.getElementById("create-btn");
   btn.disabled = true;
   btn.textContent = "Creating...";
   const payload = {
-    bot_name: document.getElementById("f-botname").value || "Assistant",
-    company_name: document.getElementById("f-company").value || "",
-    welcome_message: document.getElementById("f-welcome").value || "Hi! How can I help you?",
-    brand_color: document.getElementById("f-color").value,
-    logo_url: document.getElementById("f-logo").value || null,
-    bot_type: botType,
+    bot_name: state.bot_name,
+    company_name: state.company_name,
+    welcome_message: state.welcome_message,
+    input_placeholder: state.input_placeholder,
+    bot_status: state.bot_status,
+    bot_type: state.bot_type,
+    brand_color: state.brand_color,
+    header_color: state.header_color,
+    user_bubble_color: state.user_bubble_color,
+    bot_bubble_bg: state.bot_bubble_bg,
+    bot_bubble_text: state.bot_bubble_text,
+    chat_bg: state.chat_bg,
+    send_button_color: state.send_button_color,
+    font_family: state.font_family,
+    font_size: state.font_size,
+    corner_radius: state.corner_radius,
+    bubble_shape: state.bubble_shape,
+    header_style: state.header_style,
+    chat_width: state.chat_width,
+    chat_height: state.chat_height,
+    logo_url: state.logo_url,
+    logo_data_url: state.logo_data_url,
+    logo_shape: state.logo_shape,
+    logo_in_header: state.logo_in_header,
+    logo_in_messages: state.logo_in_messages,
+    logo_in_launcher: state.logo_in_launcher,
+    logo_header_size: state.logo_header_size,
+    logo_msg_size: state.logo_msg_size,
+    launcher_size: state.launcher_size,
+    bot_initials: state.bot_initials,
+    launcher_color: state.launcher_color,
+    launcher_shape: state.launcher_shape,
+    launcher_position: state.launcher_position,
+    launcher_animation: state.launcher_animation,
+    greeting_text: state.greeting_text,
+    show_badge: state.show_badge,
+    language: state.language,
+    auto_open: state.auto_open,
+    auto_open_delay: state.auto_open_delay,
+    sound_enabled: state.sound_enabled,
+    typing_indicator: state.typing_indicator,
+    show_timestamps: state.show_timestamps,
+    allow_upload: state.allow_upload,
+    collect_email: state.collect_email,
+    show_quick_replies: state.show_quick_replies,
+    show_branding: state.show_branding,
+    business_hours_only: state.business_hours_only,
+    offline_message: state.offline_message,
+    response_delay: state.response_delay,
+    input_mode: state.input_mode,
+    flow: state.flow.map(n => ({
+      question: n.question,
+      options: n.options.map(o => ({label: o.label, reply: o.reply, subs: o.subs || []}))
+    })),
   };
-  if (botType === "nonai") {
-    payload.qa_pairs = qaPairs.filter(p => p.question.trim());
-    if (!payload.qa_pairs.length) { toast("Add at least 1 Q&A pair", true); btn.disabled = false; btn.textContent = "✦ Create Chatbot"; return; }
+  if (state.bot_type === "nonai") {
+    payload.qa_pairs = state.qa_pairs.filter(p => p.question.trim());
+    if (!payload.qa_pairs.length && (state.input_mode === "typing")) {
+      toast("Add at least 1 Q&A pair", true);
+      btn.disabled = false;
+      btn.textContent = "✦ Create Chatbot";
+      return;
+    }
   } else {
-    payload.ai_engine = document.getElementById("f-engine").value;
-    payload.api_key = document.getElementById("f-apikey").value;
-    if (!payload.api_key) { toast("API key required for AI bots", true); btn.disabled = false; btn.textContent = "✦ Create Chatbot"; return; }
-    payload.knowledge_type = knowledgeTab;
-    payload.knowledge_content = document.getElementById("f-text").value || "";
+    payload.ai_engine = state.ai_engine;
+    payload.api_key = state.api_key;
+    if (!payload.api_key) { toast("API key required for AI bots", true); btn.disabled=false; btn.textContent="✦ Create Chatbot"; return; }
+    payload.knowledge_type = state.knowledge_type;
+    payload.knowledge_content = state.knowledge_content;
   }
   try {
-    const r = await fetch(API_BASE + "/chatbots/create", {method:"POST", headers:authHeaders(), body:JSON.stringify(payload)});
-    if (!r.ok) { const e = await r.json().catch(()=>({detail:"Failed"})); throw new Error(e.detail || "Failed"); }
+    const r = await fetch("/chatbots/create", {method:"POST", headers: authHeaders(), body: JSON.stringify(payload)});
+    if (!r.ok) {
+      const e = await r.json().catch(() => ({detail: "Failed"}));
+      throw new Error(e.detail || "Failed");
+    }
     const data = await r.json();
     toast("Chatbot created!");
     showEmbed(data.embed_id);
     loadBots();
-    // reset form
-    qaPairs = [{question:"", answer:""}]; renderQA();
-    document.getElementById("f-company").value = "";
-    document.getElementById("f-apikey").value = "";
-    document.getElementById("f-text").value = "";
-    document.getElementById("f-url").value = "";
     goStep(1);
   } catch (e) {
     toast(e.message || "Failed to create", true);
@@ -714,13 +1515,189 @@ async function createBot() {
   }
 }
 
-// init
+// ─── BINDINGS ───
+function bind() {
+  const bindText = (id, key) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", e => { state[key] = e.target.value; renderPreview(); });
+  };
+  bindText("f-company", "company_name");
+  bindText("f-botname", "bot_name");
+  bindText("f-welcome", "welcome_message");
+  bindText("f-placeholder", "input_placeholder");
+  bindText("f-status", "bot_status");
+  bindText("f-greeting", "greeting_text");
+  bindText("f-offline-msg", "offline_message");
+
+  document.getElementById("f-color-picker").addEventListener("input", e => { pickSwatch(e.target.value); });
+  document.getElementById("f-color-hex").addEventListener("input", e => {
+    const v = e.target.value;
+    if (isHex(v)) pickSwatch(v);
+  });
+
+  const advBindings = [
+    ["f-header-color","f-header-hex","header_color"],
+    ["f-user-color","f-user-hex","user_bubble_color"],
+    ["f-bot-bg","f-bot-bg-hex","bot_bubble_bg"],
+    ["f-bot-text","f-bot-text-hex","bot_bubble_text"],
+    ["f-chat-bg","f-chat-bg-hex","chat_bg"],
+    ["f-send-color","f-send-hex","send_button_color"],
+  ];
+  advBindings.forEach(([picker, hex, key]) => {
+    const p = document.getElementById(picker);
+    const h = document.getElementById(hex);
+    if (!p || !h) return;
+    p.addEventListener("input", e => {
+      state[key] = e.target.value;
+      h.value = e.target.value.toUpperCase();
+      p.parentElement.style.background = e.target.value;
+      renderPreview();
+    });
+    h.addEventListener("input", e => {
+      const v = e.target.value.trim();
+      if (isHex(v)) {
+        state[key] = v;
+        p.value = v;
+        p.parentElement.style.background = v;
+        renderPreview();
+      }
+    });
+  });
+
+  // Sliders
+  const sliders = [
+    ["f-font-size","font-size-val","font_size", v => v],
+    ["f-corner","corner-val","corner_radius", v => v],
+    ["f-chat-width","cw-val","chat_width", v => v],
+    ["f-chat-height","ch-val","chat_height", v => v],
+    ["f-lh-size","lh-val","logo_header_size", v => v],
+    ["f-lm-size","lm-val","logo_msg_size", v => v],
+    ["f-ll-size","ll-val","launcher_size", v => v],
+  ];
+  sliders.forEach(([id, valId, key]) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.addEventListener("input", e => {
+      const v = parseInt(e.target.value, 10);
+      state[key] = v;
+      const valEl = document.getElementById(valId);
+      if (valEl) valEl.textContent = v;
+      renderSizePreview();
+      renderPreview();
+    });
+  });
+
+  // Response delay slider (0-50 → 0.0-5.0)
+  document.getElementById("f-response-delay").addEventListener("input", e => {
+    const v = parseInt(e.target.value, 10) / 10;
+    state.response_delay = v;
+    document.getElementById("delay-val").textContent = v.toFixed(1) + "s";
+  });
+
+  // Chip rows
+  document.querySelectorAll("[data-bubble]").forEach(b => b.addEventListener("click", () => {
+    state.bubble_shape = b.dataset.bubble;
+    document.querySelectorAll("[data-bubble]").forEach(x => x.classList.toggle("active", x === b));
+    renderPreview();
+  }));
+  document.querySelectorAll("[data-headstyle]").forEach(b => b.addEventListener("click", () => {
+    state.header_style = b.dataset.headstyle;
+    document.querySelectorAll("[data-headstyle]").forEach(x => x.classList.toggle("active", x === b));
+    renderPreview();
+  }));
+  document.querySelectorAll("[data-logoshape]").forEach(b => b.addEventListener("click", () => {
+    state.logo_shape = b.dataset.logoshape;
+    document.querySelectorAll("[data-logoshape]").forEach(x => x.classList.toggle("active", x === b));
+    renderSizePreview();
+    renderPreview();
+  }));
+  document.querySelectorAll("[data-mode]").forEach(b => b.addEventListener("click", () => {
+    state.input_mode = b.dataset.mode;
+    document.querySelectorAll("[data-mode]").forEach(x => x.classList.toggle("active", x === b));
+    updateFlowVisibility();
+    renderPreview();
+  }));
+  document.querySelectorAll("[data-anim]").forEach(b => b.addEventListener("click", () => {
+    state.launcher_animation = b.dataset.anim;
+    document.querySelectorAll("[data-anim]").forEach(x => x.classList.toggle("active", x === b));
+    renderPreview();
+  }));
+  document.querySelectorAll("[data-pos]").forEach(b => b.addEventListener("click", () => {
+    state.launcher_position = b.dataset.pos;
+    document.querySelectorAll("[data-pos]").forEach(x => x.classList.toggle("active", x === b));
+  }));
+  document.querySelectorAll("[data-tab]").forEach(b => b.addEventListener("click", () => setKnowledgeTab(b.dataset.tab)));
+
+  // AI engine
+  document.getElementById("f-engine").addEventListener("change", e => { state.ai_engine = e.target.value; });
+  document.getElementById("f-apikey").addEventListener("input", e => { state.api_key = e.target.value; });
+  document.getElementById("f-knowledge-text").addEventListener("input", e => {
+    state.knowledge_content = e.target.value;
+    document.getElementById("char-count").textContent = e.target.value.length + " characters";
+  });
+
+  // Logo file
+  document.getElementById("f-logo-file").addEventListener("change", e => handleLogoFile(e.target.files[0]));
+
+  // Initials
+  document.getElementById("f-initials").addEventListener("input", e => {
+    state.bot_initials = (e.target.value || "A").toUpperCase().slice(0, 2);
+    renderSizePreview();
+    renderPreview();
+  });
+
+  // Logo placement toggles
+  ["f-logo-header","f-logo-messages","f-logo-launcher"].forEach((id, idx) => {
+    const keys = ["logo_in_header","logo_in_messages","logo_in_launcher"];
+    document.getElementById(id).addEventListener("change", e => {
+      state[keys[idx]] = e.target.checked;
+      renderPreview();
+    });
+  });
+
+  // Language
+  document.getElementById("f-language").addEventListener("change", e => {
+    state.language = e.target.value;
+    state.input_placeholder = PLACEHOLDERS[state.language] || "Type a message...";
+    document.getElementById("f-placeholder").value = state.input_placeholder;
+    renderPreview();
+  });
+
+  // Behavior toggles
+  const behaviorBindings = [
+    ["f-auto-open","auto_open"],
+    ["f-sound","sound_enabled"],
+    ["f-typing","typing_indicator"],
+    ["f-timestamps","show_timestamps"],
+    ["f-upload","allow_upload"],
+    ["f-collect-email","collect_email"],
+    ["f-quick","show_quick_replies"],
+    ["f-branding","show_branding"],
+    ["f-business-hours","business_hours_only"],
+    ["f-badge","show_badge"],
+  ];
+  behaviorBindings.forEach(([id, key]) => {
+    document.getElementById(id).addEventListener("change", e => {
+      state[key] = e.target.checked;
+      if (key === "auto_open") document.getElementById("auto-delay-row").style.display = e.target.checked ? "flex" : "none";
+      if (key === "business_hours_only") document.getElementById("offline-row").style.display = e.target.checked ? "flex" : "none";
+      renderPreview();
+    });
+  });
+
+  document.getElementById("f-auto-delay").addEventListener("input", e => { state.auto_open_delay = parseInt(e.target.value, 10) || 3; });
+}
+
+// ─── INIT ───
+buildSwatches();
+buildFonts();
 renderQA();
+renderFlow();
+bind();
 loadUser();
 loadBots();
-["f-botname","f-color","f-welcome"].forEach(id => {
-  document.getElementById(id).addEventListener("input", updatePreview);
-});
+renderPreview();
 </script>
 </body>
 </html>
