@@ -477,7 +477,7 @@
 
 <script>
 const API_BASE = window.location.origin;
-const TOKEN = localStorage.getItem("token") || localStorage.getItem("auth_token") || "";
+const TOKEN = localStorage.getItem("nerum_token") || localStorage.getItem("token") || localStorage.getItem("auth_token") || "";
 
 let currentStep = 1;
 let botType = "nonai";
@@ -511,6 +511,7 @@ async function loadUser() {
 }
 
 function logout() {
+  localStorage.removeItem("nerum_token");
   localStorage.removeItem("token");
   localStorage.removeItem("auth_token");
   window.location.href = "/";
