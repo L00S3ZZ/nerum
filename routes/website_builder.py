@@ -235,6 +235,10 @@ def check_slug(slug: str, db: Session = Depends(get_db)):
     existing = db.query(UserWebsite).filter(UserWebsite.slug == slug).first()
     return {"available": existing is None}
 
+@router.get("/website-builder")
+async def website_builder_page():
+    return FileResponse("static/website_builder.html")
+
 
 @router.post("/create")
 def create_website(data: dict, current_user: User = Depends(get_current_user), db: Session = Depends(get_db)):
