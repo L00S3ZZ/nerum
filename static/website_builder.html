@@ -497,39 +497,72 @@ async function loadUser() {
 }
 
 async function loadTemplates() {
+  // Try auth API first, fall back to static JSON
+  if (TOKEN) {
+    try {
+      const res = await fetch('/websites/templates', { headers: HDR });
+      if (res.ok) {
+        const data = await res.json();
+        state.templates = data;
+        state.user_plan = data.user_plan || 'free';
+        renderTemplates();
+        return;
+      }
+    } catch (e) { console.warn('API templates failed, using JSON fallback'); }
+  }
+  // Fallback: load directly from static JSON
   try {
-    const res = await fetch('/websites/templates', { headers: HDR });
-    if (!res.ok) {
-      document.getElementById('tmplGrid').innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#f87171;font-size:13px">Could not load templates.</div>';
-      return;
-    }
+    const res = await fetch('/static/website_templates.json');
+    if (!res.ok) throw new Error('JSON not found');
     const data = await res.json();
-    state.templates = data;
-    state.user_plan = data.user_plan;
+    const PLAN_ORDER = ['free','starter','starter_plus','pro','pro_plus'];
+    const userPlanIdx = PLAN_ORDER.indexOf(state.user_plan);
+    const allTemplates = (data.templates || []).map(t => ({
+      id: t.id,
+      name: t.name,
+      description: t.business_type || '',
+      plan_tier: t.tier,
+      preview_color: t.preview_color || '#C50022',
+      colors: t.colors || {},
+      locked: PLAN_ORDER.indexOf(t.tier) > userPlanIdx,
+    }));
+    state.templates = {
+      available: allTemplates.filter(t => !t.locked),
+      locked: allTemplates.filter(t => t.locked),
+    };
     renderTemplates();
   } catch (e) {
+    document.getElementById('tmplGrid').innerHTML =
+      '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#f87171;font-size:13px">Could not load templates.</div>';
     console.error(e);
   }
 }
 
 function renderTemplates() {
   const grid = document.getElementById('tmplGrid');
-  const all = [...state.templates.available, ...state.templates.locked];
+  const all = [...(state.templates.available || []), ...(state.templates.locked || [])];
+  if (!all.length) {
+    grid.innerHTML = '<div style="grid-column:1/-1;text-align:center;padding:30px;color:var(--muted);font-size:13px">No templates found.</div>';
+    return;
+  }
   grid.innerHTML = all.map(t => {
-    const tier = t.plan_tier;
-    const tierClass = 't-'+tier;
+    const tier = t.plan_tier || 'free';
     const locked = t.locked === true;
     const selected = state.selected_template === t.id ? 'selected' : '';
+    const bg = t.preview_color
+      ? `background:linear-gradient(135deg,${t.preview_color},${t.colors?.secondary||'#000'})`
+      : '';
+    const tierLabel = tier.replace('_plus','+').replace('_',' ').toUpperCase();
     return `
       <div class="tmpl-card ${locked?'locked':''} ${selected}" data-tid="${t.id}" data-tier="${tier}" data-locked="${locked}">
-        <div class="tmpl-thumb ${tierClass}">
-          ${tier.toUpperCase().replace('_','+')}
-          <div class="tier-badge">${tier.replace('_plus','+').replace('_',' ')}</div>
+        <div class="tmpl-thumb" style="${bg}">
+          <span style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-align:center;padding:0 8px">${escapeHtml(t.name)}</span>
+          <div class="tier-badge">${tierLabel}</div>
           ${locked ? '<div class="tmpl-lock-overlay">🔒</div>' : ''}
         </div>
         <div class="tmpl-meta">
-          <div class="tmpl-name">${t.name}</div>
-          <div class="tmpl-desc">${t.description}</div>
+          <div class="tmpl-name">${escapeHtml(t.name)}</div>
+          <div class="tmpl-desc">${escapeHtml(t.description)}</div>
         </div>
       </div>`;
   }).join('');
