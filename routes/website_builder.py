@@ -61,6 +61,107 @@ def shape_template_for_api(t: dict, locked: bool) -> dict:
         "locked": locked,
     }
 
+
+def _build_ai_prompt(business_type: str, business_name: str, tagline: str,
+                     phone: str, email: str, address: str,
+                     services_list: list, brand_color: str) -> str:
+    """Build the Claude prompt that asks for a unique, animated, business-specific website."""
+    return f"""You are an expert web designer. Generate a complete, stunning, single-page HTML website for a {business_type} business.
+
+BUSINESS DETAILS:
+- Business Name: {business_name}
+- Tagline: {tagline or f"The best {business_type} in town"}
+- Phone: {phone}
+- Email: {email or "contact@business.com"}
+- Address: {address or "Chennai, Tamil Nadu"}
+- Services: {", ".join(services_list) if services_list else "Our Services"}
+- Brand Color: {brand_color}
+- Business Type: {business_type}
+
+DESIGN REQUIREMENTS:
+1. Use {brand_color} as the primary brand color throughout
+2. Create a UNIQUE design specifically for a {business_type} — not generic
+3. Include CSS animations relevant to the business:
+   - Restaurant: floating food particles, steam animation, fork/spoon SVG
+   - Gym: pulsing energy rings, dumbbell SVG, progress bar animations
+   - Clinic/Dental: heartbeat line animation, medical cross SVG, pulse effect
+   - Jewellery: sparkling star animations, diamond SVG, shimmer effects
+   - Salon/Beauty: floating petals, scissors SVG, color wave animations
+   - Real Estate: building outline SVG, location pin pulse, house animation
+   - Hotel: stars twinkling, key SVG, luxury shimmer
+   - School/Coaching: floating books SVG, pencil animation, knowledge particles
+   - Lawyer/CA: scales SVG animation, justice balance, professional pulse
+   - Pharmacy: rotating medical cross, pill SVG, health pulse
+   - Bakery: steam rising animation, bread/cake SVG, warm glow
+   - Yoga/Spa: breathing circle animation, lotus SVG, zen ripple
+   - Auto Service: rotating gear SVG, wrench animation, speedometer
+   - Flower Shop: blooming flower SVG animation, petal fall
+   - Event Planner: confetti animation, star burst, celebration SVG
+   - For any other type: create a relevant SVG illustration and animation
+4. Include these sections:
+   - Hero section with business name, tagline, animated SVG illustration, CTA buttons (Call Now + WhatsApp)
+   - Services section (show each service as a card with relevant emoji)
+   - About section with business details
+   - Contact section with phone, email, address, WhatsApp button
+   - Footer with business name and "Powered by Nerum"
+5. WhatsApp button must link to: https://wa.me/91{phone}
+6. Call button must link to: tel:{phone}
+7. Mobile responsive design
+8. Use Google Fonts — pick a font that matches the business vibe
+9. Add smooth scroll behavior
+10. Hero background must use gradient with {brand_color}
+11. All SVG illustrations must be inline (no external image URLs)
+12. Make it look PROFESSIONAL enough that a real business owner would pay for it
+
+Return ONLY the complete HTML document. No explanation, no markdown, no code blocks. Just raw HTML starting with <!DOCTYPE html>"""
+
+
+def _ai_generate_site_html(template_id: str, business_name: str, tagline: str,
+                           phone: str, email: str, address: str,
+                           brand_color: str, services, logo_url: str = "") -> str:
+    """Call Claude to generate a unique HTML website. Returns raw HTML (no markdown).
+
+    Raises on API failure so callers can decide whether to fall back to a static template.
+    """
+    import anthropic
+
+    # Pull template metadata from the JSON catalog for business_type context.
+    template = next((t for t in load_templates_catalog() if t.get("id") == template_id), None)
+    business_type = template["business_type"] if template else "Business"
+
+    try:
+        services_list = json.loads(services) if isinstance(services, str) and services.strip() else (services or [])
+    except Exception:
+        services_list = [s.strip() for s in str(services).split(",") if s.strip()]
+    if not isinstance(services_list, list):
+        services_list = []
+
+    prompt = _build_ai_prompt(
+        business_type=business_type,
+        business_name=business_name or "Your Business",
+        tagline=tagline or "",
+        phone=phone or "",
+        email=email or "",
+        address=address or "",
+        services_list=services_list,
+        brand_color=brand_color or "#C50022",
+    )
+
+    client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
+    message = client.messages.create(
+        model="claude-haiku-4-5",
+        max_tokens=4000,
+        messages=[{"role": "user", "content": prompt}],
+    )
+
+    html = message.content[0].text.strip()
+    # Strip ``` fences if the model wrapped the HTML despite instructions.
+    if html.startswith("```"):
+        html = html.split("\n", 1)[1] if "\n" in html else html[3:]
+        html = html.rsplit("```", 1)[0]
+        html = html.strip()
+    return html
+
 TEMPLATE_CATALOG = {
     "free": [
         {"id": f"free_{i}", "name": f"Free Template {i}", "plan_tier": "free",
@@ -342,6 +443,7 @@ def create_website(data: dict, current_user: User = Depends(get_current_user), d
         views=0,
     )
 
+    # Always keep a static-template render as a safety net.
     rendered = render_template(template_id, {
         "business_name": site.business_name,
         "tagline": site.tagline,
@@ -356,6 +458,25 @@ def create_website(data: dict, current_user: User = Depends(get_current_user), d
         "plan_tier": site.plan_tier,
     })
     site.published_html = rendered
+
+    # Generate the unique, animated, business-specific website via Claude and
+    # store it on the record so /s/{slug} can serve it instantly.
+    try:
+        ai_html = _ai_generate_site_html(
+            template_id=site.template_id,
+            business_name=site.business_name,
+            tagline=site.tagline,
+            phone=site.phone,
+            email=site.email,
+            address=site.address,
+            brand_color=site.brand_color,
+            services=site.services,
+            logo_url=site.logo_url,
+        )
+        site.generated_html = ai_html
+    except Exception as e:
+        print(f"[create] AI generation failed for slug={slug}, using static template: {e}")
+        site.generated_html = rendered
 
     db.add(site)
     db.commit()
@@ -441,6 +562,25 @@ def update_website(website_id: int, data: dict, current_user: User = Depends(get
         "plan_tier": site.plan_tier,
     })
     site.published_html = rendered
+
+    # Regenerate the AI version so edits show up on the live site.
+    try:
+        site.generated_html = _ai_generate_site_html(
+            template_id=site.template_id,
+            business_name=site.business_name,
+            tagline=site.tagline,
+            phone=site.phone,
+            email=site.email,
+            address=site.address,
+            brand_color=site.brand_color,
+            services=site.services,
+            logo_url=site.logo_url,
+        )
+    except Exception as e:
+        print(f"[update] AI generation failed for site_id={site.id}, keeping static: {e}")
+        if not site.generated_html:
+            site.generated_html = rendered
+
     site.is_published = True
     site.updated_at = datetime.utcnow()
 
@@ -542,36 +682,69 @@ async def serve_site(slug: str, db: Session = Depends(get_db)):
     site.views = (site.views or 0) + 1
     db.commit()
 
-    html = site.published_html or render_template(site.template_id, {
-        "business_name": site.business_name,
-        "tagline": site.tagline,
-        "phone": site.phone,
-        "email": site.email,
-        "address": site.address,
-        "services": site.services,
-        "brand_color": site.brand_color,
-        "logo_url": site.logo_url,
-        "logo_data": site.logo_data,
-        "chatbot_embed_id": site.chatbot_embed_id,
-        "plan_tier": site.plan_tier,
-    })
+    # Prefer the AI-generated HTML; fall back to the cached static render,
+    # and finally to a fresh static render if both are missing.
+    html = (
+        getattr(site, "generated_html", None)
+        or site.published_html
+        or render_template(site.template_id, {
+            "business_name": site.business_name,
+            "tagline": site.tagline,
+            "phone": site.phone,
+            "email": site.email,
+            "address": site.address,
+            "services": site.services,
+            "brand_color": site.brand_color,
+            "logo_url": site.logo_url,
+            "logo_data": site.logo_data,
+            "chatbot_embed_id": site.chatbot_embed_id,
+            "plan_tier": site.plan_tier,
+        })
+    )
     return HTMLResponse(content=html, status_code=200)
 
 
 @router.post("/preview")
-def preview_website(data: dict, current_user: User = Depends(get_current_user)):
-    template_id = (data.get("template_id") or "free_1").strip()
-    rendered = render_template(template_id, {
-        "business_name": data.get("business_name", ""),
-        "tagline": data.get("tagline", ""),
-        "phone": data.get("phone", ""),
-        "email": data.get("email", ""),
-        "address": data.get("address", ""),
-        "services": data.get("services", ""),
-        "brand_color": data.get("brand_color", "#C50022"),
-        "logo_url": data.get("logo_url", ""),
-        "logo_data": data.get("logo_data", ""),
-        "chatbot_embed_id": data.get("chatbot_embed_id", ""),
-        "plan_tier": get_plan_tier_from_template(template_id),
-    })
-    return {"html": rendered}
+async def preview_website(data: dict, current_user: User = Depends(get_current_user)):
+    """AI-generated preview using Claude. Returns {html: str}."""
+    template_id = (data.get("template_id") or "").strip()
+    business_name = data.get("business_name", "Your Business") or "Your Business"
+    tagline = data.get("tagline", "") or ""
+    phone = data.get("phone", "") or ""
+    email = data.get("email", "") or ""
+    address = data.get("address", "") or ""
+    brand_color = data.get("brand_color", "#C50022") or "#C50022"
+    services = data.get("services", "[]")
+    logo_url = data.get("logo_url", "") or ""
+
+    try:
+        html = _ai_generate_site_html(
+            template_id=template_id,
+            business_name=business_name,
+            tagline=tagline,
+            phone=phone,
+            email=email,
+            address=address,
+            brand_color=brand_color,
+            services=services,
+            logo_url=logo_url,
+        )
+        return {"html": html}
+    except Exception as e:
+        # Fallback to the existing static template renderer so the UI is never blank.
+        print(f"[preview] AI generation failed, falling back to static template: {e}")
+        fallback_id = template_id or "free_1"
+        rendered = render_template(fallback_id, {
+            "business_name": business_name,
+            "tagline": tagline,
+            "phone": phone,
+            "email": email,
+            "address": address,
+            "services": services,
+            "brand_color": brand_color,
+            "logo_url": logo_url,
+            "logo_data": data.get("logo_data", ""),
+            "chatbot_embed_id": data.get("chatbot_embed_id", ""),
+            "plan_tier": get_plan_tier_from_template(fallback_id),
+        })
+        return {"html": rendered, "ai_error": str(e)}

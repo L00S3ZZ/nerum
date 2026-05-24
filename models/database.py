@@ -196,6 +196,7 @@ class UserWebsite(Base):
     logo_data = Column(Text, default="")
     chatbot_embed_id = Column(String, default="")
     published_html = Column(Text, default="")
+    generated_html = Column(Text, nullable=True)
     is_published = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     expires_at = Column(DateTime, nullable=True)
@@ -295,6 +296,7 @@ try:
             ("logo_data", "TEXT"),
             ("chatbot_embed_id", "VARCHAR"),
             ("published_html", "TEXT"),
+            ("generated_html", "TEXT"),
             ("is_published", "BOOLEAN"),
             ("is_active", "BOOLEAN"),
             ("expires_at", "DATETIME"),
