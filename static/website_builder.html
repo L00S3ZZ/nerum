@@ -579,6 +579,8 @@ function renderTemplates() {
       document.querySelectorAll('.tmpl-card').forEach(c => c.classList.remove('selected'));
       card.classList.add('selected');
       schedulePreview();
+      // Auto-advance to Step 2 so the user can fill business details immediately.
+      goStep(2);
     });
   });
 }
@@ -604,6 +606,9 @@ function goStep(n) {
   });
   document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
   document.getElementById('step-'+n).classList.add('active');
+  if (n === 2) {
+    document.getElementById('f-business_name').focus();
+  }
   schedulePreview();
 }
 
@@ -764,7 +769,8 @@ function collectForm() {
 
 function schedulePreview() {
   if (state.previewTimer) clearTimeout(state.previewTimer);
-  state.previewTimer = setTimeout(runPreview, 500);
+  // AI generation takes longer than static rendering — debounce for 1s.
+  state.previewTimer = setTimeout(runPreview, 1000);
 }
 
 async function runPreview() {
@@ -773,26 +779,35 @@ async function runPreview() {
     document.getElementById('previewWrap').style.display = 'none';
     return;
   }
+  const bn = document.getElementById('f-business_name').value.trim();
+  const ph = document.getElementById('f-phone').value.trim();
+  if (!bn || !ph) {
+    document.getElementById('previewEmpty').style.display = 'flex';
+    document.getElementById('previewWrap').style.display = 'none';
+    document.getElementById('previewEmpty').textContent = 'Fill in business name and phone to see preview.';
+    return;
+  }
   document.getElementById('previewEmpty').style.display = 'none';
   document.getElementById('previewWrap').style.display = 'block';
   document.getElementById('previewOverlay').classList.add('show');
+  document.getElementById('previewOverlay').textContent = 'Generating your website with AI...';
   const body = collectForm();
   try {
     const res = await fetch('/websites/preview', {
-      method:'POST',
+      method: 'POST',
       headers: HDR,
       body: JSON.stringify(body)
     });
     if (!res.ok) {
-      document.getElementById('previewOverlay').textContent = 'Preview failed.';
+      document.getElementById('previewOverlay').textContent = 'Preview failed. Try again.';
       return;
     }
     const data = await res.json();
     document.getElementById('previewFrame').srcdoc = data.html;
+    document.getElementById('previewOverlay').classList.remove('show');
   } catch(e) {
     console.error(e);
-  } finally {
-    setTimeout(() => document.getElementById('previewOverlay').classList.remove('show'), 200);
+    document.getElementById('previewOverlay').textContent = 'Preview failed.';
   }
 }
 
