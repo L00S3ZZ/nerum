@@ -1,0 +1,1304 @@
+{
+  "templates": [
+    {
+      "id": "tpl_001",
+      "name": "Chennai Classic Jewels",
+      "tier": "free",
+      "business_type": "Jewellery Store",
+      "tags": ["retail", "local", "gold", "wedding"],
+      "popular": true,
+      "preview_color": "#DAA520",
+      "colors": {
+        "primary": "#DAA520",
+        "secondary": "#7C2D12",
+        "accent": "#FCD34D",
+        "background": "#FFFBEB",
+        "text": "#1F2937"
+      },
+      "hero": {
+        "headline": "Timeless Gold. Timeless Tradition.",
+        "subheadline": "Three generations of trusted jewellery craftsmanship in the heart of T Nagar, Chennai.",
+        "cta": "Visit Our Showroom"
+      },
+      "services": [
+        { "title": "22K Gold Jewellery", "description": "BIS-hallmarked daily-wear and bridal collections.", "icon": "💍" },
+        { "title": "Diamond Collections", "description": "Certified solitaires and contemporary diamond sets.", "icon": "💎" },
+        { "title": "Custom Bridal Sets", "description": "Designed for your big day with traditional motifs.", "icon": "👰" }
+      ]
+    },
+    {
+      "id": "tpl_002",
+      "name": "Apollo Smile Dental",
+      "tier": "free",
+      "business_type": "Dental Clinic",
+      "tags": ["healthcare", "clinic", "dental"],
+      "popular": false,
+      "preview_color": "#14B8A6",
+      "colors": {
+        "primary": "#14B8A6",
+        "secondary": "#0F766E",
+        "accent": "#5EEAD4",
+        "background": "#F0FDFA",
+        "text": "#134E4A"
+      },
+      "hero": {
+        "headline": "Healthy Smiles, Happy Lives.",
+        "subheadline": "Modern dental care for the whole family in Anna Nagar, Chennai.",
+        "cta": "Book Appointment"
+      },
+      "services": [
+        { "title": "Root Canal Treatment", "description": "Painless RCT with latest rotary endodontics.", "icon": "🦷" },
+        { "title": "Teeth Whitening", "description": "Professional in-clinic whitening in 60 minutes.", "icon": "✨" },
+        { "title": "Dental Implants", "description": "Permanent tooth replacement with titanium implants.", "icon": "🔬" }
+      ]
+    },
+    {
+      "id": "tpl_003",
+      "name": "Mylapore Spice Kitchen",
+      "tier": "free",
+      "business_type": "Restaurant",
+      "tags": ["food", "south-indian", "dining"],
+      "popular": true,
+      "preview_color": "#EA580C",
+      "colors": {
+        "primary": "#EA580C",
+        "secondary": "#7C2D12",
+        "accent": "#FED7AA",
+        "background": "#FFF7ED",
+        "text": "#1F2937"
+      },
+      "hero": {
+        "headline": "Taste of Authentic Tamil Nadu.",
+        "subheadline": "Family-style meals, filter coffee, and the warmth of Mylapore on every plate.",
+        "cta": "View Today's Menu"
+      },
+      "services": [
+        { "title": "Traditional Thali", "description": "Unlimited South Indian meals on banana leaf.", "icon": "🍛" },
+        { "title": "Chettinad Specials", "description": "Spicy non-veg gravies cooked the old-school way.", "icon": "🌶️" },
+        { "title": "Tiffin & Filter Kaapi", "description": "Crisp dosas, fluffy idlis, and authentic degree coffee.", "icon": "☕" }
+      ]
+    },
+    {
+      "id": "tpl_004",
+      "name": "Iron Mount Gym",
+      "tier": "free",
+      "business_type": "Gym",
+      "tags": ["fitness", "strength", "training"],
+      "popular": false,
+      "preview_color": "#7F1D1D",
+      "colors": {
+        "primary": "#7F1D1D",
+        "secondary": "#000000",
+        "accent": "#F59E0B",
+        "background": "#0A0A0A",
+        "text": "#F5F5F5"
+      },
+      "hero": {
+        "headline": "Lift Heavy. Live Strong.",
+        "subheadline": "Velachery's no-nonsense strength gym. Old-school iron, modern programming.",
+        "cta": "Claim Free Trial"
+      },
+      "services": [
+        { "title": "Strength Training", "description": "Powerlifting platforms with calibrated plates.", "icon": "🏋️" },
+        { "title": "Personal Coaching", "description": "One-on-one programs by certified strength coaches.", "icon": "💪" },
+        { "title": "CrossFit WODs", "description": "Daily group workouts that build real-world fitness.", "icon": "🔥" }
+      ]
+    },
+    {
+      "id": "tpl_005",
+      "name": "Prime Realty Chennai",
+      "tier": "free",
+      "business_type": "Real Estate",
+      "tags": ["property", "real-estate", "rentals"],
+      "popular": false,
+      "preview_color": "#1E3A8A",
+      "colors": {
+        "primary": "#1E3A8A",
+        "secondary": "#0F172A",
+        "accent": "#60A5FA",
+        "background": "#F8FAFC",
+        "text": "#0F172A"
+      },
+      "hero": {
+        "headline": "Find Your Address in the City.",
+        "subheadline": "RERA-registered listings across OMR, ECR, and Greater Chennai.",
+        "cta": "Browse Properties"
+      },
+      "services": [
+        { "title": "Buy / Sell Apartments", "description": "Verified flats from leading Chennai developers.", "icon": "🏢" },
+        { "title": "Rental Assistance", "description": "Furnished and unfurnished homes for IT professionals.", "icon": "🔑" },
+        { "title": "Plot Investments", "description": "DTCP-approved layouts in fast-growing suburbs.", "icon": "📍" }
+      ]
+    },
+    {
+      "id": "tpl_006",
+      "name": "BrightMind Academy",
+      "tier": "free",
+      "business_type": "School",
+      "tags": ["education", "school", "cbse"],
+      "popular": false,
+      "preview_color": "#2563EB",
+      "colors": {
+        "primary": "#2563EB",
+        "secondary": "#1E40AF",
+        "accent": "#FBBF24",
+        "background": "#EFF6FF",
+        "text": "#1E3A8A"
+      },
+      "hero": {
+        "headline": "Nurturing Tomorrow's Leaders.",
+        "subheadline": "CBSE-affiliated school in Porur — academics, sport, and character.",
+        "cta": "Apply for Admission"
+      },
+      "services": [
+        { "title": "Primary Education", "description": "Activity-based learning from LKG to Class 5.", "icon": "📚" },
+        { "title": "Secondary Curriculum", "description": "STEM-focused middle and high school programs.", "icon": "🔬" },
+        { "title": "Co-curricular Clubs", "description": "Music, robotics, debate, and athletics for every child.", "icon": "🎨" }
+      ]
+    },
+    {
+      "id": "tpl_007",
+      "name": "Glow Beauty Parlour",
+      "tier": "free",
+      "business_type": "Salon",
+      "tags": ["beauty", "salon", "women"],
+      "popular": true,
+      "preview_color": "#EC4899",
+      "colors": {
+        "primary": "#EC4899",
+        "secondary": "#831843",
+        "accent": "#FBCFE8",
+        "background": "#FDF2F8",
+        "text": "#500724"
+      },
+      "hero": {
+        "headline": "Where You Glow Brighter.",
+        "subheadline": "Adyar's friendly neighbourhood ladies' salon — bridal, hair, skin.",
+        "cta": "Book a Service"
+      },
+      "services": [
+        { "title": "Bridal Makeup", "description": "Airbrush HD makeup for the whole wedding week.", "icon": "💄" },
+        { "title": "Hair Styling", "description": "Cuts, colour, smoothening and keratin treatments.", "icon": "💇" },
+        { "title": "Facials & Skin", "description": "Customised facials with dermat-approved products.", "icon": "🧖" }
+      ]
+    },
+    {
+      "id": "tpl_008",
+      "name": "Marina Bay Hotel",
+      "tier": "free",
+      "business_type": "Hotel",
+      "tags": ["hospitality", "stay", "business"],
+      "popular": false,
+      "preview_color": "#B45309",
+      "colors": {
+        "primary": "#B45309",
+        "secondary": "#451A03",
+        "accent": "#FCD34D",
+        "background": "#FFFBEB",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "A Refined Stay by the Bay.",
+        "subheadline": "Boutique hotel minutes from Marina Beach, ideal for business and leisure.",
+        "cta": "Reserve a Room"
+      },
+      "services": [
+        { "title": "Deluxe Rooms", "description": "Sea-facing AC rooms with daily breakfast.", "icon": "🛏️" },
+        { "title": "Banquet Hall", "description": "Up to 200-pax events with full catering.", "icon": "🎉" },
+        { "title": "Airport Pickup", "description": "Complimentary transfers from MAA on premium stays.", "icon": "🚗" }
+      ]
+    },
+    {
+      "id": "tpl_009",
+      "name": "Krishnan & Associates",
+      "tier": "free",
+      "business_type": "Lawyer",
+      "tags": ["legal", "professional", "advocate"],
+      "popular": false,
+      "preview_color": "#0F172A",
+      "colors": {
+        "primary": "#0F172A",
+        "secondary": "#334155",
+        "accent": "#CA8A04",
+        "background": "#F8FAFC",
+        "text": "#0F172A"
+      },
+      "hero": {
+        "headline": "Counsel You Can Trust.",
+        "subheadline": "Advocates at the Madras High Court — civil, property and corporate law.",
+        "cta": "Request a Consultation"
+      },
+      "services": [
+        { "title": "Property Disputes", "description": "Title verification, partition and registration matters.", "icon": "⚖️" },
+        { "title": "Family Law", "description": "Marriage, divorce, custody and succession advice.", "icon": "👨‍👩‍👧" },
+        { "title": "Corporate Compliance", "description": "Contracts, MSME registrations and labour law.", "icon": "📜" }
+      ]
+    },
+    {
+      "id": "tpl_010",
+      "name": "MediCare Pharmacy",
+      "tier": "free",
+      "business_type": "Pharmacy",
+      "tags": ["healthcare", "medical", "delivery"],
+      "popular": false,
+      "preview_color": "#16A34A",
+      "colors": {
+        "primary": "#16A34A",
+        "secondary": "#14532D",
+        "accent": "#86EFAC",
+        "background": "#F0FDF4",
+        "text": "#052E16"
+      },
+      "hero": {
+        "headline": "Trusted Medicines, Friendly Service.",
+        "subheadline": "24x7 home delivery across Tambaram and surrounding areas.",
+        "cta": "Order on WhatsApp"
+      },
+      "services": [
+        { "title": "Prescription Medicines", "description": "Branded and generic drugs from licensed distributors.", "icon": "💊" },
+        { "title": "Home Delivery", "description": "Same-day delivery within a 5 km radius.", "icon": "🛵" },
+        { "title": "Health Devices", "description": "BP monitors, glucometers, nebulisers and more.", "icon": "🩺" }
+      ]
+    },
+    {
+      "id": "tpl_011",
+      "name": "Anna Bakery & Cafe",
+      "tier": "free",
+      "business_type": "Bakery",
+      "tags": ["bakery", "cafe", "desserts"],
+      "popular": false,
+      "preview_color": "#92400E",
+      "colors": {
+        "primary": "#92400E",
+        "secondary": "#451A03",
+        "accent": "#FDBA74",
+        "background": "#FFF7ED",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "Fresh From the Oven, Every Morning.",
+        "subheadline": "Handcrafted cakes, breads and bakes in Besant Nagar since 1998.",
+        "cta": "See Today's Bakes"
+      },
+      "services": [
+        { "title": "Custom Cakes", "description": "Birthday, wedding and theme cakes baked to order.", "icon": "🎂" },
+        { "title": "Artisan Breads", "description": "Sourdough, multigrain and brioche loaves daily.", "icon": "🥖" },
+        { "title": "Cafe Counter", "description": "Coffee, sandwiches, puffs and patisserie all day.", "icon": "🥐" }
+      ]
+    },
+    {
+      "id": "tpl_012",
+      "name": "Adyar IIT Coaching",
+      "tier": "free",
+      "business_type": "Coaching Center",
+      "tags": ["education", "iit", "jee"],
+      "popular": false,
+      "preview_color": "#1D4ED8",
+      "colors": {
+        "primary": "#1D4ED8",
+        "secondary": "#1E3A8A",
+        "accent": "#FBBF24",
+        "background": "#EFF6FF",
+        "text": "#1E3A8A"
+      },
+      "hero": {
+        "headline": "Crack JEE. Conquer IIT.",
+        "subheadline": "Two-year integrated JEE Advanced program by IIT alumni faculty.",
+        "cta": "Take a Free Demo"
+      },
+      "services": [
+        { "title": "JEE Main + Advanced", "description": "Classroom + online hybrid coaching with daily tests.", "icon": "📐" },
+        { "title": "Foundation (8–10)", "description": "Olympiad-level prep for early-stage students.", "icon": "🧮" },
+        { "title": "Doubt Solving", "description": "1:1 mentor sessions and unlimited doubt clearance.", "icon": "❓" }
+      ]
+    },
+    {
+      "id": "tpl_013",
+      "name": "Saravana Catering",
+      "tier": "free",
+      "business_type": "Catering",
+      "tags": ["catering", "events", "wedding"],
+      "popular": false,
+      "preview_color": "#D97706",
+      "colors": {
+        "primary": "#D97706",
+        "secondary": "#78350F",
+        "accent": "#FDE68A",
+        "background": "#FFFBEB",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "Feasts That People Remember.",
+        "subheadline": "Pure veg South Indian wedding catering, served on banana leaf.",
+        "cta": "Get a Quote"
+      },
+      "services": [
+        { "title": "Wedding Sadhya", "description": "21+ item traditional meals for 100 to 5000 guests.", "icon": "🍌" },
+        { "title": "Corporate Lunches", "description": "Office daily meals and event boxed lunches.", "icon": "🥗" },
+        { "title": "Live Counters", "description": "Dosa, chaat, juice and dessert counters at venue.", "icon": "🍳" }
+      ]
+    },
+    {
+      "id": "tpl_014",
+      "name": "Lalitha Flower Shop",
+      "tier": "free",
+      "business_type": "Flower Shop",
+      "tags": ["flowers", "florist", "gifts"],
+      "popular": false,
+      "preview_color": "#DB2777",
+      "colors": {
+        "primary": "#DB2777",
+        "secondary": "#831843",
+        "accent": "#FBCFE8",
+        "background": "#FDF2F8",
+        "text": "#500724"
+      },
+      "hero": {
+        "headline": "Fresh Blooms for Every Moment.",
+        "subheadline": "Daily jasmine, roses and temple flowers — home delivered in T Nagar.",
+        "cta": "Order Today's Flowers"
+      },
+      "services": [
+        { "title": "Daily Pooja Flowers", "description": "Subscription packs delivered to your doorstep.", "icon": "🌸" },
+        { "title": "Bouquets & Gifts", "description": "Custom bouquets for birthdays and anniversaries.", "icon": "💐" },
+        { "title": "Wedding Decor", "description": "Stage, mandap and car decoration with fresh flowers.", "icon": "🌹" }
+      ]
+    },
+    {
+      "id": "tpl_015",
+      "name": "SpeedFix Auto",
+      "tier": "free",
+      "business_type": "Auto Service",
+      "tags": ["automotive", "garage", "car-service"],
+      "popular": false,
+      "preview_color": "#374151",
+      "colors": {
+        "primary": "#374151",
+        "secondary": "#111827",
+        "accent": "#FACC15",
+        "background": "#F9FAFB",
+        "text": "#111827"
+      },
+      "hero": {
+        "headline": "Your Car. Our Care.",
+        "subheadline": "Multi-brand car service centre in Guindy with genuine spares.",
+        "cta": "Book a Service"
+      },
+      "services": [
+        { "title": "General Service", "description": "Oil change, filters and 24-point health check.", "icon": "🔧" },
+        { "title": "AC Repair", "description": "Gas top-up, coil cleaning and AC diagnosis.", "icon": "❄️" },
+        { "title": "Pickup & Drop", "description": "Doorstep collection within Chennai city limits.", "icon": "🚗" }
+      ]
+    },
+    {
+      "id": "tpl_016",
+      "name": "SriRam Family Clinic",
+      "tier": "starter",
+      "business_type": "Clinic",
+      "tags": ["healthcare", "clinic", "general-physician"],
+      "popular": false,
+      "preview_color": "#9F1239",
+      "colors": {
+        "primary": "#9F1239",
+        "secondary": "#4C0519",
+        "accent": "#FECDD3",
+        "background": "#FFF1F2",
+        "text": "#1F2937"
+      },
+      "hero": {
+        "headline": "Trusted Family Doctor in Tambaram.",
+        "subheadline": "Walk-in OP, lab tests and home visits for all age groups.",
+        "cta": "Book Consultation"
+      },
+      "services": [
+        { "title": "General Medicine", "description": "Diabetes, BP and fever consultations daily.", "icon": "👨‍⚕️" },
+        { "title": "Pediatric Care", "description": "Vaccinations and child wellness check-ups.", "icon": "👶" },
+        { "title": "Diagnostic Lab", "description": "Blood, urine and ECG tests on-site.", "icon": "🧪" }
+      ]
+    },
+    {
+      "id": "tpl_017",
+      "name": "Surya Tailoring",
+      "tier": "starter",
+      "business_type": "Tailor",
+      "tags": ["tailor", "alterations", "stitching"],
+      "popular": false,
+      "preview_color": "#65A30D",
+      "colors": {
+        "primary": "#65A30D",
+        "secondary": "#365314",
+        "accent": "#BEF264",
+        "background": "#F7FEE7",
+        "text": "#1A2E05"
+      },
+      "hero": {
+        "headline": "Perfect Fit. Every Single Stitch.",
+        "subheadline": "Master tailor for blouses, salwars and ladies wear in Nungambakkam.",
+        "cta": "Schedule a Trial"
+      },
+      "services": [
+        { "title": "Blouse Stitching", "description": "Latest patterns with princess cut and lining options.", "icon": "🧵" },
+        { "title": "Salwar & Kurtis", "description": "Anarkali, straight-cut and party wear designs.", "icon": "👗" },
+        { "title": "Alterations", "description": "Same-day alterations on weekdays.", "icon": "✂️" }
+      ]
+    },
+    {
+      "id": "tpl_018",
+      "name": "Vision Plus Opticals",
+      "tier": "starter",
+      "business_type": "Optician",
+      "tags": ["eyewear", "opticals", "glasses"],
+      "popular": false,
+      "preview_color": "#0EA5E9",
+      "colors": {
+        "primary": "#0EA5E9",
+        "secondary": "#0C4A6E",
+        "accent": "#7DD3FC",
+        "background": "#F0F9FF",
+        "text": "#0C4A6E"
+      },
+      "hero": {
+        "headline": "See the World Clearly.",
+        "subheadline": "Computerised eye testing and 1000+ frames from top brands.",
+        "cta": "Book Eye Test"
+      },
+      "services": [
+        { "title": "Eye Examination", "description": "Free check-up with every frame purchase.", "icon": "👓" },
+        { "title": "Designer Frames", "description": "Ray-Ban, Vincent Chase and more in-store.", "icon": "🕶️" },
+        { "title": "Contact Lenses", "description": "Bausch & Lomb, Acuvue daily and monthly options.", "icon": "👁️" }
+      ]
+    },
+    {
+      "id": "tpl_019",
+      "name": "Smile Bright Dental",
+      "tier": "starter",
+      "business_type": "Dental Clinic",
+      "tags": ["dental", "kids", "orthodontics"],
+      "popular": false,
+      "preview_color": "#06B6D4",
+      "colors": {
+        "primary": "#06B6D4",
+        "secondary": "#155E75",
+        "accent": "#67E8F9",
+        "background": "#ECFEFF",
+        "text": "#164E63"
+      },
+      "hero": {
+        "headline": "Brighter Smiles for Brighter Days.",
+        "subheadline": "Family dental clinic with kid-friendly chairs in Velachery.",
+        "cta": "Reserve a Slot"
+      },
+      "services": [
+        { "title": "Kids Dentistry", "description": "Sealants, fluoride and gentle care for children.", "icon": "🪥" },
+        { "title": "Braces & Aligners", "description": "Metal braces and clear aligner consultations.", "icon": "😬" },
+        { "title": "Cosmetic Dentistry", "description": "Veneers, whitening and smile makeovers.", "icon": "✨" }
+      ]
+    },
+    {
+      "id": "tpl_020",
+      "name": "Yogasala Studio",
+      "tier": "starter",
+      "business_type": "Yoga Studio",
+      "tags": ["wellness", "yoga", "fitness"],
+      "popular": false,
+      "preview_color": "#84CC16",
+      "colors": {
+        "primary": "#84CC16",
+        "secondary": "#3F6212",
+        "accent": "#D9F99D",
+        "background": "#F7FEE7",
+        "text": "#1A2E05"
+      },
+      "hero": {
+        "headline": "Breathe. Stretch. Heal.",
+        "subheadline": "Authentic Hatha and Ashtanga yoga in the heart of Indiranagar.",
+        "cta": "Start Your Practice"
+      },
+      "services": [
+        { "title": "Morning Hatha", "description": "Beginner-friendly classes at 6 AM and 7 AM daily.", "icon": "🧘" },
+        { "title": "Power Yoga", "description": "Sweat-it-out flows for fitness and flexibility.", "icon": "💪" },
+        { "title": "Pranayama", "description": "Guided breathwork for stress and sleep.", "icon": "🌬️" }
+      ]
+    },
+    {
+      "id": "tpl_021",
+      "name": "Click Memories Studio",
+      "tier": "starter",
+      "business_type": "Photo Studio",
+      "tags": ["photography", "wedding", "portraits"],
+      "popular": true,
+      "preview_color": "#7C3AED",
+      "colors": {
+        "primary": "#7C3AED",
+        "secondary": "#3B0764",
+        "accent": "#C4B5FD",
+        "background": "#FAF5FF",
+        "text": "#2E1065"
+      },
+      "hero": {
+        "headline": "Memories That Stay Forever.",
+        "subheadline": "Candid wedding and pre-wedding photography across Tamil Nadu.",
+        "cta": "View Portfolio"
+      },
+      "services": [
+        { "title": "Wedding Photography", "description": "Full-day candid coverage with cinematic films.", "icon": "📸" },
+        { "title": "Pre-Wedding Shoots", "description": "Beach, palace and themed outdoor sessions.", "icon": "💑" },
+        { "title": "Maternity & Baby", "description": "Soft, in-studio newborn and maternity portraits.", "icon": "🤱" }
+      ]
+    },
+    {
+      "id": "tpl_022",
+      "name": "Grand Events Chennai",
+      "tier": "starter",
+      "business_type": "Event Planner",
+      "tags": ["events", "wedding-planner", "corporate"],
+      "popular": false,
+      "preview_color": "#C026D3",
+      "colors": {
+        "primary": "#C026D3",
+        "secondary": "#581C87",
+        "accent": "#F0ABFC",
+        "background": "#FAF5FF",
+        "text": "#3B0764"
+      },
+      "hero": {
+        "headline": "Events That Wow. Memories That Last.",
+        "subheadline": "End-to-end wedding and corporate event management.",
+        "cta": "Plan My Event"
+      },
+      "services": [
+        { "title": "Wedding Planning", "description": "Venue, decor, catering and stage — handled.", "icon": "💒" },
+        { "title": "Corporate Events", "description": "Product launches, AGMs and conferences.", "icon": "🎤" },
+        { "title": "Themed Decor", "description": "Floral, royal, vintage and custom decor setups.", "icon": "🎨" }
+      ]
+    },
+    {
+      "id": "tpl_023",
+      "name": "Sundar & Co Chartered Accountants",
+      "tier": "starter",
+      "business_type": "CA/Accountant",
+      "tags": ["accounting", "tax", "professional"],
+      "popular": false,
+      "preview_color": "#1E40AF",
+      "colors": {
+        "primary": "#1E40AF",
+        "secondary": "#0F172A",
+        "accent": "#93C5FD",
+        "background": "#F8FAFC",
+        "text": "#0F172A"
+      },
+      "hero": {
+        "headline": "Numbers You Can Bank On.",
+        "subheadline": "GST, ITR, audit and startup compliance from a Chennai-based CA firm.",
+        "cta": "Get Free Consultation"
+      },
+      "services": [
+        { "title": "GST & Tax Filing", "description": "Monthly returns and annual ITR for individuals and SMEs.", "icon": "📊" },
+        { "title": "Statutory Audit", "description": "Internal, statutory and tax audits as per ICAI.", "icon": "📋" },
+        { "title": "Company Registration", "description": "Pvt Ltd, LLP and OPC incorporation end to end.", "icon": "🏢" }
+      ]
+    },
+    {
+      "id": "tpl_024",
+      "name": "SafeHome Pest Control",
+      "tier": "starter",
+      "business_type": "Pest Control",
+      "tags": ["pest-control", "home-services", "hygiene"],
+      "popular": false,
+      "preview_color": "#4D7C0F",
+      "colors": {
+        "primary": "#4D7C0F",
+        "secondary": "#1A2E05",
+        "accent": "#BEF264",
+        "background": "#F7FEE7",
+        "text": "#1A2E05"
+      },
+      "hero": {
+        "headline": "Pest-Free Homes. Healthy Families.",
+        "subheadline": "Government-approved treatments backed by a 12-month warranty.",
+        "cta": "Get Free Inspection"
+      },
+      "services": [
+        { "title": "Cockroach Treatment", "description": "Odourless gel-baiting safe for kids and pets.", "icon": "🪳" },
+        { "title": "Termite Control", "description": "Pre and post-construction anti-termite treatment.", "icon": "🐜" },
+        { "title": "Mosquito Fogging", "description": "Outdoor fogging for apartments and gated layouts.", "icon": "🦟" }
+      ]
+    },
+    {
+      "id": "tpl_025",
+      "name": "Rapid Couriers",
+      "tier": "starter",
+      "business_type": "Courier",
+      "tags": ["logistics", "courier", "delivery"],
+      "popular": false,
+      "preview_color": "#F97316",
+      "colors": {
+        "primary": "#F97316",
+        "secondary": "#7C2D12",
+        "accent": "#FED7AA",
+        "background": "#FFF7ED",
+        "text": "#1F2937"
+      },
+      "hero": {
+        "headline": "Anything. Anywhere. On Time.",
+        "subheadline": "Domestic and international courier from Chennai with live tracking.",
+        "cta": "Book a Pickup"
+      },
+      "services": [
+        { "title": "Document Courier", "description": "Same-city delivery in 4 hours, pan-India next-day.", "icon": "📦" },
+        { "title": "International Parcels", "description": "DHL and FedEx partner network to 200+ countries.", "icon": "✈️" },
+        { "title": "Bulk Cargo", "description": "B2B logistics with monthly invoicing.", "icon": "🚚" }
+      ]
+    },
+    {
+      "id": "tpl_026",
+      "name": "Fresh Mart Supermarket",
+      "tier": "starter",
+      "business_type": "Supermarket",
+      "tags": ["grocery", "supermarket", "retail"],
+      "popular": true,
+      "preview_color": "#15803D",
+      "colors": {
+        "primary": "#15803D",
+        "secondary": "#052E16",
+        "accent": "#86EFAC",
+        "background": "#F0FDF4",
+        "text": "#052E16"
+      },
+      "hero": {
+        "headline": "Fresh Every Day. Saved Every Time.",
+        "subheadline": "Your neighbourhood supermarket in Pallikaranai with free home delivery.",
+        "cta": "Order on WhatsApp"
+      },
+      "services": [
+        { "title": "Daily Fresh Veggies", "description": "Farm-direct vegetables and seasonal fruits.", "icon": "🥬" },
+        { "title": "Groceries & Provisions", "description": "All brands of rice, dal, oil and spices.", "icon": "🛒" },
+        { "title": "Free Home Delivery", "description": "Within 5 km on orders above ₹500.", "icon": "🛵" }
+      ]
+    },
+    {
+      "id": "tpl_027",
+      "name": "Higginbothams Books",
+      "tier": "starter",
+      "business_type": "Bookstore",
+      "tags": ["books", "literature", "stationery"],
+      "popular": false,
+      "preview_color": "#78350F",
+      "colors": {
+        "primary": "#78350F",
+        "secondary": "#451A03",
+        "accent": "#FBBF24",
+        "background": "#FFFBEB",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "A Bookstore With Stories of Its Own.",
+        "subheadline": "Curated fiction, academic and children's titles in Mount Road.",
+        "cta": "Browse Bestsellers"
+      },
+      "services": [
+        { "title": "Latest Releases", "description": "All Booker, Pulitzer and Indian bestsellers in stock.", "icon": "📚" },
+        { "title": "Academic Books", "description": "School, college and competitive exam titles.", "icon": "🎓" },
+        { "title": "Stationery", "description": "Premium pens, journals and gifting accessories.", "icon": "✏️" }
+      ]
+    },
+    {
+      "id": "tpl_028",
+      "name": "Saraswathi Music School",
+      "tier": "starter_plus",
+      "business_type": "Music School",
+      "tags": ["music", "carnatic", "training"],
+      "popular": true,
+      "preview_color": "#6D28D9",
+      "colors": {
+        "primary": "#6D28D9",
+        "secondary": "#3B0764",
+        "accent": "#DDD6FE",
+        "background": "#FAF5FF",
+        "text": "#2E1065"
+      },
+      "hero": {
+        "headline": "Where Every Note Has a Story.",
+        "subheadline": "Carnatic vocal, veena and violin classes by senior gurus in Mylapore.",
+        "cta": "Enrol for Classes"
+      },
+      "services": [
+        { "title": "Carnatic Vocal", "description": "From varisai to varnams — structured guru-shishya training.", "icon": "🎤" },
+        { "title": "Violin & Veena", "description": "Instrument lessons with arangetram-level guidance.", "icon": "🎻" },
+        { "title": "Western Keyboard", "description": "Trinity-graded piano and keyboard for kids.", "icon": "🎹" }
+      ]
+    },
+    {
+      "id": "tpl_029",
+      "name": "Natyanjali Dance Academy",
+      "tier": "starter_plus",
+      "business_type": "Dance Academy",
+      "tags": ["dance", "bharatanatyam", "academy"],
+      "popular": false,
+      "preview_color": "#BE185D",
+      "colors": {
+        "primary": "#BE185D",
+        "secondary": "#500724",
+        "accent": "#F9A8D4",
+        "background": "#FDF2F8",
+        "text": "#500724"
+      },
+      "hero": {
+        "headline": "Express the Story. Become the Dance.",
+        "subheadline": "Bharatanatyam, Kuchipudi and contemporary classes in Adyar.",
+        "cta": "Book a Trial Class"
+      },
+      "services": [
+        { "title": "Bharatanatyam", "description": "Pandanallur tradition from adavus to arangetram.", "icon": "💃" },
+        { "title": "Kuchipudi", "description": "Beginner to advanced training in pure technique.", "icon": "🕺" },
+        { "title": "Contemporary", "description": "Fusion choreography for stage and competitions.", "icon": "🎭" }
+      ]
+    },
+    {
+      "id": "tpl_030",
+      "name": "Safe Drive Driving School",
+      "tier": "starter_plus",
+      "business_type": "Driving School",
+      "tags": ["driving", "license", "training"],
+      "popular": false,
+      "preview_color": "#CA8A04",
+      "colors": {
+        "primary": "#CA8A04",
+        "secondary": "#713F12",
+        "accent": "#FDE68A",
+        "background": "#FEFCE8",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "Confidence Behind the Wheel.",
+        "subheadline": "RTO-approved driving school with LMV and two-wheeler training.",
+        "cta": "Enrol Today"
+      },
+      "services": [
+        { "title": "Car Driving", "description": "20-day course with dual-control vehicles and LL/DL help.", "icon": "🚙" },
+        { "title": "Two-Wheeler", "description": "Geared and gearless scooter lessons for women too.", "icon": "🛵" },
+        { "title": "Highway Practice", "description": "GST Road sessions for confident long-distance driving.", "icon": "🛣️" }
+      ]
+    },
+    {
+      "id": "tpl_031",
+      "name": "Sri Vaastu Astrology",
+      "tier": "starter_plus",
+      "business_type": "Astrologer",
+      "tags": ["astrology", "vaastu", "consultation"],
+      "popular": false,
+      "preview_color": "#581C87",
+      "colors": {
+        "primary": "#581C87",
+        "secondary": "#2E1065",
+        "accent": "#E9D5FF",
+        "background": "#FAF5FF",
+        "text": "#2E1065"
+      },
+      "hero": {
+        "headline": "Guidance Rooted in Ancient Wisdom.",
+        "subheadline": "Jathagam, gemstone and Vaastu consultations by Pandit Krishnamurthy.",
+        "cta": "Book a Reading"
+      },
+      "services": [
+        { "title": "Birth Chart Reading", "description": "Detailed jathagam analysis with horary predictions.", "icon": "🔮" },
+        { "title": "Vaastu Consulting", "description": "Home and office layout corrections without demolition.", "icon": "🏠" },
+        { "title": "Marriage Matching", "description": "Porutham and 10-point compatibility analysis.", "icon": "💞" }
+      ]
+    },
+    {
+      "id": "tpl_032",
+      "name": "Hyderabad Pearls Plaza",
+      "tier": "starter_plus",
+      "business_type": "Jewellery Store",
+      "tags": ["pearls", "jewellery", "luxury"],
+      "popular": true,
+      "preview_color": "#475569",
+      "colors": {
+        "primary": "#475569",
+        "secondary": "#0F172A",
+        "accent": "#CBD5E1",
+        "background": "#F8FAFC",
+        "text": "#0F172A"
+      },
+      "hero": {
+        "headline": "The Pearl Capital, Reimagined.",
+        "subheadline": "Sourced from the finest pearl beds, finished by master craftsmen.",
+        "cta": "Explore the Collection"
+      },
+      "services": [
+        { "title": "Pearl Necklaces", "description": "Single, double and seven-line traditional sets.", "icon": "📿" },
+        { "title": "Custom Designs", "description": "Bespoke pearl jewellery with gold and diamond accents.", "icon": "✨" },
+        { "title": "Re-stringing", "description": "Heritage restoration of antique pearl jewellery.", "icon": "🔗" }
+      ]
+    },
+    {
+      "id": "tpl_033",
+      "name": "Bangalore Brew House",
+      "tier": "starter_plus",
+      "business_type": "Restaurant",
+      "tags": ["restaurant", "brewery", "casual-dining"],
+      "popular": false,
+      "preview_color": "#EF4444",
+      "colors": {
+        "primary": "#EF4444",
+        "secondary": "#7F1D1D",
+        "accent": "#FCA5A5",
+        "background": "#FEF2F2",
+        "text": "#7F1D1D"
+      },
+      "hero": {
+        "headline": "Craft Beer. Comfort Food. Good Vibes.",
+        "subheadline": "Indiranagar's favourite microbrewery with rooftop seating.",
+        "cta": "Reserve a Table"
+      },
+      "services": [
+        { "title": "Craft Brews", "description": "8 in-house brews including a Madras Stout.", "icon": "🍺" },
+        { "title": "Global Plates", "description": "Wood-fired pizzas, Asian bowls and brewpub classics.", "icon": "🍕" },
+        { "title": "Live Music", "description": "Indie and acoustic acts every Friday and Saturday.", "icon": "🎶" }
+      ]
+    },
+    {
+      "id": "tpl_034",
+      "name": "PowerCore Fitness",
+      "tier": "starter_plus",
+      "business_type": "Gym",
+      "tags": ["gym", "premium", "wellness"],
+      "popular": false,
+      "preview_color": "#0891B2",
+      "colors": {
+        "primary": "#0891B2",
+        "secondary": "#164E63",
+        "accent": "#67E8F9",
+        "background": "#ECFEFF",
+        "text": "#164E63"
+      },
+      "hero": {
+        "headline": "Train Smarter. Live Stronger.",
+        "subheadline": "Premium fitness club in HSR Layout with certified coaches.",
+        "cta": "Tour the Facility"
+      },
+      "services": [
+        { "title": "Functional Training", "description": "TRX, kettlebell and mobility group classes.", "icon": "🏋️" },
+        { "title": "Cardio Zone", "description": "Treadmills, ellipticals and rowers from Life Fitness.", "icon": "🏃" },
+        { "title": "Nutrition Plans", "description": "Customised diet by in-house sports dietitians.", "icon": "🥗" }
+      ]
+    },
+    {
+      "id": "tpl_035",
+      "name": "Skyline Properties Bangalore",
+      "tier": "starter_plus",
+      "business_type": "Real Estate",
+      "tags": ["real-estate", "luxury", "bangalore"],
+      "popular": false,
+      "preview_color": "#0284C7",
+      "colors": {
+        "primary": "#0284C7",
+        "secondary": "#0C4A6E",
+        "accent": "#7DD3FC",
+        "background": "#F0F9FF",
+        "text": "#0C4A6E"
+      },
+      "hero": {
+        "headline": "Homes With a View. Investments With a Future.",
+        "subheadline": "Premium apartments and villas across Whitefield and Sarjapur.",
+        "cta": "Schedule a Site Visit"
+      },
+      "services": [
+        { "title": "Luxury Apartments", "description": "3 and 4 BHK in gated communities with clubhouses.", "icon": "🏙️" },
+        { "title": "Independent Villas", "description": "Standalone homes with private gardens.", "icon": "🏡" },
+        { "title": "NRI Services", "description": "End-to-end purchase, registration and rental support.", "icon": "🌍" }
+      ]
+    },
+    {
+      "id": "tpl_036",
+      "name": "Lakshmi Academy of Excellence",
+      "tier": "pro",
+      "business_type": "School",
+      "tags": ["school", "icse", "premium"],
+      "popular": false,
+      "preview_color": "#312E81",
+      "colors": {
+        "primary": "#312E81",
+        "secondary": "#1E1B4B",
+        "accent": "#FBBF24",
+        "background": "#EEF2FF",
+        "text": "#1E1B4B"
+      },
+      "hero": {
+        "headline": "Excellence Is a Habit We Teach.",
+        "subheadline": "ICSE school in Hyderabad blending heritage values with global learning.",
+        "cta": "Schedule Campus Visit"
+      },
+      "services": [
+        { "title": "ICSE Curriculum", "description": "From Nursery to Class 12 with science and commerce.", "icon": "🎓" },
+        { "title": "Sports Academy", "description": "Cricket, swimming, tennis and athletics coaching.", "icon": "🏏" },
+        { "title": "Performing Arts", "description": "Music, dance, theatre and visual arts integrated.", "icon": "🎭" }
+      ]
+    },
+    {
+      "id": "tpl_037",
+      "name": "LuxeStyle Salon",
+      "tier": "pro",
+      "business_type": "Salon",
+      "tags": ["salon", "luxury", "unisex"],
+      "popular": true,
+      "preview_color": "#BE123C",
+      "colors": {
+        "primary": "#BE123C",
+        "secondary": "#4C0519",
+        "accent": "#FECDD3",
+        "background": "#FFF1F2",
+        "text": "#4C0519"
+      },
+      "hero": {
+        "headline": "Beauty, Reinvented.",
+        "subheadline": "Luxury unisex salon and spa in Jubilee Hills with master stylists.",
+        "cta": "Book a Service"
+      },
+      "services": [
+        { "title": "Hair Spa & Color", "description": "L'Oréal Professionnel and Schwarzkopf certified.", "icon": "💆" },
+        { "title": "Bridal Suites", "description": "Private bridal studios with airbrush specialists.", "icon": "👰" },
+        { "title": "Spa & Wellness", "description": "Aromatherapy, hot stone and Thai massages.", "icon": "🌿" }
+      ]
+    },
+    {
+      "id": "tpl_038",
+      "name": "Taj Coromandel Stay",
+      "tier": "pro",
+      "business_type": "Hotel",
+      "tags": ["hotel", "luxury", "business"],
+      "popular": false,
+      "preview_color": "#A16207",
+      "colors": {
+        "primary": "#A16207",
+        "secondary": "#451A03",
+        "accent": "#FDE68A",
+        "background": "#FFFBEB",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "Where Heritage Meets Hospitality.",
+        "subheadline": "5-star comfort in Nungambakkam, walkable to the Consulate district.",
+        "cta": "Book Your Stay"
+      },
+      "services": [
+        { "title": "Executive Suites", "description": "Spacious suites with workspace and butler service.", "icon": "🛎️" },
+        { "title": "Fine Dining", "description": "Two signature restaurants and a rooftop lounge.", "icon": "🍽️" },
+        { "title": "Banquets & MICE", "description": "Conference halls and wedding lawns for 50–1500 guests.", "icon": "🥂" }
+      ]
+    },
+    {
+      "id": "tpl_039",
+      "name": "Iyer Legal Partners",
+      "tier": "pro",
+      "business_type": "Lawyer",
+      "tags": ["lawyer", "corporate-law", "firm"],
+      "popular": false,
+      "preview_color": "#1F2937",
+      "colors": {
+        "primary": "#1F2937",
+        "secondary": "#030712",
+        "accent": "#FBBF24",
+        "background": "#F9FAFB",
+        "text": "#111827"
+      },
+      "hero": {
+        "headline": "Strategic Legal Counsel for Growing Businesses.",
+        "subheadline": "Full-service law firm with offices in Chennai and Bengaluru.",
+        "cta": "Engage Our Team"
+      },
+      "services": [
+        { "title": "Corporate Law", "description": "M&A, joint ventures and shareholder agreements.", "icon": "🏛️" },
+        { "title": "IP & Trademark", "description": "Patent, trademark and copyright filing and litigation.", "icon": "©️" },
+        { "title": "Litigation", "description": "Representation across HCs, NCLT and arbitration tribunals.", "icon": "⚖️" }
+      ]
+    },
+    {
+      "id": "tpl_040",
+      "name": "HealWell Pharmacy Plus",
+      "tier": "pro",
+      "business_type": "Pharmacy",
+      "tags": ["pharmacy", "online", "subscription"],
+      "popular": false,
+      "preview_color": "#059669",
+      "colors": {
+        "primary": "#059669",
+        "secondary": "#064E3B",
+        "accent": "#6EE7B7",
+        "background": "#ECFDF5",
+        "text": "#064E3B"
+      },
+      "hero": {
+        "headline": "Your Family Pharmacy, Reimagined.",
+        "subheadline": "Online ordering, subscription refills and free consultations from licensed pharmacists.",
+        "cta": "Start Subscription"
+      },
+      "services": [
+        { "title": "Medicine Subscriptions", "description": "Auto-refill for diabetes, BP and chronic care meds.", "icon": "📅" },
+        { "title": "Lab Tests at Home", "description": "Sample collection from doorstep with NABL labs.", "icon": "🧬" },
+        { "title": "Doctor Consultation", "description": "Free 10-minute teleconsultation with every order.", "icon": "👨‍⚕️" }
+      ]
+    },
+    {
+      "id": "tpl_041",
+      "name": "Choco Cravings Bakery",
+      "tier": "pro",
+      "business_type": "Bakery",
+      "tags": ["bakery", "premium", "dessert"],
+      "popular": false,
+      "preview_color": "#57534E",
+      "colors": {
+        "primary": "#57534E",
+        "secondary": "#1C1917",
+        "accent": "#FDBA74",
+        "background": "#FAFAF9",
+        "text": "#1C1917"
+      },
+      "hero": {
+        "headline": "For the Love of Chocolate.",
+        "subheadline": "Premium patisserie in Banjara Hills crafting Belgian chocolate desserts.",
+        "cta": "Order Online"
+      },
+      "services": [
+        { "title": "Designer Cakes", "description": "Couture wedding and celebration cakes.", "icon": "🎂" },
+        { "title": "Chocolate Truffles", "description": "Hand-rolled bonbons with seasonal fillings.", "icon": "🍫" },
+        { "title": "Corporate Gifting", "description": "Branded hampers for festivals and events.", "icon": "🎁" }
+      ]
+    },
+    {
+      "id": "tpl_042",
+      "name": "Mindset NEET Coaching",
+      "tier": "pro",
+      "business_type": "Coaching Center",
+      "tags": ["neet", "medical", "coaching"],
+      "popular": true,
+      "preview_color": "#115E59",
+      "colors": {
+        "primary": "#115E59",
+        "secondary": "#042F2E",
+        "accent": "#5EEAD4",
+        "background": "#F0FDFA",
+        "text": "#042F2E"
+      },
+      "hero": {
+        "headline": "Your Path to a White Coat Begins Here.",
+        "subheadline": "Result-oriented NEET coaching with 300+ MBBS selections last year.",
+        "cta": "Book a Free Counselling"
+      },
+      "services": [
+        { "title": "NEET Classroom", "description": "Two-year and one-year integrated batches.", "icon": "🩺" },
+        { "title": "Test Series", "description": "All-India ranked tests every weekend.", "icon": "📝" },
+        { "title": "Crash Course", "description": "60-day intensive revision before final exam.", "icon": "⚡" }
+      ]
+    },
+    {
+      "id": "tpl_043",
+      "name": "Royal Feast Catering",
+      "tier": "pro",
+      "business_type": "Catering",
+      "tags": ["catering", "wedding", "luxury"],
+      "popular": false,
+      "preview_color": "#991B1B",
+      "colors": {
+        "primary": "#991B1B",
+        "secondary": "#450A0A",
+        "accent": "#FCA5A5",
+        "background": "#FEF2F2",
+        "text": "#450A0A"
+      },
+      "hero": {
+        "headline": "Feast Like Royalty.",
+        "subheadline": "Multi-cuisine luxury catering for weddings and high-profile events.",
+        "cta": "Plan Your Menu"
+      },
+      "services": [
+        { "title": "Multi-Cuisine Spreads", "description": "South Indian, North Indian, Continental, Chinese.", "icon": "🍱" },
+        { "title": "Live Stations", "description": "Pasta, dosa, kebab and mocktail counters.", "icon": "🔥" },
+        { "title": "Themed Menus", "description": "Mughlai, Chettinad, Awadhi and royal thalis.", "icon": "👑" }
+      ]
+    },
+    {
+      "id": "tpl_044",
+      "name": "Bloom & Petal Florists",
+      "tier": "pro",
+      "business_type": "Flower Shop",
+      "tags": ["florist", "luxury", "decor"],
+      "popular": true,
+      "preview_color": "#A21CAF",
+      "colors": {
+        "primary": "#A21CAF",
+        "secondary": "#581C87",
+        "accent": "#F0ABFC",
+        "background": "#FAF5FF",
+        "text": "#3B0764"
+      },
+      "hero": {
+        "headline": "Florals With a Story.",
+        "subheadline": "Boutique floral studio for weddings, events and luxury gifting.",
+        "cta": "Order Bouquets"
+      },
+      "services": [
+        { "title": "Bridal Florals", "description": "Mandap, jaimala and aisle decor with imported blooms.", "icon": "🌷" },
+        { "title": "Subscription Flowers", "description": "Weekly fresh flowers for homes and offices.", "icon": "🌺" },
+        { "title": "Event Installations", "description": "Floral arches, walls and table centerpieces.", "icon": "🌼" }
+      ]
+    },
+    {
+      "id": "tpl_045",
+      "name": "TurboDrive Auto Care",
+      "tier": "pro",
+      "business_type": "Auto Service",
+      "tags": ["auto", "premium", "performance"],
+      "popular": false,
+      "preview_color": "#18181B",
+      "colors": {
+        "primary": "#18181B",
+        "secondary": "#000000",
+        "accent": "#FACC15",
+        "background": "#FAFAFA",
+        "text": "#09090B"
+      },
+      "hero": {
+        "headline": "Performance. Precision. Pride.",
+        "subheadline": "Premium multi-brand car care studio for German and Japanese luxury cars.",
+        "cta": "Book a Diagnostic"
+      },
+      "services": [
+        { "title": "Engine Diagnostics", "description": "OBD-II scans with manufacturer-grade tools.", "icon": "🛠️" },
+        { "title": "Detailing & PPF", "description": "Ceramic coating and paint protection film.", "icon": "🚘" },
+        { "title": "Wheel Alignment", "description": "3D laser alignment and balancing.", "icon": "🛞" }
+      ]
+    },
+    {
+      "id": "tpl_046",
+      "name": "Hyderabad Royal Diamonds",
+      "tier": "pro_plus",
+      "business_type": "Jewellery Store",
+      "tags": ["jewellery", "luxury", "diamond"],
+      "popular": true,
+      "preview_color": "#854D0E",
+      "colors": {
+        "primary": "#854D0E",
+        "secondary": "#422006",
+        "accent": "#FDE68A",
+        "background": "#FFFBEB",
+        "text": "#422006"
+      },
+      "hero": {
+        "headline": "Diamonds Worthy of Royalty.",
+        "subheadline": "Solitaire boutique in Banjara Hills with IGI- and GIA-certified diamonds.",
+        "cta": "Book a Private Viewing"
+      },
+      "services": [
+        { "title": "Certified Solitaires", "description": "0.30 to 5 ct stones with full provenance.", "icon": "💎" },
+        { "title": "Bespoke Bridal", "description": "Custom-designed sets in 22K, 18K and platinum.", "icon": "👑" },
+        { "title": "Investment Bullion", "description": "Bank-vault gold and silver coins for investment.", "icon": "🥇" }
+      ]
+    },
+    {
+      "id": "tpl_047",
+      "name": "Apollo Smile Dental Plus",
+      "tier": "pro_plus",
+      "business_type": "Dental Clinic",
+      "tags": ["dental", "premium", "implants"],
+      "popular": false,
+      "preview_color": "#134E4A",
+      "colors": {
+        "primary": "#134E4A",
+        "secondary": "#042F2E",
+        "accent": "#5EEAD4",
+        "background": "#F0FDFA",
+        "text": "#042F2E"
+      },
+      "hero": {
+        "headline": "Advanced Dentistry. Personal Care.",
+        "subheadline": "Multi-specialty dental hospital with full-mouth rehabilitation expertise.",
+        "cta": "Book Specialist Consult"
+      },
+      "services": [
+        { "title": "Full Mouth Implants", "description": "All-on-4 and All-on-6 immediate loading implants.", "icon": "🦷" },
+        { "title": "Digital Smile Design", "description": "3D preview before veneers and smile makeovers.", "icon": "💻" },
+        { "title": "Sedation Dentistry", "description": "Anxiety-free treatments with conscious sedation.", "icon": "😌" }
+      ]
+    },
+    {
+      "id": "tpl_048",
+      "name": "Spice Symphony Restaurant",
+      "tier": "pro_plus",
+      "business_type": "Restaurant",
+      "tags": ["restaurant", "fine-dining", "indian"],
+      "popular": false,
+      "preview_color": "#C2410C",
+      "colors": {
+        "primary": "#C2410C",
+        "secondary": "#431407",
+        "accent": "#FED7AA",
+        "background": "#FFF7ED",
+        "text": "#431407"
+      },
+      "hero": {
+        "headline": "A Symphony of Indian Flavours.",
+        "subheadline": "Award-winning fine-dining restaurant on Cathedral Road, Chennai.",
+        "cta": "Reserve a Table"
+      },
+      "services": [
+        { "title": "Chef's Tasting Menu", "description": "Seven-course curated experience pairings.", "icon": "👨‍🍳" },
+        { "title": "Private Dining", "description": "Intimate rooms for celebrations and business dinners.", "icon": "🕯️" },
+        { "title": "Wine Cellar", "description": "150+ Indian and international labels curated.", "icon": "🍷" }
+      ]
+    },
+    {
+      "id": "tpl_049",
+      "name": "Elite Fitness Hub",
+      "tier": "pro_plus",
+      "business_type": "Gym",
+      "tags": ["gym", "luxury", "wellness-club"],
+      "popular": true,
+      "preview_color": "#09090B",
+      "colors": {
+        "primary": "#09090B",
+        "secondary": "#18181B",
+        "accent": "#F59E0B",
+        "background": "#FAFAFA",
+        "text": "#09090B"
+      },
+      "hero": {
+        "headline": "An Elite Standard of Fitness.",
+        "subheadline": "Members-only wellness club in Koramangala with hydrotherapy and spa.",
+        "cta": "Apply for Membership"
+      },
+      "services": [
+        { "title": "Personal Training", "description": "1:1 sessions with internationally certified coaches.", "icon": "🏋️" },
+        { "title": "Recovery Spa", "description": "Cryotherapy, sauna and ice baths for athletes.", "icon": "🛁" },
+        { "title": "Nutrition Lab", "description": "DEXA scans, VO2 max and bespoke meal plans.", "icon": "🥗" }
+      ]
+    },
+    {
+      "id": "tpl_050",
+      "name": "Skyline Luxe Realty",
+      "tier": "pro_plus",
+      "business_type": "Real Estate",
+      "tags": ["real-estate", "ultra-luxury", "villas"],
+      "popular": false,
+      "preview_color": "#0C4A6E",
+      "colors": {
+        "primary": "#0C4A6E",
+        "secondary": "#082F49",
+        "accent": "#FDE68A",
+        "background": "#F0F9FF",
+        "text": "#082F49"
+      },
+      "hero": {
+        "headline": "Trophy Homes for the Discerning Few.",
+        "subheadline": "Ultra-luxury villas and penthouses across South India's prime addresses.",
+        "cta": "Schedule Private Tour"
+      },
+      "services": [
+        { "title": "Curated Villas", "description": "Sea-facing and farm-to-home estates in ECR and Coorg.", "icon": "🏖️" },
+        { "title": "Branded Residences", "description": "Trump, Four Seasons and Ritz-Carlton portfolio.", "icon": "🌟" },
+        { "title": "Concierge Services", "description": "Interior design, staffing and lifestyle management.", "icon": "🛎️" }
+      ]
+    }
+  ]
+}
