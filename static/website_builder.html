@@ -497,7 +497,7 @@ async function loadUser() {
 }
 
 async function loadTemplates() {
-  // Try auth API first, fall back to static JSON
+  // Try auth API first
   if (TOKEN) {
     try {
       const res = await fetch('/websites/templates', { headers: HDR });
@@ -508,12 +508,12 @@ async function loadTemplates() {
         renderTemplates();
         return;
       }
-    } catch (e) { console.warn('API templates failed, using JSON fallback'); }
+    } catch (e) { console.warn('API failed, using JSON fallback'); }
   }
-  // Fallback: load directly from static JSON
+  // Fallback: load from static JSON
   try {
-    const res = await fetch('/website_templates.json');
-    if (!res.ok) throw new Error('JSON not found');
+    const res = await fetch('/static/website_templates.json');
+    if (!res.ok) throw new Error('JSON fetch failed: ' + res.status);
     const data = await res.json();
     const PLAN_ORDER = ['free','starter','starter_plus','pro','pro_plus'];
     const userPlanIdx = PLAN_ORDER.indexOf(state.user_plan);
@@ -522,7 +522,7 @@ async function loadTemplates() {
       name: t.name,
       description: t.business_type || '',
       plan_tier: t.tier,
-      preview_color: t.preview_color || '#C50022',
+      preview_color: t.preview_color || '#333',
       colors: t.colors || {},
       locked: PLAN_ORDER.indexOf(t.tier) > userPlanIdx,
     }));
@@ -532,9 +532,9 @@ async function loadTemplates() {
     };
     renderTemplates();
   } catch (e) {
+    console.error('Template load failed:', e);
     document.getElementById('tmplGrid').innerHTML =
-      '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#f87171;font-size:13px">Could not load templates.</div>';
-    console.error(e);
+      '<div style="grid-column:1/-1;text-align:center;padding:30px;color:#f87171;font-size:13px">Could not load templates. Error: ' + e.message + '</div>';
   }
 }
 
@@ -549,14 +549,14 @@ function renderTemplates() {
     const tier = t.plan_tier || 'free';
     const locked = t.locked === true;
     const selected = state.selected_template === t.id ? 'selected' : '';
-    const bg = t.preview_color
-      ? `background:linear-gradient(135deg,${t.preview_color},${t.colors?.secondary||'#000'})`
-      : '';
-    const tierLabel = tier.replace('_plus','+').replace('_',' ').toUpperCase();
+    const primaryColor = t.preview_color || '#333';
+    const secondaryColor = t.colors?.secondary || '#000';
+    const tierLabel = tier.replace('_plus','+').replace('starter','STARTER').replace('pro','PRO').replace('free','FREE').toUpperCase();
     return `
       <div class="tmpl-card ${locked?'locked':''} ${selected}" data-tid="${t.id}" data-tier="${tier}" data-locked="${locked}">
-        <div class="tmpl-thumb" style="${bg}">
-          <span style="font-size:11px;font-weight:700;letter-spacing:0.5px;text-align:center;padding:0 8px">${escapeHtml(t.name)}</span>
+        <div class="tmpl-thumb" style="background:linear-gradient(135deg,${primaryColor},${secondaryColor});display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px">
+          <span style="font-size:22px">${getBusinessEmoji(t.description)}</span>
+          <span style="font-size:11px;font-weight:700;color:#fff;text-align:center;padding:0 8px;line-height:1.3">${escapeHtml(t.name)}</span>
           <div class="tier-badge">${tierLabel}</div>
           ${locked ? '<div class="tmpl-lock-overlay">🔒</div>' : ''}
         </div>
@@ -571,7 +571,7 @@ function renderTemplates() {
     card.addEventListener('click', () => {
       if (card.dataset.locked === 'true') {
         document.getElementById('upgradeText').textContent =
-          `This is a ${card.dataset.tier.replace('_',' ')} template. Upgrade to unlock.`;
+          'This is a ' + card.dataset.tier.replace('_',' ') + ' template. Upgrade to unlock.';
         document.getElementById('upgradeModal').classList.add('show');
         return;
       }
@@ -980,6 +980,23 @@ function showToast(msg) {
   t.textContent = msg;
   t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+function getBusinessEmoji(businessType) {
+  const map = {
+    'Jewellery': '💍', 'Dental': '🦷', 'Restaurant': '🍽️', 'Gym': '💪',
+    'Real Estate': '🏠', 'School': '🏫', 'Salon': '💇', 'Hotel': '🏨',
+    'Lawyer': '⚖️', 'Pharmacy': '💊', 'Bakery': '🥐', 'Coaching': '📚',
+    'Catering': '🍱', 'Flower': '🌸', 'Auto': '🔧', 'Tailor': '🧵',
+    'Optician': '👓', 'Yoga': '🧘', 'Photo': '📸', 'Event': '🎉',
+    'CA': '📊', 'Accountant': '📊', 'Pest': '🐛', 'Courier': '📦',
+    'Supermarket': '🛒', 'Bookstore': '📖', 'Music': '🎵', 'Dance': '💃',
+    'Driving': '🚗', 'Astrologer': '🔮', 'Clinic': '🏥', 'Spa': '💆'
+  };
+  for (const [key, emoji] of Object.entries(map)) {
+    if (businessType && businessType.includes(key)) return emoji;
+  }
+  return '🏢';
 }
 
 init();
