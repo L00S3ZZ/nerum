@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+body{font-family:'Inter',sans-serif;background:#fff;color:#1E3A5F;line-height:1.6}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+header{padding:22px 0;background:#fff;border-bottom:1px solid #E0F2FE}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-size:20px;font-weight:700;color:#1E3A5F}
+.brand-mark{width:36px;height:36px;border-radius:10px;background:#14B8A6;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+header .call{color:#14B8A6;font-weight:600;text-decoration:none;font-size:14px}
+.hero{padding:70px 0 60px;display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:center}
+.hero h1{font-size:44px;line-height:1.15;font-weight:700;color:#1E3A5F;margin-bottom:16px}
+.hero h1 span{color:#14B8A6}
+.hero p{color:#5b6b80;font-size:17px;margin-bottom:28px;max-width:520px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{padding:14px 26px;border-radius:8px;font-weight:600;text-decoration:none;font-size:14px;display:inline-block}
+.btn-p{background:#14B8A6;color:#fff}
+.btn-o{background:#E0F2FE;color:#1E3A5F}
+.hero-svg{display:flex;justify-content:center;align-items:center}
+.hero-svg svg{max-width:260px;width:100%}
+section{padding:60px 0}
+.title{font-size:30px;font-weight:700;color:#1E3A5F;text-align:center;margin-bottom:38px}
+.title span{color:#14B8A6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.service-item{padding:24px;background:#F8FCFC;border:1px solid #E0F2FE;border-radius:10px;text-align:left}
+.service-item::before{content:'+';display:inline-block;width:30px;height:30px;border-radius:50%;background:#14B8A6;color:#fff;text-align:center;line-height:30px;font-weight:700;margin-bottom:12px}
+.service-item span{display:block;font-size:16px;font-weight:600;color:#1E3A5F}
+.contact-strip{background:#1E3A5F;color:#fff;padding:40px;border-radius:14px;display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:center}
+.contact-strip h3{font-size:24px;margin-bottom:14px}
+.contact-strip p{margin:8px 0;color:#fffd;font-size:15px}
+.contact-strip strong{color:#14B8A6;font-weight:600;margin-right:8px}
+.cs-cta{display:flex;flex-direction:column;gap:10px}
+footer{padding:26px 0;text-align:center;color:#7e8a9c;font-size:13px;border-top:1px solid #E0F2FE}
+footer a{color:#14B8A6;text-decoration:none}
+@media(max-width:760px){.hero{grid-template-columns:1fr}.hero h1{font-size:30px}.contact-strip{grid-template-columns:1fr;padding:28px}.title{font-size:22px}}
+</style>
+</head>
+<body>
+<header><div class="wrap bar">
+  <div class="brand"><div class="brand-mark">+</div>{{BUSINESS_NAME}}</div>
+  <a class="call" href="tel:{{PHONE}}">📞 {{PHONE}}</a>
+</div></header>
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <h1>Healthy smiles, <span>happy lives.</span></h1>
+      <p>{{TAGLINE}}</p>
+      <div class="ctas">
+        <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Book Appointment</a>
+        <a class="btn btn-o" href="tel:{{PHONE}}">Call Now</a>
+      </div>
+    </div>
+    <div class="hero-svg">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="100" cy="100" r="90" fill="#E0F2FE"/>
+        <path d="M100 50 C70 50 55 75 60 110 C62 140 75 160 90 160 C95 160 95 145 100 145 C105 145 105 160 110 160 C125 160 138 140 140 110 C145 75 130 50 100 50 Z" fill="#14B8A6"/>
+        <rect x="92" y="80" width="16" height="40" rx="3" fill="#fff"/>
+        <rect x="80" y="92" width="40" height="16" rx="3" fill="#fff"/>
+      </svg>
+    </div>
+  </section>
+  <section>
+    <h2 class="title">Our <span>Services</span></h2>
+    <div class="grid">{{SERVICES_HTML}}</div>
+  </section>
+  <section>
+    <div class="contact-strip">
+      <div>
+        <h3>Book your visit</h3>
+        <p><strong>Phone</strong>{{PHONE}}</p>
+        <p><strong>Email</strong>{{EMAIL}}</p>
+        <p><strong>Address</strong>{{ADDRESS}}</p>
+      </div>
+      <div class="cs-cta">
+        <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WhatsApp</a>
+        <a class="btn btn-o" style="background:#fff;color:#1E3A5F" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+      </div>
+    </div>
+  </section>
+</div>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

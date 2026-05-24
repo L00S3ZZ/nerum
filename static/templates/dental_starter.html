@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+body{font-family:'Poppins',sans-serif;background:#1E3A5F;color:#fff;line-height:1.6}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+nav{padding:22px 0;background:#1E3A5F}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{font-size:22px;font-weight:700;color:#fff}
+.brand b{color:#14B8A6}
+nav a.call{padding:10px 22px;background:#14B8A6;color:#fff;border-radius:30px;text-decoration:none;font-size:13px;font-weight:600}
+.hero{position:relative;padding:90px 0 140px;background:linear-gradient(180deg,#1E3A5F 0%,#142b48 100%);text-align:center;overflow:hidden}
+.hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:80px;background:#E0F2FE;clip-path:ellipse(70% 100% at 50% 100%)}
+.hero h1{font-size:54px;line-height:1.1;font-weight:800;margin-bottom:18px;letter-spacing:-0.02em}
+.hero h1 span{color:#14B8A6}
+.hero p{font-size:18px;color:#fffc;max-width:580px;margin:0 auto 30px}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.btn{padding:14px 30px;border-radius:30px;font-weight:600;text-decoration:none;font-size:14px;display:inline-block;transition:all 0.25s}
+.btn-p{background:#14B8A6;color:#fff;box-shadow:0 12px 28px rgba(20,184,166,0.4)}
+.btn-p:hover{transform:translateY(-2px)}
+.btn-o{background:#fff;color:#1E3A5F}
+.about-strip{background:#E0F2FE;padding:90px 0;color:#1E3A5F}
+.about-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px}
+.about-card{background:#fff;padding:30px;border-radius:18px;box-shadow:0 8px 24px rgba(30,58,95,0.08);transition:transform 0.25s}
+.about-card:hover{transform:translateY(-4px)}
+.about-card .icon{width:48px;height:48px;border-radius:14px;background:#14B8A6;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:700;margin-bottom:14px}
+.about-card h3{font-size:18px;color:#1E3A5F;margin-bottom:6px}
+.about-card p{font-size:13.5px;color:#5b6b80}
+section{padding:90px 0}
+.title{font-size:38px;text-align:center;margin-bottom:48px;color:#fff;font-weight:700}
+.title span{color:#14B8A6}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:18px}
+.service-item{padding:30px;background:#fff;color:#1E3A5F;border-radius:16px;border-left:4px solid #14B8A6;transition:all 0.3s}
+.service-item:hover{transform:translateY(-4px);box-shadow:0 16px 36px rgba(0,0,0,0.25)}
+.service-item span{font-size:17px;font-weight:600}
+.gallery{padding:90px 0;background:#142b48}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.gtile{aspect-ratio:1;background:linear-gradient(135deg,#14B8A6,#1E3A5F);border-radius:14px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:42px;transition:transform 0.3s}
+.gtile:hover{transform:scale(1.04)}
+.contact{padding:90px 0}
+.contact-card{background:linear-gradient(135deg,#14B8A6,#0d8073);border-radius:24px;padding:54px;text-align:center}
+.contact-card h2{font-size:36px;margin-bottom:14px;font-weight:700}
+.contact-card .info{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin:20px 0 28px;font-size:15px}
+footer{padding:30px 0;text-align:center;color:#fff8;font-size:13px;background:#142b48}
+footer a{color:#14B8A6;text-decoration:none}
+@media(max-width:760px){.hero h1{font-size:34px}.title{font-size:26px}.contact-card{padding:36px 22px}.contact-card h2{font-size:26px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap row">
+  <div class="brand"><b>+</b> {{BUSINESS_NAME}}</div>
+  <a class="call" href="tel:{{PHONE}}">📞 {{PHONE}}</a>
+</div></nav>
+<section class="hero"><div class="wrap">
+  <h1>Where every smile <span>begins.</span></h1>
+  <p>{{TAGLINE}}</p>
+  <div class="ctas">
+    <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WhatsApp to Book</a>
+    <a class="btn btn-o" href="tel:{{PHONE}}">Call Us</a>
+  </div>
+</div></section>
+<div class="about-strip"><div class="wrap">
+  <div class="about-cards">
+    <div class="about-card"><div class="icon">⏱</div><h3>Same-day care</h3><p>Walk-ins welcome — most consultations on the day you call.</p></div>
+    <div class="about-card"><div class="icon">🦷</div><h3>Modern tech</h3><p>Digital X-rays, rotary endodontics, and pain-free anaesthesia.</p></div>
+    <div class="about-card"><div class="icon">💳</div><h3>EMI options</h3><p>No-cost EMI on implants and orthodontics. Insurance accepted.</p></div>
+  </div>
+</div></div>
+<section><div class="wrap">
+  <h2 class="title">Our <span>Services</span></h2>
+  <div class="services-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<div class="gallery"><div class="wrap">
+  <h2 class="title">Our <span>Clinic</span></h2>
+  <div class="gallery-grid">
+    <div class="gtile">🦷</div><div class="gtile">🪥</div><div class="gtile">💉</div>
+    <div class="gtile">🩺</div><div class="gtile">✨</div><div class="gtile">😁</div>
+  </div>
+</div></div>
+<section class="contact"><div class="wrap">
+  <div class="contact-card">
+    <h2>Book your appointment</h2>
+    <div class="info">
+      <div>📞 {{PHONE}}</div><div>✉️ {{EMAIL}}</div><div>📍 {{ADDRESS}}</div>
+    </div>
+    <div class="ctas">
+      <a class="btn" style="background:#fff;color:#14B8A6" href="https://wa.me/91{{PHONE}}">WhatsApp</a>
+      <a class="btn" style="background:#1E3A5F;color:#fff" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

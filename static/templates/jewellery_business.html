@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&display=swap');
+:root{--gold:#DAA520;--rose:#B76E79;--burgundy:#4A0010;--cream:#FFF8E7;--ink:#080404}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+
+/* floating gold particles */
+.bg-particles{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.bg-particles span{position:absolute;width:3px;height:3px;background:var(--gold);border-radius:50%;opacity:0.4;animation:rise 18s linear infinite}
+.bg-particles span:nth-child(1){left:8%;animation-delay:0s}.bg-particles span:nth-child(2){left:18%;animation-delay:3s}
+.bg-particles span:nth-child(3){left:32%;animation-delay:6s}.bg-particles span:nth-child(4){left:48%;animation-delay:1s}
+.bg-particles span:nth-child(5){left:62%;animation-delay:8s}.bg-particles span:nth-child(6){left:78%;animation-delay:11s}
+.bg-particles span:nth-child(7){left:88%;animation-delay:5s}.bg-particles span:nth-child(8){left:42%;animation-delay:13s}
+@keyframes rise{0%{transform:translateY(110vh);opacity:0}10%{opacity:0.6}90%{opacity:0.6}100%{transform:translateY(-10vh);opacity:0}}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(8,4,4,0.78);backdrop-filter:blur(24px);border-bottom:1px solid rgba(218,165,32,0.15);padding:20px 0}
+nav .row{display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;background:linear-gradient(90deg,var(--gold),#fff5d6,var(--gold));background-size:200%;-webkit-background-clip:text;background-clip:text;color:transparent;animation:goldshift 5s linear infinite;letter-spacing:0.02em}
+@keyframes goldshift{to{background-position:200% center}}
+nav ul{display:flex;gap:34px;list-style:none}
+nav ul a{color:#FFF8E7aa;text-decoration:none;font-size:13.5px;letter-spacing:0.05em;transition:color 0.2s}
+nav ul a:hover{color:var(--gold)}
+.cta-btn{padding:11px 24px;border:1px solid var(--gold);color:var(--gold);border-radius:30px;text-decoration:none;font-size:13px;font-weight:500;transition:all 0.25s}
+.cta-btn:hover{background:var(--gold);color:#000}
+
+.hero{position:relative;min-height:95vh;display:grid;place-items:center;text-align:center;padding:80px 0;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:-30%;background:radial-gradient(ellipse at 50% 30%,rgba(218,165,32,0.18) 0%,transparent 50%),radial-gradient(ellipse at 50% 70%,rgba(183,110,121,0.12) 0%,transparent 55%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;max-width:880px}
+.hero-svg{width:200px;height:200px;margin:0 auto 32px;display:block;animation:spinslow 22s linear infinite}
+@keyframes spinslow{to{transform:rotate(360deg)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:96px;font-weight:500;line-height:0.98;letter-spacing:-0.03em;margin-bottom:24px;background:linear-gradient(180deg,#fff7e0 0%,var(--gold) 60%,var(--rose) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 em{font-style:italic;color:var(--rose);background:none;-webkit-text-fill-color:var(--rose)}
+.hero p{font-size:19px;color:#FFF8E7cc;max-width:600px;margin:0 auto 38px;line-height:1.75;font-weight:300}
+.ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{padding:16px 36px;border-radius:34px;font-weight:600;text-decoration:none;font-size:13.5px;letter-spacing:0.1em;text-transform:uppercase;display:inline-block;transition:all 0.3s}
+.btn-p{background:linear-gradient(135deg,var(--gold),#f0c248);color:#000;box-shadow:0 18px 40px rgba(218,165,32,0.4)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(218,165,32,0.55)}
+.btn-o{border:1px solid var(--gold);color:var(--gold);background:transparent}
+.btn-o:hover{background:rgba(218,165,32,0.12)}
+
+section{padding:120px 0;position:relative;z-index:2}
+.kicker{font-size:11px;color:var(--gold);letter-spacing:0.5em;text-transform:uppercase;font-weight:600;text-align:center;margin-bottom:14px}
+.section-title{font-family:'Playfair Display',serif;font-size:64px;font-weight:500;text-align:center;margin-bottom:60px;color:var(--cream);letter-spacing:-0.02em;line-height:1.05}
+.section-title em{color:var(--gold);font-style:italic}
+
+.about-row{display:grid;grid-template-columns:1.05fr 1fr;gap:70px;align-items:center}
+.about-row .lede{font-family:'Playfair Display',serif;font-size:28px;font-weight:400;color:var(--cream);line-height:1.4;margin-bottom:24px}
+.about-row p{color:#FFF8E7aa;line-height:1.85;font-size:16px;margin-bottom:14px}
+.about-art{aspect-ratio:1;background:linear-gradient(135deg,var(--burgundy),#1c0008);border:1px solid rgba(218,165,32,0.25);border-radius:24px;display:grid;place-items:center;position:relative;overflow:hidden}
+.about-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(218,165,32,0.2),transparent 65%)}
+.about-art span{position:relative;font-family:'Playfair Display',serif;font-size:140px;color:var(--gold);line-height:1}
+
+.glass-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.service-item{padding:38px 30px;background:linear-gradient(135deg,rgba(218,165,32,0.06),rgba(74,0,16,0.4));border:1px solid rgba(218,165,32,0.22);border-radius:22px;backdrop-filter:blur(14px);transition:all 0.4s;animation:fadeUp 0.8s ease both;position:relative;overflow:hidden}
+.service-item::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(218,165,32,0.18),transparent);transition:left 0.7s}
+.service-item:hover::before{left:100%}
+.service-item:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:0 30px 60px rgba(218,165,32,0.22)}
+.service-item span{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--gold);position:relative}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tcard{padding:36px 28px;background:rgba(255,248,231,0.04);border:1px solid rgba(218,165,32,0.18);border-radius:20px;position:relative}
+.tcard::before{content:'"';position:absolute;top:8px;left:18px;font-family:'Playfair Display',serif;font-size:80px;color:var(--gold);opacity:0.35;line-height:1}
+.tcard p{color:#FFF8E7cc;line-height:1.75;font-size:15px;font-style:italic;margin-bottom:16px;position:relative}
+.tcard .who{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold);font-weight:500}
+.tcard .who small{display:block;color:#FFF8E777;font-family:'Inter',sans-serif;font-style:normal;font-size:12px;margin-top:2px;letter-spacing:0.1em;text-transform:uppercase}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center;background:linear-gradient(135deg,rgba(218,165,32,0.1),rgba(74,0,16,0.4));border:1px solid rgba(218,165,32,0.22);border-radius:28px;padding:60px 32px;position:relative;overflow:hidden}
+.stats::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(218,165,32,0.12),transparent 70%);pointer-events:none}
+.stat-num{font-family:'Playfair Display',serif;font-size:64px;font-weight:500;color:var(--gold);letter-spacing:-0.02em;line-height:1;position:relative}
+.stat-lbl{font-size:12px;letter-spacing:0.35em;text-transform:uppercase;color:#FFF8E7aa;margin-top:14px;position:relative}
+
+.contact-final{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:28px;overflow:hidden;border:1px solid rgba(218,165,32,0.22)}
+.contact-final .left{padding:64px;background:linear-gradient(135deg,var(--burgundy),#1a0006)}
+.contact-final .left h3{font-family:'Playfair Display',serif;font-size:48px;color:var(--gold);margin-bottom:30px;font-weight:500;line-height:1}
+.contact-final .left p{margin:14px 0;color:#FFF8E7cc;font-size:16px}
+.contact-final .left strong{color:var(--gold);font-weight:500;margin-right:12px;font-family:'Playfair Display',serif;display:inline-block;min-width:80px;font-size:16px}
+.contact-final .right{padding:64px;background:linear-gradient(135deg,#1c1410,var(--ink));display:flex;flex-direction:column;justify-content:center;gap:18px}
+
+footer{padding:40px 0;text-align:center;color:#FFF8E777;font-size:13px;border-top:1px solid rgba(218,165,32,0.18);position:relative;z-index:2}
+footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:900px){nav ul{display:none}.hero h1{font-size:56px}.section-title{font-size:40px}.about-row,.contact-final{grid-template-columns:1fr}.testimonials{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:30px}.contact-final .left,.contact-final .right{padding:40px 28px}}
+</style>
+</head>
+<body>
+<div class="bg-particles"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+<nav><div class="wrap row">
+  <div class="brand">{{BUSINESS_NAME}}</div>
+  <ul><li><a href="#about">Heritage</a></li><li><a href="#collections">Collections</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Visit</a></li></ul>
+  <a class="cta-btn" href="tel:{{PHONE}}">{{PHONE}}</a>
+</div></nav>
+<section class="hero">
+  <div class="wrap"><div class="hero-inner">
+    <svg class="hero-svg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="diam" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#fff5d6"/><stop offset="50%" stop-color="#DAA520"/><stop offset="100%" stop-color="#B76E79"/></linearGradient>
+        <radialGradient id="halo"><stop offset="0%" stop-color="#DAA520" stop-opacity="0.5"/><stop offset="100%" stop-color="#DAA520" stop-opacity="0"/></radialGradient>
+      </defs>
+      <circle cx="100" cy="100" r="95" fill="url(#halo)"/>
+      <polygon points="100,30 150,80 100,170 50,80" fill="url(#diam)" stroke="#DAA520" stroke-width="2"/>
+      <line x1="50" y1="80" x2="150" y2="80" stroke="#FFF8E7" stroke-width="1.2" opacity="0.7"/>
+      <line x1="100" y1="30" x2="100" y2="170" stroke="#FFF8E7" stroke-width="1" opacity="0.55"/>
+      <line x1="75" y1="55" x2="125" y2="55" stroke="#FFF8E7" stroke-width="0.7" opacity="0.5"/>
+      <line x1="68" y1="80" x2="100" y2="170" stroke="#FFF8E7" stroke-width="0.6" opacity="0.4"/>
+      <line x1="132" y1="80" x2="100" y2="170" stroke="#FFF8E7" stroke-width="0.6" opacity="0.4"/>
+    </svg>
+    <h1>{{BUSINESS_NAME}}<br><em>Maison de bijoux</em></h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Book Private Viewing</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div></div>
+</section>
+<section id="about"><div class="wrap">
+  <div class="kicker">Our Heritage</div>
+  <h2 class="section-title">A legacy <em>set in gold</em></h2>
+  <div class="about-row">
+    <div>
+      <p class="lede">Three generations. One uncompromising standard of craft.</p>
+      <p>From the original atelier opened in 1952 to our flagship boutique today, every piece passes through the hands of master jewellers who learned the craft from their fathers. The diamonds are GIA-certified. The gold is BIS-hallmarked. The design is yours.</p>
+      <p>We work closely with brides, families and collectors who expect nothing less than perfection — and the patience that perfection requires.</p>
+    </div>
+    <div class="about-art"><span>✦</span></div>
+  </div>
+</div></section>
+<section id="collections"><div class="wrap">
+  <div class="kicker">Boutique</div>
+  <h2 class="section-title">Signature <em>collections</em></h2>
+  <div class="glass-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<section id="reviews"><div class="wrap">
+  <div class="kicker">Voices</div>
+  <h2 class="section-title">In the words of <em>our patrons</em></h2>
+  <div class="testimonials">
+    <div class="tcard"><p>Their bridal team designed a set that paid tribute to my grandmother's mangalsutra — completely modern, completely heirloom.</p><div class="who">Lakshmi R. <small>Bride, Chennai</small></div></div>
+    <div class="tcard"><p>I've trusted them with every important purchase in the last 20 years. The certifications, the after-care, the discretion — it's a different league.</p><div class="who">Mr. Krishnamurthy <small>Patron, Mylapore</small></div></div>
+    <div class="tcard"><p>You can see the difference in the polish, the cut, the weight in your hand. This is what real jewellery feels like.</p><div class="who">Anandi V. <small>Collector</small></div></div>
+  </div>
+</div></section>
+<section id="stats"><div class="wrap">
+  <div class="stats">
+    <div><div class="stat-num">73</div><div class="stat-lbl">Years</div></div>
+    <div><div class="stat-num">15K</div><div class="stat-lbl">Brides</div></div>
+    <div><div class="stat-num">100%</div><div class="stat-lbl">Certified</div></div>
+    <div><div class="stat-num">4</div><div class="stat-lbl">Boutiques</div></div>
+  </div>
+</div></section>
+<section id="contact"><div class="wrap">
+  <div class="contact-final">
+    <div class="left">
+      <h3>Visit our atelier</h3>
+      <p><strong>Phone</strong>{{PHONE}}</p>
+      <p><strong>Email</strong>{{EMAIL}}</p>
+      <p><strong>Address</strong>{{ADDRESS}}</p>
+    </div>
+    <div class="right">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WhatsApp Concierge</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

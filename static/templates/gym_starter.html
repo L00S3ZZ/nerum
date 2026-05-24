@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+body{font-family:'Inter',sans-serif;background:#1C1C1C;color:#fff;line-height:1.55}
+.wrap{max-width:1180px;margin:0 auto;padding:0 28px}
+nav{padding:22px 0;background:#1C1C1C;border-bottom:1px solid #2a2a2a}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{font-family:'Anton',sans-serif;font-size:32px;letter-spacing:0.08em;color:#fff}
+.brand b{color:#EAB308}
+nav a.cta{padding:11px 24px;background:#EAB308;color:#1C1C1C;border-radius:0;text-decoration:none;font-family:'Anton',sans-serif;font-size:14px;letter-spacing:0.1em}
+.hero{padding:90px 0;background:linear-gradient(120deg,#1C1C1C 0%,#2a2a2a 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-50%;right:-30%;width:80%;height:200%;background:#EAB308;clip-path:polygon(40% 0,100% 0,100% 100%,60% 100%);opacity:0.06}
+.hero .grid{display:grid;grid-template-columns:1.2fr 1fr;gap:50px;align-items:center;position:relative}
+.hero h1{font-family:'Anton',sans-serif;font-size:120px;letter-spacing:0.02em;line-height:0.9;color:#fff}
+.hero h1 span{color:#EAB308;display:inline-block;transform:rotate(-2deg)}
+.hero h1 em{font-style:normal;color:#DC2626}
+.hero p{font-size:18px;color:#fffc;max-width:480px;margin:24px 0 30px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.btn{padding:15px 30px;border-radius:0;font-family:'Anton',sans-serif;text-decoration:none;font-size:15px;letter-spacing:0.1em;display:inline-block;transition:all 0.2s;text-transform:uppercase}
+.btn-p{background:#EAB308;color:#1C1C1C}
+.btn-p:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 #DC2626}
+.btn-o{background:transparent;color:#fff;border:2px solid #fff}
+.btn-o:hover{background:#fff;color:#1C1C1C}
+.hero-art{display:flex;justify-content:center;align-items:center;font-size:200px;color:#EAB308}
+section{padding:90px 0}
+.section-tag{display:inline-block;background:#DC2626;color:#fff;padding:5px 14px;font-family:'Anton',sans-serif;font-size:13px;letter-spacing:0.18em;text-transform:uppercase;margin-bottom:14px}
+.title{font-family:'Anton',sans-serif;font-size:84px;letter-spacing:0.04em;color:#fff;line-height:0.95;margin-bottom:48px}
+.title span{color:#EAB308}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;background:#2a2a2a;border-left:6px solid #EAB308;padding:54px}
+.about h3{font-family:'Anton',sans-serif;font-size:56px;letter-spacing:0.03em;color:#EAB308;margin-bottom:14px;line-height:1}
+.about p{font-size:16px;color:#fffd;line-height:1.85;margin-bottom:14px}
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:0}
+.service-item{padding:36px 28px;background:#2a2a2a;border:1px solid #3a3a3a;border-right:4px solid #EAB308;transition:all 0.25s}
+.service-item:hover{background:#1C1C1C;border-right-color:#DC2626;transform:translateX(4px)}
+.service-item span{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:0.04em;color:#fff;text-transform:uppercase}
+.gallery-diag{background:linear-gradient(135deg,#DC2626 0%,#1C1C1C 100%);padding:80px 0;position:relative}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.gtile{aspect-ratio:1;background:#1C1C1C;border:1px solid #EAB30866;display:flex;align-items:center;justify-content:center;font-size:54px;transition:all 0.25s}
+.gtile:hover{background:#EAB308;color:#1C1C1C;border-color:#EAB308}
+.contact-strip{background:#EAB308;color:#1C1C1C;padding:60px 32px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.contact-strip h2{font-family:'Anton',sans-serif;font-size:72px;letter-spacing:0.03em;line-height:0.9;margin-bottom:18px}
+.contact-strip h2 span{color:#DC2626}
+.contact-strip p{margin:8px 0;font-size:15px;color:#1C1C1C}
+.contact-strip strong{margin-right:10px;font-family:'Anton',sans-serif;letter-spacing:0.08em;text-transform:uppercase;font-size:13px;display:inline-block;min-width:74px}
+footer{padding:30px 0;text-align:center;color:#888;font-size:12px;letter-spacing:0.1em;text-transform:uppercase;background:#1C1C1C}
+footer a{color:#EAB308;text-decoration:none}
+@media(max-width:760px){.hero .grid{grid-template-columns:1fr}.hero h1{font-size:60px}.title{font-size:46px}.about,.contact-strip{grid-template-columns:1fr;padding:32px 22px}.contact-strip h2{font-size:46px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap row">
+  <div class="brand">{{BUSINESS_NAME}}<b>·GYM</b></div>
+  <a class="cta" href="tel:{{PHONE}}">CALL {{PHONE}}</a>
+</div></nav>
+<section class="hero"><div class="wrap grid">
+  <div>
+    <h1>BUILT <span>STRONG.</span><br><em>TRAINED</em> SMART.</h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">CLAIM TRIAL</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">CALL NOW</a>
+    </div>
+  </div>
+  <div class="hero-art">💪</div>
+</div></section>
+<section><div class="wrap">
+  <div class="about">
+    <div>
+      <div class="section-tag">Our gym</div>
+      <h3>NO FLUFF.<br>JUST WORK.</h3>
+      <p>This isn't a wellness lounge. It's a gym. Calibrated plates, hex bars, sled, prowler, rings, ropes, sandbags. Whatever you need to get strong.</p>
+      <p>Open 5am to midnight. PT optional. Excuses optional.</p>
+    </div>
+    <div style="font-size:160px;text-align:center;color:#EAB308">🏋️</div>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <div class="section-tag">Programs</div>
+  <h2 class="title">WHAT WE <span>TRAIN</span></h2>
+  <div class="services-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<div class="gallery-diag"><div class="wrap">
+  <div class="section-tag" style="background:#1C1C1C">The Floor</div>
+  <h2 class="title">INSIDE THE <span>BOX</span></h2>
+  <div class="gallery-grid">
+    <div class="gtile">🏋️</div><div class="gtile">💪</div><div class="gtile">🥊</div>
+    <div class="gtile">🤸</div><div class="gtile">⚡</div><div class="gtile">🔥</div>
+  </div>
+</div></div>
+<section style="padding:0"><div class="contact-strip">
+  <div>
+    <h2>GET <span>STRONG.</span></h2>
+    <p><strong>PHONE</strong>{{PHONE}}</p>
+    <p><strong>EMAIL</strong>{{EMAIL}}</p>
+    <p><strong>ADDR</strong>{{ADDRESS}}</p>
+  </div>
+  <div class="ctas" style="justify-content:flex-end">
+    <a class="btn" style="background:#1C1C1C;color:#EAB308" href="https://wa.me/91{{PHONE}}">WHATSAPP</a>
+    <a class="btn" style="background:#DC2626;color:#fff" href="tel:{{PHONE}}">CALL</a>
+  </div>
+</div></section>
+<footer>© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></footer>
+</body>
+</html>

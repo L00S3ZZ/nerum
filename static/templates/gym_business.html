@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Anton&family=Inter:wght@300;400;500;600&display=swap');
+:root{--yellow:#EAB308;--red:#DC2626;--ink:#050505;--char:#1C1C1C;--white:#fff}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:#fff;overflow-x:hidden;line-height:1.55}
+.wrap{max-width:1300px;margin:0 auto;padding:0 32px}
+
+/* energy waves */
+.waves{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
+.waves span{position:absolute;border-radius:50%;border:2px solid var(--yellow);opacity:0;animation:wave 8s ease-out infinite}
+.waves span:nth-child(1){left:8%;top:30%;width:140px;height:140px;animation-delay:0s}
+.waves span:nth-child(2){left:78%;top:50%;width:200px;height:200px;animation-delay:2s;border-color:var(--red)}
+.waves span:nth-child(3){left:30%;top:75%;width:120px;height:120px;animation-delay:4s}
+.waves span:nth-child(4){left:60%;top:15%;width:160px;height:160px;animation-delay:6s;border-color:var(--red)}
+@keyframes wave{0%{opacity:0;transform:scale(0.6)}25%{opacity:0.4}100%{opacity:0;transform:scale(2.5)}}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(5,5,5,0.78);backdrop-filter:blur(22px);border-bottom:1px solid var(--yellow);padding:20px 0}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px}
+.brand{font-family:'Oswald',sans-serif;font-size:30px;font-weight:700;letter-spacing:0.08em;color:#fff;text-transform:uppercase}
+.brand b{color:var(--yellow)}
+nav ul{display:flex;gap:34px;list-style:none}
+nav ul a{color:#fff9;text-decoration:none;font-family:'Oswald',sans-serif;font-size:14px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;transition:color 0.2s}
+nav ul a:hover{color:var(--yellow)}
+.cta{padding:12px 26px;background:var(--yellow);color:var(--ink);font-family:'Oswald',sans-serif;letter-spacing:0.12em;font-size:13px;font-weight:600;text-decoration:none;text-transform:uppercase;transition:all 0.25s}
+.cta:hover{background:#fff}
+
+.hero{min-height:95vh;display:grid;place-items:center;text-align:center;padding:80px 0;position:relative;overflow:hidden;z-index:2}
+.hero::before{content:'';position:absolute;inset:-30%;background:radial-gradient(ellipse at 50% 30%,rgba(234,179,8,0.22) 0%,transparent 55%),radial-gradient(ellipse at 50% 80%,rgba(220,38,38,0.18) 0%,transparent 55%);pointer-events:none}
+.hero-inner{position:relative;z-index:2;max-width:920px}
+.hero-art{margin:0 auto 32px;width:200px;height:200px;position:relative}
+.hero-art svg{width:100%;height:100%;animation:zap 1.4s ease-in-out infinite}
+@keyframes zap{0%,100%{transform:scale(1);filter:drop-shadow(0 0 18px rgba(234,179,8,0.6))}50%{transform:scale(1.1);filter:drop-shadow(0 0 32px rgba(220,38,38,0.8))}}
+.hero h1{font-family:'Anton',sans-serif;font-size:168px;letter-spacing:0.02em;line-height:0.82;margin-bottom:18px;background:linear-gradient(180deg,#fff 0%,var(--yellow) 50%,var(--red) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 span{display:block;font-size:64px;font-family:'Oswald',sans-serif;letter-spacing:0.18em;font-weight:600;margin-top:14px;color:#fff;-webkit-text-fill-color:#fff}
+.hero p{font-size:20px;color:#fffd;max-width:620px;margin:0 auto 38px;line-height:1.75;font-weight:300}
+.ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{padding:18px 36px;font-family:'Oswald',sans-serif;text-decoration:none;font-size:14px;font-weight:600;letter-spacing:0.16em;display:inline-block;transition:all 0.3s;text-transform:uppercase}
+.btn-p{background:linear-gradient(135deg,var(--yellow),#f59e0b);color:var(--ink);box-shadow:0 18px 40px rgba(234,179,8,0.4);clip-path:polygon(6% 0,100% 0,94% 100%,0 100%)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 22px 48px rgba(234,179,8,0.55)}
+.btn-o{background:transparent;color:#fff;border:2px solid #fff}
+.btn-o:hover{background:#fff;color:var(--ink)}
+
+section{padding:130px 0;position:relative;z-index:2}
+.kicker{display:inline-block;background:var(--red);color:#fff;padding:7px 18px;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.22em;text-transform:uppercase;margin-bottom:18px;font-weight:600}
+.section-title{font-family:'Anton',sans-serif;font-size:108px;letter-spacing:0.025em;text-align:center;margin-bottom:60px;line-height:0.9}
+.section-title span{color:var(--yellow)}
+.section-title em{color:var(--red);font-style:normal}
+
+.about-row{display:grid;grid-template-columns:1.05fr 1fr;gap:70px;align-items:center}
+.about-row .lede{font-family:'Anton',sans-serif;font-size:64px;letter-spacing:0.02em;color:#fff;line-height:0.95;margin-bottom:22px}
+.about-row .lede span{color:var(--yellow)}
+.about-row p{color:#fffd;font-size:17px;margin-bottom:14px;line-height:1.85}
+.about-art{aspect-ratio:1;background:linear-gradient(135deg,var(--char),var(--ink));border:2px solid var(--yellow);display:grid;place-items:center;position:relative;overflow:hidden;clip-path:polygon(6% 0,100% 0,94% 100%,0 100%)}
+.about-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle,rgba(220,38,38,0.25),transparent 65%)}
+.about-art svg{position:relative;width:60%;height:auto}
+
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:0}
+.service-item{padding:40px 30px;background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;border-top:5px solid var(--yellow);transition:all 0.35s;animation:fadeUp 0.7s ease both;position:relative;text-align:center}
+.service-item::before{content:'⚡';display:block;font-size:38px;color:var(--yellow);margin-bottom:14px;filter:drop-shadow(0 0 12px rgba(234,179,8,0.5))}
+.service-item:hover{background:rgba(234,179,8,0.1);border-top-color:var(--red);transform:translateY(-6px)}
+.service-item span{font-family:'Anton',sans-serif;font-size:24px;letter-spacing:0.04em;color:#fff;text-transform:uppercase}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:0}
+.tcard{padding:38px 30px;background:rgba(255,255,255,0.04);border:1px solid #2a2a2a;position:relative;clip-path:polygon(4% 0,100% 0,96% 100%,0 100%)}
+.tcard:nth-child(2){background:rgba(234,179,8,0.06);border-color:var(--yellow)}
+.tcard::before{content:'"';position:absolute;top:8px;left:22px;font-family:'Anton',sans-serif;font-size:80px;color:var(--yellow);opacity:0.4;line-height:1}
+.tcard p{color:#fffd;line-height:1.75;font-size:15px;margin-bottom:18px;position:relative}
+.tcard .who{font-family:'Oswald',sans-serif;font-size:16px;color:var(--yellow);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.tcard .who small{display:block;color:#fff77;font-size:11px;margin-top:4px;letter-spacing:0.12em;text-transform:uppercase;font-weight:500}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;background:linear-gradient(135deg,var(--yellow) 0%,var(--red) 100%);padding:80px 32px;text-align:center;clip-path:polygon(3% 0,100% 0,97% 100%,0 100%)}
+.stat-num{font-family:'Anton',sans-serif;font-size:96px;letter-spacing:0.02em;color:var(--ink);line-height:0.9}
+.stat-lbl{font-family:'Oswald',sans-serif;font-size:14px;font-weight:600;letter-spacing:0.22em;color:var(--ink);margin-top:10px;text-transform:uppercase}
+
+.contact-final{display:grid;grid-template-columns:1fr 1fr;gap:0;border:2px solid var(--yellow);background:var(--char)}
+.cleft{padding:64px;background:var(--ink)}
+.cleft h3{font-family:'Anton',sans-serif;font-size:72px;letter-spacing:0.03em;color:var(--yellow);margin-bottom:28px;line-height:0.95}
+.cleft h3 span{color:var(--red)}
+.cleft p{margin:12px 0;color:#fffd;font-size:16px}
+.cleft strong{color:var(--yellow);font-family:'Oswald',sans-serif;letter-spacing:0.14em;text-transform:uppercase;font-size:13px;margin-right:10px;display:inline-block;min-width:78px;font-weight:600}
+.cright{padding:64px;background:var(--char);display:flex;flex-direction:column;justify-content:center;gap:16px}
+
+footer{padding:36px 0;text-align:center;color:#666;font-family:'Oswald',sans-serif;font-size:13px;letter-spacing:0.2em;text-transform:uppercase;border-top:1px solid #2a2a2a;font-weight:500}
+footer a{color:var(--yellow);text-decoration:none}
+
+@media(max-width:900px){nav ul{display:none}.hero h1{font-size:84px}.hero h1 span{font-size:36px}.section-title{font-size:60px}.about-row,.contact-final{grid-template-columns:1fr}.testimonials{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:30px;clip-path:none;padding:50px 24px}.stat-num{font-size:60px}.cleft,.cright{padding:40px 28px}.cleft h3{font-size:48px}}
+</style>
+</head>
+<body>
+<div class="waves"><span></span><span></span><span></span><span></span></div>
+<nav><div class="wrap row">
+  <div class="brand">{{BUSINESS_NAME}}<b>·CLUB</b></div>
+  <ul><li><a href="#about">About</a></li><li><a href="#train">Train</a></li><li><a href="#reviews">Members</a></li><li><a href="#contact">Visit</a></li></ul>
+  <a class="cta" href="tel:{{PHONE}}">{{PHONE}}</a>
+</div></nav>
+<section class="hero">
+  <div class="wrap"><div class="hero-inner">
+    <div class="hero-art">
+      <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+        <defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#EAB308"/><stop offset="100%" stop-color="#DC2626"/></linearGradient></defs>
+        <polygon points="110,15 60,110 95,110 80,185 150,80 110,80" fill="url(#lg)" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>
+      </svg>
+    </div>
+    <h1>UNLEASH<span>STRENGTH · CONDITIONING · POWER</span></h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">FREE TRIAL CLASS</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">CALL {{PHONE}}</a>
+    </div>
+  </div></div>
+</section>
+<section id="about"><div class="wrap" style="text-align:center"><span class="kicker">The Club</span></div>
+  <div class="wrap">
+    <h2 class="section-title">BUILT FOR <span>ATHLETES</span></h2>
+    <div class="about-row">
+      <div>
+        <div class="lede">NOT A GYM.<br>A <span>PERFORMANCE LAB.</span></div>
+        <p>From force plates to velocity-based training, every modality in modern strength science is on this floor. Programming written by NSCA coaches. Recovery suite. Sleep lab. Nutrition science.</p>
+        <p>For the athlete, the entrepreneur, the parent. For anyone who's serious about how their body performs.</p>
+      </div>
+      <div class="about-art">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="100,10 50,100 85,100 70,190 150,85 105,85" fill="#EAB308" stroke="#DC2626" stroke-width="3" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+<section id="train"><div class="wrap" style="text-align:center"><span class="kicker">Programs</span></div>
+  <div class="wrap">
+    <h2 class="section-title">TRAIN TO <span>WIN</span></h2>
+    <div class="services-grid">{{SERVICES_HTML}}</div>
+  </div>
+</section>
+<section id="reviews"><div class="wrap" style="text-align:center"><span class="kicker">Members</span></div>
+  <div class="wrap">
+    <h2 class="section-title">IN THEIR <span>WORDS</span></h2>
+    <div class="testimonials">
+      <div class="tcard"><p>Best programming I've had in 15 years of training. My deadlift went up 50kg in eight months.</p><div class="who">RAVI K. <small>Powerlifter · 4 yrs</small></div></div>
+      <div class="tcard"><p>The recovery suite alone is worth the membership. Cryo, sauna, compression — all in one place.</p><div class="who">DR. ANITHA <small>Marathon runner · 2 yrs</small></div></div>
+      <div class="tcard"><p>Came in for general fitness. Got coached like a pro athlete. Lost 14kg in six months and kept it off.</p><div class="who">VIKRAM S. <small>Member · 3 yrs</small></div></div>
+    </div>
+  </div>
+</section>
+<section><div class="wrap">
+  <div class="stats">
+    <div><div class="stat-num">12</div><div class="stat-lbl">Coaches</div></div>
+    <div><div class="stat-num">800</div><div class="stat-lbl">Members</div></div>
+    <div><div class="stat-num">38</div><div class="stat-lbl">Classes</div></div>
+    <div><div class="stat-num">5★</div><div class="stat-lbl">Rated</div></div>
+  </div>
+</div></section>
+<section id="contact"><div class="wrap" style="text-align:center"><span class="kicker">Visit</span></div>
+  <div class="wrap">
+    <h2 class="section-title">STEP ON <span>THE FLOOR</span></h2>
+    <div class="contact-final">
+      <div class="cleft">
+        <h3>READY TO<br><span>TRAIN?</span></h3>
+        <p><strong>Phone</strong>{{PHONE}}</p>
+        <p><strong>Email</strong>{{EMAIL}}</p>
+        <p><strong>Address</strong>{{ADDRESS}}</p>
+      </div>
+      <div class="cright">
+        <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WHATSAPP NOW</a>
+        <a class="btn btn-o" href="tel:{{PHONE}}">CALL {{PHONE}}</a>
+      </div>
+    </div>
+  </div>
+</section>
+<footer>© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></footer>
+</body>
+</html>

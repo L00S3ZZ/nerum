@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=Caveat:wght@500;700&display=swap');
+:root{--orange:#EA580C;--deep:#7F1D1D;--cream:#FFF8DC;--olive:#4D7C0F;--ink:#1a0808;--gold:#C9A052}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--cream);overflow-x:hidden;line-height:1.6}
+.wrap{max-width:1280px;margin:0 auto;padding:0 32px}
+
+/* floating food particles */
+.particles{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.particles span{position:absolute;font-size:22px;opacity:0.18;animation:driftup 22s linear infinite}
+.particles span:nth-child(1){left:6%;animation-delay:0s}
+.particles span:nth-child(2){left:22%;animation-delay:4s}
+.particles span:nth-child(3){left:42%;animation-delay:8s}
+.particles span:nth-child(4){left:60%;animation-delay:2s}
+.particles span:nth-child(5){left:75%;animation-delay:11s}
+.particles span:nth-child(6){left:88%;animation-delay:14s}
+@keyframes driftup{0%{transform:translateY(110vh) rotate(0)}100%{transform:translateY(-15vh) rotate(360deg)}}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(26,8,8,0.78);backdrop-filter:blur(22px);border-bottom:1px solid rgba(201,160,82,0.18);padding:20px 0}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px}
+.brand{font-family:'Playfair Display',serif;font-size:30px;font-weight:600;color:var(--gold);letter-spacing:0.02em}
+.brand small{display:block;font-family:'Caveat',cursive;font-size:14px;color:var(--orange);font-weight:500;line-height:1;margin-top:-2px}
+nav ul{display:flex;gap:34px;list-style:none}
+nav ul a{color:#FFF8DCaa;text-decoration:none;font-size:13.5px;letter-spacing:0.05em;transition:color 0.2s}
+nav ul a:hover{color:var(--gold)}
+.cta{padding:11px 24px;background:var(--orange);color:#fff;border-radius:30px;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.25s}
+.cta:hover{background:var(--gold)}
+
+.hero{min-height:95vh;display:grid;place-items:center;text-align:center;padding:80px 0;position:relative;overflow:hidden;z-index:2}
+.hero::before{content:'';position:absolute;inset:-30%;background:radial-gradient(ellipse at 50% 30%,rgba(234,88,12,0.32) 0%,transparent 55%),radial-gradient(ellipse at 50% 80%,rgba(201,160,82,0.15) 0%,transparent 55%);pointer-events:none}
+.steam-layer{position:absolute;top:38%;left:50%;transform:translateX(-50%);width:140px;height:200px;pointer-events:none;opacity:0.5}
+.steam-layer span{position:absolute;width:18px;height:48px;border-radius:12px;background:linear-gradient(180deg,rgba(255,255,255,0.55) 0%,transparent 100%);animation:risetall 3.8s ease-out infinite}
+.steam-layer span:nth-child(1){left:30px;animation-delay:0s}
+.steam-layer span:nth-child(2){left:60px;animation-delay:0.8s}
+.steam-layer span:nth-child(3){left:90px;animation-delay:1.6s}
+@keyframes risetall{0%{transform:translateY(80px) scale(0.7);opacity:0.8}100%{transform:translateY(-120px) scale(1.6);opacity:0}}
+.hero-inner{position:relative;z-index:2;max-width:900px}
+.hero-art{margin:0 auto 28px;width:240px;height:240px;position:relative}
+.hero-art svg{width:100%;height:100%;animation:flicker 2.4s ease-in-out infinite}
+@keyframes flicker{0%,100%{transform:scale(1)}50%{transform:scale(1.05)}}
+.hero h1{font-family:'Playfair Display',serif;font-size:96px;font-weight:600;line-height:0.98;letter-spacing:-0.025em;margin-bottom:14px;background:linear-gradient(180deg,#fff7e0 0%,var(--gold) 70%,var(--orange) 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero h1 em{font-family:'Caveat',cursive;font-size:60px;color:var(--orange);display:block;font-style:normal;letter-spacing:0;margin-top:6px;transform:rotate(-2deg);background:none;-webkit-text-fill-color:var(--orange)}
+.hero p{font-size:19px;color:#FFF8DCcc;max-width:600px;margin:0 auto 36px;line-height:1.75;font-weight:300}
+.ctas{display:flex;gap:16px;justify-content:center;flex-wrap:wrap}
+.btn{padding:16px 36px;border-radius:34px;font-weight:600;text-decoration:none;font-size:13.5px;letter-spacing:0.08em;text-transform:uppercase;display:inline-block;transition:all 0.3s}
+.btn-p{background:linear-gradient(135deg,var(--orange),#d04408);color:#fff;box-shadow:0 18px 40px rgba(234,88,12,0.4)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 22px 48px rgba(234,88,12,0.55)}
+.btn-o{border:1px solid var(--gold);color:var(--gold);background:transparent}
+.btn-o:hover{background:rgba(201,160,82,0.14)}
+
+section{padding:120px 0;position:relative;z-index:2}
+.kicker{font-size:11px;color:var(--gold);letter-spacing:0.5em;text-transform:uppercase;font-weight:700;text-align:center;margin-bottom:14px}
+.section-title{font-family:'Playfair Display',serif;font-size:62px;font-weight:600;text-align:center;margin-bottom:60px;color:var(--cream);letter-spacing:-0.02em;line-height:1.05}
+.section-title em{font-family:'Caveat',cursive;color:var(--orange);font-style:normal;font-size:54px;display:block;margin-top:4px;transform:rotate(-2deg)}
+
+.about-row{display:grid;grid-template-columns:1.05fr 1fr;gap:70px;align-items:center}
+.about-row .lede{font-family:'Playfair Display',serif;font-size:30px;color:var(--cream);line-height:1.35;margin-bottom:24px;font-weight:500}
+.about-row p{color:#FFF8DCaa;font-size:16.5px;margin-bottom:14px;line-height:1.85}
+.about-art{aspect-ratio:1;background:linear-gradient(135deg,var(--deep),#380808);border:1px solid rgba(201,160,82,0.25);border-radius:24px;display:grid;place-items:center;position:relative;overflow:hidden}
+.about-art::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at center,rgba(234,88,12,0.22),transparent 65%)}
+.about-art span{position:relative;font-size:160px}
+
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:24px}
+.service-item{padding:38px 30px;background:linear-gradient(135deg,rgba(234,88,12,0.08),rgba(127,29,29,0.35));border:1px solid rgba(201,160,82,0.22);border-radius:22px;backdrop-filter:blur(14px);transition:all 0.4s;animation:fadeUp 0.8s ease both;position:relative;overflow:hidden;text-align:center}
+.service-item::before{content:'🍽️';display:block;font-size:42px;margin-bottom:14px}
+.service-item:nth-child(2)::before{content:'🌶️'}
+.service-item:nth-child(3)::before{content:'🍛'}
+.service-item:nth-child(4)::before{content:'🥘'}
+.service-item:nth-child(5)::before{content:'🔥'}
+.service-item:nth-child(6)::before{content:'☕'}
+.service-item:hover{transform:translateY(-8px);border-color:var(--gold);box-shadow:0 30px 60px rgba(201,160,82,0.2)}
+.service-item span{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--gold)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tcard{padding:36px 28px;background:rgba(255,248,220,0.04);border:1px solid rgba(201,160,82,0.18);border-radius:20px;position:relative}
+.tcard::before{content:'"';position:absolute;top:8px;left:20px;font-family:'Playfair Display',serif;font-size:80px;color:var(--gold);opacity:0.35;line-height:1}
+.tcard p{color:#FFF8DCcc;line-height:1.75;font-size:15px;font-style:italic;margin-bottom:16px;position:relative}
+.tcard .who{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold);font-weight:500}
+.tcard .who small{display:block;color:#FFF8DC77;font-family:'Inter',sans-serif;font-style:normal;font-size:12px;margin-top:2px;letter-spacing:0.08em;text-transform:uppercase}
+
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:0;text-align:center;background:linear-gradient(135deg,rgba(234,88,12,0.12),rgba(127,29,29,0.4));border:1px solid rgba(201,160,82,0.22);border-radius:28px;padding:60px 32px;position:relative;overflow:hidden}
+.stats::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,rgba(201,160,82,0.14),transparent 70%);pointer-events:none}
+.stat-num{font-family:'Playfair Display',serif;font-size:64px;font-weight:500;color:var(--gold);letter-spacing:-0.02em;line-height:1;position:relative}
+.stat-lbl{font-size:12px;letter-spacing:0.35em;text-transform:uppercase;color:#FFF8DCaa;margin-top:14px;position:relative}
+
+.contact-final{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:28px;overflow:hidden;border:1px solid rgba(201,160,82,0.22)}
+.contact-final .left{padding:64px;background:linear-gradient(135deg,var(--deep),#380808)}
+.contact-final .left h3{font-family:'Playfair Display',serif;font-size:46px;color:var(--gold);margin-bottom:28px;font-weight:500;line-height:1}
+.contact-final .left p{margin:13px 0;color:#FFF8DCcc;font-size:16px}
+.contact-final .left strong{color:var(--gold);font-weight:500;margin-right:12px;font-family:'Playfair Display',serif;display:inline-block;min-width:80px;font-size:16px}
+.contact-final .right{padding:64px;background:linear-gradient(135deg,#1c1010,var(--ink));display:flex;flex-direction:column;justify-content:center;gap:16px}
+
+footer{padding:38px 0;text-align:center;color:#FFF8DC77;font-size:13px;border-top:1px solid rgba(201,160,82,0.18);position:relative;z-index:2}
+footer a{color:var(--gold);text-decoration:none}
+
+@media(max-width:900px){nav ul{display:none}.hero h1{font-size:60px}.hero h1 em{font-size:38px}.section-title{font-size:40px}.section-title em{font-size:32px}.about-row,.contact-final{grid-template-columns:1fr}.testimonials{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:30px}.contact-final .left,.contact-final .right{padding:40px 28px}}
+</style>
+</head>
+<body>
+<div class="particles"><span>🍽️</span><span>🌶️</span><span>🍛</span><span>🥘</span><span>🔥</span><span>☕</span></div>
+<nav><div class="wrap row">
+  <div class="brand">{{BUSINESS_NAME}}<small>est. kitchen</small></div>
+  <ul><li><a href="#about">Story</a></li><li><a href="#menu">Menu</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Visit</a></li></ul>
+  <a class="cta" href="tel:{{PHONE}}">{{PHONE}}</a>
+</div></nav>
+<section class="hero">
+  <div class="steam-layer"><span></span><span></span><span></span></div>
+  <div class="wrap"><div class="hero-inner">
+    <div class="hero-art">
+      <svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+        <defs><radialGradient id="fire"><stop offset="0%" stop-color="#fff5d6"/><stop offset="40%" stop-color="#EA580C"/><stop offset="100%" stop-color="#7F1D1D"/></radialGradient></defs>
+        <ellipse cx="110" cy="180" rx="80" ry="14" fill="rgba(0,0,0,0.4)"/>
+        <path d="M110 50 C90 80 80 100 90 130 C95 150 100 160 110 160 C120 160 125 150 130 130 C140 100 130 80 110 50 Z" fill="url(#fire)"/>
+        <path d="M110 80 C100 95 95 110 100 125 C103 135 107 142 110 142 C113 142 117 135 120 125 C125 110 120 95 110 80 Z" fill="#fff5d6" opacity="0.7"/>
+        <circle cx="110" cy="115" r="6" fill="#fff"/>
+      </svg>
+    </div>
+    <h1>{{BUSINESS_NAME}}<em>a feast for the senses</em></h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Reserve a Table</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div></div>
+</section>
+<section id="about"><div class="wrap">
+  <div class="kicker">Our Story</div>
+  <h2 class="section-title">From the earth <em>to your table</em></h2>
+  <div class="about-row">
+    <div>
+      <p class="lede">Two decades. One family. One uncompromising kitchen.</p>
+      <p>From the masala ground every dawn to the biryani simmered under dum for hours, every dish leaves our kitchen the way our grandmother would have served it — slowly, generously, and with the freshest produce of the season.</p>
+      <p>Recognised by The Hindu, Times Food Guide, and Conde Nast Traveller. Visited by ministers, cricketers, and the family two streets down — for the same reason.</p>
+    </div>
+    <div class="about-art"><span>🔥</span></div>
+  </div>
+</div></section>
+<section id="menu"><div class="wrap">
+  <div class="kicker">Tasting Menu</div>
+  <h2 class="section-title">A culinary <em>journey</em></h2>
+  <div class="menu-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<section id="reviews"><div class="wrap">
+  <div class="kicker">In the press</div>
+  <h2 class="section-title">What our guests <em>are saying</em></h2>
+  <div class="testimonials">
+    <div class="tcard"><p>One of the most authentic Chettinad experiences in the city. The pepper chicken alone is worth the trip.</p><div class="who">The Hindu <small>Food Critic</small></div></div>
+    <div class="tcard"><p>I've been coming here since I was a child. The taste hasn't changed — and somehow that's the highest compliment.</p><div class="who">Vijay K. <small>Patron, 18 years</small></div></div>
+    <div class="tcard"><p>Where I bring every visiting friend. The thali is an event, not a meal.</p><div class="who">Nandini S. <small>Regular</small></div></div>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <div class="stats">
+    <div><div class="stat-num">22</div><div class="stat-lbl">Years</div></div>
+    <div><div class="stat-num">180</div><div class="stat-lbl">Dishes</div></div>
+    <div><div class="stat-num">500K</div><div class="stat-lbl">Diners</div></div>
+    <div><div class="stat-num">4.9★</div><div class="stat-lbl">Rated</div></div>
+  </div>
+</div></section>
+<section id="contact"><div class="wrap">
+  <div class="contact-final">
+    <div class="left">
+      <h3>Visit our kitchen</h3>
+      <p><strong>Phone</strong>{{PHONE}}</p>
+      <p><strong>Email</strong>{{EMAIL}}</p>
+      <p><strong>Address</strong>{{ADDRESS}}</p>
+    </div>
+    <div class="right">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WhatsApp Reservations</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

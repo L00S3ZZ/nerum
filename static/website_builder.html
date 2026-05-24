@@ -201,6 +201,7 @@
   .toast { position:fixed; bottom:20px; right:20px; background:#0f0018; border:1px solid var(--pink-border); border-radius:10px; padding:12px 18px; color:#fff; font-size:13px; z-index:300; opacity:0; transform:translateY(10px); transition:all 0.3s; pointer-events:none; }
   .toast.show { opacity:1; transform:translateY(0); }
 </style>
+<script src="/static/template_renderer.js"></script>
 </head>
 <body>
 
@@ -790,24 +791,53 @@ async function runPreview() {
   document.getElementById('previewEmpty').style.display = 'none';
   document.getElementById('previewWrap').style.display = 'block';
   document.getElementById('previewOverlay').classList.add('show');
-  document.getElementById('previewOverlay').textContent = 'Generating your website with AI...';
-  const body = collectForm();
+  document.getElementById('previewOverlay').textContent = 'Loading preview...';
+
   try {
-    const res = await fetch('/websites/preview', {
-      method: 'POST',
-      headers: HDR,
-      body: JSON.stringify(body)
-    });
-    if (!res.ok) {
-      document.getElementById('previewOverlay').textContent = 'Preview failed. Try again.';
-      return;
+    // Find the selected template metadata from state
+    const allTemplates = [...(state.templates.available || []), ...(state.templates.locked || [])];
+    const tmpl = allTemplates.find(t => t.id === state.selected_template);
+
+    // Map business_type to template file key.
+    const typeMap = {
+      'Jewellery': 'jewellery',
+      'Dental': 'dental',
+      'Restaurant': 'restaurant',
+      'Gym': 'gym',
+      'Real Estate': 'realestate',
+    };
+    let typeKey = 'jewellery';
+    if (tmpl) {
+      for (const [key, val] of Object.entries(typeMap)) {
+        if (tmpl.description && tmpl.description.includes(key)) {
+          typeKey = val;
+          break;
+        }
+      }
     }
-    const data = await res.json();
-    document.getElementById('previewFrame').srcdoc = data.html;
+    // Map plan tier to filename suffix — pro_plus → "business".
+    const tierMap = { 'free': 'free', 'starter': 'starter', 'starter_plus': 'starter', 'pro': 'pro', 'pro_plus': 'business' };
+    const tierKey = tierMap[tmpl ? tmpl.plan_tier : 'free'] || 'free';
+    const templateKey = typeKey + '_' + tierKey;
+
+    const data = collectForm();
+    const servicesArr = (() => { try { return JSON.parse(data.services || '[]'); } catch (_) { return []; } })();
+
+    const html = await window.renderTemplate(templateKey, {
+      business_name: data.business_name,
+      tagline: data.tagline,
+      phone: data.phone,
+      email: data.email,
+      address: data.address,
+      brand_color: data.brand_color,
+      services: servicesArr,
+    });
+
+    document.getElementById('previewFrame').srcdoc = html;
     document.getElementById('previewOverlay').classList.remove('show');
-  } catch(e) {
-    console.error(e);
-    document.getElementById('previewOverlay').textContent = 'Preview failed.';
+  } catch (e) {
+    console.error('Preview error:', e);
+    document.getElementById('previewOverlay').textContent = 'Preview failed: ' + e.message;
   }
 }
 

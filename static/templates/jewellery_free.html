@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;color:#2a1810;background:#FFF8E7;line-height:1.6}
+.wrap{max-width:1040px;margin:0 auto;padding:0 24px}
+header{padding:22px 0;border-bottom:1px solid rgba(218,165,32,0.25)}
+.brand{font-size:22px;font-weight:700;color:{{BRAND_COLOR}};letter-spacing:0.06em}
+.hero{padding:90px 0 70px;text-align:center}
+.hero h1{font-size:48px;font-weight:300;color:#2a1810;margin-bottom:14px;letter-spacing:-0.02em}
+.hero h1 em{color:{{BRAND_COLOR}};font-weight:600;font-style:normal}
+.hero p{color:#6b5a4a;max-width:600px;margin:0 auto 32px;font-size:17px}
+.ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+.btn{padding:14px 28px;border-radius:2px;font-weight:600;text-decoration:none;font-size:13px;letter-spacing:0.1em;text-transform:uppercase;transition:opacity 0.2s;display:inline-block}
+.btn-p{background:{{BRAND_COLOR}};color:#fff}
+.btn-o{background:transparent;color:{{BRAND_COLOR}};border:1px solid {{BRAND_COLOR}}}
+.btn:hover{opacity:0.82}
+section{padding:60px 0}
+.title{font-size:30px;font-weight:300;color:#2a1810;text-align:center;margin-bottom:36px;letter-spacing:-0.01em}
+.title::after{content:'';display:block;width:42px;height:2px;background:#DAA520;margin:14px auto 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px}
+.service-item{padding:26px;background:#fff;border:1px solid rgba(218,165,32,0.18);border-radius:4px;text-align:left}
+.service-item span{font-size:15px;font-weight:500;color:#2a1810}
+.contact-card{background:#2a1810;color:#FFF8E7;padding:46px 32px;border-radius:6px;text-align:center}
+.contact-card h2{font-size:26px;font-weight:300;margin-bottom:22px;color:#DAA520}
+.crow{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin-bottom:26px;font-size:15px;color:#FFF8E7cc}
+footer{padding:30px 0;text-align:center;color:#8a7a6a;font-size:13px;border-top:1px solid rgba(218,165,32,0.25);margin-top:40px}
+footer a{color:#DAA520;text-decoration:none;font-weight:500}
+@media(max-width:640px){.hero h1{font-size:30px}.title{font-size:22px}.contact-card{padding:30px 18px}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="brand">{{BUSINESS_NAME}}</div></div></header>
+<div class="wrap">
+  <section class="hero">
+    <h1>Crafted <em>with care</em></h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="tel:{{PHONE}}">Call Now</a>
+      <a class="btn btn-o" href="https://wa.me/91{{PHONE}}">WhatsApp</a>
+    </div>
+  </section>
+  <section>
+    <h2 class="title">Our Collections</h2>
+    <div class="grid">{{SERVICES_HTML}}</div>
+  </section>
+  <section>
+    <div class="contact-card">
+      <h2>Visit Our Showroom</h2>
+      <div class="crow">
+        <div>📞 {{PHONE}}</div>
+        <div>✉️ {{EMAIL}}</div>
+        <div>📍 {{ADDRESS}}</div>
+      </div>
+      <a class="btn" style="background:#DAA520;color:#2a1810" href="https://wa.me/91{{PHONE}}">Message Us</a>
+    </div>
+  </section>
+</div>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

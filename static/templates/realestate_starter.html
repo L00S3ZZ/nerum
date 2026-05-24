@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=DM+Serif+Display&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+body{font-family:'Poppins',sans-serif;background:#1E3A8A;color:#fff;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+nav{padding:22px 0;background:#1E3A8A}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:'DM Serif Display',serif;font-size:26px}
+.brand .mark{width:36px;height:36px;background:#B8960C;color:#1E3A8A;display:grid;place-items:center;border-radius:8px;font-family:'Poppins',sans-serif;font-weight:700}
+nav a.cta{padding:11px 24px;background:#B8960C;color:#1E3A8A;border-radius:6px;text-decoration:none;font-size:13px;font-weight:600}
+.hero{padding:90px 0 130px;text-align:center;background:linear-gradient(180deg,#1E3A8A 0%,#142a66 100%);position:relative;overflow:hidden}
+.hero::after{content:'';position:absolute;left:0;right:0;bottom:0;height:80px;background:#F5F5F0;clip-path:polygon(0 100%,100% 100%,100% 0,75% 80%,50% 0,25% 80%,0 0)}
+.hero h1{font-family:'DM Serif Display',serif;font-size:64px;line-height:1.05;margin-bottom:18px;letter-spacing:-0.02em}
+.hero h1 em{color:#B8960C;font-style:italic}
+.hero p{font-size:18px;color:#fffc;max-width:560px;margin:0 auto 32px}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;position:relative;z-index:2}
+.btn{padding:14px 30px;border-radius:30px;font-weight:600;text-decoration:none;font-size:14px;display:inline-block;transition:all 0.25s}
+.btn-p{background:#B8960C;color:#1E3A8A;box-shadow:0 14px 30px rgba(184,150,12,0.35)}
+.btn-p:hover{transform:translateY(-2px)}
+.btn-o{background:#fff;color:#1E3A8A}
+.skyline{position:absolute;left:0;right:0;bottom:80px;height:90px;pointer-events:none;opacity:0.4}
+.skyline svg{width:100%;height:100%}
+.about-strip{background:#F5F5F0;padding:80px 0;color:#1E3A8A}
+.about-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.about-card{background:#fff;padding:30px;border-radius:14px;box-shadow:0 6px 24px rgba(30,58,138,0.08);transition:transform 0.25s;border-top:4px solid #B8960C}
+.about-card:hover{transform:translateY(-3px)}
+.about-card .icon{font-size:32px;margin-bottom:12px}
+.about-card h3{font-family:'DM Serif Display',serif;font-size:20px;color:#1E3A8A;margin-bottom:6px}
+.about-card p{font-size:13.5px;color:#5b6b80}
+section{padding:90px 0}
+.title{font-family:'DM Serif Display',serif;font-size:42px;text-align:center;margin-bottom:48px;letter-spacing:-0.02em}
+.title em{color:#B8960C;font-style:italic}
+.properties-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+.service-item{background:#fff;color:#1E3A8A;border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:all 0.3s}
+.service-item:hover{transform:translateY(-6px);box-shadow:0 22px 50px rgba(0,0,0,0.25)}
+.service-item::before{content:'🏠';display:grid;place-items:center;height:140px;background:linear-gradient(135deg,#B8960C,#1E3A8A);font-size:60px}
+.service-item span{padding:20px;font-size:17px;font-weight:600;border-top:3px solid #B8960C}
+.gallery{padding:80px 0;background:#142a66}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.gtile{aspect-ratio:1;background:linear-gradient(135deg,#1E3A8A,#B8960C);border-radius:14px;display:grid;place-items:center;font-size:46px;transition:transform 0.3s}
+.gtile:hover{transform:scale(1.04)}
+.contact{padding:90px 0}
+.contact-card{background:linear-gradient(135deg,#B8960C,#8a6f08);border-radius:24px;padding:54px;color:#1E3A8A;text-align:center}
+.contact-card h2{font-family:'DM Serif Display',serif;font-size:42px;margin-bottom:14px;color:#1E3A8A}
+.contact-card .info{display:flex;justify-content:center;gap:30px;flex-wrap:wrap;margin:18px 0 28px;font-size:15px;font-weight:500}
+footer{padding:30px 0;text-align:center;color:#fff8;font-size:13px;background:#142a66}
+footer a{color:#B8960C;text-decoration:none;font-weight:500}
+@media(max-width:760px){.hero h1{font-size:38px}.title{font-size:28px}.contact-card{padding:36px 22px}.contact-card h2{font-size:28px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap row">
+  <div class="brand"><div class="mark">R</div>{{BUSINESS_NAME}}</div>
+  <a class="cta" href="tel:{{PHONE}}">📞 {{PHONE}}</a>
+</div></nav>
+<section class="hero"><div class="wrap">
+  <h1>The right address<br>is <em>everything.</em></h1>
+  <p>{{TAGLINE}}</p>
+  <div class="ctas">
+    <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Browse Listings</a>
+    <a class="btn btn-o" href="tel:{{PHONE}}">Talk to an Advisor</a>
+  </div>
+  <div class="skyline"><svg viewBox="0 0 1200 90" preserveAspectRatio="none">
+    <polygon fill="#fff" points="0,90 60,60 90,70 130,40 170,70 220,30 270,55 330,20 400,55 460,40 520,65 580,30 660,55 720,40 780,70 840,30 920,65 980,45 1050,70 1120,40 1200,60 1200,90"/>
+  </svg></div>
+</div></section>
+<div class="about-strip"><div class="wrap">
+  <div class="about-cards">
+    <div class="about-card"><div class="icon">🛡</div><h3>RERA registered</h3><p>Every project verified. Every transaction transparent.</p></div>
+    <div class="about-card"><div class="icon">🌏</div><h3>NRI desk</h3><p>End-to-end support — buying, registration, rental management.</p></div>
+    <div class="about-card"><div class="icon">📈</div><h3>15+ years</h3><p>From plots to penthouses, we know the city's pin codes.</p></div>
+  </div>
+</div></div>
+<section><div class="wrap">
+  <h2 class="title">Featured <em>properties</em></h2>
+  <div class="properties-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<div class="gallery"><div class="wrap">
+  <h2 class="title" style="color:#fff">Inside the <em>portfolio</em></h2>
+  <div class="gallery-grid">
+    <div class="gtile">🏠</div><div class="gtile">🏢</div><div class="gtile">🏘</div>
+    <div class="gtile">🏡</div><div class="gtile">🏙</div><div class="gtile">🌇</div>
+  </div>
+</div></div>
+<section class="contact"><div class="wrap">
+  <div class="contact-card">
+    <h2>Find your <em>address.</em></h2>
+    <div class="info">
+      <div>📞 {{PHONE}}</div><div>✉️ {{EMAIL}}</div><div>📍 {{ADDRESS}}</div>
+    </div>
+    <div class="ctas">
+      <a class="btn" style="background:#1E3A8A;color:#fff" href="https://wa.me/91{{PHONE}}">WhatsApp</a>
+      <a class="btn" style="background:#fff;color:#1E3A8A" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

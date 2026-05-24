@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Bebas+Neue&display=swap');
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+body{font-family:'Poppins',sans-serif;background:#7F1D1D;color:#FFF8DC;line-height:1.6}
+.wrap{max-width:1200px;margin:0 auto;padding:0 28px}
+nav{padding:22px 0;background:rgba(127,29,29,0.95);position:sticky;top:0;z-index:30}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px;flex-wrap:wrap}
+.brand{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:0.08em;color:#EA580C}
+.brand span{color:#FFF8DC}
+nav a.cta{padding:11px 24px;background:#EA580C;color:#fff;border-radius:30px;text-decoration:none;font-size:13px;font-weight:700;letter-spacing:0.06em;text-transform:uppercase}
+.hero{padding:90px 0;text-align:center;background:linear-gradient(135deg,#7F1D1D 0%,#5a1414 100%);position:relative}
+.hero h1{font-family:'Bebas Neue',sans-serif;font-size:96px;letter-spacing:0.04em;line-height:0.95;margin-bottom:18px;color:#FFF8DC}
+.hero h1 span{color:#EA580C}
+.hero p{font-size:18px;color:#FFF8DCcc;max-width:600px;margin:0 auto 30px}
+.ctas{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+.btn{padding:15px 32px;border-radius:30px;font-weight:700;text-decoration:none;font-size:13px;display:inline-block;letter-spacing:0.08em;text-transform:uppercase;transition:all 0.25s}
+.btn-p{background:#EA580C;color:#fff;box-shadow:0 14px 30px rgba(234,88,12,0.35)}
+.btn-p:hover{transform:translateY(-3px)}
+.btn-o{background:transparent;color:#FFF8DC;border:2px solid #FFF8DC}
+.btn-o:hover{background:#FFF8DC;color:#7F1D1D}
+section{padding:90px 0}
+.section-label{display:inline-block;padding:6px 14px;background:#4D7C0F;color:#FFF8DC;border-radius:20px;font-size:11px;letter-spacing:0.2em;text-transform:uppercase;font-weight:600;margin-bottom:14px}
+.title{font-family:'Bebas Neue',sans-serif;font-size:60px;letter-spacing:0.04em;color:#FFF8DC;margin-bottom:48px;text-align:center}
+.title span{color:#EA580C}
+.about{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center;background:#FFF8DC;color:#3a2010;padding:54px;border-radius:24px}
+.about h3{font-family:'Bebas Neue',sans-serif;font-size:42px;color:#7F1D1D;letter-spacing:0.04em;margin-bottom:14px}
+.about p{font-size:15.5px;color:#5a3a1a;line-height:1.85;margin-bottom:12px}
+.about-emoji{font-size:140px;text-align:center}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px}
+.service-item{padding:30px;background:#5a1414;border:1px solid #EA580C44;border-radius:18px;transition:all 0.25s;text-align:center}
+.service-item::before{content:'🍽️';display:block;font-size:34px;margin-bottom:12px}
+.service-item:nth-child(2)::before{content:'🍛'}
+.service-item:nth-child(3)::before{content:'🌶️'}
+.service-item:nth-child(4)::before{content:'🥘'}
+.service-item:nth-child(5)::before{content:'🍲'}
+.service-item:nth-child(6)::before{content:'☕'}
+.service-item:hover{border-color:#EA580C;transform:translateY(-4px);background:#7F1D1D}
+.service-item span{font-family:'Poppins',sans-serif;font-size:16px;font-weight:600;color:#FFF8DC}
+.gallery{background:#5a1414;padding:90px 0}
+.gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.gtile{aspect-ratio:1;background:linear-gradient(135deg,#EA580C,#7F1D1D);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:50px;transition:transform 0.3s}
+.gtile:hover{transform:scale(1.05) rotate(-2deg)}
+.contact-strip{background:linear-gradient(135deg,#EA580C,#4D7C0F);padding:54px;border-radius:24px;display:grid;grid-template-columns:1fr 1fr;gap:32px;align-items:center}
+.contact-strip h2{font-family:'Bebas Neue',sans-serif;font-size:46px;letter-spacing:0.04em;color:#fff;margin-bottom:18px}
+.contact-strip p{margin:8px 0;color:#fffd;font-size:15px}
+.contact-strip strong{color:#FFF8DC;font-weight:700;margin-right:10px;display:inline-block;min-width:74px;letter-spacing:0.04em}
+footer{padding:30px 0;text-align:center;color:#FFF8DCaa;font-size:13px;background:#5a1414}
+footer a{color:#EA580C;text-decoration:none;font-weight:600}
+@media(max-width:760px){.hero h1{font-size:56px}.title{font-size:36px}.about{grid-template-columns:1fr;padding:32px}.contact-strip{grid-template-columns:1fr;padding:36px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap row">
+  <div class="brand">{{BUSINESS_NAME}}<span> · KITCHEN</span></div>
+  <a class="cta" href="tel:{{PHONE}}">📞 {{PHONE}}</a>
+</div></nav>
+<section class="hero"><div class="wrap">
+  <h1>FRESH<span>.</span> BOLD<span>.</span> <span>UNFORGETTABLE.</span></h1>
+  <p>{{TAGLINE}}</p>
+  <div class="ctas">
+    <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Order on WhatsApp</a>
+    <a class="btn btn-o" href="tel:{{PHONE}}">Call to Reserve</a>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <div class="about">
+    <div>
+      <div class="section-label">Our story</div>
+      <h3>Made in our kitchen, every single day.</h3>
+      <p>We don't do shortcuts. The masala is ground in-house. The dosa batter is fermented overnight. The biryani simmers for hours, not minutes.</p>
+      <p>One family. One recipe book. One mission — feed you like our own.</p>
+    </div>
+    <div class="about-emoji">🍛</div>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <div class="section-label" style="display:block;text-align:center;margin:0 auto 14px;width:fit-content">The menu</div>
+  <h2 class="title">From our <span>kitchen</span></h2>
+  <div class="menu-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<div class="gallery"><div class="wrap">
+  <div class="section-label" style="display:block;text-align:center;margin:0 auto 14px;width:fit-content">Mood board</div>
+  <h2 class="title">A taste of <span>the table</span></h2>
+  <div class="gallery-grid">
+    <div class="gtile">🍕</div><div class="gtile">🍔</div><div class="gtile">🍜</div>
+    <div class="gtile">🥗</div><div class="gtile">🍝</div><div class="gtile">🍱</div>
+  </div>
+</div></div>
+<section><div class="wrap">
+  <div class="contact-strip">
+    <div>
+      <h2>Visit us</h2>
+      <p><strong>Phone</strong>{{PHONE}}</p>
+      <p><strong>Email</strong>{{EMAIL}}</p>
+      <p><strong>Address</strong>{{ADDRESS}}</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <a class="btn" style="background:#FFF8DC;color:#7F1D1D" href="https://wa.me/91{{PHONE}}">WhatsApp</a>
+      <a class="btn" style="background:#7F1D1D;color:#FFF8DC" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>

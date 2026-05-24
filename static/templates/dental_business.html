@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BUSINESS_NAME}}</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Inter:wght@300;400;500;600;700&display=swap');
+:root{--teal:#14B8A6;--navy:#1E3A5F;--soft:#E0F2FE;--gold:#C9A052;--ink:#fafdff}
+*{margin:0;padding:0;box-sizing:border-box}
+::selection{background:{{BRAND_COLOR}};color:#fff}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--ink);color:var(--navy);overflow-x:hidden;line-height:1.6}
+.wrap{max-width:1260px;margin:0 auto;padding:0 32px}
+
+nav{position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.85);backdrop-filter:blur(20px);border-bottom:1px solid #E0F2FE;padding:18px 0}
+nav .row{display:flex;justify-content:space-between;align-items:center;gap:18px}
+.brand{display:flex;align-items:center;gap:12px;font-family:'Playfair Display',serif;font-size:26px;font-weight:600;color:var(--navy)}
+.brand-mark{width:42px;height:42px;border-radius:14px;background:linear-gradient(135deg,var(--teal),#0e8c7f);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:20px;box-shadow:0 8px 20px rgba(20,184,166,0.3)}
+nav ul{display:flex;gap:30px;list-style:none}
+nav ul a{color:var(--navy);text-decoration:none;font-size:14px;font-weight:500;transition:color 0.2s}
+nav ul a:hover{color:var(--teal)}
+.cta{padding:11px 24px;background:var(--navy);color:#fff;border-radius:30px;text-decoration:none;font-size:13px;font-weight:600;transition:all 0.25s}
+.cta:hover{background:var(--teal)}
+
+.hero{padding:100px 0;background:linear-gradient(135deg,#fafdff 0%,#E0F2FE 100%);position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-20%;right:-20%;width:600px;height:600px;background:radial-gradient(circle,rgba(20,184,166,0.16),transparent 65%);border-radius:50%;animation:floatorb 16s ease-in-out infinite}
+@keyframes floatorb{0%,100%{transform:translate(0,0)}50%{transform:translate(40px,40px)}}
+.hero .row{display:grid;grid-template-columns:1.1fr 1fr;gap:60px;align-items:center;position:relative;z-index:2}
+.hero h1{font-family:'Playfair Display',serif;font-size:72px;font-weight:600;line-height:1.05;letter-spacing:-0.025em;margin-bottom:22px;color:var(--navy)}
+.hero h1 em{color:var(--teal);font-style:italic}
+.hero p{font-size:19px;color:#5b6b80;max-width:520px;margin-bottom:34px;line-height:1.7}
+.ctas{display:flex;gap:14px;flex-wrap:wrap}
+.btn{padding:16px 32px;border-radius:34px;font-weight:600;text-decoration:none;font-size:14px;display:inline-block;transition:all 0.3s}
+.btn-p{background:var(--teal);color:#fff;box-shadow:0 18px 40px rgba(20,184,166,0.35)}
+.btn-p:hover{transform:translateY(-3px);box-shadow:0 22px 48px rgba(20,184,166,0.5)}
+.btn-o{background:transparent;color:var(--navy);border:1.5px solid var(--navy)}
+.btn-o:hover{background:var(--navy);color:#fff}
+.gold-pill{display:inline-flex;align-items:center;gap:8px;padding:8px 16px;background:rgba(201,160,82,0.14);color:var(--gold);border:1px solid rgba(201,160,82,0.3);border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.08em;margin-bottom:18px;text-transform:uppercase}
+.hero-art{display:flex;justify-content:center;align-items:center}
+.hero-art svg{max-width:380px;width:100%}
+.hero-art svg .pulse{animation:smile 3.5s ease-in-out infinite}
+@keyframes smile{0%,100%{transform-origin:center;transform:scale(1)}50%{transform:scale(1.05)}}
+
+section{padding:120px 0}
+.kicker{font-size:12px;color:var(--teal);letter-spacing:0.45em;text-transform:uppercase;font-weight:700;text-align:center;margin-bottom:14px}
+.section-title{font-family:'Playfair Display',serif;font-size:54px;font-weight:600;text-align:center;margin-bottom:54px;color:var(--navy);letter-spacing:-0.02em;line-height:1.1}
+.section-title em{color:var(--teal);font-style:italic}
+
+.about-row{display:grid;grid-template-columns:1fr 1fr;gap:60px;align-items:center;background:#fff;border:1px solid #E0F2FE;border-radius:28px;padding:60px;box-shadow:0 22px 50px rgba(30,58,95,0.06)}
+.about-row .lede{font-family:'Playfair Display',serif;font-size:30px;color:var(--navy);line-height:1.3;margin-bottom:18px;font-weight:500}
+.about-row p{color:#5b6b80;font-size:16px;margin-bottom:14px;line-height:1.85}
+.trust-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.tbadge{padding:22px;background:#fafdff;border:1px solid #E0F2FE;border-radius:16px;text-align:center}
+.tbadge .e{font-size:32px;margin-bottom:6px;display:block}
+.tbadge .l{font-size:12px;color:var(--navy);font-weight:600;letter-spacing:0.06em;text-transform:uppercase}
+.tbadge .s{font-size:11px;color:#8794a8;margin-top:4px}
+
+.services-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:22px}
+.service-item{padding:36px 30px;background:#fff;border:1px solid #E0F2FE;border-radius:20px;border-top:4px solid var(--teal);transition:all 0.3s;animation:fadeUp 0.7s ease both;position:relative}
+.service-item::after{content:'+';position:absolute;top:24px;right:28px;width:34px;height:34px;border-radius:50%;background:var(--soft);color:var(--teal);display:flex;align-items:center;justify-content:center;font-weight:700;font-size:18px}
+.service-item:hover{transform:translateY(-6px);box-shadow:0 24px 50px rgba(30,58,95,0.1);border-top-color:var(--gold)}
+.service-item span{font-family:'Playfair Display',serif;font-size:22px;font-weight:500;color:var(--navy);display:block;padding-right:50px}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.testimonials{display:grid;grid-template-columns:repeat(3,1fr);gap:24px}
+.tcard{background:#fff;padding:36px;border-radius:22px;border:1px solid #E0F2FE;box-shadow:0 14px 40px rgba(30,58,95,0.06);position:relative}
+.tcard::before{content:'"';position:absolute;top:6px;left:18px;font-family:'Playfair Display',serif;font-size:80px;color:var(--teal);opacity:0.25;line-height:1}
+.tcard p{color:var(--navy);line-height:1.75;font-size:15px;margin-bottom:18px;position:relative;font-style:italic}
+.tcard .who{font-family:'Playfair Display',serif;font-size:17px;color:var(--navy);font-weight:600}
+.tcard .who small{display:block;color:#8794a8;font-family:'Inter',sans-serif;font-size:12px;margin-top:2px;letter-spacing:0.08em;text-transform:uppercase;font-style:normal;font-weight:500}
+
+.stats{background:linear-gradient(135deg,var(--navy) 0%,#0a1a2c 100%);border-radius:28px;padding:70px 32px;color:#fff;display:grid;grid-template-columns:repeat(4,1fr);gap:24px;text-align:center;position:relative;overflow:hidden}
+.stats::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(20,184,166,0.2),transparent 65%);pointer-events:none}
+.stat-num{font-family:'Playfair Display',serif;font-size:62px;font-weight:600;color:var(--teal);letter-spacing:-0.02em;line-height:1;position:relative}
+.stat-lbl{font-size:12.5px;letter-spacing:0.35em;text-transform:uppercase;color:#fffc;margin-top:14px;position:relative}
+
+.contact-final{display:grid;grid-template-columns:1fr 1fr;gap:0;border-radius:28px;overflow:hidden;border:1px solid #E0F2FE;box-shadow:0 24px 60px rgba(30,58,95,0.1)}
+.contact-final .left{padding:64px;background:linear-gradient(135deg,var(--navy),#0a1a2c);color:#fff}
+.contact-final .left h3{font-family:'Playfair Display',serif;font-size:42px;color:#fff;margin-bottom:26px;font-weight:600;line-height:1.1}
+.contact-final .left p{margin:12px 0;color:#fffd;font-size:16px}
+.contact-final .left strong{color:var(--teal);font-weight:600;margin-right:10px;display:inline-block;min-width:80px}
+.contact-final .right{padding:64px;background:#fff;display:flex;flex-direction:column;justify-content:center;gap:14px}
+
+footer{padding:38px 0;text-align:center;color:#8794a8;font-size:13px;border-top:1px solid #E0F2FE}
+footer a{color:var(--teal);text-decoration:none;font-weight:500}
+
+@media(max-width:900px){nav ul{display:none}.hero .row,.about-row,.contact-final{grid-template-columns:1fr}.hero h1{font-size:44px}.section-title{font-size:34px}.testimonials{grid-template-columns:1fr}.stats{grid-template-columns:repeat(2,1fr);gap:30px}.about-row{padding:36px 24px}.contact-final .left,.contact-final .right{padding:40px 26px}}
+</style>
+</head>
+<body>
+<nav><div class="wrap row">
+  <div class="brand"><div class="brand-mark">+</div>{{BUSINESS_NAME}}</div>
+  <ul><li><a href="#about">About</a></li><li><a href="#services">Services</a></li><li><a href="#reviews">Reviews</a></li><li><a href="#contact">Contact</a></li></ul>
+  <a class="cta" href="tel:{{PHONE}}">{{PHONE}}</a>
+</div></nav>
+<section class="hero"><div class="wrap row">
+  <div>
+    <div class="gold-pill">★ Award-winning practice</div>
+    <h1>Dentistry, done with <em>care.</em></h1>
+    <p>{{TAGLINE}}</p>
+    <div class="ctas">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">Book Appointment</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+  <div class="hero-art">
+    <svg viewBox="0 0 360 280" xmlns="http://www.w3.org/2000/svg">
+      <defs><linearGradient id="sm" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#14B8A6"/><stop offset="100%" stop-color="#1E3A5F"/></linearGradient></defs>
+      <ellipse cx="180" cy="140" rx="140" ry="100" fill="#E0F2FE"/>
+      <g class="pulse">
+        <path d="M70 130 Q180 250 290 130" stroke="url(#sm)" stroke-width="14" fill="none" stroke-linecap="round"/>
+        <rect x="100" y="105" width="22" height="36" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+        <rect x="130" y="100" width="22" height="40" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+        <rect x="160" y="98" width="22" height="42" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+        <rect x="190" y="98" width="22" height="42" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+        <rect x="220" y="100" width="22" height="40" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+        <rect x="250" y="105" width="22" height="36" rx="6" fill="#fff" stroke="#14B8A6" stroke-width="2"/>
+      </g>
+      <circle cx="60" cy="60" r="8" fill="#C9A052" opacity="0.7"/>
+      <circle cx="300" cy="50" r="6" fill="#14B8A6" opacity="0.6"/>
+      <circle cx="320" cy="200" r="10" fill="#C9A052" opacity="0.5"/>
+    </svg>
+  </div>
+</div></section>
+<section id="about"><div class="wrap">
+  <div class="kicker">About</div>
+  <h2 class="section-title">A practice <em>built on trust</em></h2>
+  <div class="about-row">
+    <div>
+      <p class="lede">Over two decades. Tens of thousands of smiles.</p>
+      <p>From the family GP to the city's top orthodontist, we've built a multi-specialty practice that treats every patient like a guest in our home. Modern technology, gentle technique, transparent pricing.</p>
+      <p>Same-day care for emergencies, EMI on advanced procedures, and a team that genuinely cares about the people behind the smiles.</p>
+    </div>
+    <div class="trust-grid">
+      <div class="tbadge"><span class="e">🏆</span><div class="l">ISO 9001</div><div class="s">Certified</div></div>
+      <div class="tbadge"><span class="e">🛡</span><div class="l">Sterile</div><div class="s">Class B autoclaves</div></div>
+      <div class="tbadge"><span class="e">💳</span><div class="l">EMI</div><div class="s">No-cost options</div></div>
+      <div class="tbadge"><span class="e">🤝</span><div class="l">Insurance</div><div class="s">All major networks</div></div>
+    </div>
+  </div>
+</div></section>
+<section id="services"><div class="wrap">
+  <div class="kicker">Treatments</div>
+  <h2 class="section-title">A full range of <em>specialty care</em></h2>
+  <div class="services-grid">{{SERVICES_HTML}}</div>
+</div></section>
+<section id="reviews"><div class="wrap">
+  <div class="kicker">Patient Stories</div>
+  <h2 class="section-title">What our patients <em>say</em></h2>
+  <div class="testimonials">
+    <div class="tcard"><p>I was terrified of dentists my whole life. Their team genuinely made me feel safe. Now my whole family comes here.</p><div class="who">Priya M. <small>Patient since 2019</small></div></div>
+    <div class="tcard"><p>The implant work was world-class. Painless, fast, and the result is indistinguishable from my natural teeth.</p><div class="who">Dr. Senthil R. <small>Implant patient</small></div></div>
+    <div class="tcard"><p>Took my 6-year-old for a check-up. They turned a scary visit into something fun. Modern, caring, professional.</p><div class="who">Anita G. <small>Parent</small></div></div>
+  </div>
+</div></section>
+<section><div class="wrap">
+  <div class="stats">
+    <div><div class="stat-num">22+</div><div class="stat-lbl">Years</div></div>
+    <div><div class="stat-num">28K</div><div class="stat-lbl">Smiles</div></div>
+    <div><div class="stat-num">12</div><div class="stat-lbl">Specialists</div></div>
+    <div><div class="stat-num">4.9★</div><div class="stat-lbl">Rating</div></div>
+  </div>
+</div></section>
+<section id="contact"><div class="wrap">
+  <div class="contact-final">
+    <div class="left">
+      <h3>Book your visit</h3>
+      <p><strong>Phone</strong>{{PHONE}}</p>
+      <p><strong>Email</strong>{{EMAIL}}</p>
+      <p><strong>Address</strong>{{ADDRESS}}</p>
+    </div>
+    <div class="right">
+      <a class="btn btn-p" href="https://wa.me/91{{PHONE}}">WhatsApp Us</a>
+      <a class="btn btn-o" href="tel:{{PHONE}}">Call {{PHONE}}</a>
+    </div>
+  </div>
+</div></section>
+<footer><div class="wrap">© {{YEAR}} {{BUSINESS_NAME}} · <a href="#">Powered by Nerum</a></div></footer>
+</body>
+</html>
