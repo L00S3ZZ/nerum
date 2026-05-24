@@ -14,7 +14,52 @@ router = APIRouter(prefix="/websites", tags=["website-builder"])
 
 TEMPLATES_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static", "sites", "templates")
 
+STATIC_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "static")
+TEMPLATES_JSON_PATH = os.path.join(STATIC_DIR, "website_templates.json")
+
 PLAN_TIERS = ["free", "starter", "starter_plus", "pro", "pro_plus"]
+
+# Cached read of the website_templates.json catalog. We re-read if the file
+# mtime changes so editors can hot-reload templates without restarting the app.
+_TEMPLATES_CACHE = {"mtime": 0, "data": None}
+
+
+def load_templates_catalog() -> list:
+    """Read static/website_templates.json and return the list of templates."""
+    try:
+        mtime = os.path.getmtime(TEMPLATES_JSON_PATH)
+    except OSError:
+        return []
+    if _TEMPLATES_CACHE["data"] is not None and _TEMPLATES_CACHE["mtime"] == mtime:
+        return _TEMPLATES_CACHE["data"]
+    try:
+        with open(TEMPLATES_JSON_PATH, "r", encoding="utf-8") as f:
+            payload = json.load(f)
+        templates = payload.get("templates", []) if isinstance(payload, dict) else []
+        if not isinstance(templates, list):
+            templates = []
+    except Exception:
+        templates = []
+    _TEMPLATES_CACHE["mtime"] = mtime
+    _TEMPLATES_CACHE["data"] = templates
+    return templates
+
+
+def shape_template_for_api(t: dict, locked: bool) -> dict:
+    """Map a raw JSON template entry to the API response shape."""
+    return {
+        "id": t.get("id"),
+        "name": t.get("name"),
+        "description": t.get("business_type", ""),
+        "plan_tier": t.get("tier", "free"),
+        "preview_color": t.get("preview_color", "#333"),
+        "colors": t.get("colors", {}) or {},
+        "tags": t.get("tags", []) or [],
+        "popular": bool(t.get("popular", False)),
+        "hero": t.get("hero", {}) or {},
+        "services": t.get("services", []) or [],
+        "locked": locked,
+    }
 
 TEMPLATE_CATALOG = {
     "free": [
@@ -213,13 +258,20 @@ def site_to_dict(s: UserWebsite) -> dict:
 
 @router.get("/templates")
 def list_templates(current_user: User = Depends(get_current_user)):
+    """Return the real template catalog from static/website_templates.json,
+    split into `available` (at or below user's plan tier) and `locked` (above)."""
     user_tier = normalize_user_plan(current_user.plan)
-    available = TEMPLATE_CATALOG.get(user_tier, TEMPLATE_CATALOG["free"])
-    locked = []
-    for tier in PLAN_TIERS:
-        if tier != user_tier:
-            for t in TEMPLATE_CATALOG[tier]:
-                locked.append({**t, "locked": True})
+    user_idx = PLAN_TIERS.index(user_tier) if user_tier in PLAN_TIERS else 0
+
+    catalog = load_templates_catalog()
+    available, locked = [], []
+    for t in catalog:
+        tier = t.get("tier", "free")
+        tier_idx = PLAN_TIERS.index(tier) if tier in PLAN_TIERS else 0
+        is_locked = tier_idx > user_idx
+        shaped = shape_template_for_api(t, locked=is_locked)
+        (locked if is_locked else available).append(shaped)
+
     return {
         "user_plan": user_tier,
         "available": available,
