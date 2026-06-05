@@ -1,11 +1,11 @@
 /* Nerum Workflow Builder — self-contained styles */
 
 :root {
-  --wb-bg: #000000;
+  --wb-bg: #0a0010;
   --wb-bg-2: #08000f;
-  --wb-accent: #C50022;
-  --wb-accent-soft: rgba(197, 0, 34, 0.25);
-  --wb-accent-hot: #ff4060;
+  --wb-accent: #6366f1;
+  --wb-accent-soft: rgba(99, 102, 241, 0.25);
+  --wb-accent-hot: #818cf8;
   --wb-ink: #ffffff;
   --wb-ink-dim: rgba(255, 255, 255, 0.7);
   --wb-ink-mute: rgba(255, 255, 255, 0.5);
@@ -134,7 +134,7 @@ body.wb-sidebar-closed .wb-sidebar {
   color: var(--wb-ink);
 }
 .wb-nav-item.active {
-  background: rgba(197, 0, 34, 0.15);
+  background: rgba(99, 102, 241, 0.15);
   color: var(--wb-ink);
   border-color: var(--wb-accent-soft);
 }
@@ -219,13 +219,13 @@ body.wb-sidebar-closed .wb-topbar {
   transition: transform var(--wb-ease), box-shadow var(--wb-ease), background var(--wb-ease);
 }
 .wb-btn-primary {
-  background: linear-gradient(120deg, #C50022 0%, #ff4060 50%, #C50022 100%);
-  color: #000;
-  box-shadow: 0 10px 30px rgba(197, 0, 34, 0.3);
+  background: linear-gradient(120deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
+  color: #fff;
+  box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
 }
 .wb-btn-primary:hover {
   transform: translateY(-1px);
-  box-shadow: 0 14px 40px rgba(197, 0, 34, 0.45);
+  box-shadow: 0 14px 40px rgba(99, 102, 241, 0.45);
 }
 .wb-btn-ghost {
   background: var(--wb-glass);
@@ -299,11 +299,11 @@ body.wb-sidebar-closed .wb-canvas {
   right: 32px;
   padding: 10px 18px;
   border-radius: 999px;
-  background: linear-gradient(120deg, #C50022 0%, #ff4060 50%, #C50022 100%);
-  color: #000;
+  background: linear-gradient(120deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
+  color: #fff;
   font-weight: 700;
   font-size: 13px;
-  box-shadow: 0 12px 36px rgba(197, 0, 34, 0.45);
+  box-shadow: 0 12px 36px rgba(99, 102, 241, 0.45);
   z-index: 25;
   transition: transform var(--wb-ease);
 }
@@ -326,11 +326,11 @@ body.wb-sidebar-closed .wb-canvas {
 }
 .wb-node:active { cursor: grabbing; }
 .wb-node:hover {
-  box-shadow: 0 0 0 1px var(--wb-accent-soft), 0 10px 30px rgba(197, 0, 34, 0.25);
+  box-shadow: 0 0 0 1px var(--wb-accent-soft), 0 10px 30px rgba(99, 102, 241, 0.25);
 }
 .wb-node.is-trigger {
   border-color: var(--wb-accent);
-  box-shadow: 0 0 24px rgba(197, 0, 34, 0.18);
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.18);
 }
 .wb-node.is-action {
   border-color: var(--wb-border);
@@ -413,7 +413,7 @@ body.wb-sidebar-closed .wb-canvas {
   align-items: center;
   gap: 10px;
   z-index: 35;
-  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), 0 0 28px rgba(197, 0, 34, 0.15);
+  box-shadow: 0 18px 50px rgba(0, 0, 0, 0.5), 0 0 28px rgba(99, 102, 241, 0.15);
 }
 .wb-chat-input {
   flex: 1;
@@ -547,7 +547,7 @@ body.wb-sidebar-closed .wb-canvas {
 .wb-trigger-card:hover {
   transform: translateY(-2px);
   border-color: var(--wb-accent);
-  box-shadow: 0 12px 30px rgba(197, 0, 34, 0.25);
+  box-shadow: 0 12px 30px rgba(99, 102, 241, 0.25);
 }
 .wb-trigger-icon {
   font-size: 22px;
