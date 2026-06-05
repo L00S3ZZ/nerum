@@ -13,7 +13,7 @@ window.renderTemplate = async function (templateKey, data) {
   html = html.replace(/{{PHONE}}/g, data.phone || '');
   html = html.replace(/{{EMAIL}}/g, data.email || '');
   html = html.replace(/{{ADDRESS}}/g, data.address || 'Chennai, Tamil Nadu');
-  html = html.replace(/{{BRAND_COLOR}}/g, data.brand_color || '#C50022');
+  html = html.replace(/{{BRAND_COLOR}}/g, data.brand_color || '#6366f1');
   html = html.replace(/{{YEAR}}/g, new Date().getFullYear());
 
   // Build services HTML.

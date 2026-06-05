@@ -87,7 +87,7 @@
   .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
   .page-title { font-size:32px; font-weight:700; line-height:1; }
   .page-title .accent { color:var(--purple); }
-  #overview-name { color:#60a5fa; }
+  #overview-name { background:linear-gradient(90deg,#60a5fa,#a78bfa,#f472b6); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:480px; }
   .header-actions { display:flex; gap:10px; align-items:center; }
 
@@ -258,6 +258,38 @@
   ::-webkit-scrollbar { width:4px; }
   ::-webkit-scrollbar-track { background:transparent; }
   ::-webkit-scrollbar-thumb { background:rgba(99,102,241,0.3); border-radius:2px; }
+  /* ── PER-NAV ITEM COLORS ── */
+  .nav-item:nth-child(1).active { background:rgba(96,165,250,0.15); color:#60a5fa; border-color:rgba(96,165,250,0.25); }
+  .nav-item:nth-child(2).active { background:rgba(167,139,250,0.15); color:#a78bfa; border-color:rgba(167,139,250,0.25); }
+  .nav-item:nth-child(3).active { background:rgba(244,114,182,0.15); color:#f472b6; border-color:rgba(244,114,182,0.25); }
+  .nav-item:nth-child(4).active { background:rgba(52,211,153,0.15);  color:#34d399; border-color:rgba(52,211,153,0.25); }
+  .nav-section:nth-child(4) .nav-item:nth-child(1).active { background:rgba(251,146,60,0.15);  color:#fb923c; border-color:rgba(251,146,60,0.25); }
+  .nav-section:nth-child(5) .nav-item:nth-child(1).active { background:rgba(251,146,60,0.15);  color:#fb923c; border-color:rgba(251,146,60,0.25); }
+  .nav-section:nth-child(3) .nav-item:nth-child(1).active { background:rgba(251,191,36,0.15); color:#fbbf24; border-color:rgba(251,191,36,0.25); }
+  .nav-section:nth-child(3) .nav-item:nth-child(2).active { background:rgba(248,113,113,0.15); color:#f87171; border-color:rgba(248,113,113,0.25); }
+  /* Icon colors per nav section */
+  .nav-section:nth-child(2) .nav-item:nth-child(1) .nav-icon { color:#60a5fa; }
+  .nav-section:nth-child(2) .nav-item:nth-child(2) .nav-icon { color:#a78bfa; }
+  .nav-section:nth-child(2) .nav-item:nth-child(3) .nav-icon { color:#f472b6; }
+  .nav-section:nth-child(2) .nav-item:nth-child(4) .nav-icon { color:#34d399; }
+  .nav-section:nth-child(2) .nav-item:nth-child(5) .nav-icon { color:#fb923c; }
+  .nav-section:nth-child(2) .nav-item:nth-child(6) .nav-icon { color:#2dd4bf; }
+  .nav-section:nth-child(3) .nav-item:nth-child(1) .nav-icon { color:#fbbf24; }
+  .nav-section:nth-child(3) .nav-item:nth-child(2) .nav-icon { color:#f87171; }
+  .nav-section:nth-child(3) .nav-item:nth-child(3) .nav-icon { color:#94a3b8; }
+  .nav-section:nth-child(4) .nav-item:nth-child(1) .nav-icon { color:#6366f1; }
+  .nav-section:nth-child(4) .nav-item:nth-child(2) .nav-icon { color:#a78bfa; }
+  .nav-section:nth-child(4) .nav-item:nth-child(3) .nav-icon { color:#60a5fa; }
+  /* Colored stat card borders */
+  .stat-card[style*="60a5fa"] { border-color:rgba(96,165,250,0.3); }
+  .stat-card[style*="a78bfa"] { border-color:rgba(167,139,250,0.3); }
+  .stat-card[style*="f472b6"] { border-color:rgba(244,114,182,0.3); }
+  .stat-card[style*="34d399"] { border-color:rgba(52,211,153,0.3); }
+  .stat-card[style*="60a5fa"]:hover { border-color:rgba(96,165,250,0.6); box-shadow:0 0 30px rgba(96,165,250,0.15); }
+  .stat-card[style*="a78bfa"]:hover { border-color:rgba(167,139,250,0.6); box-shadow:0 0 30px rgba(167,139,250,0.15); }
+  .stat-card[style*="f472b6"]:hover { border-color:rgba(244,114,182,0.6); box-shadow:0 0 30px rgba(244,114,182,0.15); }
+  .stat-card[style*="34d399"]:hover { border-color:rgba(52,211,153,0.6); box-shadow:0 0 30px rgba(52,211,153,0.15); }
+
 </style>
 </head>
 <body>
@@ -400,26 +432,26 @@
         </div>
         <!-- Stats -->
         <div class="stats-grid">
-          <div class="stat-card" style="--accent:var(--purple)">
+          <div class="stat-card" style="--accent:#60a5fa">
             <div class="stat-icon">⚡</div>
             <div class="stat-label">Active Workflows</div>
             <div class="stat-value" id="stat-active">—</div>
             <div class="stat-delta" id="stat-total" style="color:var(--muted)">of 0 total</div>
             <div class="sparkline"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="0,28 14,22 28,25 42,14 56,18 70,8 84,12 100,4" fill="none" stroke="#60a5fa" stroke-width="2" opacity="0.8"/></svg></div>
           </div>
-          <div class="stat-card" style="--accent:var(--indigo)">
+          <div class="stat-card" style="--accent:#a78bfa">
             <div class="stat-icon">▷</div>
             <div class="stat-label">Total Runs</div>
             <div class="stat-value" id="stat-runs">—</div>
             <div class="stat-delta">all time</div>
-            <div class="sparkline"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="0,24 14,20 28,22 42,16 56,12 70,10 84,6 100,4" fill="none" stroke="#818cf8" stroke-width="2" opacity="0.8"/></svg></div>
+            <div class="sparkline"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="0,24 14,20 28,22 42,16 56,12 70,10 84,6 100,4" fill="none" stroke="#a78bfa" stroke-width="2" opacity="0.8"/></svg></div>
           </div>
-          <div class="stat-card" style="--accent:var(--pink)">
+          <div class="stat-card" style="--accent:#f472b6">
             <div class="stat-icon">◈</div>
             <div class="stat-label">Tokens Used</div>
             <div class="stat-value" id="stat-tokens">—</div>
             <div class="stat-delta" id="stat-tokens-remaining" style="color:var(--muted)">of 1000</div>
-            <div class="sparkline"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="0,28 14,26 28,20 42,18 56,14 70,12 84,10 100,8" fill="none" stroke="#60a5fa" stroke-width="2" opacity="0.8"/></svg></div>
+            <div class="sparkline"><svg viewBox="0 0 100 32" preserveAspectRatio="none"><polyline points="0,28 14,26 28,20 42,18 56,14 70,12 84,10 100,8" fill="none" stroke="#f472b6" stroke-width="2" opacity="0.8"/></svg></div>
           </div>
           <div class="stat-card" style="--accent:var(--green)">
             <div class="stat-icon">◉</div>
@@ -758,7 +790,7 @@ function showToast(msg, isError = false) {
 // ── STARS ────────────────────────────────────────────────────────────────────
 (function(){
   const sf = document.getElementById('starfield');
-  const colors = ['#ffffff','#60a5fa','#a78bfa'];
+  const colors = ['#ffffff','#60a5fa','#a78bfa','#f472b6','#34d399','#fb923c','#2dd4bf','#fbbf24','#f87171'];
   for(let i=0;i<200;i++){
     const s = document.createElement('div');
     s.className = 'star';

@@ -16,11 +16,11 @@
       width: 58px;
       height: 58px;
       border-radius: 18px;
-      background: linear-gradient(135deg, #C50022, #C50022);
+      background: linear-gradient(135deg, #fb923c, #fb923c);
       border: none;
       cursor: pointer;
       z-index: 99999;
-      box-shadow: 0 4px 24px rgba(197,0,34,0.55), 0 0 0 0 rgba(197,0,34,0.4);
+      box-shadow: 0 4px 24px rgba(251,146,60,0.55), 0 0 0 0 rgba(251,146,60,0.4);
       display: flex;
       align-items: center;
       justify-content: center;
@@ -32,8 +32,8 @@
       border-radius: 20px;
     }
     @keyframes nerum-glow {
-      0%, 100% { box-shadow: 0 4px 24px rgba(197,0,34,0.55), 0 0 0 0 rgba(197,0,34,0.4); }
-      50% { box-shadow: 0 4px 32px rgba(197,0,34,0.8), 0 0 0 8px rgba(197,0,34,0.08); }
+      0%, 100% { box-shadow: 0 4px 24px rgba(251,146,60,0.55), 0 0 0 0 rgba(251,146,60,0.4); }
+      50% { box-shadow: 0 4px 32px rgba(251,146,60,0.8), 0 0 0 8px rgba(251,146,60,0.08); }
     }
     #nerum-chat-btn .nerum-badge {
       position: absolute;
@@ -57,9 +57,9 @@
       width: 340px;
       height: 490px;
       border-radius: 20px;
-      background: #08000f;
-      border: 1px solid rgba(197,0,34,0.2);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(197,0,34,0.05);
+      background: #0a0010;
+      border: 1px solid rgba(251,146,60,0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.6), 0 0 40px rgba(251,146,60,0.05);
       z-index: 99998;
       display: none;
       flex-direction: column;
@@ -73,8 +73,8 @@
     }
     #nerum-chat-header {
       padding: 14px 16px;
-      background: linear-gradient(135deg, rgba(197,0,34,0.12), rgba(197,0,34,0.08));
-      border-bottom: 1px solid rgba(197,0,34,0.12);
+      background: linear-gradient(135deg, rgba(251,146,60,0.12), rgba(251,146,60,0.08));
+      border-bottom: 1px solid rgba(251,146,60,0.12);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -83,7 +83,7 @@
     .nerum-header-left { display: flex; align-items: center; gap: 10px; }
     .nerum-avatar {
       width: 36px; height: 36px; border-radius: 12px;
-      background: linear-gradient(135deg, #C50022, #C50022);
+      background: linear-gradient(135deg, #fb923c, #fb923c);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
       overflow: hidden;
@@ -119,10 +119,10 @@
       flex-direction: column;
       gap: 10px;
       scrollbar-width: thin;
-      scrollbar-color: rgba(197,0,34,0.15) transparent;
+      scrollbar-color: rgba(251,146,60,0.15) transparent;
     }
     #nerum-chat-messages::-webkit-scrollbar { width: 4px; }
-    #nerum-chat-messages::-webkit-scrollbar-thumb { background: rgba(197,0,34,0.2); border-radius: 4px; }
+    #nerum-chat-messages::-webkit-scrollbar-thumb { background: rgba(251,146,60,0.2); border-radius: 4px; }
     .nerum-msg { display: flex; gap: 8px; align-items: flex-end; max-width: 100%; }
     .nerum-msg.user { flex-direction: row-reverse; }
     .nerum-bubble {
@@ -140,7 +140,7 @@
       border-bottom-left-radius: 4px;
     }
     .nerum-msg.user .nerum-bubble {
-      background: linear-gradient(135deg, #C50022, #C50022);
+      background: linear-gradient(135deg, #fb923c, #fb923c);
       border-bottom-right-radius: 4px;
     }
     .nerum-typing {
@@ -153,7 +153,7 @@
     }
     .nerum-typing span {
       width: 6px; height: 6px; border-radius: 50%;
-      background: #C50022; display: inline-block;
+      background: #fb923c; display: inline-block;
       animation: nerum-bounce 1.2s ease-in-out infinite;
     }
     .nerum-typing span:nth-child(2) { animation-delay: 0.2s; }
@@ -183,10 +183,10 @@
       transition: border-color 0.2s;
     }
     #nerum-chat-input::placeholder { color: rgba(255,255,255,0.25); }
-    #nerum-chat-input:focus { border-color: rgba(197,0,34,0.5); background: rgba(255,255,255,0.07); }
+    #nerum-chat-input:focus { border-color: rgba(251,146,60,0.5); background: rgba(255,255,255,0.07); }
     #nerum-send-btn {
       width: 34px; height: 34px; border-radius: 50%;
-      background: linear-gradient(135deg, #C50022, #C50022);
+      background: linear-gradient(135deg, #fb923c, #fb923c);
       border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0; transition: transform 0.2s, opacity 0.2s;
@@ -201,7 +201,7 @@
       flex-shrink: 0;
     }
     .nerum-powered a {
-      color: rgba(197,0,34,0.6);
+      color: rgba(251,146,60,0.6);
       text-decoration: none;
       font-weight: 600;
       transition: color 0.2s;
@@ -209,7 +209,7 @@
       align-items: center;
       gap: 4px;
     }
-    .nerum-powered a:hover { color: #C50022; }
+    .nerum-powered a:hover { color: #fb923c; }
     .nerum-powered img {
       width: 12px;
       height: 12px;

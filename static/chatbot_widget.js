@@ -81,7 +81,7 @@
 
   function boot(cfg) {
     // ── Defaults ──
-    cfg.brand_color = cfg.brand_color || "#C50022";
+    cfg.brand_color = cfg.brand_color || "#fb923c";
     cfg.font_family = cfg.font_family || "System";
     cfg.font_size = cfg.font_size || 13;
     cfg.corner_radius = cfg.corner_radius || 14;

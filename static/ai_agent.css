@@ -1,11 +1,11 @@
 /* ===== Neru AI Agent — styles ===== */
 
 :root {
-  --bg: #08000f;
-  --pink: #C50022;
-  --magenta: #C50022;
+  --bg: #0a0010;
+  --pink: #f472b6;
+  --magenta: #f472b6;
   --card-bg: rgba(255,255,255,0.03);
-  --card-border: rgba(197,0,34,0.25);
+  --card-border: rgba(244,114,182,0.25);
   --text: #ffffff;
   --subtext: rgba(255,255,255,0.5);
 }
@@ -27,8 +27,8 @@ body {
   pointer-events: none;
   z-index: 0;
   background:
-    radial-gradient(1200px 700px at 20% 20%, rgba(197,0,34,0.10), transparent 60%),
-    radial-gradient(900px 600px at 80% 80%, rgba(197,0,34,0.08), transparent 60%),
+    radial-gradient(1200px 700px at 20% 20%, rgba(244,114,182,0.10), transparent 60%),
+    radial-gradient(900px 600px at 80% 80%, rgba(244,114,182,0.08), transparent 60%),
     var(--bg);
 }
 .star {
@@ -92,14 +92,14 @@ body {
   padding: 10px 14px;
   border-radius: 12px;
   border: 1px solid var(--card-border);
-  background: linear-gradient(90deg, rgba(197,0,34,0.25), rgba(197,0,34,0.25));
+  background: linear-gradient(90deg, rgba(244,114,182,0.25), rgba(244,114,182,0.25));
   color: var(--text);
   font-weight: 600;
   cursor: pointer;
   display: flex; align-items: center; gap: 8px; justify-content: center;
   transition: 0.2s;
 }
-.new-chat-btn:hover { background: linear-gradient(90deg, rgba(197,0,34,0.45), rgba(197,0,34,0.45)); }
+.new-chat-btn:hover { background: linear-gradient(90deg, rgba(244,114,182,0.45), rgba(244,114,182,0.45)); }
 .plus { font-size: 18px; line-height: 1; }
 .divider { height: 1px; background: var(--card-border); margin: 14px 0; }
 .sidebar-label { font-size: 11px; color: var(--subtext); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
@@ -110,7 +110,7 @@ body {
   border: 1px solid transparent; border-radius: 10px; padding: 2px;
 }
 .convo-row:hover { border-color: var(--card-border); background: var(--card-bg); }
-.convo-row.active { border-color: var(--pink); background: rgba(197,0,34,0.08); }
+.convo-row.active { border-color: var(--pink); background: rgba(244,114,182,0.08); }
 .convo-open {
   flex: 1; text-align: left;
   background: none; border: none; color: var(--text);
@@ -122,7 +122,7 @@ body {
   cursor: pointer; padding: 6px; border-radius: 6px;
   font-size: 12px;
 }
-.convo-del:hover { color: var(--pink); background: rgba(197,0,34,0.1); }
+.convo-del:hover { color: var(--pink); background: rgba(244,114,182,0.1); }
 
 /* ===== Main stage ===== */
 .stage {
@@ -150,7 +150,7 @@ body {
 }
 .avatar-svg {
   width: 220px; height: 280px;
-  filter: drop-shadow(0 6px 20px rgba(197,0,34,0.35));
+  filter: drop-shadow(0 6px 20px rgba(244,114,182,0.35));
   overflow: visible;
 }
 
@@ -171,7 +171,7 @@ body {
   pointer-events: none;
   transition: opacity 0.3s ease, transform 0.3s ease;
   z-index: 5;
-  box-shadow: 0 8px 24px rgba(197,0,34,0.25);
+  box-shadow: 0 8px 24px rgba(244,114,182,0.25);
 }
 .speech-bubble.visible {
   opacity: 1;
@@ -283,7 +283,7 @@ body {
   font-size: 12px;
   transition: 0.2s;
 }
-.upload-btn:hover { border-color: var(--pink); background: rgba(197,0,34,0.08); }
+.upload-btn:hover { border-color: var(--pink); background: rgba(244,114,182,0.08); }
 .upload-icon { color: var(--pink); font-weight: 700; font-size: 14px; }
 
 /* ===== Workflow canvas ===== */
@@ -333,7 +333,7 @@ body {
   border-color: #4ade80;
   background: rgba(74,222,128,0.12);
 }
-.step-card.complete .step-index { background: #4ade80; color: #08000f; }
+.step-card.complete .step-index { background: #4ade80; color: #0a0010; }
 .step-card.complete::after { content: "✓"; color: #4ade80; font-weight: 700; margin-left: 4px; }
 
 /* ===== Chat area ===== */
@@ -401,7 +401,7 @@ body {
   color: var(--text);
   display: flex; align-items: center; justify-content: center;
 }
-.mic-btn:hover { background: rgba(197,0,34,0.15); color: var(--pink); }
+.mic-btn:hover { background: rgba(244,114,182,0.15); color: var(--pink); }
 .mic-btn.recording {
   background: #ef4444;
   color: #fff;
@@ -484,7 +484,7 @@ body {
   98% { transform: scaleY(0.1); }
 }
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 10px rgba(197,0,34,0.25); }
+  0%, 100% { box-shadow: 0 0 10px rgba(244,114,182,0.25); }
   50% { box-shadow: 0 0 25px var(--pink), 0 0 50px rgba(255,64,96,0.25); }
 }
 @keyframes stepSlideIn {
@@ -511,7 +511,7 @@ body {
 .chat-messages::-webkit-scrollbar-thumb,
 .sidebar::-webkit-scrollbar-thumb,
 .workflow-canvas::-webkit-scrollbar-thumb {
-  background: rgba(197,0,34,0.4);
+  background: rgba(244,114,182,0.4);
   border-radius: 3px;
 }
 

@@ -8,12 +8,12 @@
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   :root {
-    --bg: #08000f;
+    --bg: #0a0010;
     --panel: rgba(255,255,255,0.04);
     --border: rgba(255,255,255,0.08);
     --text: #ffffff;
     --muted: rgba(255,255,255,0.55);
-    --brand: #C50022;
+    --brand: #fb923c;
   }
   html, body { height:100%; }
   body { font-family:'Space Grotesk',-apple-system,BlinkMacSystemFont,sans-serif; background:var(--bg); color:var(--text); display:flex; flex-direction:column; min-height:100vh; }
@@ -103,7 +103,7 @@
     .catch(function () { showError("This chatbot is unavailable."); });
 
   function render(cfg) {
-    var color = cfg.brand_color || "#C50022";
+    var color = cfg.brand_color || "#fb923c";
     var name = cfg.bot_name || "Assistant";
     var company = cfg.company_name || "";
     var welcome = cfg.welcome_message || "Hi! How can I help you?";

@@ -522,20 +522,20 @@ Or email us directly: **support@nerum.in** 📧`;
       #neru-btn {
         position: fixed; bottom: 24px; right: 24px;
         width: 54px; height: 54px; border-radius: 50%;
-        background: linear-gradient(135deg, #C50022, #34d399);
+        background: linear-gradient(135deg, #fb923c, #34d399);
         cursor: pointer; z-index: 9000;
         display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 4px 20px rgba(197,0,34,0.4);
+        box-shadow: 0 4px 20px rgba(251,146,60,0.4);
         transition: all 0.3s ease;
         animation: neruFloat 3s ease-in-out infinite;
       }
-      #neru-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(197,0,34,0.5); }
+      #neru-btn:hover { transform: scale(1.1); box-shadow: 0 6px 25px rgba(251,146,60,0.5); }
       @keyframes neruFloat {
         0%,100%{transform:translateY(0)} 50%{transform:translateY(-4px)}
       }
       #neru-notif {
         position: absolute; top: -4px; right: -4px;
-        width: 18px; height: 18px; background: #C50022;
+        width: 18px; height: 18px; background: #fb923c;
         border-radius: 50%; font-size: 10px; font-weight: 700;
         color: #fff; display: flex; align-items: center;
         justify-content: center; font-family: -apple-system, sans-serif;
@@ -551,11 +551,11 @@ Or email us directly: **support@nerum.in** 📧`;
         from{opacity:0;transform:scale(0.85) translateY(20px)}
         to{opacity:1;transform:scale(1) translateY(0)}
       }
-      body.dark #neru-window { background: #000000; border: 1px solid rgba(197,0,34,0.2); }
-      body.light #neru-window { background: rgba(255,255,255,0.95); border: 1px solid rgba(197,0,34,0.2); }
+      body.dark #neru-window { background: #000000; border: 1px solid rgba(251,146,60,0.2); }
+      body.light #neru-window { background: rgba(255,255,255,0.95); border: 1px solid rgba(251,146,60,0.2); }
       #neru-header {
         display: flex; align-items: center; justify-content: space-between;
-        padding: 14px 16px; background: linear-gradient(135deg, #C50022, #34d399); flex-shrink: 0;
+        padding: 14px 16px; background: linear-gradient(135deg, #fb923c, #34d399); flex-shrink: 0;
       }
       #neru-header-info { display: flex; align-items: center; gap: 10px; }
       #neru-avatar {
@@ -586,7 +586,7 @@ Or email us directly: **support@nerum.in** 📧`;
       }
       #neru-msgs::-webkit-scrollbar { width: 3px; }
       body.dark #neru-msgs::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 10px; }
-      body.light #neru-msgs::-webkit-scrollbar-thumb { background: rgba(197,0,34,0.2); border-radius: 10px; }
+      body.light #neru-msgs::-webkit-scrollbar-thumb { background: rgba(251,146,60,0.2); border-radius: 10px; }
       .neru-msg-bot, .neru-msg-user {
         font-size: 11px; line-height: 1.7; padding: 9px 12px;
         border-radius: 12px; max-width: 88%; font-family: -apple-system, sans-serif;
@@ -594,22 +594,22 @@ Or email us directly: **support@nerum.in** 📧`;
       }
       .neru-msg-bot { border-radius: 4px 12px 12px 12px; align-self: flex-start; }
       body.dark .neru-msg-bot {
-        background: rgba(197,0,34,0.1); border: 1px solid rgba(197,0,34,0.15); color: rgba(255,255,255,0.85);
+        background: rgba(251,146,60,0.1); border: 1px solid rgba(251,146,60,0.15); color: rgba(255,255,255,0.85);
       }
       body.light .neru-msg-bot {
-        background: rgba(255,255,255,0.9); border: 1px solid rgba(197,0,34,0.15); color: #000000;
+        background: rgba(255,255,255,0.9); border: 1px solid rgba(251,146,60,0.15); color: #000000;
       }
       .neru-msg-user {
         border-radius: 12px 12px 4px 12px; align-self: flex-end;
-        background: linear-gradient(135deg, #C50022, #34d399); color: #fff;
+        background: linear-gradient(135deg, #fb923c, #34d399); color: #fff;
       }
       .neru-typing {
         display: flex; gap: 4px; padding: 10px 14px;
         border-radius: 4px 12px 12px 12px; align-self: flex-start; border: 1px solid;
       }
-      body.dark .neru-typing { background: rgba(197,0,34,0.1); border-color: rgba(197,0,34,0.15); }
-      body.light .neru-typing { background: rgba(255,255,255,0.9); border-color: rgba(197,0,34,0.15); }
-      .neru-typing span { width: 6px; height: 6px; border-radius: 50%; background: #C50022; display: inline-block; }
+      body.dark .neru-typing { background: rgba(251,146,60,0.1); border-color: rgba(251,146,60,0.15); }
+      body.light .neru-typing { background: rgba(255,255,255,0.9); border-color: rgba(251,146,60,0.15); }
+      .neru-typing span { width: 6px; height: 6px; border-radius: 50%; background: #fb923c; display: inline-block; }
       .neru-typing span:nth-child(1){animation:pulse 1.2s ease-in-out infinite}
       .neru-typing span:nth-child(2){animation:pulse 1.2s ease-in-out 0.4s infinite}
       .neru-typing span:nth-child(3){animation:pulse 1.2s ease-in-out 0.8s infinite}
@@ -617,39 +617,39 @@ Or email us directly: **support@nerum.in** 📧`;
         padding: 8px 12px; display: flex; gap: 6px; flex-wrap: wrap; flex-shrink: 0; border-top: 1px solid;
       }
       body.dark #neru-quick { border-color: rgba(255,255,255,0.07); }
-      body.light #neru-quick { border-color: rgba(197,0,34,0.1); }
+      body.light #neru-quick { border-color: rgba(251,146,60,0.1); }
       #neru-quick button {
         font-size: 9px; padding: 4px 9px; border-radius: 20px; cursor: pointer;
         font-family: -apple-system, sans-serif; transition: all 0.2s; border: 1px solid; font-weight: 500;
       }
-      body.dark #neru-quick button { background: rgba(197,0,34,0.08); border-color: rgba(197,0,34,0.2); color: #C50022; }
-      body.dark #neru-quick button:hover { background: rgba(197,0,34,0.18); }
-      body.light #neru-quick button { background: rgba(197,0,34,0.06); border-color: rgba(197,0,34,0.2); color: #a0001b; }
-      body.light #neru-quick button:hover { background: rgba(197,0,34,0.12); }
+      body.dark #neru-quick button { background: rgba(251,146,60,0.08); border-color: rgba(251,146,60,0.2); color: #fb923c; }
+      body.dark #neru-quick button:hover { background: rgba(251,146,60,0.18); }
+      body.light #neru-quick button { background: rgba(251,146,60,0.06); border-color: rgba(251,146,60,0.2); color: #fb923c; }
+      body.light #neru-quick button:hover { background: rgba(251,146,60,0.12); }
       #neru-input-row {
         display: flex; gap: 8px; padding: 10px 12px; flex-shrink: 0; border-top: 1px solid;
       }
       body.dark #neru-input-row { border-color: rgba(255,255,255,0.07); }
-      body.light #neru-input-row { border-color: rgba(197,0,34,0.1); }
+      body.light #neru-input-row { border-color: rgba(251,146,60,0.1); }
       #neru-input {
         flex: 1; border-radius: 20px; padding: 8px 14px;
         font-size: 11px; outline: none; border: 1px solid; font-family: -apple-system, sans-serif;
       }
       body.dark #neru-input { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.1); color: #fff; }
       body.dark #neru-input::placeholder { color: rgba(255,255,255,0.25); }
-      body.dark #neru-input:focus { border-color: rgba(197,0,34,0.5); }
-      body.light #neru-input { background: rgba(255,255,255,0.7); border-color: rgba(197,0,34,0.2); color: #000000; }
-      body.light #neru-input::placeholder { color: #ff4060; }
-      body.light #neru-input:focus { border-color: #C50022; }
+      body.dark #neru-input:focus { border-color: rgba(251,146,60,0.5); }
+      body.light #neru-input { background: rgba(255,255,255,0.7); border-color: rgba(251,146,60,0.2); color: #000000; }
+      body.light #neru-input::placeholder { color: #f97316; }
+      body.light #neru-input:focus { border-color: #fb923c; }
       #neru-send {
         width: 34px; height: 34px; border-radius: 50%;
-        background: linear-gradient(135deg, #C50022, #34d399);
+        background: linear-gradient(135deg, #fb923c, #34d399);
         border: none; cursor: pointer; display: flex;
         align-items: center; justify-content: center; transition: all 0.2s; flex-shrink: 0;
       }
       #neru-send:hover { transform: scale(1.1); opacity: 0.9; }
-      .neru-msg-bot strong { font-weight: 700; color: #C50022; }
-      body.light .neru-msg-bot strong { color: #a0001b; }
+      .neru-msg-bot strong { font-weight: 700; color: #fb923c; }
+      body.light .neru-msg-bot strong { color: #fb923c; }
     `;
     document.head.appendChild(style);
   }

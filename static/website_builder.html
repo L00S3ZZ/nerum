@@ -7,16 +7,16 @@
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
   :root {
-    --purple: #C50022;
-    --indigo: #C50022;
+    --purple: #2dd4bf;
+    --indigo: #2dd4bf;
     --green: #34d399;
-    --pink: #C50022;
-    --pink-soft: rgba(197,0,34,0.15);
-    --pink-border: rgba(197,0,34,0.35);
-    --violet: #ff4060;
-    --bg: #08000f;
+    --pink: #2dd4bf;
+    --pink-soft: rgba(45,212,191,0.15);
+    --pink-border: rgba(45,212,191,0.35);
+    --violet: #34d399;
+    --bg: #0a0010;
     --card: rgba(255,255,255,0.03);
-    --card-border: rgba(197,0,34,0.25);
+    --card-border: rgba(45,212,191,0.25);
     --text: #ffffff;
     --muted: rgba(255,255,255,0.5);
     --sidebar-w: 220px;
@@ -25,10 +25,10 @@
   body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
 
   .galaxy { position:fixed; inset:0; z-index:0;
-    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.18) 0%,transparent 60%),
-                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(197,0,34,0.14) 0%,transparent 55%),
-                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.12) 0%,transparent 50%),
-                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(197,0,34,0.10) 0%,transparent 55%),#08000f;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(45,212,191,0.18) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(45,212,191,0.14) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(45,212,191,0.12) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(45,212,191,0.10) 0%,transparent 55%),#0a0010;
     pointer-events:none; }
 
   .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
@@ -36,9 +36,9 @@
   /* SIDEBAR */
   .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
   .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
-  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(45,212,191,0.4); }
   .logo-text { font-size:18px; font-weight:700; }
-  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(45,212,191,0.2); color:var(--purple); border:1px solid rgba(45,212,191,0.3); border-radius:4px; padding:1px 5px; }
   .nav-section { padding:14px 10px 4px; }
   .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
   .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; }
@@ -150,12 +150,12 @@
   .btn-ghost:hover { background:var(--pink-soft); }
   .btn-ghost.danger { color:#f87171; border-color:rgba(248,113,113,0.4); }
   .btn-ghost.danger:hover { background:rgba(248,113,113,0.12); }
-  .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(197,0,34,0.3); }
+  .btn-primary { display:inline-flex; align-items:center; justify-content:center; gap:8px; background:linear-gradient(135deg,var(--purple),var(--indigo)); border:none; border-radius:10px; padding:10px 22px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(45,212,191,0.3); }
   .btn-primary:hover { opacity:0.92; transform:translateY(-1px); }
   .btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
   .btn-primary.full { width:100%; padding:14px; font-size:15px; }
-  .btn-small { padding:6px 12px; font-size:12px; font-weight:500; border-radius:8px; border:none; background:rgba(197,0,34,0.15); color:var(--pink); cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .btn-small:hover { background:rgba(197,0,34,0.25); }
+  .btn-small { padding:6px 12px; font-size:12px; font-weight:500; border-radius:8px; border:none; background:rgba(45,212,191,0.15); color:var(--pink); cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .btn-small:hover { background:rgba(45,212,191,0.25); }
 
   /* PREVIEW PANEL */
   .preview-panel { position:sticky; top:84px; background:var(--card); border:1px solid var(--card-border); border-radius:18px; padding:18px; }
@@ -328,10 +328,10 @@
                 <div class="form-field">
                   <label class="form-label">Brand color</label>
                   <div class="color-row">
-                    <div class="color-swatch-btn" id="colorSwatch" style="background:#C50022">
-                      <input type="color" id="f-brand_color" value="#C50022">
+                    <div class="color-swatch-btn" id="colorSwatch" style="background:#2dd4bf">
+                      <input type="color" id="f-brand_color" value="#2dd4bf">
                     </div>
-                    <input type="text" class="form-input color-hex" id="f-brand_color_hex" value="#C50022" maxlength="7">
+                    <input type="text" class="form-input color-hex" id="f-brand_color_hex" value="#2dd4bf" maxlength="7">
                   </div>
                 </div>
                 <div class="form-field">
@@ -760,7 +760,7 @@ function collectForm() {
     email: document.getElementById('f-email').value.trim(),
     address: document.getElementById('f-address').value.trim(),
     services: JSON.stringify(state.services),
-    brand_color: document.getElementById('f-brand_color_hex').value.trim() || '#C50022',
+    brand_color: document.getElementById('f-brand_color_hex').value.trim() || '#2dd4bf',
     logo_url: document.getElementById('f-logo_url').value.trim(),
     logo_data: state.logo_data,
     chatbot_embed_id: document.getElementById('f-chatbot_embed_id').value.trim(),
@@ -961,9 +961,9 @@ function editWebsite(id) {
   document.getElementById('f-phone').value = w.phone || '';
   document.getElementById('f-email').value = w.email || '';
   document.getElementById('f-address').value = w.address || '';
-  document.getElementById('f-brand_color').value = w.brand_color || '#C50022';
-  document.getElementById('f-brand_color_hex').value = w.brand_color || '#C50022';
-  document.getElementById('colorSwatch').style.background = w.brand_color || '#C50022';
+  document.getElementById('f-brand_color').value = w.brand_color || '#2dd4bf';
+  document.getElementById('f-brand_color_hex').value = w.brand_color || '#2dd4bf';
+  document.getElementById('colorSwatch').style.background = w.brand_color || '#2dd4bf';
   document.getElementById('f-logo_url').value = w.logo_url || '';
   state.logo_data = w.logo_data || '';
   if (w.logo_data || w.logo_url) {
