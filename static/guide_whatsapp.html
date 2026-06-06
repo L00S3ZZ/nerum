@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhatsApp Setup Guide · Nerum</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #C50022;
+    --indigo: #C50022;
+    --green: #34d399;
+    --pink: #ff4060;
+    --bg: #08000f;
+    --card: rgba(255,255,255,0.04);
+    --card-border: rgba(255,255,255,0.08);
+    --text: #ffffff;
+    --muted: rgba(255,255,255,0.5);
+    --sidebar-w: 220px;
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  html, body { background:#08000f !important; color:var(--text); font-family:'Space Grotesk',sans-serif; min-height:100vh; overflow-x:hidden; }
+
+  #starfield { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  .galaxy { position:fixed; inset:0; z-index:0;
+    background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.15) 0%,transparent 60%),
+                radial-gradient(ellipse 60% 80% at 80% 80%,rgba(255,64,96,0.10) 0%,transparent 55%),
+                radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.08) 0%,transparent 50%),
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(255,64,96,0.06) 0%,transparent 55%),#08000f;
+    pointer-events:none; }
+
+  .layout { display:flex; min-height:100vh; position:relative; z-index:1; background:transparent !important; }
+
+  /* SIDEBAR */
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.85); backdrop-filter:blur(20px); border-right:1px solid rgba(197,0,34,0.15); z-index:100; padding:0 0 20px; }
+  .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
+  .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#C50022,#ff4060); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
+  .logo-text { font-size:18px; font-weight:700; }
+  .beta-tag { font-size:9px; font-weight:600; background:rgba(197,0,34,0.2); color:var(--purple); border:1px solid rgba(197,0,34,0.3); border-radius:4px; padding:1px 5px; }
+  .nav-section { padding:14px 10px 4px; }
+  .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
+  .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; position:relative; }
+  .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
+  .nav-item.active { background:rgba(197,0,34,0.12); border-color:rgba(197,0,34,0.25); color:#fff; }
+  .nav-item.active::before { content:""; position:absolute; left:0; top:20%; bottom:20%; width:3px; border-radius:0 3px 3px 0; background:#C50022; }
+  .nav-icon { font-size:15px; width:18px; text-align:center; }
+  .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
+  .ai-core-pill { background:rgba(197,0,34,0.06); border:1px solid rgba(197,0,34,0.18); border-radius:10px; padding:10px 12px; margin-bottom:10px; }
+  .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:linear-gradient(135deg,#C50022,#ff4060); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; flex-shrink:0; }
+  .user-name { font-size:13px; font-weight:600; }
+  .user-plan { font-size:11px; color:var(--purple); }
+
+  /* MAIN */
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; background:transparent !important; }
+
+  /* TOPBAR */
+  .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(8,0,15,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
+  .status-pill { display:flex; align-items:center; gap:7px; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.25); border-radius:20px; padding:6px 12px; font-size:12px; color:var(--green); font-weight:500; }
+  .status-dot { width:7px; height:7px; border-radius:50%; background:var(--green); animation:pulse 2s infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
+  .back-topbar { display:inline-flex; align-items:center; gap:6px; color:var(--muted); font-size:13px; text-decoration:none; transition:color 0.2s; }
+  .back-topbar:hover { color:#fff; }
+
+  /* CONTENT */
+  .content { padding:32px 28px; flex:1; max-width:880px; width:100%; margin:0 auto; background:transparent !important; }
+
+  /* GUIDE HEADER */
+  .guide-icon { font-size:48px; margin-bottom:12px; line-height:1; }
+  .guide-title { font-size:30px; font-weight:700; margin-bottom:8px; }
+  .guide-sub { font-size:14px; color:var(--muted); max-width:560px; line-height:1.55; margin-bottom:14px; }
+  .guide-badge { display:inline-flex; align-items:center; gap:6px; background:rgba(197,0,34,0.1); border:1px solid rgba(197,0,34,0.25); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--pink); font-weight:500; margin-bottom:32px; }
+
+  /* STEPPER */
+  .stepper { display:flex; align-items:center; background:rgba(255,255,255,0.03); border:1px solid var(--card-border); border-radius:14px; padding:16px 22px; margin-bottom:32px; overflow-x:auto; }
+  .stepper-item { display:flex; align-items:center; flex-direction:column; gap:7px; text-align:center; min-width:84px; }
+  .stepper-num { width:32px; height:32px; border-radius:50%; background:rgba(255,255,255,0.08); border:2px solid rgba(255,255,255,0.14); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--muted); transition:all 0.3s; }
+  .stepper-item.active .stepper-num { background:#C50022; border-color:#C50022; color:#fff; box-shadow:0 0 14px rgba(197,0,34,0.5); }
+  .stepper-label { font-size:11px; color:var(--muted); font-weight:500; white-space:nowrap; }
+  .stepper-item.active .stepper-label { color:#fff; font-weight:600; }
+  .stepper-line { flex:1; height:1px; background:rgba(255,255,255,0.1); min-width:20px; }
+
+  /* STEP CARDS */
+  .step-card { background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:26px; margin-bottom:20px; backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); }
+  .step-card-header { display:flex; align-items:flex-start; gap:14px; margin-bottom:20px; }
+  .step-num-badge { width:38px; height:38px; border-radius:10px; background:#C50022; display:flex; align-items:center; justify-content:center; font-size:17px; font-weight:700; color:#fff; flex-shrink:0; box-shadow:0 0 14px rgba(197,0,34,0.4); }
+  .step-card-title { font-size:18px; font-weight:700; margin-bottom:4px; }
+  .step-card-desc { font-size:13px; color:var(--muted); line-height:1.5; }
+  .req-badge { display:inline-block; font-size:10px; font-weight:600; background:rgba(197,0,34,0.12); color:var(--pink); border:1px solid rgba(197,0,34,0.28); border-radius:5px; padding:2px 8px; margin-top:6px; }
+
+  /* STEP LIST */
+  .step-list { list-style:none; padding:0; margin:0 0 16px; counter-reset:slist; }
+  .step-list li { counter-increment:slist; display:flex; align-items:flex-start; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.05); font-size:13.5px; color:rgba(255,255,255,0.85); line-height:1.5; }
+  .step-list li:last-child { border-bottom:none; padding-bottom:0; }
+  .step-list li::before { content:counter(slist); min-width:24px; height:24px; border-radius:6px; background:rgba(197,0,34,0.12); color:var(--pink); font-size:11px; font-weight:700; display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:1px; border:1px solid rgba(197,0,34,0.2); }
+
+  .ext-link { color:#C50022; text-decoration:none; font-weight:500; }
+  .ext-link:hover { text-decoration:underline; color:#ff4060; }
+  code.inline { background:rgba(255,255,255,0.08); padding:2px 7px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:12px; }
+
+  /* INFO BOXES */
+  .tip-box  { background:rgba(245,158,11,0.1);  border:1px solid rgba(245,158,11,0.3);  border-radius:10px; padding:13px 16px; font-size:13px; color:rgba(255,255,255,0.82); line-height:1.55; margin-bottom:14px; }
+  .info-box { background:rgba(56,189,248,0.08); border:1px solid rgba(56,189,248,0.25); border-radius:10px; padding:13px 16px; font-size:13px; color:rgba(255,255,255,0.8);  line-height:1.55; margin-bottom:14px; }
+  .warn-box { background:rgba(197,0,34,0.1);    border:1px solid rgba(197,0,34,0.3);    border-radius:10px; padding:13px 16px; font-size:13px; color:rgba(255,255,255,0.84); line-height:1.55; margin-bottom:14px; }
+
+  /* DOC CHECKLIST */
+  .doc-checklist { list-style:none; padding:0; margin:0 0 16px; }
+  .doc-checklist li { display:flex; align-items:flex-start; gap:10px; padding:8px 0; font-size:13px; color:rgba(255,255,255,0.8); line-height:1.5; border-bottom:1px solid rgba(255,255,255,0.04); }
+  .doc-checklist li:last-child { border-bottom:none; }
+  .doc-checklist li::before { content:"✓"; color:#34d399; font-weight:700; flex-shrink:0; margin-top:1px; }
+
+  /* REJECTION BOX */
+  .rejection-box { background:rgba(197,0,34,0.08); border:1px solid rgba(197,0,34,0.25); border-radius:10px; padding:14px 16px; font-size:13px; color:rgba(255,255,255,0.78); line-height:1.6; margin-bottom:14px; }
+  .rejection-box ul { list-style:none; padding:0; margin:8px 0 0; display:flex; flex-direction:column; gap:4px; }
+  .rejection-box ul li::before { content:"• "; color:#f87171; font-weight:700; }
+
+  /* GUIDE LINK BUTTON */
+  .guide-link-btn { display:inline-flex; align-items:center; gap:8px; background:rgba(197,0,34,0.1); border:1px solid rgba(197,0,34,0.28); border-radius:10px; padding:9px 16px; color:#ff6080; font-size:13px; font-weight:500; text-decoration:none; transition:all 0.2s; margin-top:4px; }
+  .guide-link-btn:hover { background:rgba(197,0,34,0.2); border-color:rgba(197,0,34,0.5); color:#fff; }
+
+  /* INTERACTIVE CHECKLIST */
+  .checklist-item { display:flex; align-items:center; gap:12px; padding:11px 0; border-bottom:1px solid rgba(255,255,255,0.05); cursor:pointer; user-select:none; transition:opacity 0.15s; }
+  .checklist-item:last-child { border-bottom:none; }
+  .checklist-item:hover { opacity:0.82; }
+  .checklist-box { width:20px; height:20px; border-radius:6px; border:2px solid rgba(255,255,255,0.2); flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all 0.2s; font-size:11px; font-weight:700; }
+  .checklist-box.checked { background:#C50022; border-color:#C50022; color:#fff; }
+  .checklist-label { font-size:13.5px; color:rgba(255,255,255,0.85); line-height:1.4; }
+  .checklist-item.done .checklist-label { text-decoration:line-through; color:var(--muted); }
+  .progress-wrap { margin:0 0 16px; }
+  .progress-bar-bg { height:6px; background:rgba(255,255,255,0.08); border-radius:3px; overflow:hidden; margin-bottom:7px; }
+  .progress-bar { height:100%; background:linear-gradient(90deg,#C50022,#ff4060); border-radius:3px; transition:width 0.4s; }
+  .progress-lbl { font-size:12px; color:var(--muted); }
+  .success-banner { display:none; background:rgba(52,211,153,0.1); border:1px solid rgba(52,211,153,0.3); border-radius:10px; padding:14px 18px; font-size:14px; color:#34d399; font-weight:600; text-align:center; margin-top:14px; animation:waFadeIn 0.3s ease; }
+  .success-banner.show { display:block; }
+  @keyframes waFadeIn { from{opacity:0;transform:translateY(6px);} to{opacity:1;transform:translateY(0);} }
+
+  ::-webkit-scrollbar { width:6px; }
+  ::-webkit-scrollbar-track { background:transparent; }
+  ::-webkit-scrollbar-thumb { background:rgba(197,0,34,0.3); border-radius:3px; }
+</style>
+</head>
+<body>
+<div class="galaxy"></div>
+<canvas id="starfield"></canvas>
+
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-wrap">
+      <div class="logo-icon">N</div>
+      <div>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="logo-text">Nerum</span>
+          <span class="beta-tag">BETA</span>
+        </div>
+        <div style="font-size:10px;color:var(--muted);">v2.4.1 · online</div>
+      </div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Main</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⬡</span> Overview</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚡</span> Workflows</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">✦</span> AI Builder</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">≡</span> Smart Lists</a>
+      <a class="nav-item" href="/chatbot-builder"><span class="nav-icon">🤖</span> Chatbot</a>
+      <a class="nav-item" href="/website-builder"><span class="nav-icon">🌐</span> Website</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Connect</div>
+      <a class="nav-item active" href="/integrations"><span class="nav-icon">⬡</span> Integrations</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">↗</span> Analytics</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◷</span> History</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Account</div>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">⚙</span> Settings</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">◈</span> Billing</a>
+      <a class="nav-item" href="/dashboard"><span class="nav-icon">?</span> Help</a>
+    </div>
+    <div class="sidebar-footer">
+      <div class="ai-core-pill">
+        <div style="font-size:10px;color:var(--purple);font-weight:700;letter-spacing:0.8px;">✦ AI CORE</div>
+        <div style="font-size:12px;margin-top:2px;">Nerum-X · <span style="color:var(--green)">running</span></div>
+      </div>
+      <div class="user-pill">
+        <div class="avatar" id="user-avatar">N</div>
+        <div style="flex:1;min-width:0;">
+          <div class="user-name" id="user-name-sidebar">Loading...</div>
+          <div class="user-plan" id="user-plan-sidebar">Free</div>
+        </div>
+        <span style="color:var(--muted);font-size:14px;cursor:pointer;" onclick="logout()">↪</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+    <div class="topbar">
+      <a href="/integrations" class="back-topbar">← Back to Integrations</a>
+      <div style="margin-left:auto;">
+        <div class="status-pill"><div class="status-dot"></div>AI CORE · online</div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- HEADER -->
+      <div class="guide-icon">💬</div>
+      <h1 class="guide-title">WhatsApp Business Setup Guide</h1>
+      <p class="guide-sub">Complete guide to connect and verify your WhatsApp Business account</p>
+      <div class="guide-badge">⏱ 15-30 mins setup &nbsp;•&nbsp; 7-15 days verification</div>
+
+      <!-- STEPPER -->
+      <div class="stepper">
+        <div class="stepper-item active">
+          <div class="stepper-num">1</div>
+          <div class="stepper-label">Create Meta App</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item">
+          <div class="stepper-num">2</div>
+          <div class="stepper-label">Add WhatsApp</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item">
+          <div class="stepper-num">3</div>
+          <div class="stepper-label">Get Credentials</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item">
+          <div class="stepper-num">4</div>
+          <div class="stepper-label">Business Verification</div>
+        </div>
+        <div class="stepper-line"></div>
+        <div class="stepper-item">
+          <div class="stepper-num">5</div>
+          <div class="stepper-label">Go Live</div>
+        </div>
+      </div>
+
+      <!-- STEP 1 -->
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num-badge">1</div>
+          <div>
+            <div class="step-card-title">Create Your Meta Business App</div>
+            <div class="step-card-desc">Set up a Meta developer app to access WhatsApp Cloud API</div>
+          </div>
+        </div>
+        <ol class="step-list">
+          <li>Go to <a class="ext-link" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> and sign in with your Meta account</li>
+          <li>Click <strong>Create App</strong></li>
+          <li>Select <strong>Business</strong> as the app type</li>
+          <li>Enter your app name — e.g. <em>"YourBusiness WA"</em></li>
+          <li>Select your Meta Business Account from the dropdown</li>
+          <li>Click <strong>Create App</strong> to confirm</li>
+        </ol>
+        <div class="tip-box">💡 <strong>Tip:</strong> Use your business name in the app name for easy identification later</div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num-badge">2</div>
+          <div>
+            <div class="step-card-title">Add WhatsApp to Your App</div>
+            <div class="step-card-desc">Enable WhatsApp Cloud API as a product in your Meta app</div>
+          </div>
+        </div>
+        <ol class="step-list">
+          <li>Inside your app dashboard, scroll to the <strong>Add Products to Your App</strong> section</li>
+          <li>Find <strong>WhatsApp</strong> and click <strong>Set Up</strong></li>
+          <li>Select your Business Portfolio when prompted</li>
+          <li>Click <strong>Continue</strong></li>
+        </ol>
+        <div class="info-box">ℹ️ This links WhatsApp Cloud API to your Meta app — required to send and receive messages programmatically</div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num-badge">3</div>
+          <div>
+            <div class="step-card-title">Get Your Credentials</div>
+            <div class="step-card-desc">Copy the three values you'll paste into Nerum</div>
+          </div>
+        </div>
+        <ol class="step-list">
+          <li>Go to <strong>WhatsApp → API Setup</strong> in the left sidebar of your app</li>
+          <li>Copy your <strong>Phone Number ID</strong> — paste this into Nerum</li>
+          <li>Copy your <strong>WhatsApp Business Account ID (WABA ID)</strong> — paste this into Nerum</li>
+          <li>For the Access Token: go to <strong>Business Settings → System Users</strong></li>
+          <li>Create a System User (select <strong>Admin</strong> role)</li>
+          <li>Click <strong>Generate New Token</strong> → select your app → check <code class="inline">whatsapp_business_messaging</code> permission</li>
+          <li>Copy the token and paste into Nerum</li>
+        </ol>
+        <div class="warn-box">⚠️ <strong>Use a PERMANENT token from System Users, NOT the temporary token.</strong> Temporary tokens expire in 24 hours!</div>
+        <a class="guide-link-btn" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">Go to API Setup →</a>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num-badge">4</div>
+          <div>
+            <div class="step-card-title">Meta Business Verification</div>
+            <div class="step-card-desc">Required for full messaging access and higher rate limits</div>
+            <div class="req-badge">Required for full messaging access</div>
+          </div>
+        </div>
+        <div class="tip-box">📅 <strong>Timeline:</strong> 7-15 business days after submission</div>
+        <div style="font-size:12px;font-weight:700;color:var(--muted);letter-spacing:0.9px;text-transform:uppercase;margin-bottom:10px;">What you need</div>
+        <ul class="doc-checklist">
+          <li>Business Registration Certificate / GST Certificate</li>
+          <li>Business website (must match business name)</li>
+          <li>Business email — not Gmail/Yahoo, must be domain email (e.g. you@yourbusiness.com)</li>
+          <li>Business phone number</li>
+          <li>Utility bill or bank statement (address proof)</li>
+        </ul>
+        <ol class="step-list">
+          <li>Go to <a class="ext-link" href="https://business.facebook.com" target="_blank" rel="noopener">business.facebook.com</a></li>
+          <li>Click <strong>Settings → Business Info</strong></li>
+          <li>Scroll to the <strong>Business Verification</strong> section</li>
+          <li>Click <strong>Start Verification</strong></li>
+          <li>Select your country (India)</li>
+          <li>Enter your <strong>business legal name</strong> — must match your documents exactly</li>
+          <li>Upload the required documents</li>
+          <li>Submit and wait for Meta review (7-15 business days)</li>
+        </ol>
+        <div class="rejection-box">
+          ❌ <strong>Common rejection reasons:</strong>
+          <ul>
+            <li>Business name doesn't match documents exactly</li>
+            <li>Website not live or doesn't mention your business</li>
+            <li>Using personal Gmail instead of domain email</li>
+            <li>Documents not in English (get translated copies)</li>
+          </ul>
+        </div>
+        <a class="guide-link-btn" href="https://business.facebook.com" target="_blank" rel="noopener">Go to Meta Business Manager →</a>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-card">
+        <div class="step-card-header">
+          <div class="step-num-badge">5</div>
+          <div>
+            <div class="step-card-title">Go Live Checklist</div>
+            <div class="step-card-desc">Track your full setup progress — saved automatically</div>
+          </div>
+        </div>
+        <div class="progress-wrap">
+          <div class="progress-bar-bg"><div class="progress-bar" id="cl-bar" style="width:0%"></div></div>
+          <div class="progress-lbl" id="cl-lbl">0 of 8 completed</div>
+        </div>
+        <div id="checklist">
+          <div class="checklist-item" data-key="meta_app" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Meta app created</div>
+          </div>
+          <div class="checklist-item" data-key="wa_added" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">WhatsApp product added to app</div>
+          </div>
+          <div class="checklist-item" data-key="phone_verified" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Phone number added and verified via SMS/call</div>
+          </div>
+          <div class="checklist-item" data-key="creds_pasted" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Credentials pasted in Nerum</div>
+          </div>
+          <div class="checklist-item" data-key="test_sent" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Test message sent successfully</div>
+          </div>
+          <div class="checklist-item" data-key="biz_submitted" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Business verification submitted</div>
+          </div>
+          <div class="checklist-item" data-key="biz_approved" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Business verification approved by Meta</div>
+          </div>
+          <div class="checklist-item" data-key="templates_done" onclick="toggleCheck(this)">
+            <div class="checklist-box"></div>
+            <div class="checklist-label">Message templates created (for outbound messaging)</div>
+          </div>
+        </div>
+        <div class="success-banner" id="cl-success">🎉 You're fully set up! WhatsApp Business is ready to use.</div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<script>
+// ── Auth guard ────────────────────────────────────────────────────────────────
+(function() {
+  const token = localStorage.getItem('nerum_token');
+  if (!token) { window.location.href = '/'; return; }
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    const name = payload.name || payload.sub || payload.email || 'User';
+    document.getElementById('user-avatar').textContent = name.slice(0,2).toUpperCase();
+    document.getElementById('user-name-sidebar').textContent = name;
+  } catch(e) {}
+})();
+
+function logout() {
+  localStorage.removeItem('nerum_token');
+  window.location.href = '/';
+}
+
+// ── Checklist ────────────────────────────────────────────────────────────────
+const CL_KEY = 'nerum_wa_checklist';
+const TOTAL = 8;
+
+function loadChecklist() {
+  const saved = JSON.parse(localStorage.getItem(CL_KEY) || '{}');
+  document.querySelectorAll('.checklist-item').forEach(item => {
+    if (saved[item.dataset.key]) {
+      item.classList.add('done');
+      const box = item.querySelector('.checklist-box');
+      box.classList.add('checked');
+      box.textContent = '✓';
+    }
+  });
+  updateProgress();
+}
+
+function toggleCheck(item) {
+  const key = item.dataset.key;
+  const box = item.querySelector('.checklist-box');
+  const saved = JSON.parse(localStorage.getItem(CL_KEY) || '{}');
+  if (box.classList.contains('checked')) {
+    box.classList.remove('checked');
+    box.textContent = '';
+    item.classList.remove('done');
+    delete saved[key];
+  } else {
+    box.classList.add('checked');
+    box.textContent = '✓';
+    item.classList.add('done');
+    saved[key] = true;
+  }
+  localStorage.setItem(CL_KEY, JSON.stringify(saved));
+  updateProgress();
+}
+
+function updateProgress() {
+  const checked = document.querySelectorAll('.checklist-box.checked').length;
+  const pct = Math.round((checked / TOTAL) * 100);
+  document.getElementById('cl-bar').style.width = pct + '%';
+  document.getElementById('cl-lbl').textContent = checked + ' of ' + TOTAL + ' completed';
+  document.getElementById('cl-success').classList.toggle('show', checked === TOTAL);
+}
+
+loadChecklist();
+
+// ── Stars (canvas) ────────────────────────────────────────────────────────────
+(function(){
+  const sf = document.getElementById('starfield');
+  if (!sf || !sf.getContext) return;
+  const ctx = sf.getContext('2d');
+  let stars = [], W, H;
+  const COLORS = [[255,255,255],[197,0,34],[255,64,96]];
+  const resize = () => {
+    const dpr = window.devicePixelRatio || 1;
+    W = sf.width = window.innerWidth * dpr;
+    H = sf.height = window.innerHeight * dpr;
+    sf.style.width = '100vw'; sf.style.height = '100vh';
+    stars = Array.from({length:350}, () => {
+      const col = COLORS[Math.floor(Math.random()*COLORS.length)];
+      return {x:Math.random()*W, y:Math.random()*H, z:Math.random()*1.2+0.3,
+              s:Math.random()*2.0+0.5, tw:Math.random()*Math.PI*2,
+              dx:(Math.random()-0.5)*0.25, col, dpr};
+    });
+  };
+  resize(); window.addEventListener('resize', resize);
+  function drawStars(t) {
+    ctx.clearRect(0,0,W,H);
+    for (const s of stars) {
+      const a = 0.55 + 0.45*Math.sin(t*0.0007+s.tw);
+      const [r,g,b] = s.col; const radius = s.s*s.dpr; const glowR = radius*3.5;
+      const grad = ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,glowR);
+      grad.addColorStop(0,'rgba('+r+','+g+','+b+','+(a*0.85).toFixed(2)+')');
+      grad.addColorStop(1,'rgba('+r+','+g+','+b+',0)');
+      ctx.beginPath(); ctx.fillStyle=grad; ctx.arc(s.x,s.y,glowR,0,Math.PI*2); ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle='rgba('+r+','+g+','+b+','+Math.min(1,a+0.2).toFixed(2)+')';
+      ctx.arc(s.x,s.y,radius*0.7,0,Math.PI*2); ctx.fill();
+      s.y -= 0.10*s.z*s.dpr; s.x += s.dx*s.z*s.dpr;
+      if (s.y < -10) { s.y = H+10; s.x = Math.random()*W; }
+      if (s.x < -10) s.x = W+10;
+      if (s.x > W+10) s.x = -10;
+    }
+    requestAnimationFrame(drawStars);
+  }
+  requestAnimationFrame(drawStars);
+})();
+</script>
+</body>
+</html>

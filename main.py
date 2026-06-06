@@ -127,6 +127,10 @@ def home():
 def dashboard_page():
     return FileResponse("static/dashboard.html")
 
+@app.get("/dashboard/guide/whatsapp")
+def whatsapp_guide_page():
+    return FileResponse("static/guide_whatsapp.html")
+
 @app.get("/integrations")
 def integrations_page():
     return FileResponse("static/integrations.html")
