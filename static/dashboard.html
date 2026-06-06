@@ -840,7 +840,8 @@ function showPage(id, navEl) {
   document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
   const page = document.getElementById('page-' + id);
   if (page) page.classList.add('active');
-  if (navEl) navEl.classList.add('active');
+  const activeItem = document.querySelector(`.nav-item[data-page="${id}"]`);
+  if (activeItem) activeItem.classList.add('active');
   const pageColors = {
     'overview':     '#C50022',
     'workflows':    '#22c55e',
@@ -1125,7 +1126,7 @@ async function createWorkflow() {
     document.getElementById('wf-name').value='';
     document.getElementById('wf-desc').value='';
     loadUser();
-    showPage('workflows', document.querySelector('.nav-item:nth-child(2)'));
+    showPage('workflows', null);
   } else if (data && data.detail) {
     showToast(data.detail, true);
   }
