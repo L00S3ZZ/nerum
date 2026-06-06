@@ -153,6 +153,54 @@
   .terms-body { font-size:13px; color:var(--text); line-height:1.6; max-height:240px; overflow-y:auto; padding:14px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; margin-bottom:14px; }
   .terms-body strong { color:var(--purple); }
   #starfield { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none !important; }
+
+  /* ── WhatsApp Premium Modal ─────────────────────────────────────────────── */
+  .wa-modal-card { width:100%; max-width:480px; background:rgba(255,255,255,0.06); border:1px solid rgba(197,0,34,0.3); border-radius:20px; padding:32px 28px 28px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 0 80px rgba(197,0,34,0.15),0 30px 80px rgba(0,0,0,0.5); max-height:92vh; overflow-y:auto; position:relative; }
+  .wa-dots { display:flex; align-items:center; justify-content:center; margin-bottom:28px; }
+  .wa-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.12); transition:all 0.3s; flex-shrink:0; }
+  .wa-dot.active { background:#C50022; border-color:#C50022; box-shadow:0 0 10px rgba(197,0,34,0.6); }
+  .wa-dot-line { flex:0 0 44px; height:1px; background:rgba(255,255,255,0.12); }
+  .wa-step { animation:waFadeIn 0.22s ease; }
+  @keyframes waFadeIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
+  .wa-icon-wrap { text-align:center; font-size:52px; line-height:1; margin-bottom:16px; }
+  .wa-title { font-size:22px; font-weight:700; color:#fff; margin-bottom:8px; line-height:1.2; }
+  .wa-sub { font-size:13px; color:rgba(255,255,255,0.52); margin-bottom:22px; line-height:1.5; }
+  .wa-info-box { background:rgba(197,0,34,0.08); border:1px solid rgba(197,0,34,0.25); border-radius:10px; padding:12px 14px; font-size:12.5px; color:rgba(255,255,255,0.68); line-height:1.55; margin-bottom:18px; }
+  .wa-info-box strong { color:#ff6080; }
+  .wa-helper { font-size:11px; color:rgba(255,255,255,0.36); margin-top:5px; }
+  .wa-token-wrap { position:relative; }
+  .wa-token-wrap .form-input { padding-right:42px; }
+  .wa-eye-btn { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:15px; opacity:0.45; padding:4px; line-height:1; transition:opacity 0.2s; }
+  .wa-eye-btn:hover { opacity:0.9; }
+  .wa-option-card { display:flex; align-items:flex-start; gap:14px; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
+  .wa-option-card:hover { border-color:rgba(197,0,34,0.35); background:rgba(197,0,34,0.05); }
+  .wa-option-card.selected { border-color:rgba(197,0,34,0.5); background:rgba(197,0,34,0.08); }
+  .wa-option-radio { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,0.22); flex-shrink:0; margin-top:2px; transition:all 0.2s; position:relative; }
+  .wa-option-radio.active { border-color:#C50022; }
+  .wa-option-radio.active::after { content:''; position:absolute; inset:3px; border-radius:50%; background:#C50022; }
+  .wa-option-title { font-size:13.5px; font-weight:600; color:#fff; margin-bottom:3px; }
+  .wa-option-sub { font-size:12px; color:rgba(255,255,255,0.42); }
+  .wa-rec-tag { display:inline-block; font-size:10px; font-weight:600; background:rgba(52,211,153,0.15); color:#34d399; border:1px solid rgba(52,211,153,0.3); border-radius:4px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
+  .wa-btn-primary { width:100%; background:linear-gradient(135deg,#C50022,#ff4060); border:none; border-radius:12px; padding:13px 20px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 4px 20px rgba(197,0,34,0.35); margin-top:8px; letter-spacing:0.2px; }
+  .wa-btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
+  .wa-btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
+  .wa-btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:11px 18px; color:rgba(255,255,255,0.58); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
+  .wa-btn-ghost:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+  .wa-btn-row { display:flex; gap:10px; margin-top:8px; }
+  .wa-btn-row .wa-btn-primary { margin-top:0; flex:1; }
+  .wa-cancel-link { display:block; text-align:center; margin-top:12px; font-size:13px; color:rgba(255,255,255,0.33); cursor:pointer; background:none; border:none; font-family:inherit; transition:color 0.2s; width:100%; }
+  .wa-cancel-link:hover { color:rgba(255,255,255,0.62); }
+  .wa-center-state { text-align:center; padding:20px 0 10px; }
+  .wa-spinner { width:44px; height:44px; border:3px solid rgba(255,255,255,0.08); border-top-color:#C50022; border-radius:50%; animation:waSpin 0.75s linear infinite; margin:0 auto 20px; }
+  @keyframes waSpin { to { transform:rotate(360deg); } }
+  .wa-check-wrap { text-align:center; margin-bottom:16px; }
+  .wa-check-circle { width:60px; height:60px; border-radius:50%; background:rgba(52,211,153,0.12); border:2px solid rgba(52,211,153,0.4); display:inline-flex; align-items:center; justify-content:center; font-size:26px; color:#34d399; animation:waPulse 2s ease-in-out infinite; }
+  .wa-success-circle { width:64px; height:64px; border-radius:50%; background:rgba(52,211,153,0.12); border:2px solid rgba(52,211,153,0.45); display:inline-flex; align-items:center; justify-content:center; font-size:28px; color:#34d399; margin-bottom:18px; animation:waPulse 1.8s ease-in-out 3; }
+  .wa-error-circle { width:64px; height:64px; border-radius:50%; background:rgba(248,113,113,0.1); border:2px solid rgba(248,113,113,0.4); display:inline-flex; align-items:center; justify-content:center; font-size:28px; color:#f87171; margin-bottom:18px; }
+  @keyframes waPulse { 0%,100% { box-shadow:0 0 0 0 rgba(52,211,153,0.3); } 50% { box-shadow:0 0 0 12px rgba(52,211,153,0); } }
+  .wa-state-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; }
+  .wa-state-sub { font-size:13px; color:rgba(255,255,255,0.48); line-height:1.5; }
+  .wa-err-inline { display:none; margin-top:10px; padding:10px 14px; border-radius:10px; background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.28); font-size:12.5px; color:#f87171; }
 </style>
 </head>
 <body>
@@ -253,66 +301,118 @@
 
 <!-- WHATSAPP BUSINESS MODAL -->
 <div class="modal-overlay" id="wa-modal">
-  <div class="modal">
-    <div class="step-pill-row">
-      <div class="step-pill" data-pill="1"></div>
-      <div class="step-pill" data-pill="2"></div>
-      <div class="step-pill" data-pill="3"></div>
+  <div class="wa-modal-card">
+
+    <!-- Step dots -->
+    <div class="wa-dots" id="wa-dots-bar">
+      <div class="wa-dot active" id="wad-1"></div>
+      <div class="wa-dot-line"></div>
+      <div class="wa-dot" id="wad-2"></div>
+      <div class="wa-dot-line"></div>
+      <div class="wa-dot" id="wad-3"></div>
     </div>
 
-    <!-- STEP 1 -->
-    <div data-step="1">
-      <div class="modal-title">Connect WhatsApp Business</div>
-      <div class="modal-sub">You'll need three values from your Meta for Developers app. Follow these steps to grab them, then continue.</div>
-      <ol class="instruction-list">
-        <li>Go to <a class="ext-link" href="https://developers.facebook.com/apps" target="_blank" rel="noopener">developers.facebook.com/apps</a> and open your WhatsApp Business app (or create one).</li>
-        <li>Under <strong>WhatsApp → API Setup</strong>, copy your <strong>Phone Number ID</strong> and <strong>WhatsApp Business Account ID (WABA ID)</strong>.</li>
-        <li>Generate a <strong>permanent Access Token</strong> via System Users in Business Settings (temporary tokens expire after 24 hours).</li>
-        <li>Make sure your phone number is verified and a recipient is added for testing.</li>
-      </ol>
-      <div class="modal-actions">
-        <button class="btn-ghost" onclick="closeWaModal()">Cancel</button>
-        <button class="btn-primary" onclick="waStep(2)">Continue →</button>
+    <!-- STEP 1: Business Info -->
+    <div id="wa-step-1" class="wa-step">
+      <div class="wa-icon-wrap">💚</div>
+      <div class="wa-title">Connect WhatsApp Business</div>
+      <div class="wa-sub">Send messages directly from your WhatsApp Business number</div>
+      <div class="form-field">
+        <label class="form-label">Business Name</label>
+        <input class="form-input" id="wa-biz-name" type="text" placeholder="Acme Coffee Co." autocomplete="off">
       </div>
+      <div class="form-field">
+        <label class="form-label">WhatsApp Business Phone Number</label>
+        <input class="form-input" id="wa-biz-phone" type="tel" placeholder="+91 98765 43210" autocomplete="off">
+      </div>
+      <button class="wa-btn-primary" onclick="waStep(2)">Continue →</button>
+      <button class="wa-cancel-link" onclick="closeWaModal()">Cancel</button>
     </div>
 
-    <!-- STEP 2 -->
-    <div data-step="2" style="display:none;">
-      <div class="modal-title">Enter your credentials</div>
-      <div class="modal-sub">Stored encrypted (AES-256-GCM) on Nerum's servers. Only you can use them.</div>
+    <!-- STEP 2: Credentials -->
+    <div id="wa-step-2" class="wa-step" style="display:none;">
+      <div class="wa-title">Enter your Meta credentials</div>
+      <div class="wa-sub">Get these from developers.facebook.com/apps</div>
+      <div class="wa-info-box">📋 <strong>Quick guide:</strong> WhatsApp → API Setup → copy Phone Number ID and WABA ID. For token: Business Settings → System Users → Generate token</div>
       <div class="form-field">
         <label class="form-label">Phone Number ID</label>
         <input class="form-input" id="wa-phone" type="text" placeholder="e.g. 109876543210987" autocomplete="off">
+        <div class="wa-helper">Found under WhatsApp → API Setup</div>
       </div>
       <div class="form-field">
         <label class="form-label">WhatsApp Business Account ID (WABA ID)</label>
         <input class="form-input" id="wa-waba" type="text" placeholder="e.g. 234567890123456" autocomplete="off">
+        <div class="wa-helper">Found under WhatsApp → API Setup</div>
       </div>
       <div class="form-field">
-        <label class="form-label">Access Token</label>
-        <input class="form-input" id="wa-token" type="password" placeholder="EAAJ..." autocomplete="off">
+        <label class="form-label">Permanent Access Token</label>
+        <div class="wa-token-wrap">
+          <input class="form-input" id="wa-token" type="password" placeholder="EAAJ..." autocomplete="off">
+          <button class="wa-eye-btn" id="wa-eye" onclick="toggleWaToken()" type="button">👁</button>
+        </div>
+        <div class="wa-helper">Generate from Business Settings → System Users</div>
       </div>
-      <div class="modal-actions">
-        <button class="btn-ghost" onclick="waStep(1)">← Back</button>
-        <button class="btn-primary" onclick="waStep(3)">Test connection</button>
+      <div class="wa-btn-row">
+        <button class="wa-btn-ghost" onclick="waStep(1)">← Back</button>
+        <button class="wa-btn-primary" onclick="waStep(3)">Continue →</button>
       </div>
     </div>
 
-    <!-- STEP 3 -->
-    <div data-step="3" style="display:none;">
-      <div class="modal-title">Verifying credentials</div>
-      <div class="modal-sub">Calling Meta's Graph API to confirm your token and Phone Number ID are valid.</div>
-      <div class="test-status" id="wa-test-status">
-        <div class="spinner"></div>
-        <div class="test-status-title">Testing connection...</div>
-        <div class="test-status-msg">This usually takes 2-3 seconds.</div>
+    <!-- STEP 3: Test + Connect -->
+    <div id="wa-step-3" class="wa-step" style="display:none;">
+      <div class="wa-check-wrap"><div class="wa-check-circle">✓</div></div>
+      <div class="wa-title">Test your connection</div>
+      <div class="wa-sub">We'll send a test message to verify everything works</div>
+      <div class="form-field">
+        <label class="form-label">Test phone number</label>
+        <input class="form-input" id="wa-test-phone" type="tel" placeholder="+91 98765 43210" autocomplete="off">
+        <div class="wa-helper">Must be added as a recipient in your Meta app</div>
       </div>
-      <div class="modal-actions">
-        <button class="btn-ghost" id="wa-back-btn" onclick="waStep(2)" style="display:none;">← Back</button>
-        <button class="btn-ghost" id="wa-close-btn" onclick="closeWaModal()" style="display:none;">Close</button>
-        <button class="btn-primary" id="wa-save-btn" onclick="saveWhatsapp()" style="display:none;">Save & Connect</button>
+      <div class="wa-option-card selected" id="wa-opt-send" onclick="selectWaOpt('send')">
+        <div class="wa-option-radio active" id="wa-radio-send"></div>
+        <div>
+          <div class="wa-option-title">Send test message now <span class="wa-rec-tag">Recommended</span></div>
+          <div class="wa-option-sub">Verify credentials with a real message</div>
+        </div>
+      </div>
+      <div class="wa-option-card" id="wa-opt-skip" onclick="selectWaOpt('skip')">
+        <div class="wa-option-radio" id="wa-radio-skip"></div>
+        <div>
+          <div class="wa-option-title">Skip test, connect anyway</div>
+          <div class="wa-option-sub">Connect without sending a test message</div>
+        </div>
+      </div>
+      <div class="wa-err-inline" id="wa-connect-err"></div>
+      <div class="wa-btn-row" style="margin-top:16px;">
+        <button class="wa-btn-ghost" onclick="waStep(2)">← Back</button>
+        <button class="wa-btn-primary" id="wa-connect-btn" onclick="connectWhatsapp()">Connect WhatsApp →</button>
       </div>
     </div>
+
+    <!-- LOADING -->
+    <div id="wa-loading" style="display:none;" class="wa-step wa-center-state">
+      <div class="wa-spinner"></div>
+      <div class="wa-state-title">Connecting your account...</div>
+      <div class="wa-state-sub">This usually takes a few seconds</div>
+    </div>
+
+    <!-- SUCCESS -->
+    <div id="wa-success" style="display:none;" class="wa-step wa-center-state">
+      <div class="wa-success-circle">✓</div>
+      <div class="wa-state-title">WhatsApp Business Connected! 🎉</div>
+      <div id="wa-success-biz" class="wa-state-sub"></div>
+      <div id="wa-success-phone" class="wa-state-sub" style="margin-top:4px;"></div>
+      <button class="wa-btn-primary" style="margin-top:20px;" onclick="closeWaModal()">Start sending messages →</button>
+    </div>
+
+    <!-- ERROR -->
+    <div id="wa-error" style="display:none;" class="wa-step wa-center-state">
+      <div class="wa-error-circle">✗</div>
+      <div class="wa-state-title">Connection failed</div>
+      <div id="wa-error-msg" class="wa-state-sub"></div>
+      <button class="wa-btn-primary" style="margin-top:20px;" onclick="waStep(2)">Try again</button>
+    </div>
+
   </div>
 </div>
 
@@ -446,6 +546,8 @@ document.getElementById('search-input').addEventListener('input', (e) => {
 });
 
 // ── WhatsApp Business modal flow ────────────────────────────────────────────
+let waSelectedOpt = 'send';
+
 function openWaModal() {
   if (!termsAccepted()) { openTermsModal(); return; }
   resetWaModal();
@@ -455,74 +557,78 @@ function closeWaModal() {
   document.getElementById('wa-modal').classList.remove('open');
 }
 function resetWaModal() {
+  ['wa-biz-name','wa-biz-phone','wa-phone','wa-waba','wa-token','wa-test-phone'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.value = '';
+  });
+  waSelectedOpt = 'send';
+  selectWaOpt('send');
   waStep(1);
-  document.getElementById('wa-phone').value = '';
-  document.getElementById('wa-waba').value = '';
-  document.getElementById('wa-token').value = '';
 }
 function waStep(n) {
+  ['wa-step-1','wa-step-2','wa-step-3','wa-loading','wa-success','wa-error'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('wa-step-' + n).style.display = 'block';
+  document.getElementById('wa-dots-bar').style.display = 'flex';
   for (let i=1; i<=3; i++) {
-    document.querySelector(`[data-step="${i}"]`).style.display = (i === n ? 'block' : 'none');
-    document.querySelector(`[data-pill="${i}"]`).classList.toggle('active', i <= n);
+    document.getElementById('wad-' + i).classList.toggle('active', i <= n);
   }
-  if (n === 3) runWaTest();
 }
-
-async function runWaTest() {
-  const phone = document.getElementById('wa-phone').value.trim();
-  const waba  = document.getElementById('wa-waba').value.trim();
-  const token = document.getElementById('wa-token').value.trim();
-
-  const statusEl = document.getElementById('wa-test-status');
-  const backBtn  = document.getElementById('wa-back-btn');
-  const closeBtn = document.getElementById('wa-close-btn');
-  const saveBtn  = document.getElementById('wa-save-btn');
-
-  backBtn.style.display = 'none';
-  closeBtn.style.display = 'none';
-  saveBtn.style.display = 'none';
-  statusEl.className = 'test-status';
-  statusEl.innerHTML = `<div class="spinner"></div><div class="test-status-title">Testing connection...</div><div class="test-status-msg">Calling Meta Graph API.</div>`;
+function showWaState(state) {
+  ['wa-step-1','wa-step-2','wa-step-3','wa-loading','wa-success','wa-error'].forEach(id => {
+    document.getElementById(id).style.display = 'none';
+  });
+  document.getElementById('wa-' + state).style.display = 'block';
+  const hide = state === 'loading' || state === 'success' || state === 'error';
+  document.getElementById('wa-dots-bar').style.display = hide ? 'none' : 'flex';
+}
+function selectWaOpt(opt) {
+  waSelectedOpt = opt;
+  document.getElementById('wa-opt-send').classList.toggle('selected', opt === 'send');
+  document.getElementById('wa-opt-skip').classList.toggle('selected', opt === 'skip');
+  document.getElementById('wa-radio-send').classList.toggle('active', opt === 'send');
+  document.getElementById('wa-radio-skip').classList.toggle('active', opt === 'skip');
+}
+function toggleWaToken() {
+  const inp = document.getElementById('wa-token');
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+async function connectWhatsapp() {
+  const phone    = document.getElementById('wa-phone').value.trim();
+  const waba     = document.getElementById('wa-waba').value.trim();
+  const token    = document.getElementById('wa-token').value.trim();
+  const bizName  = document.getElementById('wa-biz-name').value.trim() || 'Your Business';
+  const bizPhone = document.getElementById('wa-biz-phone').value.trim();
+  const errEl    = document.getElementById('wa-connect-err');
+  errEl.style.display = 'none';
 
   if (!phone || !waba || !token) {
-    statusEl.className = 'test-status error';
-    statusEl.innerHTML = `<div class="test-status-icon">⚠</div><div class="test-status-title">Missing fields</div><div class="test-status-msg">All three credentials are required.</div>`;
-    backBtn.style.display = 'inline-block';
+    errEl.textContent = 'Please complete all credential fields in Step 2.';
+    errEl.style.display = 'block';
     return;
   }
 
-  try {
-    const r = await fetch('/integrations/whatsapp/test', {
-      method:'POST',
-      headers: authHeaders(),
-      body: JSON.stringify({ phone_number_id: phone, waba_id: waba, access_token: token })
-    });
-    if (r.status === 401) { logout(); return; }
-    if (r.ok) {
-      statusEl.className = 'test-status success';
-      statusEl.innerHTML = `<div class="test-status-icon" style="color:var(--green);">✓</div><div class="test-status-title">Connection verified</div><div class="test-status-msg">Meta accepted your credentials.</div>`;
-      saveBtn.style.display = 'inline-block';
-    } else {
-      const data = await r.json().catch(() => ({}));
-      statusEl.className = 'test-status error';
-      statusEl.innerHTML = `<div class="test-status-icon" style="color:#f87171;">✗</div><div class="test-status-title">Verification failed</div><div class="test-status-msg">${(data.detail || 'Invalid credentials')}</div>`;
-      backBtn.style.display = 'inline-block';
-    }
-  } catch (err) {
-    statusEl.className = 'test-status error';
-    statusEl.innerHTML = `<div class="test-status-icon" style="color:#f87171;">✗</div><div class="test-status-title">Network error</div><div class="test-status-msg">${err.message || 'Could not reach Nerum'}</div>`;
-    backBtn.style.display = 'inline-block';
-  }
-}
+  const connectBtn = document.getElementById('wa-connect-btn');
+  connectBtn.disabled = true;
+  showWaState('loading');
 
-async function saveWhatsapp() {
-  const phone = document.getElementById('wa-phone').value.trim();
-  const waba  = document.getElementById('wa-waba').value.trim();
-  const token = document.getElementById('wa-token').value.trim();
-  const saveBtn = document.getElementById('wa-save-btn');
-  saveBtn.disabled = true;
-  saveBtn.textContent = 'Saving...';
   try {
+    if (waSelectedOpt === 'send') {
+      const r = await fetch('/integrations/whatsapp/test', {
+        method:'POST',
+        headers: authHeaders(),
+        body: JSON.stringify({ phone_number_id: phone, waba_id: waba, access_token: token })
+      });
+      if (r.status === 401) { logout(); return; }
+      if (!r.ok) {
+        const data = await r.json().catch(() => ({}));
+        document.getElementById('wa-error-msg').textContent = data.detail || 'Credential verification failed';
+        showWaState('error');
+        connectBtn.disabled = false;
+        return;
+      }
+    }
+
     const r = await fetch('/integrations/whatsapp', {
       method:'POST',
       headers: authHeaders(),
@@ -530,17 +636,21 @@ async function saveWhatsapp() {
     });
     if (r.status === 401) { logout(); return; }
     if (r.ok) {
+      document.getElementById('wa-success-biz').textContent = bizName;
+      document.getElementById('wa-success-phone').textContent = bizPhone;
+      showWaState('success');
       markWhatsappConnected();
-      closeWaModal();
+      setTimeout(() => closeWaModal(), 3000);
     } else {
       const data = await r.json().catch(() => ({}));
-      alert('Failed to save: ' + (data.detail || r.status));
+      document.getElementById('wa-error-msg').textContent = data.detail || ('Error ' + r.status);
+      showWaState('error');
     }
   } catch (e) {
-    alert('Network error: ' + e.message);
+    document.getElementById('wa-error-msg').textContent = e.message || 'Network error';
+    showWaState('error');
   } finally {
-    saveBtn.disabled = false;
-    saveBtn.textContent = 'Save & Connect';
+    connectBtn.disabled = false;
   }
 }
 
