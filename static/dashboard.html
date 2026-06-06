@@ -6,6 +6,11 @@
 <title>Nerum Dashboard</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  @property --page-color {
+    syntax: '<color>';
+    initial-value: #C50022;
+    inherits: true;
+  }
   :root {
     --purple: #6366f1;
     --indigo: #6366f1;
@@ -18,6 +23,7 @@
     --text: #ffffff;
     --muted: rgba(255,255,255,0.5);
     --sidebar-w: 220px;
+    --page-color: #C50022;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
@@ -38,7 +44,7 @@
   .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
 
   /* ── SIDEBAR ── */
-  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid color-mix(in srgb, var(--page-color) 20%, transparent); z-index:100; padding:0 0 20px; transition: border-color 0.3s; }
   .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
   .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,#6366f1,#8b5cf6); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(99,102,241,0.4); }
   .logo-text { font-size:18px; font-weight:700; }
@@ -47,35 +53,19 @@
   .nav-label { font-size:10px; font-weight:600; color:var(--muted); letter-spacing:1.2px; text-transform:uppercase; padding:0 8px; margin-bottom:4px; }
   .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; position:relative; }
   .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
-  .nav-item.active { color: var(--ink, #ffffff); font-weight: 500; }
+  .nav-item.active {
+    background: color-mix(in srgb, var(--page-color) 15%, transparent);
+    border-color: color-mix(in srgb, var(--page-color) 30%, transparent);
+    color: #ffffff;
+    font-weight: 500;
+    transition: background 0.3s, border-color 0.3s, color 0.3s;
+  }
   .nav-item.active::before {
     content: ""; position: absolute; left: 0; top: 20%; bottom: 20%;
     width: 3px; border-radius: 0 3px 3px 0;
+    background: var(--page-color);
+    transition: background 0.3s;
   }
-  .nav-item[data-page="overview"].active        { background: rgba(197,0,34,.18); }
-  .nav-item[data-page="overview"].active::before { background: #C50022; }
-  .nav-item[data-page="workflows"].active        { background: rgba(34,197,94,.15); }
-  .nav-item[data-page="workflows"].active::before { background: #22c55e; }
-  .nav-item[data-page="ai-builder"].active        { background: rgba(129,140,248,.15); }
-  .nav-item[data-page="ai-builder"].active::before { background: #818cf8; }
-  .nav-item[data-page="smart-lists"].active        { background: rgba(245,158,11,.15); }
-  .nav-item[data-page="smart-lists"].active::before { background: #f59e0b; }
-  .nav-item[data-page="chatbot"].active        { background: rgba(192,132,252,.15); }
-  .nav-item[data-page="chatbot"].active::before { background: #c084fc; }
-  .nav-item[data-page="website"].active        { background: rgba(45,212,191,.15); }
-  .nav-item[data-page="website"].active::before { background: #2dd4bf; }
-  .nav-item[data-page="integrations"].active        { background: rgba(56,189,248,.15); }
-  .nav-item[data-page="integrations"].active::before { background: #38bdf8; }
-  .nav-item[data-page="analytics"].active        { background: rgba(251,146,60,.15); }
-  .nav-item[data-page="analytics"].active::before { background: #fb923c; }
-  .nav-item[data-page="history"].active        { background: rgba(163,230,53,.15); }
-  .nav-item[data-page="history"].active::before { background: #a3e635; }
-  .nav-item[data-page="settings"].active        { background: rgba(148,163,184,.15); }
-  .nav-item[data-page="settings"].active::before { background: #94a3b8; }
-  .nav-item[data-page="billing"].active        { background: rgba(52,211,153,.15); }
-  .nav-item[data-page="billing"].active::before { background: #34d399; }
-  .nav-item[data-page="help"].active        { background: rgba(250,204,21,.15); }
-  .nav-item[data-page="help"].active::before { background: #facc15; }
   .nav-icon { font-size:15px; width:18px; text-align:center; }
   .nav-badge { margin-left:auto; background:var(--purple); color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 7px; }
   .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
@@ -86,7 +76,7 @@
   .user-plan { font-size:11px; color:var(--purple); }
 
   /* ── MAIN ── */
-  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; }
+  .main { margin-left:var(--sidebar-w); flex:1; display:flex; flex-direction:column; border-top:2px solid color-mix(in srgb, var(--page-color) 50%, transparent); transition: border-color 0.3s; }
 
   /* ── TOPBAR ── */
   .topbar { display:flex; align-items:center; gap:12px; padding:14px 28px; background:rgba(8,0,15,0.5); backdrop-filter:blur(20px); border-bottom:1px solid var(--card-border); position:sticky; top:0; z-index:50; }
@@ -98,14 +88,14 @@
   @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:0.4;} }
   .token-pill { display:flex; align-items:center; gap:8px; background:var(--card); border:1px solid var(--card-border); border-radius:20px; padding:6px 14px; font-size:12px; color:var(--muted); }
   .token-bar { width:60px; height:4px; background:rgba(255,255,255,0.1); border-radius:2px; overflow:hidden; }
-  .token-fill { height:100%; border-radius:2px; background:linear-gradient(90deg,#60a5fa,#8b5cf6); transition:width 0.5s; }
+  .token-fill { height:100%; border-radius:2px; background:var(--page-color); transition:width 0.5s, background 0.3s; }
   .notif-btn { width:36px; height:36px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:16px; position:relative; transition:all 0.2s; }
   .notif-btn:hover { border-color:var(--purple); }
   .new-btn { display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 20px rgba(99,102,241,0.3); }
   .new-btn:hover { opacity:0.88; transform:translateY(-1px); }
 
   /* ── CONTENT ── */
-  .content { padding:28px; flex:1; }
+  .content { padding:28px; flex:1; background: radial-gradient(ellipse 70% 20% at 50% 0%, color-mix(in srgb, var(--page-color) 6%, transparent), transparent 70%); transition: background 0.4s; }
   .page { display:none; animation:fadeIn 0.3s ease; }
   .page.active { display:block; }
   @keyframes fadeIn { from{opacity:0;transform:translateY(8px);} to{opacity:1;transform:translateY(0);} }
@@ -113,7 +103,7 @@
   /* ── SECTION HEADER ── */
   .section-header { display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:24px; }
   .breadcrumb { font-size:11px; color:var(--muted); letter-spacing:0.8px; text-transform:uppercase; margin-bottom:6px; }
-  .page-title { font-size:32px; font-weight:700; line-height:1; }
+  .page-title { font-size:32px; font-weight:700; line-height:1; transition: color 0.3s; }
   .page-title .accent { color:var(--purple); }
   #overview-name { background:linear-gradient(90deg,#60a5fa,#a78bfa,#f472b6); -webkit-background-clip:text; background-clip:text; color:transparent; }
   .page-sub { font-size:14px; color:var(--muted); margin-top:6px; max-width:480px; }
@@ -122,7 +112,7 @@
   /* ── BUTTONS ── */
   .btn-ghost { display:flex; align-items:center; gap:7px; background:var(--card); border:1px solid var(--card-border); border-radius:10px; padding:8px 14px; color:var(--text); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .btn-ghost:hover { border-color:var(--purple); color:var(--purple); }
-  .btn-primary { display:flex; align-items:center; gap:7px; background:linear-gradient(135deg,#6366f1,#8b5cf6); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 0 18px rgba(99,102,241,0.25); }
+  .btn-primary { display:flex; align-items:center; gap:7px; background:var(--page-color); border:none; border-radius:10px; padding:8px 16px; color:#fff; font-size:13px; font-weight:600; cursor:pointer; font-family:inherit; transition:background 0.3s, opacity 0.2s, transform 0.15s, box-shadow 0.3s; box-shadow:0 0 18px color-mix(in srgb, var(--page-color) 30%, transparent); }
   .btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
   .btn-danger { background:rgba(248,113,113,0.15); border:1px solid rgba(248,113,113,0.3); color:#f87171; border-radius:8px; padding:6px 12px; font-size:12px; cursor:pointer; font-family:inherit; transition:all 0.2s; }
   .btn-danger:hover { background:rgba(248,113,113,0.25); }
@@ -848,6 +838,7 @@ function showPage(id, navEl) {
     'help':         '#facc15'
   };
   const color = pageColors[id] || '#818cf8';
+  document.documentElement.style.setProperty('--page-color', color);
   const titleEl = document.querySelector('.page.active .page-title, .page.active .content-title, .page.active h1.title');
   if (titleEl) titleEl.style.color = color;
   // Load data for page
@@ -1260,6 +1251,7 @@ function logout() {
 }
 
 // ── INIT ─────────────────────────────────────────────────────────────────────
+document.documentElement.style.setProperty('--page-color', '#C50022');
 loadUser();
 </script>
 </body>
