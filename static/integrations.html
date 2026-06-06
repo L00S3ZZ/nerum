@@ -157,52 +157,73 @@
   #starfield { position:fixed; top:0; left:0; width:100%; height:100%; z-index:0; pointer-events:none !important; }
 
   /* ── WhatsApp Premium Modal ─────────────────────────────────────────────── */
-  .wa-modal-card { width:100%; max-width:480px; background:rgba(255,255,255,0.06); border:1px solid rgba(197,0,34,0.3); border-radius:20px; padding:32px 28px 28px; backdrop-filter:blur(20px); -webkit-backdrop-filter:blur(20px); box-shadow:0 0 80px rgba(197,0,34,0.15),0 30px 80px rgba(0,0,0,0.5); max-height:92vh; overflow-y:auto; position:relative; }
-  .wa-dots { display:flex; align-items:center; justify-content:center; margin-bottom:28px; }
-  .wa-dot { width:10px; height:10px; border-radius:50%; background:rgba(255,255,255,0.18); border:2px solid rgba(255,255,255,0.12); transition:all 0.3s; flex-shrink:0; }
-  .wa-dot.active { background:#C50022; border-color:#C50022; box-shadow:0 0 10px rgba(197,0,34,0.6); }
-  .wa-dot-line { flex:0 0 44px; height:1px; background:rgba(255,255,255,0.12); }
-  .wa-step { animation:waFadeIn 0.22s ease; }
-  @keyframes waFadeIn { from { opacity:0; transform:translateY(7px); } to { opacity:1; transform:translateY(0); } }
-  .wa-icon-wrap { text-align:center; font-size:52px; line-height:1; margin-bottom:16px; }
-  .wa-title { font-size:22px; font-weight:700; color:#fff; margin-bottom:8px; line-height:1.2; }
-  .wa-sub { font-size:13px; color:rgba(255,255,255,0.52); margin-bottom:22px; line-height:1.5; }
-  .wa-info-box { background:rgba(197,0,34,0.08); border:1px solid rgba(197,0,34,0.25); border-radius:10px; padding:12px 14px; font-size:12.5px; color:rgba(255,255,255,0.68); line-height:1.55; margin-bottom:18px; }
-  .wa-info-box strong { color:#ff6080; }
-  .wa-helper { font-size:11px; color:rgba(255,255,255,0.36); margin-top:5px; }
+  .wa-modal-card { width:100%; max-width:480px; background:#0d0d0d; border:1px solid #1f1f1f; border-radius:16px; padding:32px 28px 28px; max-height:92vh; overflow-y:auto; position:relative; }
+  /* Stepper */
+  .wa-stepper { display:flex; align-items:flex-start; justify-content:center; margin-bottom:28px; }
+  .wa-step-item { display:flex; flex-direction:column; align-items:center; gap:6px; }
+  .wa-step-connector { flex:0 0 56px; height:1px; background:#2a2a2a; margin-top:16px; }
+  .wa-step-circle { width:32px; height:32px; border-radius:50%; border:2px solid #2a2a2a; background:#111; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:600; color:#555; transition:all 0.25s; }
+  .wa-step-circle.active { border-color:#C50022; background:#C50022; color:#fff; }
+  .wa-step-num { line-height:1; }
+  .wa-step-check { display:none; line-height:1; }
+  .wa-step-label { font-size:11px; color:#444; white-space:nowrap; }
+  .wa-step-item:has(.wa-step-circle.active) .wa-step-label { color:#999; }
+  /* Completed step: has active circle AND a following step-item also has active circle */
+  .wa-step-item:has(.wa-step-circle.active):has(~ .wa-step-connector ~ .wa-step-item .wa-step-circle.active) .wa-step-circle .wa-step-check { display:inline; }
+  .wa-step-item:has(.wa-step-circle.active):has(~ .wa-step-connector ~ .wa-step-item .wa-step-circle.active) .wa-step-circle .wa-step-num { display:none; }
+  /* Step content */
+  .wa-step { animation:waFadeIn 0.2s ease; }
+  @keyframes waFadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+  .wa-icon-wrap { text-align:center; margin-bottom:16px; }
+  .wa-wa-svg { width:52px; height:52px; }
+  .wa-title { font-size:20px; font-weight:700; color:#fff; margin-bottom:6px; line-height:1.2; }
+  .wa-sub { font-size:13px; color:#666; margin-bottom:20px; line-height:1.5; }
+  .wa-info-box { background:#111; border:1px solid #2a2a2a; border-radius:8px; padding:12px 14px; font-size:12.5px; color:#888; line-height:1.55; margin-bottom:18px; }
+  .wa-info-box strong { color:#bbb; }
+  #wa-modal .form-input { background:#111 !important; border:1px solid #2a2a2a !important; border-radius:8px !important; color:#fff !important; }
+  #wa-modal .form-input:focus { border-color:#C50022 !important; outline:none; }
+  #wa-modal .form-label { color:#888; }
+  .wa-helper { font-size:11px; color:#444; margin-top:5px; }
   .wa-token-wrap { position:relative; }
   .wa-token-wrap .form-input { padding-right:42px; }
-  .wa-eye-btn { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:15px; opacity:0.45; padding:4px; line-height:1; transition:opacity 0.2s; }
-  .wa-eye-btn:hover { opacity:0.9; }
-  .wa-option-card { display:flex; align-items:flex-start; gap:14px; padding:14px 16px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background:rgba(255,255,255,0.03); cursor:pointer; margin-bottom:10px; transition:all 0.2s; }
-  .wa-option-card:hover { border-color:rgba(197,0,34,0.35); background:rgba(197,0,34,0.05); }
-  .wa-option-card.selected { border-color:rgba(197,0,34,0.5); background:rgba(197,0,34,0.08); }
-  .wa-option-radio { width:18px; height:18px; border-radius:50%; border:2px solid rgba(255,255,255,0.22); flex-shrink:0; margin-top:2px; transition:all 0.2s; position:relative; }
+  .wa-eye-btn { position:absolute; right:10px; top:50%; transform:translateY(-50%); background:none; border:none; cursor:pointer; font-size:14px; opacity:0.35; padding:4px; line-height:1; transition:opacity 0.2s; color:#fff; }
+  .wa-eye-btn:hover { opacity:0.8; }
+  /* Summary card */
+  .wa-summary-card { background:#111; border:1px solid #2a2a2a; border-radius:10px; padding:14px 16px; margin-bottom:18px; }
+  .wa-summary-row { display:flex; justify-content:space-between; align-items:center; padding:5px 0; font-size:13px; }
+  .wa-summary-row:not(:last-child) { border-bottom:1px solid #1e1e1e; }
+  .wa-summary-key { color:#555; }
+  .wa-summary-val { color:#ccc; font-weight:500; max-width:200px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* Option cards */
+  .wa-option-card { display:flex; align-items:flex-start; gap:14px; padding:13px 16px; border-radius:10px; border:1px solid #2a2a2a; background:#111; cursor:pointer; margin-bottom:8px; transition:border-color 0.2s,background 0.2s; }
+  .wa-option-card:hover { border-color:#444; }
+  .wa-option-card.selected { border-color:#C50022; background:#130003; }
+  .wa-option-radio { width:18px; height:18px; border-radius:50%; border:2px solid #333; flex-shrink:0; margin-top:2px; transition:all 0.2s; position:relative; }
   .wa-option-radio.active { border-color:#C50022; }
   .wa-option-radio.active::after { content:''; position:absolute; inset:3px; border-radius:50%; background:#C50022; }
-  .wa-option-title { font-size:13.5px; font-weight:600; color:#fff; margin-bottom:3px; }
-  .wa-option-sub { font-size:12px; color:rgba(255,255,255,0.42); }
-  .wa-rec-tag { display:inline-block; font-size:10px; font-weight:600; background:rgba(52,211,153,0.15); color:#34d399; border:1px solid rgba(52,211,153,0.3); border-radius:4px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
-  .wa-btn-primary { width:100%; background:linear-gradient(135deg,#C50022,#ff4060); border:none; border-radius:12px; padding:13px 20px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; box-shadow:0 4px 20px rgba(197,0,34,0.35); margin-top:8px; letter-spacing:0.2px; }
-  .wa-btn-primary:hover { opacity:0.9; transform:translateY(-1px); }
-  .wa-btn-primary:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-  .wa-btn-ghost { background:transparent; border:1px solid rgba(255,255,255,0.15); border-radius:12px; padding:11px 18px; color:rgba(255,255,255,0.58); font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:all 0.2s; }
-  .wa-btn-ghost:hover { border-color:rgba(255,255,255,0.3); color:#fff; }
+  .wa-option-title { font-size:13.5px; font-weight:600; color:#ddd; margin-bottom:3px; }
+  .wa-option-sub { font-size:12px; color:#555; }
+  .wa-rec-tag { display:inline-block; font-size:10px; font-weight:600; background:rgba(52,211,153,0.1); color:#34d399; border:1px solid rgba(52,211,153,0.25); border-radius:4px; padding:2px 6px; margin-left:6px; vertical-align:middle; }
+  /* Buttons */
+  .wa-btn-primary { width:100%; background:#C50022; border:none; border-radius:8px; padding:13px 20px; color:#fff; font-size:14px; font-weight:600; cursor:pointer; font-family:inherit; transition:opacity 0.2s,transform 0.15s; margin-top:8px; letter-spacing:0.2px; }
+  .wa-btn-primary:hover { opacity:0.88; transform:translateY(-1px); }
+  .wa-btn-primary:disabled { opacity:0.4; cursor:not-allowed; transform:none; }
+  .wa-btn-ghost { background:transparent; border:1px solid #2a2a2a; border-radius:8px; padding:11px 18px; color:#666; font-size:13px; font-weight:500; cursor:pointer; font-family:inherit; transition:border-color 0.2s,color 0.2s; }
+  .wa-btn-ghost:hover { border-color:#555; color:#ccc; }
   .wa-btn-row { display:flex; gap:10px; margin-top:8px; }
   .wa-btn-row .wa-btn-primary { margin-top:0; flex:1; }
-  .wa-cancel-link { display:block; text-align:center; margin-top:12px; font-size:13px; color:rgba(255,255,255,0.33); cursor:pointer; background:none; border:none; font-family:inherit; transition:color 0.2s; width:100%; }
-  .wa-cancel-link:hover { color:rgba(255,255,255,0.62); }
+  .wa-cancel-link { display:block; text-align:center; margin-top:12px; font-size:13px; color:#444; cursor:pointer; background:none; border:none; font-family:inherit; transition:color 0.2s; width:100%; }
+  .wa-cancel-link:hover { color:#888; }
+  /* States */
   .wa-center-state { text-align:center; padding:20px 0 10px; }
-  .wa-spinner { width:44px; height:44px; border:3px solid rgba(255,255,255,0.08); border-top-color:#C50022; border-radius:50%; animation:waSpin 0.75s linear infinite; margin:0 auto 20px; }
+  .wa-spinner { width:40px; height:40px; border:3px solid #1f1f1f; border-top-color:#C50022; border-radius:50%; animation:waSpin 0.75s linear infinite; margin:0 auto 20px; }
   @keyframes waSpin { to { transform:rotate(360deg); } }
-  .wa-check-wrap { text-align:center; margin-bottom:16px; }
-  .wa-check-circle { width:60px; height:60px; border-radius:50%; background:rgba(52,211,153,0.12); border:2px solid rgba(52,211,153,0.4); display:inline-flex; align-items:center; justify-content:center; font-size:26px; color:#34d399; animation:waPulse 2s ease-in-out infinite; }
-  .wa-success-circle { width:64px; height:64px; border-radius:50%; background:rgba(52,211,153,0.12); border:2px solid rgba(52,211,153,0.45); display:inline-flex; align-items:center; justify-content:center; font-size:28px; color:#34d399; margin-bottom:18px; animation:waPulse 1.8s ease-in-out 3; }
-  .wa-error-circle { width:64px; height:64px; border-radius:50%; background:rgba(248,113,113,0.1); border:2px solid rgba(248,113,113,0.4); display:inline-flex; align-items:center; justify-content:center; font-size:28px; color:#f87171; margin-bottom:18px; }
-  @keyframes waPulse { 0%,100% { box-shadow:0 0 0 0 rgba(52,211,153,0.3); } 50% { box-shadow:0 0 0 12px rgba(52,211,153,0); } }
+  .wa-success-circle { width:60px; height:60px; border-radius:50%; background:rgba(52,211,153,0.08); border:2px solid rgba(52,211,153,0.35); display:inline-flex; align-items:center; justify-content:center; font-size:26px; color:#34d399; margin-bottom:18px; animation:waPulse 1.8s ease-in-out 3; }
+  .wa-error-circle { width:60px; height:60px; border-radius:50%; background:rgba(248,113,113,0.08); border:2px solid rgba(248,113,113,0.3); display:inline-flex; align-items:center; justify-content:center; font-size:26px; color:#f87171; margin-bottom:18px; }
+  @keyframes waPulse { 0%,100% { box-shadow:0 0 0 0 rgba(52,211,153,0.2); } 50% { box-shadow:0 0 0 10px rgba(52,211,153,0); } }
   .wa-state-title { font-size:18px; font-weight:700; color:#fff; margin-bottom:8px; }
-  .wa-state-sub { font-size:13px; color:rgba(255,255,255,0.48); line-height:1.5; }
-  .wa-err-inline { display:none; margin-top:10px; padding:10px 14px; border-radius:10px; background:rgba(248,113,113,0.08); border:1px solid rgba(248,113,113,0.28); font-size:12.5px; color:#f87171; }
+  .wa-state-sub { font-size:13px; color:#666; line-height:1.5; }
+  .wa-err-inline { display:none; margin-top:10px; padding:10px 14px; border-radius:8px; background:rgba(248,113,113,0.06); border:1px solid rgba(248,113,113,0.2); font-size:12.5px; color:#f87171; }
 </style>
 </head>
 <body>
@@ -309,21 +330,45 @@
 <div class="modal-overlay" id="wa-modal">
   <div class="wa-modal-card">
 
-    <!-- Step dots -->
-    <div class="wa-dots" id="wa-dots-bar">
-      <div class="wa-dot active" id="wad-1"></div>
-      <div class="wa-dot-line"></div>
-      <div class="wa-dot" id="wad-2"></div>
-      <div class="wa-dot-line"></div>
-      <div class="wa-dot" id="wad-3"></div>
+    <!-- Stepper -->
+    <div class="wa-stepper" id="wa-dots-bar">
+      <div class="wa-step-item">
+        <div class="wa-step-circle active" id="wad-1">
+          <span class="wa-step-num">1</span>
+          <span class="wa-step-check">✓</span>
+        </div>
+        <div class="wa-step-label">Business Info</div>
+      </div>
+      <div class="wa-step-connector"></div>
+      <div class="wa-step-item">
+        <div class="wa-step-circle" id="wad-2">
+          <span class="wa-step-num">2</span>
+          <span class="wa-step-check">✓</span>
+        </div>
+        <div class="wa-step-label">Credentials</div>
+      </div>
+      <div class="wa-step-connector"></div>
+      <div class="wa-step-item">
+        <div class="wa-step-circle" id="wad-3">
+          <span class="wa-step-num">3</span>
+          <span class="wa-step-check">✓</span>
+        </div>
+        <div class="wa-step-label">Verify</div>
+      </div>
     </div>
 
     <!-- STEP 1: Business Info -->
     <div id="wa-step-1" class="wa-step">
-      <div class="wa-icon-wrap">💚</div>
+      <div class="wa-icon-wrap">
+        <svg class="wa-wa-svg" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="24" cy="24" r="24" fill="#25D366"/>
+          <path d="M24 11C16.82 11 11 16.82 11 24c0 2.3.62 4.46 1.7 6.32L11 37l6.84-1.79A13 13 0 0024 37c7.18 0 13-5.82 13-13S31.18 11 24 11zm0 23.85a10.85 10.85 0 01-5.53-1.52l-.4-.24-4.1 1.08 1.1-3.99-.26-.41A10.84 10.84 0 0113.15 24 10.85 10.85 0 0124 13.15 10.85 10.85 0 0134.85 24 10.85 10.85 0 0124 34.85z" fill="white"/>
+          <path d="M30.1 26.5c-.32-.16-1.9-.94-2.19-1.04-.3-.1-.51-.16-.72.16-.21.32-.82 1.04-1 1.25-.18.22-.37.24-.69.08-.32-.16-1.35-.5-2.57-1.58-.95-.84-1.59-1.88-1.78-2.2-.18-.31-.02-.48.14-.64.14-.14.32-.37.48-.55.16-.18.21-.32.32-.53.1-.21.05-.4-.03-.56-.08-.16-.72-1.74-.99-2.38-.26-.62-.53-.54-.72-.55H20c-.21 0-.54.08-.82.4-.28.32-1.07 1.04-1.07 2.54s1.1 2.95 1.25 3.15c.15.21 2.16 3.3 5.24 4.63.73.32 1.3.5 1.74.64.73.23 1.4.2 1.92.12.59-.09 1.8-.74 2.06-1.45.26-.71.26-1.32.18-1.45-.07-.12-.28-.2-.6-.36z" fill="white"/>
+        </svg>
+      </div>
       <div class="wa-title">Connect WhatsApp Business</div>
       <div class="wa-sub">Send messages directly from your WhatsApp Business number</div>
-      <a href="/dashboard/guide/whatsapp" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#C50022;font-size:13px;text-decoration:none;margin-bottom:16px;font-weight:500;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.75'" onmouseout="this.style.opacity='1'">📖 View Setup Guide →</a>
+      <a href="/dashboard/guide/whatsapp" target="_blank" style="display:inline-flex;align-items:center;gap:6px;color:#C50022;font-size:13px;text-decoration:none;margin-bottom:16px;font-weight:500;transition:opacity 0.2s;" onmouseover="this.style.opacity='0.7'" onmouseout="this.style.opacity='1'">📖 View Setup Guide →</a>
       <div class="form-field">
         <label class="form-label">Business Name</label>
         <input class="form-input" id="wa-biz-name" type="text" placeholder="Acme Coffee Co." autocomplete="off">
@@ -336,20 +381,20 @@
       <button class="wa-cancel-link" onclick="closeWaModal()">Cancel</button>
     </div>
 
-    <!-- STEP 2: Credentials -->
+    <!-- STEP 2: Meta Credentials -->
     <div id="wa-step-2" class="wa-step" style="display:none;">
-      <div class="wa-title">Enter your Meta credentials</div>
-      <div class="wa-sub">Get these from developers.facebook.com/apps</div>
-      <div class="wa-info-box">📋 <strong>Quick guide:</strong> WhatsApp → API Setup → copy Phone Number ID and WABA ID. For token: Business Settings → System Users → Generate token</div>
+      <div class="wa-title">Meta Credentials</div>
+      <div class="wa-sub">From developers.facebook.com/apps</div>
+      <div class="wa-info-box"><strong>Where to find these:</strong> WhatsApp → API Setup → copy Phone Number ID and WABA ID. For token: Business Settings → System Users → Generate token with whatsapp_business_messaging permission.</div>
       <div class="form-field">
         <label class="form-label">Phone Number ID</label>
         <input class="form-input" id="wa-phone" type="text" placeholder="e.g. 109876543210987" autocomplete="off">
-        <div class="wa-helper">Found under WhatsApp → API Setup</div>
+        <div class="wa-helper">WhatsApp → API Setup</div>
       </div>
       <div class="form-field">
         <label class="form-label">WhatsApp Business Account ID (WABA ID)</label>
         <input class="form-input" id="wa-waba" type="text" placeholder="e.g. 234567890123456" autocomplete="off">
-        <div class="wa-helper">Found under WhatsApp → API Setup</div>
+        <div class="wa-helper">WhatsApp → API Setup</div>
       </div>
       <div class="form-field">
         <label class="form-label">Permanent Access Token</label>
@@ -357,19 +402,28 @@
           <input class="form-input" id="wa-token" type="password" placeholder="EAAJ..." autocomplete="off">
           <button class="wa-eye-btn" id="wa-eye" onclick="toggleWaToken()" type="button">👁</button>
         </div>
-        <div class="wa-helper">Generate from Business Settings → System Users</div>
+        <div class="wa-helper">Business Settings → System Users</div>
       </div>
       <div class="wa-btn-row">
         <button class="wa-btn-ghost" onclick="waStep(1)">← Back</button>
-        <button class="wa-btn-primary" onclick="waStep(3)">Continue →</button>
+        <button class="wa-btn-primary" onclick="(function(){var b=document.getElementById('wa-biz-name'),p=document.getElementById('wa-biz-phone'),sb=document.getElementById('wa-summary-biz'),sp=document.getElementById('wa-summary-phone');if(sb)sb.textContent=b&&b.value?b.value:'—';if(sp)sp.textContent=p&&p.value?p.value:'—';waStep(3);})()">Continue →</button>
       </div>
     </div>
 
-    <!-- STEP 3: Test + Connect -->
+    <!-- STEP 3: Verify & Connect -->
     <div id="wa-step-3" class="wa-step" style="display:none;">
-      <div class="wa-check-wrap"><div class="wa-check-circle">✓</div></div>
-      <div class="wa-title">Test your connection</div>
-      <div class="wa-sub">We'll send a test message to verify everything works</div>
+      <div class="wa-title">Verify & Connect</div>
+      <div class="wa-sub">Review your details and test the connection</div>
+      <div class="wa-summary-card">
+        <div class="wa-summary-row">
+          <span class="wa-summary-key">Business</span>
+          <span class="wa-summary-val" id="wa-summary-biz">—</span>
+        </div>
+        <div class="wa-summary-row">
+          <span class="wa-summary-key">Phone</span>
+          <span class="wa-summary-val" id="wa-summary-phone">—</span>
+        </div>
+      </div>
       <div class="form-field">
         <label class="form-label">Test phone number</label>
         <input class="form-input" id="wa-test-phone" type="tel" placeholder="+91 98765 43210" autocomplete="off">
@@ -406,7 +460,7 @@
     <!-- SUCCESS -->
     <div id="wa-success" style="display:none;" class="wa-step wa-center-state">
       <div class="wa-success-circle">✓</div>
-      <div class="wa-state-title">WhatsApp Business Connected! 🎉</div>
+      <div class="wa-state-title">WhatsApp Business Connected!</div>
       <div id="wa-success-biz" class="wa-state-sub"></div>
       <div id="wa-success-phone" class="wa-state-sub" style="margin-top:4px;"></div>
       <button class="wa-btn-primary" style="margin-top:20px;" onclick="closeWaModal()">Start sending messages →</button>
