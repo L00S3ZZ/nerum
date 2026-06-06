@@ -14,7 +14,7 @@
     --pink-soft: rgba(197,0,34,0.15);
     --pink-border: rgba(197,0,34,0.35);
     --violet: #ff4060;
-    --bg: #0a0010;
+    --bg: #08000f;
     --card: rgba(255,255,255,0.04);
     --card-border: rgba(255,255,255,0.08);
     --text: #ffffff;
@@ -22,20 +22,21 @@
     --sidebar-w: 220px;
   }
   * { margin:0; padding:0; box-sizing:border-box; }
-  body { font-family:'Space Grotesk',sans-serif; background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+  html, body { background:#08000f !important; }
+  body { font-family:'Space Grotesk',sans-serif; color:var(--text); min-height:100vh; overflow-x:hidden; }
 
   .galaxy { position:fixed; inset:0; z-index:0;
     background: radial-gradient(ellipse 80% 60% at 20% 10%,rgba(197,0,34,0.15) 0%,transparent 60%),
                 radial-gradient(ellipse 60% 80% at 80% 80%,rgba(255,64,96,0.10) 0%,transparent 55%),
                 radial-gradient(ellipse 50% 40% at 60% 20%,rgba(197,0,34,0.08) 0%,transparent 50%),
-                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(255,64,96,0.06) 0%,transparent 55%),#0a0010;
+                radial-gradient(ellipse 40% 60% at 10% 70%,rgba(255,64,96,0.06) 0%,transparent 55%),#08000f;
     pointer-events:none; }
   #starfield { position:fixed; inset:0; z-index:0; pointer-events:none; }
 
   .layout { display:flex; min-height:100vh; position:relative; z-index:1; }
 
   /* SIDEBAR */
-  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.6); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
+  .sidebar { width:var(--sidebar-w); min-height:100vh; position:fixed; top:0; left:0; display:flex; flex-direction:column; background:rgba(8,0,15,0.85); backdrop-filter:blur(20px); border-right:1px solid var(--card-border); z-index:100; padding:0 0 20px; }
   .logo-wrap { display:flex; align-items:center; gap:10px; padding:22px 18px 18px; border-bottom:1px solid var(--card-border); }
   .logo-icon { width:34px; height:34px; border-radius:10px; background:linear-gradient(135deg,var(--purple),var(--indigo)); display:flex; align-items:center; justify-content:center; font-size:16px; font-weight:700; color:#fff; box-shadow:0 0 18px rgba(197,0,34,0.4); }
   .logo-text { font-size:18px; font-weight:700; }
