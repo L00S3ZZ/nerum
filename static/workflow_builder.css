@@ -3,7 +3,7 @@
 :root {
   --wb-bg: #0a0010;
   --wb-bg-2: #08000f;
-  --wb-accent: #6366f1;
+  --wb-accent: #C50022;
   --wb-accent-soft: rgba(99, 102, 241, 0.25);
   --wb-accent-hot: #818cf8;
   --wb-ink: #ffffff;
@@ -219,7 +219,7 @@ body.wb-sidebar-closed .wb-topbar {
   transition: transform var(--wb-ease), box-shadow var(--wb-ease), background var(--wb-ease);
 }
 .wb-btn-primary {
-  background: linear-gradient(120deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
+  background: linear-gradient(120deg, #C50022 0%, #ff4060 50%, #C50022 100%);
   color: #fff;
   box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
 }
@@ -299,7 +299,7 @@ body.wb-sidebar-closed .wb-canvas {
   right: 32px;
   padding: 10px 18px;
   border-radius: 999px;
-  background: linear-gradient(120deg, #6366f1 0%, #8b5cf6 50%, #6366f1 100%);
+  background: linear-gradient(120deg, #C50022 0%, #ff4060 50%, #C50022 100%);
   color: #fff;
   font-weight: 700;
   font-size: 13px;

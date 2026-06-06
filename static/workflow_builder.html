@@ -15,6 +15,7 @@
   </script>
 </head>
 <body>
+<canvas id="starfield" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;"></canvas>
   <button id="sidebarToggle" class="wb-hamburger" aria-label="Toggle sidebar">
     <svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
       <line x1="3" y1="5" x2="17" y2="5"/>
@@ -114,6 +115,45 @@
   <!-- Toast -->
   <div id="wbToast" class="wb-toast" hidden></div>
 
-  <script src="/static/workflow_builder.js" defer></script>
+  <script src="/static/workflow_builder.js" defer>
+// ── STAR CANVAS ──────────────────────────────────────────────────────────────
+(function(){
+  var sf=document.getElementById('starfield');
+  if(!sf||!sf.getContext)return;
+  var ctx=sf.getContext('2d'),stars=[],W,H;
+  var C=[[255,255,255],[197,0,34],[255,64,96]];
+  function resize(){
+    var dpr=window.devicePixelRatio||1;
+    W=sf.width=window.innerWidth*dpr; H=sf.height=window.innerHeight*dpr;
+    sf.style.width='100vw'; sf.style.height='100vh';
+    stars=Array.from({length:350},function(){
+      var c=C[Math.floor(Math.random()*C.length)];
+      return{x:Math.random()*W,y:Math.random()*H,z:Math.random()*1.2+0.3,
+             s:Math.random()*2+0.5,tw:Math.random()*Math.PI*2,
+             dx:(Math.random()-0.5)*0.25,col:c,dpr:dpr};
+    });
+  }
+  resize(); window.addEventListener('resize',resize);
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    for(var i=0;i<stars.length;i++){
+      var s=stars[i],a=0.55+0.45*Math.sin(t*0.0007+s.tw);
+      var r=s.col[0],g=s.col[1],b=s.col[2],rad=s.s*s.dpr,gR=rad*3.5;
+      var gr=ctx.createRadialGradient(s.x,s.y,0,s.x,s.y,gR);
+      gr.addColorStop(0,'rgba('+r+','+g+','+b+','+(a*0.85).toFixed(2)+')');
+      gr.addColorStop(1,'rgba('+r+','+g+','+b+',0)');
+      ctx.beginPath();ctx.fillStyle=gr;ctx.arc(s.x,s.y,gR,0,Math.PI*2);ctx.fill();
+      ctx.beginPath();
+      ctx.fillStyle='rgba('+r+','+g+','+b+','+Math.min(1,a+0.2).toFixed(2)+')';
+      ctx.arc(s.x,s.y,rad*0.7,0,Math.PI*2);ctx.fill();
+      s.y-=0.10*s.z*s.dpr; s.x+=s.dx*s.z*s.dpr;
+      if(s.y<-10){s.y=H+10;s.x=Math.random()*W;}
+      if(s.x<-10)s.x=W+10; if(s.x>W+10)s.x=-10;
+    }
+    requestAnimationFrame(draw);
+  }
+  requestAnimationFrame(draw);
+})();
+</script>
 </body>
 </html>
