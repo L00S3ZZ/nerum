@@ -63,6 +63,8 @@
     background: var(--page-color);
     transition: background 0.3s;
   }
+  .nav-item[data-page="guide-whatsapp"].active { background:rgba(37,211,102,0.15) !important; border-color:rgba(37,211,102,0.3) !important; }
+  .nav-item[data-page="guide-whatsapp"].active::before { background:#25d366 !important; }
   .nav-icon { font-size:15px; width:18px; text-align:center; }
   .nav-badge { margin-left:auto; background:var(--purple); color:#fff; font-size:10px; font-weight:700; border-radius:10px; padding:1px 7px; }
   .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
@@ -379,6 +381,10 @@
       <a class="nav-item" data-page="integrations" href="/integrations" style="text-decoration:none;"><span class="nav-icon">⬡</span> Integrations</a>
       <div class="nav-item" data-page="analytics" onclick="showPage('analytics',this)"><span class="nav-icon">↗</span> Analytics</div>
       <div class="nav-item" data-page="history" onclick="showPage('history',this)"><span class="nav-icon">◷</span> History</div>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Guides</div>
+      <a href="/dashboard/guide/whatsapp" target="_blank" class="nav-item" data-page="guide-whatsapp" style="text-decoration:none;"><span class="nav-icon">📖</span> WhatsApp Setup</a>
     </div>
     <div class="nav-section">
       <div class="nav-label">Account</div>

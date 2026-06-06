@@ -46,6 +46,8 @@
   .nav-item { display:flex; align-items:center; gap:10px; padding:9px 10px; border-radius:10px; cursor:pointer; color:var(--muted); font-size:13.5px; font-weight:500; transition:all 0.2s; margin-bottom:1px; border:1px solid transparent; text-decoration:none; }
   .nav-item:hover { background:rgba(255,255,255,0.07); color:var(--text); }
   .nav-item.active { background:var(--pink-soft); color:var(--pink); border-color:var(--pink-border); }
+  .nav-item[data-page="guide-whatsapp"].active { background:rgba(37,211,102,0.15) !important; border-color:rgba(37,211,102,0.3) !important; color:#25d366 !important; }
+  .nav-item[data-page="guide-whatsapp"].active::before { background:#25d366 !important; }
   .nav-icon { font-size:15px; width:18px; text-align:center; }
   .sidebar-footer { margin-top:auto; padding:14px 14px 0; border-top:1px solid var(--card-border); }
   .user-pill { display:flex; align-items:center; gap:10px; padding:10px; border-radius:10px; background:var(--card); border:1px solid var(--card-border); cursor:pointer; }
@@ -234,6 +236,10 @@
       <a class="nav-item" href="/integrations"><span class="nav-icon">⬡</span> Integrations</a>
       <a class="nav-item" href="/dashboard"><span class="nav-icon">↗</span> Analytics</a>
       <a class="nav-item" href="/dashboard"><span class="nav-icon">◷</span> History</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-label">Guides</div>
+      <a href="/dashboard/guide/whatsapp" target="_blank" class="nav-item" data-page="guide-whatsapp" style="text-decoration:none;"><span class="nav-icon">📖</span> WhatsApp Setup</a>
     </div>
     <div class="nav-section">
       <div class="nav-label">Account</div>
