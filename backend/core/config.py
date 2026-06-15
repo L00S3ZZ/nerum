@@ -27,7 +27,10 @@ class Settings(BaseSettings):
     GOOGLE_CLIENT_SECRET: str = ""
     GOOGLE_REDIRECT_URI: str = ""
     ADMIN_SECRET: str = ""
-    FRONTEND_URL: str = "http://localhost:3000"
+    FRONTEND_URL: str = "http://localhost:3000"  # CORS dev origin only
+    # Public site origin the BROWSER is redirected to (OAuth callback, password
+    # reset, email links). Defaults to prod so a stale/missing .env still works.
+    APP_URL: str = "https://nerum.in"
 
     model_config = SettingsConfigDict(
         env_file=".env",

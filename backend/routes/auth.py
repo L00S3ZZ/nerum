@@ -191,7 +191,7 @@ async def forgot_password(body: ForgotRequest, db: AsyncSession = Depends(get_db
         token = secrets.token_urlsafe(32)
         db.add(PasswordResetToken(email=email, token=token, expires_at=datetime.utcnow() + timedelta(hours=RESET_HOURS), used=False))
         await db.flush()
-        await send_password_reset_email(email, user.name, f"{settings.FRONTEND_URL}/reset-password?token={token}")
+        await send_password_reset_email(email, user.name, f"{settings.APP_URL}/reset-password?token={token}")
     return {"message": "If that email exists, a reset link has been sent."}
 
 
@@ -255,12 +255,12 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
         )
         access = tok.json().get("access_token")
         if not access:
-            return RedirectResponse(f"{settings.FRONTEND_URL}/login?error=google_failed")
+            return RedirectResponse(f"{settings.APP_URL}/login?error=google_failed")
         info = (await client.get("https://www.googleapis.com/oauth2/v2/userinfo", headers={"Authorization": f"Bearer {access}"})).json()
 
     email = (info.get("email") or "").lower().strip()
     if not email:
-        return RedirectResponse(f"{settings.FRONTEND_URL}/login?error=google_failed")
+        return RedirectResponse(f"{settings.APP_URL}/login?error=google_failed")
     name = info.get("name", email)
 
     user = (await db.scalars(select(User).where(User.email == email))).first()
@@ -286,4 +286,4 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
             user.google_id = info.get("id")
 
     token = create_access_token(user.email, user.name)
-    return RedirectResponse(f"{settings.FRONTEND_URL}/auth/callback?token={token}")
+    return RedirectResponse(f"{settings.APP_URL}/auth/callback?token={token}")

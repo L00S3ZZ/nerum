@@ -68,7 +68,7 @@ async def send_welcome_email(to: str, name: str) -> dict:
         f'<h1 style="color:#fff;font-size:22px;font-weight:800;margin:0 0 8px">Welcome to Nerum, {first}!</h1>'
         '<p style="color:rgba(255,255,255,0.5);font-size:14px;line-height:1.6;margin:0 0 28px">'
         "You're all set to automate your business with AI workflows.</p>"
-        f'<a href="{settings.FRONTEND_URL}/dashboard" style="display:inline-block;padding:14px 32px;'
+        f'<a href="{settings.APP_URL}/dashboard" style="display:inline-block;padding:14px 32px;'
         'background:linear-gradient(135deg,#FF6B00,#7B2FFF);color:#fff;text-decoration:none;'
         'border-radius:25px;font-size:14px;font-weight:700">Go to Dashboard →</a>'
     )
