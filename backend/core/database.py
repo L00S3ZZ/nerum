@@ -18,6 +18,12 @@ engine = create_async_engine(
     max_overflow=20,
     pool_pre_ping=True,
     echo=False,
+    connect_args={
+        # Supabase routes through pgbouncer, which doesn't support prepared
+        # statements. Disable both asyncpg's cache and SQLAlchemy's.
+        "statement_cache_size": 0,
+        "prepared_statement_cache_size": 0,
+    },
 )
 
 AsyncSessionLocal = async_sessionmaker(
