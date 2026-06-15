@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# Virtual environments
+venv/
+env/
+.venv/
+
+# Secrets / env (keep the template)
+.env
+.env.local
+.env.production
+*.env
+backend/.env
+service-account.json
+backend/service-account.json
+!.env.example
+!.env.local.example
+
+# Database
+*.db
+*.sqlite3
+nerum.db
+
+# Node / Next
+node_modules/
+.next/
+frontend/.next/
+out/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Keys / certs
+*.pem
+*.key
+*.cert
+credentials.json
+token.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Claude Code session data — never commit
+.claude/
+.claude
+
+# NOTE: .dockerignore is intentionally NOT ignored — it must ship to the server
+# so `docker build` keeps secrets (.env) out of the image.

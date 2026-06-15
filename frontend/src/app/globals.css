@@ -1,0 +1,265 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: #07080F;
+  color: #ffffff;
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+:root {
+  --bg: #07080F;
+  --orange: #FF6B00;
+  --violet: #7B2FFF;
+  --cyan: #00D4FF;
+  --yellow: #FFD60A;
+  --muted: #9AA0B8;
+  --card-bg: #0D0E1A;
+  --border: rgba(255,255,255,0.06);
+  --font-sans: 'Plus Jakarta Sans', sans-serif;
+  --font-display: 'Space Grotesk', 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+/* Display font for headings across the product */
+h1, h2, h3 {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+.font-display { font-family: var(--font-display); }
+.font-mono { font-family: var(--font-mono); }
+
+/* Custom scrollbar */
+::-webkit-scrollbar { width: 7px; }
+::-webkit-scrollbar-track { background: #07080F; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,107,0,0.45); }
+
+/* Selection */
+::selection { background: rgba(255,107,0,0.32); color: #fff; }
+
+/* Gradient text utilities (Liquid Glass: iridescent, animated sheen) */
+.gradient-text {
+  background: linear-gradient(120deg, #FF6B00, #7B2FFF);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.gradient-iris {
+  background: linear-gradient(110deg, #FF6B00 0%, #FFD60A 22%, #FF6B00 40%, #7B2FFF 65%, #00D4FF 100%);
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: sheen 7s linear infinite;
+}
+@keyframes sheen {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 220% 50%; }
+}
+
+/* Glassmorphism card (Liquid Glass) */
+.glass-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 20px;
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  transition: transform 0.4s cubic-bezier(0.22,1,0.36,1), border-color 0.4s ease, box-shadow 0.4s ease;
+}
+.glass-card:hover {
+  border-color: rgba(255,107,0,0.4);
+  box-shadow: 0 24px 60px -24px rgba(123,47,255,0.5);
+}
+
+/* Iridescent hairline border that animates (used on premium cards) */
+.iris-border { position: relative; }
+.iris-border::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(120deg, rgba(255,107,0,0.6), rgba(123,47,255,0.6), rgba(0,212,255,0.6), rgba(255,107,0,0.6));
+  background-size: 300% 100%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  animation: sheen 6s linear infinite;
+  pointer-events: none;
+}
+.iris-border:hover::before { opacity: 1; }
+
+/* Faint engineering grid background */
+.grid-bg {
+  background-image:
+    linear-gradient(rgba(255,255,255,0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.035) 1px, transparent 1px);
+  background-size: 64px 64px;
+  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, #000 30%, transparent 75%);
+}
+
+/* Infinite marquee */
+@keyframes marquee-left {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes marquee-right {
+  from { transform: translateX(-50%); }
+  to { transform: translateX(0); }
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  gap: 14px;
+  will-change: transform;
+}
+.marquee-track:hover { animation-play-state: paused; }
+
+/* Form error shake */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+.shake { animation: shake 0.4s ease; }
+
+/* Scroll-indicator bounce */
+@keyframes chev-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(10px); }
+}
+.chev-bounce { animation: chev-bounce 1.5s ease-in-out infinite; will-change: transform; }
+
+/* Plasma orb drift (organic, transform-only) */
+@keyframes orb-float-a {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(40px, -30px, 0) scale(1.08); }
+}
+@keyframes orb-float-b {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50% { transform: translate3d(-35px, 35px, 0) scale(0.94); }
+}
+.orb { will-change: transform; }
+
+/* Wire energy flow (SVG stroke — not layout) */
+@keyframes flow-dash { to { stroke-dashoffset: -240; } }
+.wire-flow { animation: flow-dash 1.4s linear infinite; }
+
+/* Slow spin for decorative rings */
+@keyframes spin-slow { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow 24s linear infinite; will-change: transform; }
+
+/* Mobile workflow pulse (transform-only) */
+@keyframes pulse-down {
+  0% { transform: translateY(-8px); opacity: 0; }
+  15% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { transform: translateY(160px); opacity: 0; }
+}
+.pulse-down { animation: pulse-down 2.2s ease-in-out infinite; will-change: transform, opacity; }
+
+/* Custom-cursor: hide native cursor on precise pointers */
+@media (hover: hover) and (pointer: fine) {
+  body.cursor-none,
+  body.cursor-none * { cursor: none !important; }
+}
+
+/* Skeleton shimmer (dashboard loading states) */
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+  border-radius: 10px;
+}
+.skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.07), transparent);
+  animation: shimmer 1.4s infinite;
+}
+@keyframes shimmer { 100% { transform: translateX(100%); } }
+
+/* Pulsing "live" ring (status dots, heartbeat) */
+@keyframes ping-ring {
+  0% { transform: scale(0.7); opacity: 0.55; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+.ping-ring { animation: ping-ring 2s cubic-bezier(0,0,0.2,1) infinite; will-change: transform, opacity; }
+
+/* ECG / heartbeat trace (SVG stroke) */
+@keyframes ecg-dash { to { stroke-dashoffset: -1000; } }
+.ecg-line { animation: ecg-dash 3s linear infinite; }
+
+/* Generic logo backdrop pulse (entry loader) */
+@keyframes pulse {
+  0%, 100% { opacity: 0.18; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 0.25; transform: translate(-50%, -50%) scale(1.06); }
+}
+
+/* Elliptical / figure-8 orb drift (more alive than a simple translate) */
+@keyframes orb-ellipse-a {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(45px, -30px, 0); }
+  50% { transform: translate3d(20px, 35px, 0); }
+  75% { transform: translate3d(-30px, 12px, 0); }
+}
+@keyframes orb-ellipse-b {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  25% { transform: translate3d(-38px, 26px, 0); }
+  50% { transform: translate3d(-16px, -32px, 0); }
+  75% { transform: translate3d(32px, -12px, 0); }
+}
+
+/* Slowly drifting background grid lines */
+@keyframes grid-scroll { from { transform: translateY(0); } to { transform: translateY(-80px); } }
+.grid-drift { animation: grid-scroll 20s linear infinite; will-change: transform; }
+
+/* Animated plasma gradient for heading accent words */
+.plasma-gradient-text {
+  background: linear-gradient(90deg, #FF6B00, #7B2FFF, #00D4FF, #FF6B00);
+  background-size: 300% 100%;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
+  animation: plasmaShift 8s ease infinite;
+}
+@keyframes plasmaShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* React Flow attribution hidden */
+.react-flow__attribution { display: none !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .orb,
+  .chev-bounce,
+  .marquee-track,
+  .gradient-iris,
+  .iris-border::before,
+  .wire-flow,
+  .spin-slow,
+  .pulse-down,
+  .skeleton::after,
+  .ping-ring,
+  .grid-drift,
+  .plasma-gradient-text,
+  .ecg-line { animation: none !important; }
+}

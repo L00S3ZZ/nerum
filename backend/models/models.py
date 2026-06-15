@@ -1,0 +1,146 @@
+"""Consolidated ORM models.
+
+Column names mirror the existing V1 Supabase schema EXACTLY so live data keeps
+working. New V2-only columns (failed_attempts, locked_until, google_id,
+avatar_url, otp purpose) are added via additive migrations in core.database.
+"""
+from datetime import datetime
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+
+from core.database import Base
+
+
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String)
+    email = Column(String, unique=True, index=True)
+    hashed_password = Column(String)
+    plan = Column(String, default="free")
+    token_limit = Column(Integer, default=1000)
+    tokens_used = Column(Integer, default=0)
+    is_verified = Column(Boolean, default=False)
+    two_fa_enabled = Column(Boolean, default=False)
+    terms_accepted = Column(Boolean, default=False)
+    terms_accepted_at = Column(DateTime, nullable=True)
+    terms_version = Column(String, default="1.0")
+    created_at = Column(DateTime, default=datetime.utcnow)
+    # ── V2 additions (migrated in) ──
+    failed_attempts = Column(Integer, default=0)
+    locked_until = Column(DateTime, nullable=True)
+    google_id = Column(String, nullable=True)
+    avatar_url = Column(String, nullable=True)
+
+
+class Workflow(Base):
+    __tablename__ = "workflows"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    name = Column(String, default="Untitled Workflow")
+    description = Column(Text, default="")
+    trigger = Column(String, default="")
+    action = Column(String, default="")
+    config = Column(Text, default="{}")
+    is_active = Column(Boolean, default=True)
+    runs = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_run = Column(DateTime, nullable=True)
+
+
+class WorkflowRun(Base):
+    __tablename__ = "workflow_runs"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    workflow_id = Column(Integer, index=True)
+    workflow_name = Column(String)
+    action = Column(String)
+    status = Column(String, default="success")
+    details = Column(Text, default="")
+    ran_at = Column(DateTime, default=datetime.utcnow)
+
+
+class DashboardList(Base):
+    __tablename__ = "dashboard_lists"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    workflow_id = Column(Integer, index=True)
+    name = Column(String)
+    business_type = Column(String)
+    message_template = Column(Text)
+    condition_field = Column(String)
+    condition_value = Column(String)
+    schedule_time = Column(String)
+    schedule_type = Column(String, default="daily")
+    is_active = Column(Boolean, default=True)
+    whatsapp_enabled = Column(Boolean, default=True)
+    email_enabled = Column(Boolean, default=False)
+    telegram_enabled = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_run = Column(DateTime, nullable=True)
+
+
+class DashboardRecord(Base):
+    __tablename__ = "dashboard_records"
+    id = Column(Integer, primary_key=True, index=True)
+    list_id = Column(Integer, index=True)
+    user_id = Column(Integer, index=True)
+    name = Column(String)
+    phone = Column(String)
+    email = Column(String, nullable=True)
+    fields = Column(Text, default="{}")
+    status = Column(String, default="pending")
+    last_message_sent = Column(DateTime, nullable=True)
+    message_count = Column(Integer, default=0)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+
+class UserIntegration(Base):
+    __tablename__ = "user_integrations"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    integration_type = Column(String)  # provider key: whatsapp/gmail/telegram/...
+    encrypted_credentials = Column(Text)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_used_at = Column(DateTime, nullable=True)
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    token = Column(String, unique=True, index=True)
+    expires_at = Column(DateTime)
+    used = Column(Boolean, default=False)
+
+
+class EmailVerificationToken(Base):
+    __tablename__ = "email_verification_tokens"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    token = Column(String, unique=True, index=True)
+    expires_at = Column(DateTime)
+    used = Column(Boolean, default=False)
+
+
+class LoginHistory(Base):
+    __tablename__ = "login_history"
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, index=True)
+    email = Column(String, index=True)
+    ip_address = Column(String)
+    device = Column(String)
+    logged_in_at = Column(DateTime, default=datetime.utcnow)
+
+
+class OTPCode(Base):
+    __tablename__ = "otp_codes"
+    id = Column(Integer, primary_key=True, index=True)
+    email = Column(String, index=True)
+    code = Column(String)
+    purpose = Column(String, default="verify")  # verify | 2fa  (V2 addition)
+    expires_at = Column(DateTime)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

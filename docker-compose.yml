@@ -1,0 +1,40 @@
+services:
+  backend:
+    build: ./backend
+    container_name: nerum_backend
+    env_file:
+      - ./backend/.env
+    ports:
+      - "127.0.0.1:8000:8000"   # private — only Nginx (localhost) reaches it
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0) if urllib.request.urlopen('http://localhost:8000/').status==200 else sys.exit(1)"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    networks:
+      - nerum_net
+
+  frontend:
+    build:
+      context: ./frontend
+      args:
+        # NEXT_PUBLIC_* is inlined at build time. Browser hits this URL, so it
+        # must be public and Nginx-proxied to the backend (which is private).
+        # Nginx: location /api/ { proxy_pass http://127.0.0.1:8000/; }  (strips /api)
+        - NEXT_PUBLIC_API_URL=https://nerum.in/api
+    container_name: nerum_frontend
+    environment:
+      - NODE_ENV=production
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - nerum_net
+
+networks:
+  nerum_net:
+    driver: bridge
