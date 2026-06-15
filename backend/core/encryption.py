@@ -1,9 +1,12 @@
 """AES-256-GCM encryption for stored integration credentials.
 
-Ported from V1 (security/encryption.py). ENCRYPTION_KEY is a 64-char hex string
-(32 bytes). Token format: base64(nonce[12] + ciphertext).
+Ported from V1 (security/encryption.py). ENCRYPTION_KEY may be any string: a
+64-char hex string is used directly as the 32-byte key, anything else (base64,
+arbitrary length) is hashed to 32 bytes via SHA-256. Token format:
+base64(nonce[12] + ciphertext).
 """
 import base64
+import hashlib
 import json
 import os
 
@@ -11,10 +14,20 @@ from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 
 from core.config import settings
 
-_key_hex = settings.ENCRYPTION_KEY
-if len(_key_hex) != 64:
-    raise ValueError("ENCRYPTION_KEY must be a 64-character hex string (32 bytes)")
-_KEY = bytes.fromhex(_key_hex)
+
+def get_key(raw_key: str) -> bytes:
+    """Accept any string key and derive 32 bytes from it."""
+    # If it's already a valid 64-char hex string, use it directly.
+    try:
+        if len(raw_key) == 64:
+            return bytes.fromhex(raw_key)
+    except ValueError:
+        pass
+    # Otherwise derive 32 bytes via SHA-256.
+    return hashlib.sha256(raw_key.encode()).digest()
+
+
+_KEY = get_key(settings.ENCRYPTION_KEY)
 
 
 def encrypt_data(data: dict) -> str:
