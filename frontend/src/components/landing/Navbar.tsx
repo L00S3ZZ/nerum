@@ -71,13 +71,21 @@ export default function Navbar() {
 
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           <Link
-            href="/dashboard"
-            className="nav-dash"
-            style={{ fontSize: 14, fontWeight: 600, color: '#fff', textDecoration: 'none', padding: '9px 14px', borderRadius: 999, transition: 'background 0.25s ease' }}
+            href="/login"
+            style={{
+              fontSize: '14px',
+              fontWeight: 600,
+              color: '#fff',
+              textDecoration: 'none',
+              padding: '9px 16px',
+              borderRadius: '999px',
+              border: '1px solid rgba(255,255,255,0.15)',
+              transition: 'background 0.25s ease',
+            }}
             onMouseEnter={(e) => (e.currentTarget.style.background = 'rgba(255,255,255,0.06)')}
             onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
           >
-            Dashboard
+            Login
           </Link>
           <MagneticButton strength={0.4}>
             <Link
@@ -103,7 +111,6 @@ export default function Navbar() {
       <style>{`
         @media (max-width: 760px) {
           .nav-links { display: none !important; }
-          .nav-dash { display: none !important; }
         }
       `}</style>
     </motion.header>
