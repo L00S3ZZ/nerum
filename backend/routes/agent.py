@@ -1,20 +1,28 @@
-"""Neru Agent — real Anthropic streaming over SSE. No demo mode."""
+"""Neru Agent — the tool-calling agent engine over SSE.
+
+POST /agent/run        run the agent loop on a goal, streaming events as SSE
+GET  /agent/runs       recent runs for the current user
+GET  /agent/runs/{id}/steps   the executed steps of one run
+GET  /agent/conversations     (kept for the existing frontend; no history yet)
+"""
 import json
+import uuid
 
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from agent.engine import AgentEngine
 from core.config import settings
 from core.database import get_db
+from core.encryption import decrypt_data
 from core.security import get_current_user
-from models.models import User
+from models.models import AgentRun, AgentStep, User, UserIntegration
 from routes.integrations import get_user_byok
 
 router = APIRouter()
-
-MODEL = "claude-sonnet-4-6"  # adjust to a model id your Anthropic key can access
 
 
 class AgentRequest(BaseModel):
@@ -24,7 +32,32 @@ class AgentRequest(BaseModel):
 
 
 def _sse(event: dict) -> str:
-    return f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+    return f"data: {json.dumps(event, ensure_ascii=False, default=str)}\n\n"
+
+
+async def _load_credentials(db: AsyncSession, user_id: int) -> dict:
+    """Decrypt the user's connected (non-BYOK) integration credentials.
+
+    Returns {provider: {fields}}. A credential that fails to decrypt is skipped
+    rather than aborting the run — the tool that needs it will report it missing.
+    """
+    rows = (
+        await db.scalars(
+            select(UserIntegration).where(
+                UserIntegration.user_id == user_id,
+                UserIntegration.is_active.is_(True),
+            )
+        )
+    ).all()
+    creds: dict = {}
+    for r in rows:
+        if not r.integration_type or r.integration_type.startswith("byok_"):
+            continue
+        try:
+            creds[r.integration_type] = decrypt_data(r.encrypted_credentials)
+        except Exception:  # noqa: BLE001 — a corrupt row shouldn't block the agent
+            continue
+    return creds
 
 
 @router.post("/run")
@@ -33,8 +66,8 @@ async def agent_run(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    message = body.message.strip()
-    if not message:
+    goal = body.message.strip()
+    if not goal:
         raise HTTPException(400, "Message cannot be empty")
 
     # Prefer the user's own Anthropic BYOK key; fall back to the server key.
@@ -43,38 +76,84 @@ async def agent_run(
     if not api_key:
         raise HTTPException(503, "AI not configured — add an Anthropic key (BYOK) or set ANTHROPIC_API_KEY")
 
-    lang = "Tamil" if str(body.language).lower().startswith("ta") else "English"
-    system = (
-        f"You are Neru, Nerum's AI automation agent for Indian small businesses. "
-        f"User: {user.name}, plan: {user.plan}. "
-        f"Available tools: WhatsApp, Gmail, Telegram, Google Sheets, Razorpay. "
-        f"When the user describes a task, explain the workflow you'd build (trigger + actions) "
-        f"clearly and concisely. Reply in {lang}."
-    )
+    credentials = await _load_credentials(db, user.id)
+    session_id = body.session_id or uuid.uuid4().hex
+
+    engine = AgentEngine(user=user, db=db, api_key=api_key, credentials=credentials)
 
     async def stream():
-        from anthropic import AsyncAnthropic
-
-        client = AsyncAnthropic(api_key=api_key)
-        yield _sse({"type": "commander_thinking", "content": "Understanding your request..."})
+        # Tell the client its session id up front so follow-ups can reuse it.
+        yield _sse({"type": "session", "session_id": session_id})
         try:
-            async with client.messages.stream(
-                model=MODEL,
-                max_tokens=2000,
-                system=system,
-                messages=[{"role": "user", "content": message}],
-            ) as s:
-                async for text in s.text_stream:
-                    yield _sse({"type": "response", "content": text})
-            yield _sse({"type": "agent_complete"})
-        except Exception as exc:
-            yield _sse({"type": "agent_error", "content": str(exc)[:300]})
+            async for event in engine.run(goal, body.language, session_id):
+                yield _sse(event)
+        except Exception as exc:  # noqa: BLE001 — never leak a raw traceback to the client
+            yield _sse({"type": "error", "content": str(exc)[:300]})
 
     return StreamingResponse(
         stream(),
         media_type="text/event-stream",
         headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no", "Connection": "keep-alive"},
     )
+
+
+@router.get("/runs")
+async def get_runs(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    rows = (
+        await db.scalars(
+            select(AgentRun)
+            .where(AgentRun.user_id == user.id)
+            .order_by(AgentRun.id.desc())
+            .limit(20)
+        )
+    ).all()
+    return {
+        "runs": [
+            {
+                "id": r.id,
+                "session_id": r.session_id,
+                "goal": r.goal,
+                "status": r.status,
+                "steps_count": r.steps_count,
+                "result_summary": r.result_summary,
+                "created_at": r.created_at,
+                "completed_at": r.completed_at,
+            }
+            for r in rows
+        ]
+    }
+
+
+@router.get("/runs/{run_id}/steps")
+async def get_run_steps(
+    run_id: int,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    run = await db.get(AgentRun, run_id)
+    if not run or run.user_id != user.id:
+        raise HTTPException(404, "Run not found")
+    rows = (
+        await db.scalars(
+            select(AgentStep)
+            .where(AgentStep.run_id == run_id)
+            .order_by(AgentStep.id.asc())
+        )
+    ).all()
+    return {
+        "run_id": run_id,
+        "steps": [
+            {
+                "id": s.id,
+                "tool_name": s.tool_name,
+                "tool_input": s.tool_input,
+                "tool_result": s.tool_result,
+                "success": s.success,
+                "executed_at": s.executed_at,
+            }
+            for s in rows
+        ],
+    }
 
 
 @router.get("/conversations")

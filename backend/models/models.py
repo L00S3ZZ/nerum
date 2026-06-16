@@ -6,7 +6,7 @@ avatar_url, otp purpose) are added via additive migrations in core.database.
 """
 from datetime import datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, String, Text
 
 from core.database import Base
 
@@ -144,3 +144,28 @@ class OTPCode(Base):
     expires_at = Column(DateTime)
     used = Column(Boolean, default=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AgentRun(Base):
+    __tablename__ = "agent_runs"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    session_id = Column(String, index=True)
+    goal = Column(Text)
+    status = Column(String, default="running")  # running | complete | error
+    steps_count = Column(Integer, default=0)
+    result_summary = Column(Text, nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    completed_at = Column(DateTime, nullable=True)
+
+
+class AgentStep(Base):
+    __tablename__ = "agent_steps"
+    id = Column(Integer, primary_key=True)
+    run_id = Column(Integer, ForeignKey("agent_runs.id"), index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True)
+    tool_name = Column(String)
+    tool_input = Column(JSON)
+    tool_result = Column(JSON)
+    success = Column(Boolean, default=True)
+    executed_at = Column(DateTime, default=datetime.utcnow)
