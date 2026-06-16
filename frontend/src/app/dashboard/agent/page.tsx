@@ -90,7 +90,7 @@ export default function NeruAgentPage() {
   return (
     <div className="agent-wrap" style={{ height: '100%', display: 'grid', gridTemplateColumns: '1fr 340px' }}>
       {/* ===== chat column ===== */}
-      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, borderRight: '1px solid rgba(255,255,255,0.06)' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', minWidth: 0, height: '100%', borderRight: '1px solid rgba(255,255,255,0.06)' }}>
         {/* header */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '14px 20px', borderBottom: '1px solid rgba(255,255,255,0.06)', flexShrink: 0 }}>
           <img src="/nerum-logo.png" width={36} height={36} alt="Neru" style={{ borderRadius: '50%' }} onError={(e) => ((e.currentTarget as HTMLImageElement).style.display = 'none')} />
@@ -107,7 +107,7 @@ export default function NeruAgentPage() {
         </div>
 
         {/* messages */}
-        <div ref={scrollRef} style={{ flex: 1, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div ref={scrollRef} style={{ flex: 1, height: 0, minHeight: 0, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {messages.map((m) => (
             <Bubble key={m.id} m={m} />
           ))}
