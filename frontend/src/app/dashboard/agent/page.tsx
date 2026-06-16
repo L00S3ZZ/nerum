@@ -107,7 +107,7 @@ export default function NeruAgentPage() {
         </div>
 
         {/* messages */}
-        <div ref={scrollRef} style={{ flex: 1, height: 0, minHeight: 0, overflowY: 'auto', padding: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div ref={scrollRef} style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: 20, paddingBottom: 20, display: 'flex', flexDirection: 'column', gap: 16 }}>
           {messages.map((m) => (
             <Bubble key={m.id} m={m} />
           ))}
