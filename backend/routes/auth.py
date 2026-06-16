@@ -1,4 +1,5 @@
 """Auth: register + OTP verify, login (+lockout, +2FA), password reset, Google OAuth."""
+import os
 import random
 import secrets
 from datetime import datetime, timedelta
@@ -29,6 +30,8 @@ from services.email import (
 )
 
 router = APIRouter()
+
+FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
 LOCKOUT_THRESHOLD = 5
 LOCKOUT_MINUTES = 15
@@ -286,4 +289,4 @@ async def google_callback(code: str, db: AsyncSession = Depends(get_db)):
             user.google_id = info.get("id")
 
     token = create_access_token(user.email, user.name)
-    return RedirectResponse(f"{settings.APP_URL}/auth/callback?token={token}")
+    return RedirectResponse(f"{FRONTEND_URL}/auth/callback?token={token}")

@@ -52,14 +52,28 @@ export default function NeruAgentPage() {
 
     api
       .stream('/agent/run', { message: text, language: 'english' }, (e) => {
-        if (e.type === 'commander_thinking') {
+        const finishLastThought = () =>
+          setThoughts((t) => t.map((x, i) => (i === t.length - 1 && !x.done ? { ...x, done: true } : x)))
+        const appendMsg = (chunk: string) =>
+          setMessages((m) => m.map((x) => (x.id === neruId ? { ...x, text: x.text ? `${x.text}\n${chunk}` : chunk } : x)))
+
+        if (e.type === 'thinking' || e.type === 'plan') {
           setThoughts((t) => [...t, { label: String(e.content ?? ''), done: true }])
-        } else if (e.type === 'response') {
+        } else if (e.type === 'tool_start') {
           setStatus('responding')
-          setMessages((m) => m.map((x) => (x.id === neruId ? { ...x, text: x.text + String(e.content ?? '') } : x)))
-        } else if (e.type === 'agent_complete') {
+          setThoughts((t) => [...t, { label: String(e.content ?? ''), done: false }])
+        } else if (e.type === 'tool_result') {
+          finishLastThought()
+          appendMsg(String(e.content ?? ''))
+        } else if (e.type === 'tool_error') {
+          finishLastThought()
+          appendMsg(`⚠ ${String(e.content ?? 'error')}`)
+        } else if (e.type === 'loop' || e.type === 'session') {
+          // internal — ignore
+        } else if (e.type === 'complete') {
+          setMessages((m) => m.map((x) => (x.id === neruId ? { ...x, text: String(e.content ?? '') || x.text } : x)))
           setStatus('idle')
-        } else if (e.type === 'agent_error') {
+        } else if (e.type === 'error') {
           appendErr(String(e.content ?? 'error'))
           setStatus('idle')
         }

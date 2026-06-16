@@ -4,6 +4,8 @@ services:
     container_name: nerum_backend
     env_file:
       - ./backend/.env
+    environment:
+      - FRONTEND_URL=https://nerum.in
     ports:
       - "127.0.0.1:8000:8000"   # private — only Nginx (localhost) reaches it
     restart: unless-stopped
