@@ -795,7 +795,8 @@ export default function BuilderPage() {
       list.map(
         (n) =>
           new Promise<void>((resolve) => {
-            if (imageCache.current[n.name]) return resolve()
+            const cached = imageCache.current[n.name]
+            if (cached && cached.complete && cached.naturalWidth > 0) return resolve()
             const img = new Image()
             img.crossOrigin = 'anonymous'
             img.onload = () => {
@@ -910,8 +911,8 @@ export default function BuilderPage() {
       const active = activeRef.current
       const rings = ns.reduce((m, n) => Math.max(m, n.ring), 0) + 1
 
-      ctx.fillStyle = PLASMA.bg
-      ctx.fillRect(0, 0, w, h)
+      // background is CSS on the wrapper — never fill it here (causes flicker)
+      ctx.clearRect(0, 0, w, h)
 
       const angles = ringAnglesRef.current
       for (let ri = 0; ri < rings; ri++) {
@@ -943,12 +944,8 @@ export default function BuilderPage() {
       ctx.lineWidth = 2
       ctx.stroke()
       const sunImg = imageCache.current['__sun__']
-      if (sunImg) {
-        try {
-          ctx.drawImage(sunImg, CX - 9, CY - 9, 18, 18)
-        } catch {
-          /* not decodable yet */
-        }
+      if (sunImg && sunImg.complete && sunImg.naturalWidth > 0) {
+        ctx.drawImage(sunImg, CX - 9, CY - 9, 18, 18)
       } else {
         ctx.fillStyle = '#FF6B00'
         ctx.font = `500 16px ${CANVAS_FONT}`
@@ -999,12 +996,8 @@ export default function BuilderPage() {
           ctx.stroke()
 
           const img = imageCache.current[node.name]
-          if (img) {
-            try {
-              ctx.drawImage(img, x - 11, y - 11, 22, 22)
-            } catch {
-              /* image not yet decodable */
-            }
+          if (img && img.complete && img.naturalWidth > 0) {
+            ctx.drawImage(img, x - 11, y - 11, 22, 22)
           } else {
             ctx.fillStyle = bc
             ctx.font = `500 9px ${CANVAS_FONT}`
@@ -1028,10 +1021,12 @@ export default function BuilderPage() {
       drawFrame()
       animFrameRef.current = requestAnimationFrame(render)
     }
+    // cancel any frame already in flight before starting a fresh loop
+    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     animFrameRef.current = requestAnimationFrame(render)
     return () => {
       running = false
-      cancelAnimationFrame(animFrameRef.current)
+      if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
   }, [])
 
