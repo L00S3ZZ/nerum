@@ -120,6 +120,33 @@ const iconUrlFor = (m: IntMeta) => `https://cdn.simpleicons.org/${m.slug}/${m.he
 const iconMap: Record<string, string> = Object.fromEntries(INTEGRATIONS.map((m) => [m.name, iconUrlFor(m)]))
 const metaByName: Record<string, IntMeta> = Object.fromEntries(INTEGRATIONS.map((m) => [m.name, m]))
 
+/** Each integration's OWN brand colour — node border/glow/fallback use this. */
+const BRAND_COLORS: Record<string, string> = {
+  WhatsApp: '#25D366',
+  Gmail: '#EA4335',
+  Telegram: '#2AABEE',
+  'Google Sheets': '#34A853',
+  Razorpay: '#2D9CDB',
+  Webhook: '#FF6B00',
+  'Google Forms': '#673AB7',
+  SMS: '#FF6B00',
+  'Google Calendar': '#4285F4',
+  Notion: '#ffffff',
+  Slack: '#E01E5A',
+  Airtable: '#18BFFF',
+  'Google Drive': '#4285F4',
+  Shopify: '#96BF48',
+  Discord: '#5865F2',
+  Stripe: '#635BFF',
+  HubSpot: '#FF7A59',
+  Jira: '#0052CC',
+  LinkedIn: '#0A66C2',
+  YouTube: '#FF0000',
+  MySQL: '#4479A1',
+  'Custom HTTP': '#6b7280',
+}
+const brandColor = (name: string) => BRAND_COLORS[name] ?? '#6b7280'
+
 /* ------- per-integration credential + action config (researched A→Z) ------ */
 const PK = '-----BEGIN PRIVATE KEY-----\\n...'
 const SA_EMAIL = 'name@project.iam.gserviceaccount.com'
@@ -545,7 +572,7 @@ function ConfigPanel({
           ✕
         </button>
       </div>
-      <div style={{ fontSize: 11, color: ringColor, fontWeight: 500, marginTop: 6 }}>Ring {node.ring + 1} · Soldier</div>
+      <div style={{ display: 'inline-block', fontSize: 11, color: ringColor, fontWeight: 500, marginTop: 6, border: `0.5px solid ${brandColor(node.name)}`, borderRadius: 6, padding: '2px 8px' }}>Ring {node.ring + 1} · Soldier</div>
       <div style={divider} />
 
       {/* credentials */}
@@ -955,18 +982,19 @@ export default function BuilderPage() {
 
           const node = ns[gi]
           const isActive = gi === active
+          const bc = brandColor(node.name)
 
           if (isActive) {
             ctx.beginPath()
             ctx.arc(x, y, 30, 0, Math.PI * 2)
-            ctx.fillStyle = rc.color + '25'
+            ctx.fillStyle = bc + '25'
             ctx.fill()
           }
           ctx.beginPath()
           ctx.arc(x, y, 22, 0, Math.PI * 2)
           ctx.fillStyle = '#07080F'
           ctx.fill()
-          ctx.strokeStyle = isActive ? rc.color : rc.color + '55'
+          ctx.strokeStyle = isActive ? bc : bc + '55'
           ctx.lineWidth = isActive ? 2 : 1
           ctx.stroke()
 
@@ -978,7 +1006,7 @@ export default function BuilderPage() {
               /* image not yet decodable */
             }
           } else {
-            ctx.fillStyle = rc.color
+            ctx.fillStyle = bc
             ctx.font = `500 9px ${CANVAS_FONT}`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
@@ -1126,7 +1154,9 @@ export default function BuilderPage() {
                   setConfigIdx(i)
                   setActiveIdx(i)
                 }}
-                style={{ background: '#111327', border: `0.5px solid ${i === activeIdx ? ringConfig(openDropdown).color : '#1e2240'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = brandColor(n.name))}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = i === activeIdx ? brandColor(n.name) : '#1e2240')}
+                style={{ background: '#111327', border: `0.5px solid ${i === activeIdx ? brandColor(n.name) : '#1e2240'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={iconMap[n.name]} alt={n.name} width={18} height={18} style={{ objectFit: 'contain' }} />
