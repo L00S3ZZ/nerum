@@ -318,6 +318,45 @@ const CONFIG: Record<string, IntCfg> = {
   },
 }
 
+/* ------------------------- AI Commander (sun) config ---------------------- */
+const SUN_ORANGE = '#FF6B00'
+const SUN_PROVIDERS = ['Anthropic Claude', 'OpenAI GPT', 'Google Gemini', 'Groq', 'Ollama (Local)']
+const SUN_KEY_PH: Record<string, string> = {
+  'Anthropic Claude': 'sk-ant-XXXXXXXXXX',
+  'OpenAI GPT': 'sk-XXXXXXXXXX',
+  'Google Gemini': 'AIzaSyXXXXXXXXXX',
+  Groq: 'gsk_XXXXXXXXXX',
+  'Ollama (Local)': 'http://localhost:11434 (no key needed)',
+}
+const SUN_MODELS: Record<string, string[]> = {
+  'Anthropic Claude': ['claude-sonnet-4-6', 'claude-haiku-4-5', 'claude-opus-4-6'],
+  'OpenAI GPT': ['gpt-4o', 'gpt-4o-mini', 'gpt-4-turbo'],
+  'Google Gemini': ['gemini-1.5-pro', 'gemini-1.5-flash'],
+  Groq: ['llama-3.3-70b', 'mixtral-8x7b'],
+  'Ollama (Local)': ['llama3', 'mistral', 'codellama'],
+}
+
+interface Commander {
+  provider: string
+  apiKey: string
+  model: string
+  agentName: string
+  systemPrompt: string
+  maxSteps: string
+  temperature: number
+  configured: boolean
+}
+const initCommander = (): Commander => ({
+  provider: 'Anthropic Claude',
+  apiKey: '',
+  model: SUN_MODELS['Anthropic Claude'][0],
+  agentName: 'Nerum Agent',
+  systemPrompt: '',
+  maxSteps: '10',
+  temperature: 0.7,
+  configured: false,
+})
+
 /* --------------------------------- rings ---------------------------------- */
 const RING_PRESETS: RingConfig[] = [
   { radius: 80, capacity: 3, color: '#00D4FF', speed: 0.007 },
@@ -598,6 +637,95 @@ function ConfigPanel({
   )
 }
 
+/* ============================ AI Commander Panel ========================== */
+function SunPanel({ commander, onClose, onChange }: { commander: Commander; onClose: () => void; onChange: (patch: Partial<Commander>) => void }) {
+  const [test, setTest] = useState<'idle' | 'testing' | 'ok'>('idle')
+  const models = SUN_MODELS[commander.provider] ?? []
+  const focusRing = (e: React.FocusEvent<HTMLElement>) => {
+    e.currentTarget.style.borderColor = SUN_ORANGE
+  }
+  const blurRing = (e: React.FocusEvent<HTMLElement>) => {
+    e.currentTarget.style.borderColor = '#1e2240'
+  }
+
+  return (
+    <div style={{ padding: 16, height: '100%', boxSizing: 'border-box' }}>
+      {/* header */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={SUN_ICON} alt="AI Commander" width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} />
+        <div style={{ fontSize: 16, color: '#fff', fontWeight: 500, flex: 1, minWidth: 0 }}>AI Commander</div>
+        <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>
+          ✕
+        </button>
+      </div>
+      <div style={{ display: 'inline-block', fontSize: 11, color: SUN_ORANGE, fontWeight: 500, marginTop: 6, border: `0.5px solid ${SUN_ORANGE}`, borderRadius: 6, padding: '2px 8px' }}>Core · Orchestrator</div>
+      <div style={divider} />
+
+      {/* credentials */}
+      <span style={sectionLabel}>Credentials</span>
+      <label style={fieldLabel}>AI Provider</label>
+      <select className="ncfg-field" value={commander.provider} onChange={(e) => onChange({ provider: e.target.value, model: (SUN_MODELS[e.target.value] ?? [''])[0] })} onFocus={focusRing} onBlur={blurRing} style={fieldInput}>
+        {SUN_PROVIDERS.map((p) => (
+          <option key={p} value={p} style={{ background: '#111327' }}>
+            {p}
+          </option>
+        ))}
+      </select>
+
+      <label style={fieldLabel}>API Key</label>
+      <input className="ncfg-field" type="password" value={commander.apiKey} placeholder={SUN_KEY_PH[commander.provider]} onChange={(e) => onChange({ apiKey: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+      <span style={fieldHelp}>This is your BYOK (Bring Your Own Key)</span>
+
+      <label style={fieldLabel}>Model</label>
+      <select className="ncfg-field" value={commander.model} onChange={(e) => onChange({ model: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput}>
+        {models.map((m) => (
+          <option key={m} value={m} style={{ background: '#111327' }}>
+            {m}
+          </option>
+        ))}
+      </select>
+
+      <div style={divider} />
+
+      {/* configuration */}
+      <span style={sectionLabel}>Configuration</span>
+      <label style={fieldLabel}>Agent Name</label>
+      <input className="ncfg-field" value={commander.agentName} placeholder="My Automation Agent" onChange={(e) => onChange({ agentName: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+
+      <label style={fieldLabel}>System Prompt</label>
+      <textarea className="ncfg-field" rows={4} value={commander.systemPrompt} placeholder="You are an automation agent for [business name]. Your job is to..." onChange={(e) => onChange({ systemPrompt: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={{ ...fieldInput, resize: 'vertical', lineHeight: 1.45 }} />
+
+      <label style={fieldLabel}>Max Steps (how many soldier nodes to call)</label>
+      <input className="ncfg-field" type="number" value={commander.maxSteps} placeholder="10" onChange={(e) => onChange({ maxSteps: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+
+      <label style={fieldLabel}>Temperature</label>
+      <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
+        <input type="range" min={0} max={1} step={0.1} value={commander.temperature} onChange={(e) => onChange({ temperature: parseFloat(e.target.value) })} style={{ flex: 1, accentColor: SUN_ORANGE }} />
+        <span style={{ fontSize: 13, color: SUN_ORANGE, fontWeight: 600, minWidth: 28, textAlign: 'right' }}>{commander.temperature.toFixed(1)}</span>
+      </div>
+
+      <div style={divider} />
+
+      {/* footer */}
+      <div style={{ display: 'flex', gap: 10 }}>
+        <button
+          onClick={() => {
+            setTest('testing')
+            window.setTimeout(() => setTest('ok'), 800)
+          }}
+          style={{ flex: 1, background: '#111327', border: `0.5px solid ${SUN_ORANGE}`, color: SUN_ORANGE, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+        >
+          {test === 'testing' ? 'Testing…' : test === 'ok' ? '✓ Connection OK' : 'Test Connection'}
+        </button>
+        <button onClick={() => onChange({ configured: true })} style={{ flex: 1, background: SUN_ORANGE + '40', border: `0.5px solid ${SUN_ORANGE}`, color: SUN_ORANGE, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+          {commander.configured ? '✓ Saved' : 'Save'}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /* ================================ component ================================ */
 export default function BuilderPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null)
@@ -617,16 +745,20 @@ export default function BuilderPage() {
   const [picker, setPicker] = useState<{ ring: number | undefined } | null>(null)
   const [pickerQuery, setPickerQuery] = useState('')
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
+  const [commander, setCommander] = useState<Commander>(initCommander)
+  const [sunOpen, setSunOpen] = useState(false)
 
   // Refs mirror state so the single RAF loop + native handlers read fresh values.
   const nodesRef = useRef(nodes)
   const activeRef = useRef(activeIdx)
+  const commanderRef = useRef(commander)
   nodesRef.current = nodes
   activeRef.current = activeIdx
+  commanderRef.current = commander
 
   const maxRing = nodes.reduce((m, n) => Math.max(m, n.ring), 0)
   const ringCount = maxRing + 1
-  const panelOpen = configIdx !== null
+  const panelOpen = configIdx !== null || sunOpen
   const configNode = configIdx !== null ? nodes[configIdx] : null
   const configRingColor = configNode ? ringConfig(configNode.ring).color : PLASMA.orange
 
@@ -797,6 +929,13 @@ export default function BuilderPage() {
         ctx.textBaseline = 'middle'
         ctx.fillText('N', CX, CY)
       }
+      // commander configured indicator
+      if (commanderRef.current.configured) {
+        ctx.beginPath()
+        ctx.arc(CX + 18, CY - 18, 4, 0, Math.PI * 2)
+        ctx.fillStyle = '#25D366'
+        ctx.fill()
+      }
 
       // planets
       const positions: { idx: number; x: number; y: number }[] = []
@@ -890,15 +1029,21 @@ export default function BuilderPage() {
     if (hit) {
       setActiveIdx(hit.idx)
       setConfigIdx(hit.idx)
+      setSunOpen(false)
       return
     }
     const { w, h } = sizeRef.current
     if (Math.hypot(w / 2 - mx, h / 2 - my) <= 30) {
+      // sun → open the AI Commander config panel
       setActiveIdx(-1)
       setConfigIdx(null)
-      setOpenDropdown(null)
+      setSunOpen(true)
       return
     }
+    // empty canvas → deselect everything
+    setActiveIdx(-1)
+    setConfigIdx(null)
+    setSunOpen(false)
     setOpenDropdown(null)
   }
 
@@ -1062,6 +1207,7 @@ export default function BuilderPage() {
               onRemove={() => removeNodeAt(configIdx)}
             />
           )}
+          {sunOpen && <SunPanel commander={commander} onClose={() => setSunOpen(false)} onChange={(p) => setCommander((c) => ({ ...c, ...p }))} />}
         </aside>
       </div>
 
