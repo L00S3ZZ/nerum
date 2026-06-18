@@ -391,6 +391,7 @@ function ConfigPanel({
   onClose,
   onChange,
   onCred,
+  onRemove,
 }: {
   node: AgentNode
   idx: number
@@ -399,6 +400,7 @@ function ConfigPanel({
   onClose: () => void
   onChange: (patch: Partial<AgentNode>) => void
   onCred: (key: string, val: string) => void
+  onRemove: () => void
 }) {
   const cfg = CONFIG[node.name]
   const [test, setTest] = useState<'idle' | 'testing' | 'ok'>('idle')
@@ -495,6 +497,11 @@ function ConfigPanel({
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={iconMap[node.name]} alt={node.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} />
         <div style={{ fontSize: 16, color: '#fff', fontWeight: 500, flex: 1, minWidth: 0 }}>{node.name}</div>
+        <button onClick={onRemove} aria-label="Remove node" title="Remove node" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'inline-flex', padding: 0 }}>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M3 6h18M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M10 11v6M14 11v6" />
+          </svg>
+        </button>
         <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>
           ✕
         </button>
@@ -609,6 +616,7 @@ export default function BuilderPage() {
   const [configIdx, setConfigIdx] = useState<number | null>(null)
   const [picker, setPicker] = useState<{ ring: number | undefined } | null>(null)
   const [pickerQuery, setPickerQuery] = useState('')
+  const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
 
   // Refs mirror state so the single RAF loop + native handlers read fresh values.
   const nodesRef = useRef(nodes)
@@ -677,6 +685,27 @@ export default function BuilderPage() {
   const openPicker = useCallback((ring?: number) => {
     setPickerQuery('')
     setPicker({ ring })
+  }, [])
+
+  /**
+   * Remove a node, then compact rings: any ring left empty is dropped and the
+   * outer rings shift inward (re-indexed densely). Remaining nodes redistribute
+   * evenly automatically — the draw loop spaces by index within each ring.
+   */
+  const removeNodeAt = useCallback((idx: number) => {
+    const prev = nodesRef.current
+    if (idx < 0 || idx >= prev.length) return
+    const filtered = prev.filter((_, i) => i !== idx)
+    const usedRings = Array.from(new Set(filtered.map((n) => n.ring))).sort((a, b) => a - b)
+    const remap = new Map<number, number>()
+    usedRings.forEach((r, i) => remap.set(r, i))
+    setNodes(filtered.map((n) => ({ ...n, ring: remap.get(n.ring) ?? n.ring })))
+
+    // shift selection / open dropdown to track the removed + re-indexed nodes
+    setConfigIdx((c) => (c === null ? null : c === idx ? null : c > idx ? c - 1 : c))
+    setActiveIdx((a) => (a === idx ? -1 : a > idx ? a - 1 : a))
+    setOpenDropdown((d) => (d === null ? null : remap.has(d) ? (remap.get(d) as number) : null))
+    setMenu(null)
   }, [])
 
   /* ---------------------------- canvas resize ---------------------------- */
@@ -873,10 +902,19 @@ export default function BuilderPage() {
     setOpenDropdown(null)
   }
 
+  const onContext = (e: React.MouseEvent) => {
+    e.preventDefault()
+    const { hit } = hitNode(e)
+    if (hit) setMenu({ x: e.clientX, y: e.clientY, idx: hit.idx })
+    else setMenu(null)
+  }
+
   /* ----------------- close ring dropdown on outside click ---------------- */
   useEffect(() => {
     const onDown = (e: MouseEvent) => {
       const t = e.target as HTMLElement
+      if (t.closest('[data-ctx-menu]')) return
+      setMenu(null)
       if (t.closest('[data-ring-ui]')) return
       if (t.tagName === 'CANVAS') return
       setOpenDropdown(null)
@@ -949,6 +987,18 @@ export default function BuilderPage() {
                 <img src={iconMap[n.name]} alt={n.name} width={18} height={18} style={{ objectFit: 'contain' }} />
                 <span style={{ fontSize: 12, color: '#fff' }}>{n.name}</span>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: n.configured ? '#25D366' : '#FF6B00' }} />
+                <span
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    removeNodeAt(i)
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+                  onMouseLeave={(e) => (e.currentTarget.style.color = '#6b7280')}
+                  title="Remove node"
+                  style={{ color: '#6b7280', fontSize: 13, lineHeight: 1, cursor: 'pointer', marginLeft: 2 }}
+                >
+                  ✕
+                </span>
               </div>
             ))}
           {countInRing(nodes, openDropdown) < ringConfig(openDropdown).capacity && (
@@ -973,6 +1023,7 @@ export default function BuilderPage() {
             onMouseMove={onMove}
             onMouseLeave={() => setHovered(null)}
             onClick={onClick}
+            onContextMenu={onContext}
             style={{ display: 'block', width: '100%', height: '100%' }}
           />
 
@@ -1008,6 +1059,7 @@ export default function BuilderPage() {
               }}
               onChange={(patch) => updateNode(configIdx, patch)}
               onCred={(key, val) => updateCred(configIdx, key, val)}
+              onRemove={() => removeNodeAt(configIdx)}
             />
           )}
         </aside>
@@ -1066,6 +1118,20 @@ export default function BuilderPage() {
               ))}
               {filteredPicker.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 24 }}>No integrations match.</div>}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* ===================== RIGHT-CLICK CONTEXT MENU ================ */}
+      {menu && (
+        <div data-ctx-menu style={{ position: 'fixed', left: menu.x, top: menu.y, zIndex: 300, background: '#0d0f1e', border: '0.5px solid #1e2240', borderRadius: 8, padding: 4 }}>
+          <div
+            onClick={() => removeNodeAt(menu.idx)}
+            onMouseEnter={(e) => (e.currentTarget.style.background = '#1a1020')}
+            onMouseLeave={(e) => (e.currentTarget.style.background = 'transparent')}
+            style={{ color: '#ef4444', fontSize: 13, padding: '6px 12px', cursor: 'pointer', borderRadius: 6, whiteSpace: 'nowrap' }}
+          >
+            Remove node
           </div>
         </div>
       )}
