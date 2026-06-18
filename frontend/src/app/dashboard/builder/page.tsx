@@ -117,7 +117,59 @@ const INTEGRATIONS: IntMeta[] = [
 ]
 
 const iconUrlFor = (m: IntMeta) => `https://cdn.simpleicons.org/${m.slug}/${m.hex}`
-const iconMap: Record<string, string> = Object.fromEntries(INTEGRATIONS.map((m) => [m.name, iconUrlFor(m)]))
+/* All canvas + DOM icons as static URLs, preloaded once into a module cache. */
+const ICON_URLS: Record<string, string> = {
+  WhatsApp: 'https://cdn.simpleicons.org/whatsapp/25D366',
+  Gmail: 'https://cdn.simpleicons.org/gmail/EA4335',
+  Telegram: 'https://cdn.simpleicons.org/telegram/2AABEE',
+  'Google Sheets': 'https://cdn.simpleicons.org/googlesheets/34A853',
+  Razorpay: 'https://cdn.simpleicons.org/razorpay/2D9CDB',
+  Webhook: 'https://cdn.simpleicons.org/webhook/FF6B00',
+  'Google Forms': 'https://cdn.simpleicons.org/googleforms/673AB7',
+  SMS: 'https://cdn.simpleicons.org/minutemailer/FF6B00',
+  'Google Calendar': 'https://cdn.simpleicons.org/googlecalendar/4285F4',
+  Notion: 'https://cdn.simpleicons.org/notion/ffffff',
+  Slack: 'https://cdn.simpleicons.org/slack/E01E5A',
+  Airtable: 'https://cdn.simpleicons.org/airtable/18BFFF',
+  'Google Drive': 'https://cdn.simpleicons.org/googledrive/4285F4',
+  Shopify: 'https://cdn.simpleicons.org/shopify/96BF48',
+  Discord: 'https://cdn.simpleicons.org/discord/5865F2',
+  Stripe: 'https://cdn.simpleicons.org/stripe/635BFF',
+  HubSpot: 'https://cdn.simpleicons.org/hubspot/FF7A59',
+  Jira: 'https://cdn.simpleicons.org/jira/0052CC',
+  LinkedIn: 'https://cdn.simpleicons.org/linkedin/0A66C2',
+  YouTube: 'https://cdn.simpleicons.org/youtube/FF0000',
+  MySQL: 'https://cdn.simpleicons.org/mysql/4479A1',
+  'Custom HTTP': 'https://cdn.simpleicons.org/curl/6b7280',
+  AI: 'https://cdn.simpleicons.org/anthropic/FF6B00',
+}
+// DOM <img> elements reuse the exact same URLs as the canvas.
+const iconMap: Record<string, string> = ICON_URLS
+
+// Module-level cache: survives component remounts, so icons never reload → no flash.
+const GLOBAL_IMAGE_CACHE: Record<string, HTMLImageElement> = {}
+
+function preloadAllIcons(): Promise<void[]> {
+  return Promise.all(
+    Object.entries(ICON_URLS).map(
+      ([name, url]) =>
+        new Promise<void>((resolve) => {
+          if (GLOBAL_IMAGE_CACHE[name]?.complete) {
+            resolve()
+            return
+          }
+          const img = new Image()
+          img.crossOrigin = 'anonymous'
+          img.onload = () => {
+            GLOBAL_IMAGE_CACHE[name] = img
+            resolve()
+          }
+          img.onerror = () => resolve()
+          img.src = url
+        })
+    )
+  )
+}
 const metaByName: Record<string, IntMeta> = Object.fromEntries(INTEGRATIONS.map((m) => [m.name, m]))
 
 /** Each integration's OWN brand colour — node border/glow/fallback use this. */
@@ -759,9 +811,9 @@ export default function BuilderPage() {
   const wrapRef = useRef<HTMLDivElement>(null)
   const animFrameRef = useRef<number>(0)
   const ringAnglesRef = useRef<number[]>([])
-  const imageCache = useRef<Record<string, HTMLImageElement>>({})
   const sunPulseRef = useRef(0)
-  const sizeRef = useRef({ w: 0, h: 0 })
+  const canvasSizeRef = useRef({ w: 0, h: 0 })
+  const iconsLoadedRef = useRef(false)
   const nodePositionsRef = useRef<{ idx: number; x: number; y: number }[]>([])
 
   const [nodes, setNodes] = useState<AgentNode[]>(() => [createNode(INTEGRATIONS[0], 0)])
@@ -777,10 +829,10 @@ export default function BuilderPage() {
 
   // Refs mirror state so the single RAF loop + native handlers read fresh values.
   const nodesRef = useRef(nodes)
-  const activeRef = useRef(activeIdx)
+  const activeIdxRef = useRef(activeIdx)
   const commanderRef = useRef(commander)
   nodesRef.current = nodes
-  activeRef.current = activeIdx
+  activeIdxRef.current = activeIdx
   commanderRef.current = commander
 
   const maxRing = nodes.reduce((m, n) => Math.max(m, n.ring), 0)
@@ -789,41 +841,7 @@ export default function BuilderPage() {
   const configNode = configIdx !== null ? nodes[configIdx] : null
   const configRingColor = configNode ? ringConfig(configNode.ring).color : PLASMA.orange
 
-  /* --------------------------- icon preloading --------------------------- */
-  const preloadIcons = useCallback((list: AgentNode[]) => {
-    return Promise.all(
-      list.map(
-        (n) =>
-          new Promise<void>((resolve) => {
-            const cached = imageCache.current[n.name]
-            if (cached && cached.complete && cached.naturalWidth > 0) return resolve()
-            const img = new Image()
-            img.crossOrigin = 'anonymous'
-            img.onload = () => {
-              imageCache.current[n.name] = img
-              resolve()
-            }
-            img.onerror = () => resolve()
-            img.src = iconMap[n.name] || n.iconUrl || ''
-          })
-      )
-    )
-  }, [])
-
-  useEffect(() => {
-    preloadIcons(nodes)
-  }, [nodes, preloadIcons])
-
-  // sun icon (anthropic mark) — cached under a reserved key
-  useEffect(() => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      imageCache.current['__sun__'] = img
-    }
-    img.onerror = () => {}
-    img.src = SUN_ICON
-  }, [])
+  /* icons are preloaded once at mount via preloadAllIcons() — see RAF effect below */
 
   /* ------------------------------ mutations ------------------------------ */
   const addNode = useCallback((meta: IntMeta, ringIndex?: number) => {
@@ -877,7 +895,7 @@ export default function BuilderPage() {
       const dpr = window.devicePixelRatio || 1
       const w = wrap.clientWidth
       const h = wrap.clientHeight
-      sizeRef.current = { w, h }
+      canvasSizeRef.current = { w, h }
       canvas.width = Math.round(w * dpr)
       canvas.height = Math.round(h * dpr)
       canvas.style.width = `${w}px`
@@ -895,21 +913,26 @@ export default function BuilderPage() {
     }
   }, [])
 
-  /* ---------------------------- animation loop --------------------------- */
-  useEffect(() => {
-    let running = true
+  /* ----------------------- animation loop (refs only) -------------------- */
+  // draw never reads useState — only refs + the module image cache — so React
+  // re-renders cannot restart or disturb the RAF loop. Stable identity ([] deps).
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext('2d')
+    if (!ctx) return
+    const w = canvasSizeRef.current.w
+    const h = canvasSizeRef.current.h
+    if (!w || !h) {
+      animFrameRef.current = requestAnimationFrame(draw)
+      return
+    }
 
-    const drawFrame = () => {
-      const canvas = canvasRef.current
-      const ctx = canvas?.getContext('2d')
-      const { w, h } = sizeRef.current
-      if (!canvas || !ctx || !w || !h) return
-
-      const CX = w / 2
-      const CY = h / 2
-      const ns = nodesRef.current
-      const active = activeRef.current
-      const rings = ns.reduce((m, n) => Math.max(m, n.ring), 0) + 1
+    const CX = w / 2
+    const CY = h / 2
+    const ns = nodesRef.current
+    const active = activeIdxRef.current
+    const rings = ns.reduce((m, n) => Math.max(m, n.ring), 0) + 1
 
       // background is CSS on the wrapper — never fill it here (causes flicker)
       ctx.clearRect(0, 0, w, h)
@@ -943,7 +966,7 @@ export default function BuilderPage() {
       ctx.strokeStyle = '#FF6B00'
       ctx.lineWidth = 2
       ctx.stroke()
-      const sunImg = imageCache.current['__sun__']
+      const sunImg = GLOBAL_IMAGE_CACHE['AI']
       if (sunImg && sunImg.complete && sunImg.naturalWidth > 0) {
         ctx.drawImage(sunImg, CX - 9, CY - 9, 18, 18)
       } else {
@@ -995,7 +1018,7 @@ export default function BuilderPage() {
           ctx.lineWidth = isActive ? 2 : 1
           ctx.stroke()
 
-          const img = imageCache.current[node.name]
+          const img = GLOBAL_IMAGE_CACHE[node.name]
           if (img && img.complete && img.naturalWidth > 0) {
             ctx.drawImage(img, x - 11, y - 11, 22, 22)
           } else {
@@ -1003,7 +1026,7 @@ export default function BuilderPage() {
             ctx.font = `500 9px ${CANVAS_FONT}`
             ctx.textAlign = 'center'
             ctx.textBaseline = 'middle'
-            ctx.fillText(node.name.slice(0, 2), x, y)
+            ctx.fillText(node.name.slice(0, 2).toUpperCase(), x, y)
           }
 
           // configured status dot
@@ -1014,21 +1037,20 @@ export default function BuilderPage() {
         })
       }
       nodePositionsRef.current = positions
-    }
 
-    const render = () => {
-      if (!running) return
-      drawFrame()
-      animFrameRef.current = requestAnimationFrame(render)
-    }
-    // cancel any frame already in flight before starting a fresh loop
-    if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
-    animFrameRef.current = requestAnimationFrame(render)
+    animFrameRef.current = requestAnimationFrame(draw)
+  }, [])
+
+  // Start the loop once on mount + preload every icon upfront into the module cache.
+  useEffect(() => {
+    preloadAllIcons().then(() => {
+      iconsLoadedRef.current = true
+    })
+    animFrameRef.current = requestAnimationFrame(draw)
     return () => {
-      running = false
       if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     }
-  }, [])
+  }, [draw])
 
   /* ------------------------- canvas interaction -------------------------- */
   const hitNode = (e: React.MouseEvent) => {
@@ -1055,7 +1077,7 @@ export default function BuilderPage() {
       setSunOpen(false)
       return
     }
-    const { w, h } = sizeRef.current
+    const { w, h } = canvasSizeRef.current
     if (Math.hypot(w / 2 - mx, h / 2 - my) <= 30) {
       // sun → open the AI Commander config panel
       setActiveIdx(-1)
