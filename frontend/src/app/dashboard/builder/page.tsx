@@ -66,6 +66,15 @@ interface IntMeta {
   color: string // brand colour (with #)
 }
 
+interface Star {
+  x: number // 0-1, multiply by W when drawing
+  y: number // 0-1, multiply by H when drawing
+  r: number
+  opacity: number
+  twinkleSpeed: number
+  twinkleOffset: number
+}
+
 type FieldType = 'text' | 'password' | 'email' | 'textarea' | 'select' | 'toggle'
 
 interface CredField {
@@ -814,6 +823,8 @@ export default function BuilderPage() {
   const sunPulseRef = useRef(0)
   const canvasSizeRef = useRef({ w: 0, h: 0 })
   const iconsLoadedRef = useRef(false)
+  const starsRef = useRef<Star[]>([])
+  const twinkleTimeRef = useRef(0)
   const nodePositionsRef = useRef<{ idx: number; x: number; y: number }[]>([])
 
   const [nodes, setNodes] = useState<AgentNode[]>(() => [createNode(INTEGRATIONS[0], 0)])
@@ -934,8 +945,28 @@ export default function BuilderPage() {
     const active = activeIdxRef.current
     const rings = ns.reduce((m, n) => Math.max(m, n.ring), 0) + 1
 
-      // background is CSS on the wrapper — never fill it here (causes flicker)
+      // canvas stays transparent — the wrapper CSS paints the night sky
       ctx.clearRect(0, 0, w, h)
+
+      // nebula glow behind the sun
+      const neb = ctx.createRadialGradient(CX, CY, 0, CX, CY, 200)
+      neb.addColorStop(0, 'rgba(123, 47, 255, 0.06)')
+      neb.addColorStop(1, 'rgba(0, 0, 0, 0)')
+      ctx.beginPath()
+      ctx.arc(CX, CY, 200, 0, Math.PI * 2)
+      ctx.fillStyle = neb
+      ctx.fill()
+
+      // twinkling star field (drawn first, behind everything)
+      twinkleTimeRef.current += 0.01
+      const twinkleTime = twinkleTimeRef.current
+      starsRef.current.forEach((star) => {
+        const twinkle = Math.sin(twinkleTime * star.twinkleSpeed * 60 + star.twinkleOffset) * 0.3 + 0.7
+        ctx.beginPath()
+        ctx.arc(star.x * w, star.y * h, star.r, 0, Math.PI * 2)
+        ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity * twinkle})`
+        ctx.fill()
+      })
 
       const angles = ringAnglesRef.current
       for (let ri = 0; ri < rings; ri++) {
@@ -947,7 +978,7 @@ export default function BuilderPage() {
         const rc = ringConfig(ri)
         ctx.beginPath()
         ctx.arc(CX, CY, rc.radius, 0, Math.PI * 2)
-        ctx.strokeStyle = rc.color + '22'
+        ctx.strokeStyle = rc.color + '30'
         ctx.lineWidth = 1
         ctx.stroke()
       }
@@ -1043,6 +1074,14 @@ export default function BuilderPage() {
 
   // Start the loop once on mount + preload every icon upfront into the module cache.
   useEffect(() => {
+    starsRef.current = Array.from({ length: 150 }, () => ({
+      x: Math.random(),
+      y: Math.random(),
+      r: Math.random() * 1.2 + 0.3,
+      opacity: Math.random() * 0.6 + 0.2,
+      twinkleSpeed: Math.random() * 0.02 + 0.005,
+      twinkleOffset: Math.random() * Math.PI * 2,
+    }))
     preloadAllIcons().then(() => {
       iconsLoadedRef.current = true
     })
@@ -1208,7 +1247,7 @@ export default function BuilderPage() {
       <div style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
         <div
           ref={wrapRef}
-          style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: panelOpen ? `calc(100% - ${PANEL_W}px)` : '100%', background: PLASMA.bg, overflow: 'hidden', transition: 'width 0.25s ease' }}
+          style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: panelOpen ? `calc(100% - ${PANEL_W}px)` : '100%', background: '#020408', overflow: 'hidden', transition: 'width 0.25s ease' }}
         >
           <canvas
             ref={canvasRef}
@@ -1216,7 +1255,7 @@ export default function BuilderPage() {
             onMouseLeave={() => setHovered(null)}
             onClick={onClick}
             onContextMenu={onContext}
-            style={{ display: 'block', width: '100%', height: '100%' }}
+            style={{ display: 'block', width: '100%', height: '100%', background: 'transparent' }}
           />
 
           {hoveredNode && hovered && (
