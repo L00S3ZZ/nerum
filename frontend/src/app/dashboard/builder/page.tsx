@@ -1144,6 +1144,7 @@ export default function BuilderPage() {
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
   const [commander, setCommander] = useState<Commander>(initCommander)
   const [sunOpen, setSunOpen] = useState(false)
+  const [chatOpen, setChatOpen] = useState(false)
 
   // Refs mirror state so the single RAF loop + native handlers read fresh values.
   const nodesRef = useRef(nodes)
@@ -1596,7 +1597,7 @@ export default function BuilderPage() {
       <div style={{ flex: 1, position: 'relative', minHeight: 0, overflow: 'hidden' }}>
         <div
           ref={wrapRef}
-          style={{ position: 'absolute', top: 0, left: 0, bottom: 0, width: panelOpen ? `calc(100% - ${PANEL_W}px)` : '100%', background: '#020408', overflow: 'hidden', transition: 'width 0.25s ease' }}
+          style={{ position: 'absolute', top: 0, left: 0, bottom: chatOpen ? 'max(46vh, 300px)' : 0, width: panelOpen ? `calc(100% - ${PANEL_W}px)` : '100%', background: '#020408', overflow: 'hidden', transition: 'width 0.25s ease, bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)' }}
         >
           <canvas
             ref={canvasRef}
@@ -1732,7 +1733,7 @@ export default function BuilderPage() {
       )}
 
       {/* ===================== BOTTOM CHAT DRAWER ===================== */}
-      <AgentChatDrawer />
+      <AgentChatDrawer configOpen={panelOpen} open={chatOpen} onOpenChange={setChatOpen} />
 
       <style>{`
         .ncfg-field::placeholder { color: #4b5563; }

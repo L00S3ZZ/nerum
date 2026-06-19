@@ -22,6 +22,8 @@ type Role = 'user' | 'neru'
 interface Message { id: number; role: Role; text: string }
 type Status = 'idle' | 'thinking' | 'responding'
 
+const CONFIG_PANEL_W = 340 // matches the Builder node config side-panel width
+
 const STORAGE_KEY = 'neru_chat_v1'
 const GREETING: Message = {
   id: 0,
@@ -34,8 +36,7 @@ const SUGGESTIONS = [
   'Auto-reply to customer WhatsApp messages',
 ]
 
-export default function AgentChatDrawer() {
-  const [open, setOpen] = useState(false)
+export default function AgentChatDrawer({ configOpen = false, open, onOpenChange }: { configOpen?: boolean; open: boolean; onOpenChange: (v: boolean) => void }) {
   const [messages, setMessages] = useState<Message[]>([GREETING])
   const [input, setInput] = useState('')
   const [status, setStatus] = useState<Status>('idle')
@@ -123,15 +124,16 @@ export default function AgentChatDrawer() {
       {/* collapsed handle bar */}
       {!open && (
         <button
-          onClick={() => setOpen(true)}
+          onClick={() => onOpenChange(true)}
           aria-label="Open chat with Neru"
           style={{
             position: 'absolute',
             left: 0,
-            right: 0,
+            right: configOpen ? CONFIG_PANEL_W : 0,
             bottom: 0,
             height: 48,
             zIndex: 8,
+            transition: 'right 0.25s ease',
             display: 'flex',
             alignItems: 'center',
             gap: 10,
@@ -159,11 +161,12 @@ export default function AgentChatDrawer() {
             style={{
               position: 'absolute',
               left: 0,
-              right: 0,
+              right: configOpen ? CONFIG_PANEL_W : 0,
               bottom: 0,
               height: '46vh',
               minHeight: 300,
               zIndex: 8,
+              transition: 'right 0.25s ease',
               display: 'flex',
               flexDirection: 'column',
               background: '#07080F',
@@ -184,7 +187,7 @@ export default function AgentChatDrawer() {
               >
                 <Plus size={13} /> New
               </button>
-              <button onClick={() => setOpen(false)} aria-label="Collapse chat" style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 8, padding: 6, color: '#cdd0dd', cursor: 'pointer', display: 'inline-flex' }}>
+              <button onClick={() => onOpenChange(false)} aria-label="Collapse chat" style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 8, padding: 6, color: '#cdd0dd', cursor: 'pointer', display: 'inline-flex' }}>
                 <ChevronDown size={16} />
               </button>
             </div>
