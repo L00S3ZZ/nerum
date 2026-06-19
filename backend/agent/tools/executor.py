@@ -15,17 +15,34 @@ global Telegram bot, Resend, a shared Google service account). Per-user
 credentials only exist today for Razorpay, so ``self.credentials`` is consulted
 there and we fall back to the server settings everywhere else.
 """
+import asyncio
+import logging
+from datetime import datetime
+
 import httpx
 from fastapi import HTTPException
+from sqlalchemy import select
 
 from core.config import settings
+from core.database import AsyncSessionLocal
+from core.encryption import decrypt_data
+from models.models import UserDbConnection
 from services.email import send_email as svc_send_email
 from services.sheets import append_to_sheet, read_sheet
 from services.telegram import send_telegram_message as svc_send_telegram
 from services.whatsapp import send_whatsapp_message as svc_send_whatsapp
+from . import db_guard
 from .definitions import TOOL_NAMES
 
 RAZORPAY_PAYMENTS_URL = "https://api.razorpay.com/v1/payments"
+
+# Database integrations (query_database). Both limits are enforced on every query.
+DB_QUERY_TIMEOUT = 10   # seconds — skill Rule 3
+DB_MAX_ROWS = 1000      # rows — skill Rule 4
+
+logger = logging.getLogger("nerum.agent.db")
+
+_DB_DEFAULT_PORT = {"postgresql": 5432, "mysql": 3306, "mongodb": 27017}
 
 
 def _ok(result) -> dict:
@@ -283,3 +300,280 @@ class ToolExecutor:
             "Reading Gmail is not available yet. Nerum can send email "
             "(send_email) but cannot fetch inbox messages."
         )
+
+    # ── Database integrations (the "Database Soldier") ───────────────────────
+    async def _query_database(self, params: dict) -> dict:
+        """Run a query against one of the user's connected databases.
+
+        Safety contract (see .claude/skills/nerum-db-integrations):
+          * ownership-scoped lookup; credentials decrypted server-side only and
+            never logged or returned;
+          * every query is classified by db_guard BEFORE execution and rejected
+            if the connection's toggles don't permit it;
+          * 10s timeout AND 1000-row cap enforced together;
+          * the connection is opened per-call and always closed (never pooled).
+        """
+        connection_id = params.get("connection_id")
+        try:
+            connection_id = int(connection_id)
+        except (TypeError, ValueError):
+            return _err("connection_id (integer) is required.")
+
+        # 1. Ownership-scoped lookup via its own short-lived session.
+        try:
+            async with AsyncSessionLocal() as db:
+                row = (
+                    await db.scalars(
+                        select(UserDbConnection).where(
+                            UserDbConnection.id == connection_id,
+                            UserDbConnection.user_id == self.user_id,
+                        )
+                    )
+                ).first()
+                if row is None:
+                    return _err("Database connection not found.")
+                if not row.is_active:
+                    return _err("That database connection is disabled.")
+                db_type = row.db_type
+                allow_write = bool(row.allow_write)
+                allow_delete = bool(row.allow_delete)
+                encrypted = row.encrypted_credentials
+        except Exception:  # noqa: BLE001
+            return _err("Could not load the database connection.")
+
+        # 2. Decrypt server-side only — never logged, never returned.
+        try:
+            creds = decrypt_data(encrypted)
+        except Exception:  # noqa: BLE001
+            return _err("Stored credentials for this connection could not be read.")
+
+        # 3. Guard the query/operation BEFORE touching the database.
+        if db_type in ("postgresql", "mysql"):
+            query = params.get("query")
+            if not isinstance(query, str) or not query.strip():
+                return _err("A SQL 'query' string is required for this connection.")
+            sql_params = params.get("params") or []
+            if not isinstance(sql_params, list):
+                return _err("'params' must be a list of values for the SQL placeholders.")
+            verdict = db_guard.guard_sql(query, allow_write, allow_delete)
+        elif db_type == "mongodb":
+            mongo_op = params.get("mongo_operation")
+            if not isinstance(mongo_op, dict) or not mongo_op:
+                return _err("A 'mongo_operation' object is required for this connection.")
+            verdict = db_guard.guard_mongo(mongo_op, allow_write, allow_delete)
+        else:
+            return _err(f"Unsupported database type: {db_type}")
+
+        if not verdict["allowed"]:
+            logger.info(
+                "query_database REJECTED: connection_id=%s op_type=%s reason=%s",
+                connection_id, verdict.get("operation_type"), verdict.get("reason"),
+            )
+            return _err(verdict.get("reason") or "This query is not permitted on this connection.")
+
+        op_type = verdict["operation_type"]
+
+        # 4. Execute under BOTH the timeout and the row cap; always close.
+        try:
+            if db_type == "postgresql":
+                data = await asyncio.wait_for(
+                    self._db_run_postgres(creds, verdict["query"], sql_params, op_type),
+                    timeout=DB_QUERY_TIMEOUT,
+                )
+            elif db_type == "mysql":
+                data = await asyncio.wait_for(
+                    self._db_run_mysql(creds, verdict["query"], sql_params, op_type),
+                    timeout=DB_QUERY_TIMEOUT,
+                )
+            else:  # mongodb
+                data = await asyncio.wait_for(
+                    self._db_run_mongo(creds, mongo_op, op_type),
+                    timeout=DB_QUERY_TIMEOUT,
+                )
+        except asyncio.TimeoutError:
+            return _err(f"The query exceeded the {DB_QUERY_TIMEOUT}s limit and was cancelled.")
+        except Exception:  # noqa: BLE001 — raw driver errors may carry host/creds
+            return _err("The database query failed. Check the query and the connection settings.")
+
+        # 5. Best-effort usage stamp.
+        try:
+            async with AsyncSessionLocal() as db:
+                r = await db.get(UserDbConnection, connection_id)
+                if r:
+                    r.last_used_at = datetime.utcnow()
+                    await db.commit()
+        except Exception:  # noqa: BLE001
+            pass
+
+        # 6. Success — operation type + results only, never credentials.
+        return _ok({"operation_type": op_type, **data})
+
+    async def _db_run_postgres(self, creds: dict, query: str, params: list, op_type: str) -> dict:
+        import asyncpg
+
+        conn = await _pg_connect(creds)
+        try:
+            if op_type == "read":
+                rows: list[dict] = []
+                async with conn.transaction():
+                    # Server-side statement timeout (belt) — asyncio.wait_for is the
+                    # suspenders. Cursor stops at DB_MAX_ROWS (mechanism b).
+                    await conn.execute(f"SET LOCAL statement_timeout = {DB_QUERY_TIMEOUT * 1000}")
+                    async for record in conn.cursor(query, *params):
+                        rows.append(dict(record))
+                        if len(rows) >= DB_MAX_ROWS:
+                            break
+                return {"rows": rows, "row_count": len(rows)}
+            status = await conn.execute(query, *params)  # e.g. "UPDATE 5"
+            return {"rows": None, "row_count": _affected_from_status(status), "status": status}
+        finally:
+            await conn.close()
+
+    async def _db_run_mysql(self, creds: dict, query: str, params: list, op_type: str) -> dict:
+        import asyncmy
+
+        conn = await asyncmy.connect(
+            host=creds.get("host"),
+            port=int(creds.get("port") or _DB_DEFAULT_PORT["mysql"]),
+            user=creds.get("user"),
+            password=creds.get("password") or "",
+            database=creds.get("database"),
+            connect_timeout=DB_QUERY_TIMEOUT,
+        )
+        try:
+            async with conn.cursor() as cur:
+                # Server-side cap for SELECTs where supported (MySQL 5.7.8+); ignored
+                # elsewhere. asyncio.wait_for remains the hard stop.
+                try:
+                    await cur.execute(f"SET SESSION max_execution_time={DB_QUERY_TIMEOUT * 1000}")
+                except Exception:  # noqa: BLE001 — MariaDB / older MySQL lack this var
+                    pass
+                await cur.execute(query, tuple(params) if params else None)
+                if op_type == "read":
+                    fetched = await cur.fetchmany(DB_MAX_ROWS)  # caps the read (mechanism b)
+                    columns = [d[0] for d in (cur.description or [])]
+                    rows = [dict(zip(columns, r)) for r in fetched]
+                    return {"rows": rows, "row_count": len(rows)}
+                await conn.commit()  # asyncmy is not autocommit — persist the write
+                return {"rows": None, "row_count": cur.rowcount}
+        finally:
+            conn.close()
+
+    async def _db_run_mongo(self, creds: dict, op: dict, op_type: str) -> dict:
+        from motor.motor_asyncio import AsyncIOMotorClient
+
+        client = _mongo_client(creds)
+        try:
+            db_name = op.get("database") or creds.get("database")
+            database = client[db_name] if db_name else client.get_default_database()
+            coll_name = op.get("collection")
+            name = str(op.get("operation") or "").lower()
+            max_ms = DB_QUERY_TIMEOUT * 1000
+
+            # Collection-level admin ops first.
+            if name == "dropdatabase":
+                await client.drop_database(database.name)
+                return {"rows": None, "row_count": None, "result": "database dropped"}
+            if not coll_name:
+                return {"rows": None, "row_count": None, "result": "collection is required"}
+            coll = database[coll_name]
+
+            if name == "find":
+                cursor = coll.find(
+                    op.get("filter") or {},
+                    op.get("projection"),
+                    max_time_ms=max_ms,
+                ).limit(DB_MAX_ROWS)  # caps the read (mechanism b)
+                docs = await cursor.to_list(length=DB_MAX_ROWS)
+                return {"rows": docs, "row_count": len(docs)}
+            if name == "aggregate":
+                pipeline = list(op.get("pipeline") or []) + [{"$limit": DB_MAX_ROWS}]
+                cursor = coll.aggregate(pipeline, maxTimeMS=max_ms)
+                docs = await cursor.to_list(length=DB_MAX_ROWS)
+                return {"rows": docs, "row_count": len(docs)}
+            if name in ("countdocuments", "count"):
+                n = await coll.count_documents(op.get("filter") or {}, maxTimeMS=max_ms)
+                return {"rows": None, "row_count": n, "result": n}
+            if name == "distinct":
+                vals = await coll.distinct(op.get("field") or op.get("key"), op.get("filter") or {})
+                return {"rows": vals[:DB_MAX_ROWS], "row_count": len(vals[:DB_MAX_ROWS])}
+
+            # Writes
+            if name == "insertone":
+                res = await coll.insert_one(op.get("document") or {})
+                return {"rows": None, "row_count": 1, "result": str(res.inserted_id)}
+            if name == "insertmany":
+                res = await coll.insert_many(op.get("documents") or [])
+                return {"rows": None, "row_count": len(res.inserted_ids)}
+            if name in ("updateone", "updatemany"):
+                fn = coll.update_one if name == "updateone" else coll.update_many
+                res = await fn(op.get("filter") or {}, op.get("update") or {})
+                return {"rows": None, "row_count": res.modified_count}
+            if name == "replaceone":
+                res = await coll.replace_one(op.get("filter") or {}, op.get("document") or op.get("replacement") or {})
+                return {"rows": None, "row_count": res.modified_count}
+            if name in ("findoneandupdate", "findoneandreplace"):
+                fn = coll.find_one_and_update if name == "findoneandupdate" else coll.find_one_and_replace
+                doc = await fn(op.get("filter") or {}, op.get("update") or op.get("document") or {})
+                return {"rows": [doc] if doc else [], "row_count": 1 if doc else 0}
+
+            # Destructive
+            if name in ("deleteone", "deletemany"):
+                fn = coll.delete_one if name == "deleteone" else coll.delete_many
+                res = await fn(op.get("filter") or {})
+                return {"rows": None, "row_count": res.deleted_count}
+            if name == "findoneanddelete":
+                doc = await coll.find_one_and_delete(op.get("filter") or {})
+                return {"rows": [doc] if doc else [], "row_count": 1 if doc else 0}
+            if name in ("drop", "dropcollection"):
+                await coll.drop()
+                return {"rows": None, "row_count": None, "result": "collection dropped"}
+            if name == "renamecollection":
+                await coll.rename(op.get("new_name") or op.get("to"))
+                return {"rows": None, "row_count": None, "result": "collection renamed"}
+
+            # Should be unreachable — the guard only allows known operations.
+            return {"rows": None, "row_count": None, "result": "operation not executed"}
+        finally:
+            client.close()
+
+
+# ── database connection helpers (lazy-imported drivers; short-lived) ─────────
+async def _pg_connect(creds: dict):
+    import asyncpg
+
+    if creds.get("uri"):
+        return await asyncpg.connect(dsn=creds["uri"], timeout=DB_QUERY_TIMEOUT)
+    return await asyncpg.connect(
+        host=creds.get("host"),
+        port=int(creds.get("port") or _DB_DEFAULT_PORT["postgresql"]),
+        user=creds.get("user"),
+        password=creds.get("password"),
+        database=creds.get("database"),
+        ssl=creds.get("ssl"),
+        timeout=DB_QUERY_TIMEOUT,
+    )
+
+
+def _mongo_client(creds: dict):
+    from motor.motor_asyncio import AsyncIOMotorClient
+
+    ms = DB_QUERY_TIMEOUT * 1000
+    if creds.get("uri"):
+        return AsyncIOMotorClient(creds["uri"], serverSelectionTimeoutMS=ms)
+    return AsyncIOMotorClient(
+        host=creds.get("host"),
+        port=int(creds.get("port") or _DB_DEFAULT_PORT["mongodb"]),
+        username=creds.get("user"),
+        password=creds.get("password"),
+        serverSelectionTimeoutMS=ms,
+    )
+
+
+def _affected_from_status(status: str) -> int | None:
+    """Pull the affected-row count out of an asyncpg command status like
+    'UPDATE 5' / 'DELETE 2' / 'INSERT 0 3'. Returns None if not parseable."""
+    try:
+        return int(str(status).split()[-1])
+    except (ValueError, IndexError, AttributeError):
+        return None

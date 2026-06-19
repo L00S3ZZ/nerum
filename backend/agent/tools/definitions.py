@@ -237,6 +237,69 @@ TOOLS_LIST = [
         },
     },
     {
+        "name": "query_database",
+        "description": (
+            "Query one of the user's connected databases (PostgreSQL, MySQL, or "
+            "MongoDB). Use this when the user asks about data that lives in their own "
+            "database. You can ONLY use connections the user has already added — "
+            "refer to them by connection_id. Read access (SELECT / find) is always "
+            "allowed. Writes (INSERT/UPDATE) and deletes (DELETE/DROP/etc.) are only "
+            "allowed if the user enabled them for that specific connection; if a "
+            "write or delete is blocked the result will say so — do not retry the "
+            "same blocked operation, just tell the user it isn't enabled. For SQL "
+            "connections put the statement in 'query' (one statement only) and pass "
+            "any values via 'params' as bound parameters — never build the SQL by "
+            "concatenating values. For MongoDB connections use 'mongo_operation' "
+            "instead. Results are capped at 1000 rows."
+        ),
+        "input_schema": {
+            "type": "object",
+            "properties": {
+                "connection_id": {
+                    "type": "integer",
+                    "description": "Which of the user's database connections to query.",
+                },
+                "query": {
+                    "type": "string",
+                    "description": (
+                        "SQL text for PostgreSQL/MySQL connections. Exactly ONE "
+                        "statement. Use placeholders for values (PostgreSQL: $1,$2; "
+                        "MySQL: %s) and supply them in 'params'."
+                    ),
+                },
+                "params": {
+                    "type": "array",
+                    "description": (
+                        "Bound parameter values for the SQL placeholders, in order. "
+                        "Never interpolate values directly into 'query'."
+                    ),
+                    "items": {},
+                },
+                "mongo_operation": {
+                    "type": "object",
+                    "description": (
+                        "For MongoDB connections only. Structured operation, e.g. "
+                        "{\"operation\": \"find\", \"collection\": \"orders\", "
+                        "\"filter\": {\"status\": \"paid\"}}. Supports reads (find, "
+                        "aggregate, countDocuments, distinct) and, when enabled, "
+                        "writes (insertOne, updateMany, …) and deletes (deleteMany, "
+                        "drop, …)."
+                    ),
+                    "properties": {
+                        "operation": {"type": "string", "description": "e.g. find, aggregate, insertOne, deleteMany."},
+                        "collection": {"type": "string", "description": "Target collection name."},
+                        "filter": {"type": "object", "description": "Query filter for find/update/delete."},
+                        "document": {"type": "object", "description": "Document for insertOne."},
+                        "documents": {"type": "array", "description": "Documents for insertMany.", "items": {"type": "object"}},
+                        "update": {"type": "object", "description": "Update spec for update operations."},
+                        "pipeline": {"type": "array", "description": "Stages for aggregate.", "items": {"type": "object"}},
+                    },
+                },
+            },
+            "required": ["connection_id"],
+        },
+    },
+    {
         "name": "fetch_gmail_emails",
         "description": (
             "Fetch emails from a Gmail inbox. Use when the user wants to process "
