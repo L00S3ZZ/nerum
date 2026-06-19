@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { LayoutDashboard, Workflow, LayoutGrid, Boxes, Settings, Bell, User, LogOut, LucideIcon } from 'lucide-react'
+import { LayoutDashboard, Workflow, LayoutGrid, Boxes, Database, Settings, Bell, User, LogOut, LucideIcon } from 'lucide-react'
 
 interface Tab {
   label: string
@@ -17,6 +17,7 @@ const TABS: Tab[] = [
   { label: 'Builder', href: '/dashboard/builder', icon: Workflow },
   { label: 'Templates', href: '/dashboard/templates', icon: LayoutGrid },
   { label: 'Integrations', href: '/dashboard/integrations', icon: Boxes },
+  { label: 'Databases', href: '/dashboard/databases', icon: Database },
 ]
 
 function isActive(pathname: string, href: string) {

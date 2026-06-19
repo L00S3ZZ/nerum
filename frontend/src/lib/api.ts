@@ -46,6 +46,9 @@ export const api = {
   put<T>(path: string, body?: unknown): Promise<T> {
     return fetch(`${API_URL}${path}`, { method: 'PUT', headers: authHeaders(), body: body ? JSON.stringify(body) : undefined }).then(handle<T>)
   },
+  patch<T>(path: string, body?: unknown): Promise<T> {
+    return fetch(`${API_URL}${path}`, { method: 'PATCH', headers: authHeaders(), body: body ? JSON.stringify(body) : undefined }).then(handle<T>)
+  },
   del<T>(path: string): Promise<T> {
     return fetch(`${API_URL}${path}`, { method: 'DELETE', headers: authHeaders() }).then(handle<T>)
   },
