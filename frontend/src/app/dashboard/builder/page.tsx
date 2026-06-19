@@ -41,6 +41,7 @@ interface AgentNode {
   ring: number
   iconUrl: string
   brandColor: string
+  nodeType: 'soldier' | 'trigger' | 'logic'
   credentials: Record<string, string>
   action: string
   message: string
@@ -75,7 +76,7 @@ interface Star {
   twinkleOffset: number
 }
 
-type FieldType = 'text' | 'password' | 'email' | 'textarea' | 'select' | 'toggle'
+type FieldType = 'text' | 'password' | 'email' | 'textarea' | 'select' | 'toggle' | 'number' | 'date' | 'nodeselect'
 
 interface CredField {
   key: string
@@ -155,22 +156,49 @@ const ICON_URLS: Record<string, string> = {
 // DOM <img> elements reuse the exact same URLs as the canvas.
 const iconMap: Record<string, string> = ICON_URLS
 
-// Module-level cache: survives component remounts, so icons never reload → no flash.
+/* Trigger + Logic palettes for the picker (name, sub, icon URL). */
+interface SpecialMeta {
+  name: string
+  sub: string
+  icon: string
+}
+const TRIGGERS: SpecialMeta[] = [
+  { name: 'Schedule', sub: 'Run every X minutes/hours/days', icon: 'https://cdn.simpleicons.org/clockify/FFD60A' },
+  { name: 'Webhook', sub: 'Triggered by HTTP POST request', icon: 'https://cdn.simpleicons.org/webhooks/FFD60A' },
+  { name: 'WhatsApp Msg', sub: 'Incoming WhatsApp message', icon: 'https://cdn.simpleicons.org/whatsapp/FFD60A' },
+  { name: 'Email Received', sub: 'New email in Gmail inbox', icon: 'https://cdn.simpleicons.org/gmail/FFD60A' },
+  { name: 'Form Submit', sub: 'Google Form submitted', icon: 'https://cdn.simpleicons.org/googleforms/FFD60A' },
+  { name: 'Payment Done', sub: 'Razorpay payment captured', icon: 'https://cdn.simpleicons.org/razorpay/FFD60A' },
+  { name: 'New Sheet Row', sub: 'New row added in Google Sheets', icon: 'https://cdn.simpleicons.org/googlesheets/FFD60A' },
+  { name: 'New Lead', sub: 'New contact in HubSpot/Airtable', icon: 'https://cdn.simpleicons.org/hubspot/FFD60A' },
+  { name: 'Manual Run', sub: 'Triggered manually by user', icon: 'https://cdn.simpleicons.org/hand/FFD60A' },
+]
+const LOGIC: SpecialMeta[] = [
+  { name: 'If / Else', sub: 'Branch based on a condition', icon: 'https://cdn.simpleicons.org/undertale/00D4FF' },
+  { name: 'Filter', sub: 'Stop if condition not met', icon: 'https://cdn.simpleicons.org/v8/00D4FF' },
+  { name: 'Switch', sub: 'Route to different paths by value', icon: 'https://cdn.simpleicons.org/traefikmesh/00D4FF' },
+  { name: 'Wait', sub: 'Delay before next step runs', icon: 'https://cdn.simpleicons.org/clockify/00D4FF' },
+  { name: 'Loop', sub: 'Repeat for each item in list', icon: 'https://cdn.simpleicons.org/myob/00D4FF' },
+  { name: 'Split', sub: 'Run multiple paths in parallel', icon: 'https://cdn.simpleicons.org/buffer/00D4FF' },
+]
+
+// Module-level cache, keyed by URL (so identical names across categories never collide).
 const GLOBAL_IMAGE_CACHE: Record<string, HTMLImageElement> = {}
 
 function preloadAllIcons(): Promise<void[]> {
+  const urls = Array.from(new Set([...Object.values(ICON_URLS), ...TRIGGERS.map((t) => t.icon), ...LOGIC.map((l) => l.icon)]))
   return Promise.all(
-    Object.entries(ICON_URLS).map(
-      ([name, url]) =>
+    urls.map(
+      (url) =>
         new Promise<void>((resolve) => {
-          if (GLOBAL_IMAGE_CACHE[name]?.complete) {
+          if (GLOBAL_IMAGE_CACHE[url]?.complete) {
             resolve()
             return
           }
           const img = new Image()
           img.crossOrigin = 'anonymous'
           img.onload = () => {
-            GLOBAL_IMAGE_CACHE[name] = img
+            GLOBAL_IMAGE_CACHE[url] = img
             resolve()
           }
           img.onerror = () => resolve()
@@ -205,8 +233,60 @@ const BRAND_COLORS: Record<string, string> = {
   YouTube: '#FF0000',
   MySQL: '#4479A1',
   'Custom HTTP': '#6b7280',
+  // triggers (yellow) — 'Webhook' already mapped above
+  Schedule: '#FFD60A',
+  'WhatsApp Msg': '#FFD60A',
+  'Email Received': '#FFD60A',
+  'Form Submit': '#FFD60A',
+  'Payment Done': '#FFD60A',
+  'New Sheet Row': '#FFD60A',
+  'New Lead': '#FFD60A',
+  'Manual Run': '#FFD60A',
+  // logic (cyan)
+  'If / Else': '#00D4FF',
+  Filter: '#00D4FF',
+  Switch: '#00D4FF',
+  Wait: '#00D4FF',
+  Loop: '#00D4FF',
+  Split: '#00D4FF',
 }
-const brandColor = (name: string) => BRAND_COLORS[name] ?? '#6b7280'
+const OPERATORS = ['equals', 'not equals', 'contains', 'not contains', 'greater than', 'less than', 'is empty', 'is not empty']
+
+/* Special node shapes — star for triggers, diamond for logic. */
+function drawStar(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, isActive: boolean) {
+  const spikes = 5
+  const outerR = r
+  const innerR = r * 0.5
+  ctx.beginPath()
+  for (let i = 0; i < spikes * 2; i++) {
+    const angle = (i * Math.PI) / spikes - Math.PI / 2
+    const radius = i % 2 === 0 ? outerR : innerR
+    const px = x + Math.cos(angle) * radius
+    const py = y + Math.sin(angle) * radius
+    if (i === 0) ctx.moveTo(px, py)
+    else ctx.lineTo(px, py)
+  }
+  ctx.closePath()
+  ctx.fillStyle = '#07080F'
+  ctx.fill()
+  ctx.strokeStyle = isActive ? color : color + '66'
+  ctx.lineWidth = isActive ? 2 : 1
+  ctx.stroke()
+}
+
+function drawDiamond(ctx: CanvasRenderingContext2D, x: number, y: number, r: number, color: string, isActive: boolean) {
+  ctx.beginPath()
+  ctx.moveTo(x, y - r)
+  ctx.lineTo(x + r, y)
+  ctx.lineTo(x, y + r)
+  ctx.lineTo(x - r, y)
+  ctx.closePath()
+  ctx.fillStyle = '#07080F'
+  ctx.fill()
+  ctx.strokeStyle = isActive ? color : color + '66'
+  ctx.lineWidth = isActive ? 2 : 1
+  ctx.stroke()
+}
 
 /* ------- per-integration credential + action config (researched A→Z) ------ */
 const PK = '-----BEGIN PRIVATE KEY-----\\n...'
@@ -477,6 +557,136 @@ function pickRing(list: AgentNode[]): number {
 const genId = () =>
   typeof globalThis.crypto?.randomUUID === 'function' ? globalThis.crypto.randomUUID() : Math.random().toString(36).slice(2)
 
+/* ----- credential + configuration field defs for trigger / logic nodes ---- */
+interface SpecialDef {
+  creds: CredField[]
+  config: CredField[]
+}
+const TRIGGER_DEFS: Record<string, SpecialDef> = {
+  Schedule: {
+    creds: [],
+    config: [
+      { key: 'Frequency', label: 'Frequency', type: 'select', defaultValue: 'Every 15 min', options: ['Every minute', 'Every 5 min', 'Every 15 min', 'Every hour', 'Every day', 'Every week', 'Custom cron'] },
+      { key: 'Custom Cron', label: 'Custom Cron', type: 'text', placeholder: '0 9 * * MON-FRI', showWhen: (c) => c['Frequency'] === 'Custom cron' },
+      { key: 'Timezone', label: 'Timezone', type: 'select', defaultValue: 'IST', options: ['IST', 'UTC', 'GST', 'EST', 'PST'] },
+      { key: 'Start Date', label: 'Start Date (optional)', type: 'date' },
+    ],
+  },
+  Webhook: {
+    creds: [{ key: 'Webhook URL', label: 'Webhook URL', type: 'text', readonly: true, help: 'Copy this URL and paste in your source app' }],
+    config: [
+      { key: 'Expected Method', label: 'Expected Method', type: 'select', defaultValue: 'POST', options: ['POST', 'GET', 'PUT'] },
+      { key: 'Secret Key', label: 'Secret Key', type: 'text', placeholder: 'Optional verification secret' },
+    ],
+  },
+  'WhatsApp Msg': {
+    creds: [
+      { key: 'Phone Number ID', label: 'Phone Number ID', type: 'text' },
+      { key: 'Access Token', label: 'Access Token', type: 'password' },
+    ],
+    config: [{ key: 'Filter keyword', label: 'Filter keyword', type: 'text', placeholder: 'Only trigger if message contains...' }],
+  },
+  'Email Received': {
+    creds: [
+      { key: 'Gmail Address', label: 'Gmail Address', type: 'email', placeholder: 'yourname@gmail.com' },
+      { key: 'App Password', label: 'App Password', type: 'password' },
+    ],
+    config: [
+      { key: 'Filter Subject', label: 'Filter Subject', type: 'text', placeholder: 'Only trigger if subject contains...' },
+      { key: 'Filter From', label: 'Filter From', type: 'text', placeholder: 'Only trigger if from this email' },
+    ],
+  },
+  'Form Submit': {
+    creds: [
+      { key: 'Form ID', label: 'Form ID', type: 'text' },
+      { key: 'Service Account Email', label: 'Service Account Email', type: 'email', placeholder: SA_EMAIL },
+      { key: 'Private Key', label: 'Private Key', type: 'textarea', rows: 3, placeholder: PK },
+    ],
+    config: [],
+  },
+  'Payment Done': {
+    creds: [
+      { key: 'Razorpay Key ID', label: 'Razorpay Key ID', type: 'text' },
+      { key: 'Razorpay Key Secret', label: 'Razorpay Key Secret', type: 'password' },
+    ],
+    config: [{ key: 'Event Type', label: 'Event Type', type: 'select', defaultValue: 'payment.captured', options: ['payment.captured', 'order.paid', 'refund.processed'] }],
+  },
+  'New Sheet Row': {
+    creds: [
+      { key: 'Service Account Email', label: 'Service Account Email', type: 'email', placeholder: SA_EMAIL },
+      { key: 'Private Key', label: 'Private Key', type: 'textarea', rows: 3, placeholder: PK },
+      { key: 'Spreadsheet ID', label: 'Spreadsheet ID', type: 'text' },
+    ],
+    config: [{ key: 'Sheet Name', label: 'Sheet Name', type: 'text', placeholder: 'Sheet1', defaultValue: 'Sheet1' }],
+  },
+  'New Lead': {
+    creds: [{ key: 'API Token', label: 'API Token', type: 'password', placeholder: 'HubSpot / Airtable token' }],
+    config: [],
+  },
+  'Manual Run': { creds: [], config: [] },
+}
+
+const LOGIC_DEFS: Record<string, SpecialDef> = {
+  'If / Else': {
+    creds: [],
+    config: [
+      { key: 'Condition Field', label: 'Condition Field', type: 'text', placeholder: '{{payment.amount}} or {{message.text}}' },
+      { key: 'Operator', label: 'Operator', type: 'select', defaultValue: 'equals', options: OPERATORS },
+      { key: 'Value', label: 'Value', type: 'text', placeholder: 'Value to compare against' },
+      { key: 'True Path', label: 'True Path → connects to', type: 'nodeselect' },
+      { key: 'False Path', label: 'False Path → connects to', type: 'nodeselect' },
+    ],
+  },
+  Filter: {
+    creds: [],
+    config: [
+      { key: 'Condition Field', label: 'Condition Field', type: 'text', placeholder: '{{status}} or {{amount}}' },
+      { key: 'Operator', label: 'Operator', type: 'select', defaultValue: 'equals', options: OPERATORS },
+      { key: 'Value', label: 'Value', type: 'text' },
+      { key: 'Logic', label: 'Logic', type: 'select', defaultValue: 'AND', options: ['AND', 'OR'] },
+      { key: 'On Fail', label: 'If condition fails', type: 'select', defaultValue: 'Stop workflow', options: ['Stop workflow', 'Continue anyway'] },
+    ],
+  },
+  Switch: { creds: [], config: [] }, // rendered specially (dynamic case list)
+  Wait: {
+    creds: [],
+    config: [
+      { key: 'Wait For', label: 'Wait for', type: 'number', placeholder: '5' },
+      { key: 'Unit', label: 'Unit', type: 'select', defaultValue: 'Minutes', options: ['Seconds', 'Minutes', 'Hours', 'Days'] },
+      { key: 'Wait Until', label: 'Or wait until (optional)', type: 'date' },
+    ],
+  },
+  Loop: {
+    creds: [],
+    config: [
+      { key: 'Input Array Field', label: 'Input Array Field', type: 'text', placeholder: '{{sheets.rows}} or {{contacts}}' },
+      { key: 'Max iterations', label: 'Max iterations', type: 'number', placeholder: '100', defaultValue: '100' },
+      { key: 'Loop Body', label: 'Loop Body → connects to', type: 'nodeselect' },
+      { key: 'After Loop', label: 'After loop → connects to', type: 'nodeselect' },
+    ],
+  },
+  Split: {
+    creds: [],
+    config: [
+      { key: 'Paths', label: 'Number of parallel paths', type: 'select', defaultValue: '2', options: ['2', '3', '4'] },
+      { key: 'Path 1', label: 'Path 1 → connects to', type: 'nodeselect' },
+      { key: 'Path 2', label: 'Path 2 → connects to', type: 'nodeselect' },
+      { key: 'Path 3', label: 'Path 3 → connects to', type: 'nodeselect', showWhen: (c) => Number(c['Paths'] || '2') >= 3 },
+      { key: 'Path 4', label: 'Path 4 → connects to', type: 'nodeselect', showWhen: (c) => Number(c['Paths'] || '2') >= 4 },
+      { key: 'Merge', label: 'Merge results after', type: 'toggle' },
+    ],
+  },
+}
+
+function seedCreds(fields: CredField[]): Record<string, string> {
+  const c: Record<string, string> = {}
+  fields.forEach((f) => {
+    if (f.key === 'Webhook URL') c[f.key] = `https://nerum.in/webhook/trigger/${genId()}`
+    else if (f.defaultValue !== undefined) c[f.key] = f.defaultValue
+  })
+  return c
+}
+
 function createNode(meta: IntMeta, ring: number): AgentNode {
   const cfg = CONFIG[meta.name]
   const credentials: Record<string, string> = {}
@@ -489,10 +699,33 @@ function createNode(meta: IntMeta, ring: number): AgentNode {
     name: meta.name,
     sub: meta.sub,
     ring,
-    iconUrl: iconUrlFor(meta),
-    brandColor: meta.color,
+    iconUrl: ICON_URLS[meta.name] ?? iconUrlFor(meta),
+    brandColor: BRAND_COLORS[meta.name] ?? meta.color,
+    nodeType: 'soldier',
     credentials,
     action: cfg?.actions[0] ?? '',
+    message: '',
+    recipient: '',
+    subject: '',
+    query: '',
+    connectedTo: [],
+    configured: false,
+  }
+}
+
+function createSpecialNode(meta: SpecialMeta, kind: 'trigger' | 'logic', ring: number): AgentNode {
+  const def = kind === 'trigger' ? TRIGGER_DEFS[meta.name] : LOGIC_DEFS[meta.name]
+  const fields = [...(def?.creds ?? []), ...(def?.config ?? [])]
+  return {
+    id: genId(),
+    name: meta.name,
+    sub: meta.sub,
+    ring,
+    iconUrl: meta.icon,
+    brandColor: kind === 'trigger' ? '#FFD60A' : '#00D4FF',
+    nodeType: kind,
+    credentials: seedCreds(fields),
+    action: '',
     message: '',
     recipient: '',
     subject: '',
@@ -529,24 +762,32 @@ function ConfigPanel({
   onCred: (key: string, val: string) => void
   onRemove: () => void
 }) {
-  const cfg = CONFIG[node.name]
   const [test, setTest] = useState<'idle' | 'testing' | 'ok'>('idle')
-
+  const [ran, setRan] = useState(false)
   useEffect(() => {
     setTest('idle')
+    setRan(false)
   }, [node.id])
 
-  // credential values merged with their defaults — used for showWhen() logic.
+  const nt = node.nodeType
+  const soldierCfg = nt === 'soldier' ? CONFIG[node.name] : undefined
+  const def = nt === 'trigger' ? TRIGGER_DEFS[node.name] : nt === 'logic' ? LOGIC_DEFS[node.name] : undefined
+  const allFields = nt === 'soldier' ? soldierCfg?.creds ?? [] : [...(def?.creds ?? []), ...(def?.config ?? [])]
+  const accent = nt === 'soldier' ? ringColor : node.brandColor
+
+  // field values merged with their defaults — used for showWhen() logic.
   const credsView = useMemo(() => {
     const v: Record<string, string> = {}
-    cfg?.creds.forEach((f) => {
+    allFields.forEach((f) => {
       if (f.defaultValue !== undefined) v[f.key] = f.defaultValue
     })
     return { ...v, ...node.credentials }
-  }, [cfg, node.credentials])
+  }, [allFields, node.credentials])
+
+  const others = nodes.map((n, i) => ({ n, i })).filter((o) => o.i !== idx)
 
   const focusRing = (e: React.FocusEvent<HTMLElement>) => {
-    e.currentTarget.style.borderColor = ringColor
+    e.currentTarget.style.borderColor = accent
   }
   const blurRing = (e: React.FocusEvent<HTMLElement>) => {
     e.currentTarget.style.borderColor = '#1e2240'
@@ -585,9 +826,18 @@ function ConfigPanel({
               </option>
             ))}
           </select>
+        ) : f.type === 'nodeselect' ? (
+          <select className="ncfg-field" value={val} onChange={(e) => onCred(f.key, e.target.value)} onFocus={focusRing} onBlur={blurRing} style={fieldInput}>
+            <option value="" style={{ background: '#111327' }}>— none —</option>
+            {others.map(({ n }) => (
+              <option key={n.id} value={n.id} style={{ background: '#111327' }}>
+                {n.name}
+              </option>
+            ))}
+          </select>
         ) : f.type === 'toggle' ? (
           <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10, cursor: 'pointer', fontSize: 12.5, color: '#cdd0dd' }}>
-            <input type="checkbox" checked={val === 'true'} onChange={(e) => onCred(f.key, e.target.checked ? 'true' : 'false')} style={{ accentColor: ringColor }} />
+            <input type="checkbox" checked={val === 'true'} onChange={(e) => onCred(f.key, e.target.checked ? 'true' : 'false')} style={{ accentColor: accent }} />
             {f.label}
           </label>
         ) : (
@@ -608,8 +858,6 @@ function ConfigPanel({
     )
   }
 
-  const others = nodes.map((n, i) => ({ n, i })).filter((o) => o.i !== idx)
-
   const toggleConnect = (otherId: string) => {
     const set = new Set(node.connectedTo)
     if (set.has(otherId)) set.delete(otherId)
@@ -617,12 +865,41 @@ function ConfigPanel({
     onChange({ connectedTo: Array.from(set) })
   }
 
+  const badge = nt === 'trigger' ? { text: 'Trigger · Start', color: '#FFD60A' } : nt === 'logic' ? { text: 'Logic · Control', color: '#00D4FF' } : { text: `Ring ${node.ring + 1} · Soldier`, color: ringColor }
+
+  const connectSection = (
+    <>
+      <div style={divider} />
+      <span style={sectionLabel}>Connect To</span>
+      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8 }}>Runs after:</div>
+      {others.length === 0 ? (
+        <div style={{ fontSize: 11, color: '#4b5563', marginBottom: 8 }}>No other agents yet.</div>
+      ) : (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 4 }}>
+          {others.map(({ n }) => {
+            const on = node.connectedTo.includes(n.id)
+            return (
+              <label key={n.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', borderRadius: 8, cursor: 'pointer', background: on ? '#1a1020' : '#111327', border: `0.5px solid ${on ? accent : '#1e2240'}` }}>
+                <input type="checkbox" checked={on} onChange={() => toggleConnect(n.id)} style={{ accentColor: accent }} />
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={n.iconUrl} alt={n.name} width={16} height={16} style={{ objectFit: 'contain' }} />
+                <span style={{ fontSize: 12.5, color: '#fff' }}>{n.name}</span>
+              </label>
+            )
+          })}
+        </div>
+      )}
+    </>
+  )
+
+  const caseCount = Number(credsView['caseCount'] || '2')
+
   return (
     <div style={{ padding: 16, height: '100%', boxSizing: 'border-box' }}>
       {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={iconMap[node.name]} alt={node.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} />
+        <img src={node.iconUrl} alt={node.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} />
         <div style={{ fontSize: 16, color: '#fff', fontWeight: 500, flex: 1, minWidth: 0 }}>{node.name}</div>
         <button onClick={onRemove} aria-label="Remove node" title="Remove node" style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', display: 'inline-flex', padding: 0 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -633,72 +910,101 @@ function ConfigPanel({
           ✕
         </button>
       </div>
-      <div style={{ display: 'inline-block', fontSize: 11, color: ringColor, fontWeight: 500, marginTop: 6, border: `0.5px solid ${brandColor(node.name)}`, borderRadius: 6, padding: '2px 8px' }}>Ring {node.ring + 1} · Soldier</div>
+      <div style={{ display: 'inline-block', fontSize: 11, color: badge.color, fontWeight: 500, marginTop: 6, border: `0.5px solid ${node.brandColor}`, borderRadius: 6, padding: '2px 8px' }}>{badge.text}</div>
       <div style={divider} />
 
-      {/* credentials */}
-      <span style={sectionLabel}>Credentials</span>
-      {cfg?.creds.map(renderField)}
-
-      <div style={divider} />
-
-      {/* configuration */}
-      <span style={sectionLabel}>Configuration</span>
-      <label style={fieldLabel}>Action</label>
-      <select className="ncfg-field" value={node.action} onChange={(e) => onChange({ action: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput}>
-        {cfg?.actions.map((a) => (
-          <option key={a} value={a} style={{ background: '#111327' }}>
-            {a}
-          </option>
-        ))}
-      </select>
-
-      {cfg?.message && (
+      {/* ---------------- SOLDIER ---------------- */}
+      {nt === 'soldier' && (
         <>
-          <label style={fieldLabel}>Message Template</label>
-          <textarea className="ncfg-field" rows={3} value={node.message} placeholder="Enter message... use {{variable}} for dynamic values" onChange={(e) => onChange({ message: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={{ ...fieldInput, resize: 'vertical', lineHeight: 1.45 }} />
+          <span style={sectionLabel}>Credentials</span>
+          {soldierCfg?.creds.map(renderField)}
+          <div style={divider} />
+          <span style={sectionLabel}>Configuration</span>
+          <label style={fieldLabel}>Action</label>
+          <select className="ncfg-field" value={node.action} onChange={(e) => onChange({ action: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput}>
+            {soldierCfg?.actions.map((a) => (
+              <option key={a} value={a} style={{ background: '#111327' }}>
+                {a}
+              </option>
+            ))}
+          </select>
+          {soldierCfg?.message && (
+            <>
+              <label style={fieldLabel}>Message Template</label>
+              <textarea className="ncfg-field" rows={3} value={node.message} placeholder="Enter message... use {{variable}} for dynamic values" onChange={(e) => onChange({ message: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={{ ...fieldInput, resize: 'vertical', lineHeight: 1.45 }} />
+            </>
+          )}
+          {soldierCfg?.recipient && (
+            <>
+              <label style={fieldLabel}>Send To</label>
+              <input className="ncfg-field" value={node.recipient} placeholder="+91XXXXXXXXXX or email@domain.com" onChange={(e) => onChange({ recipient: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+            </>
+          )}
+          {soldierCfg?.subject && (
+            <>
+              <label style={fieldLabel}>Subject</label>
+              <input className="ncfg-field" value={node.subject} placeholder="Email subject line" onChange={(e) => onChange({ subject: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+            </>
+          )}
+          {soldierCfg?.query && (
+            <>
+              <label style={fieldLabel}>Query</label>
+              <textarea className="ncfg-field" rows={2} value={node.query} placeholder="SELECT * FROM users WHERE id = {{user_id}}" onChange={(e) => onChange({ query: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={{ ...fieldInput, resize: 'vertical', lineHeight: 1.45, fontFamily: 'var(--font-mono, monospace)' }} />
+            </>
+          )}
+          {connectSection}
         </>
       )}
-      {cfg?.recipient && (
+
+      {/* ---------------- TRIGGER ---------------- */}
+      {nt === 'trigger' && node.name === 'Manual Run' && (
         <>
-          <label style={fieldLabel}>Send To</label>
-          <input className="ncfg-field" value={node.recipient} placeholder="+91XXXXXXXXXX or email@domain.com" onChange={(e) => onChange({ recipient: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
+          <div style={{ fontSize: 12.5, color: '#cdd0dd', lineHeight: 1.5, marginBottom: 12 }}>This workflow runs when you click Run Now from the dashboard.</div>
+          <button onClick={() => setRan(true)} style={{ background: '#FFD60A40', border: '0.5px solid #FFD60A', color: '#FFD60A', borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}>
+            {ran ? '✓ Triggered' : 'Run Now'}
+          </button>
+          {connectSection}
         </>
       )}
-      {cfg?.subject && (
+      {nt === 'trigger' && node.name !== 'Manual Run' && (
         <>
-          <label style={fieldLabel}>Subject</label>
-          <input className="ncfg-field" value={node.subject} placeholder="Email subject line" onChange={(e) => onChange({ subject: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={fieldInput} />
-        </>
-      )}
-      {cfg?.query && (
-        <>
-          <label style={fieldLabel}>Query</label>
-          <textarea className="ncfg-field" rows={2} value={node.query} placeholder="SELECT * FROM users WHERE id = {{user_id}}" onChange={(e) => onChange({ query: e.target.value })} onFocus={focusRing} onBlur={blurRing} style={{ ...fieldInput, resize: 'vertical', lineHeight: 1.45, fontFamily: 'var(--font-mono, monospace)' }} />
+          {(def?.creds.length ?? 0) > 0 && (
+            <>
+              <span style={sectionLabel}>Credentials</span>
+              {def?.creds.map(renderField)}
+              <div style={divider} />
+            </>
+          )}
+          <span style={sectionLabel}>Configuration</span>
+          {def?.config.map(renderField)}
+          {connectSection}
         </>
       )}
 
-      <div style={divider} />
-
-      {/* connect to */}
-      <span style={sectionLabel}>Connect To</span>
-      <div style={{ fontSize: 11, color: '#6b7280', marginBottom: 8 }}>Runs after:</div>
-      {others.length === 0 ? (
-        <div style={{ fontSize: 11, color: '#4b5563', marginBottom: 8 }}>No other agents yet.</div>
-      ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 4, marginBottom: 4 }}>
-          {others.map(({ n }) => {
-            const on = node.connectedTo.includes(n.id)
-            return (
-              <label key={n.id} style={{ display: 'flex', alignItems: 'center', gap: 8, padding: '6px 8px', borderRadius: 8, cursor: 'pointer', background: on ? '#1a1020' : '#111327', border: `0.5px solid ${on ? ringColor : '#1e2240'}` }}>
-                <input type="checkbox" checked={on} onChange={() => toggleConnect(n.id)} style={{ accentColor: ringColor }} />
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconMap[n.name]} alt={n.name} width={16} height={16} style={{ objectFit: 'contain' }} />
-                <span style={{ fontSize: 12.5, color: '#fff' }}>{n.name}</span>
-              </label>
-            )
-          })}
-        </div>
+      {/* ---------------- LOGIC ---------------- */}
+      {nt === 'logic' && node.name === 'Switch' && (
+        <>
+          <span style={sectionLabel}>Configuration</span>
+          {renderField({ key: 'Field to check', label: 'Field to check', type: 'text', placeholder: '{{payment.status}}' })}
+          {Array.from({ length: caseCount }).map((_, i) => (
+            <div key={i}>
+              {renderField({ key: `Case ${i + 1} Value`, label: `Case ${i + 1} value`, type: 'text', placeholder: 'Value to match' })}
+              {renderField({ key: `Case ${i + 1} Route`, label: `Case ${i + 1} → route to`, type: 'nodeselect' })}
+            </div>
+          ))}
+          {caseCount < 5 && (
+            <button onClick={() => onCred('caseCount', String(caseCount + 1))} style={{ background: '#00D4FF18', border: '0.5px solid #00D4FF55', color: '#00D4FF', borderRadius: 8, padding: '6px 12px', fontSize: 12, fontWeight: 500, cursor: 'pointer', marginBottom: 10 }}>
+              + Add Case
+            </button>
+          )}
+          {renderField({ key: 'Default Route', label: 'Default → route to', type: 'nodeselect' })}
+        </>
+      )}
+      {nt === 'logic' && node.name !== 'Switch' && (
+        <>
+          <span style={sectionLabel}>Configuration</span>
+          {def?.config.map(renderField)}
+        </>
       )}
 
       <div style={divider} />
@@ -710,13 +1016,13 @@ function ConfigPanel({
             setTest('testing')
             window.setTimeout(() => setTest('ok'), 800)
           }}
-          style={{ flex: 1, background: '#111327', border: `0.5px solid ${ringColor}`, color: ringColor, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
+          style={{ flex: 1, background: '#111327', border: `0.5px solid ${accent}`, color: accent, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 500, cursor: 'pointer' }}
         >
           {test === 'testing' ? 'Testing…' : test === 'ok' ? '✓ Connection OK' : 'Test Node'}
         </button>
         <button
           onClick={() => onChange({ configured: true })}
-          style={{ flex: 1, background: ringColor + '40', border: `0.5px solid ${ringColor}`, color: ringColor, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+          style={{ flex: 1, background: accent + '40', border: `0.5px solid ${accent}`, color: accent, borderRadius: 8, padding: '8px 16px', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
         >
           {node.configured ? '✓ Saved' : 'Save'}
         </button>
@@ -832,7 +1138,7 @@ export default function BuilderPage() {
   const [openDropdown, setOpenDropdown] = useState<number | null>(null)
   const [hovered, setHovered] = useState<{ idx: number; x: number; y: number } | null>(null)
   const [configIdx, setConfigIdx] = useState<number | null>(null)
-  const [picker, setPicker] = useState<{ ring: number | undefined } | null>(null)
+  const [picker, setPicker] = useState<{ ring: number | undefined; tab: 'soldiers' | 'triggers' | 'logic' } | null>(null)
   const [pickerQuery, setPickerQuery] = useState('')
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
   const [commander, setCommander] = useState<Commander>(initCommander)
@@ -871,9 +1177,24 @@ export default function BuilderPage() {
     setNodes((prev) => prev.map((n, i) => (i === idx ? { ...n, credentials: { ...n.credentials, [key]: val } } : n)))
   }, [])
 
-  const openPicker = useCallback((ring?: number) => {
+  const openPicker = useCallback((ring?: number, tab: 'soldiers' | 'triggers' | 'logic' = 'soldiers') => {
     setPickerQuery('')
-    setPicker({ ring })
+    setPicker({ ring, tab })
+  }, [])
+
+  // Exactly one trigger per workflow; always Ring 1, first slot (prepended).
+  const addTrigger = useCallback((meta: SpecialMeta) => {
+    setNodes((prev) => [createSpecialNode(meta, 'trigger', 0), ...prev.filter((n) => n.nodeType !== 'trigger')])
+    setConfigIdx(null)
+    setActiveIdx(-1)
+    setSunOpen(false)
+  }, [])
+
+  const addLogic = useCallback((meta: SpecialMeta, ringIndex?: number) => {
+    setNodes((prev) => {
+      const ring = ringIndex !== undefined && countInRing(prev, ringIndex) < ringConfig(ringIndex).capacity ? ringIndex : pickRing(prev)
+      return [...prev, createSpecialNode(meta, 'logic', ring)]
+    })
   }, [])
 
   /**
@@ -997,7 +1318,7 @@ export default function BuilderPage() {
       ctx.strokeStyle = '#FF6B00'
       ctx.lineWidth = 2
       ctx.stroke()
-      const sunImg = GLOBAL_IMAGE_CACHE['AI']
+      const sunImg = GLOBAL_IMAGE_CACHE[ICON_URLS.AI]
       if (sunImg && sunImg.complete && sunImg.naturalWidth > 0) {
         ctx.drawImage(sunImg, CX - 9, CY - 9, 18, 18)
       } else {
@@ -1033,25 +1354,35 @@ export default function BuilderPage() {
 
           const node = ns[gi]
           const isActive = gi === active
-          const bc = brandColor(node.name)
+          const bc = node.brandColor
 
+          // active glow (all shapes)
           if (isActive) {
             ctx.beginPath()
             ctx.arc(x, y, 30, 0, Math.PI * 2)
             ctx.fillStyle = bc + '25'
             ctx.fill()
           }
-          ctx.beginPath()
-          ctx.arc(x, y, 22, 0, Math.PI * 2)
-          ctx.fillStyle = '#07080F'
-          ctx.fill()
-          ctx.strokeStyle = isActive ? bc : bc + '55'
-          ctx.lineWidth = isActive ? 2 : 1
-          ctx.stroke()
 
-          const img = GLOBAL_IMAGE_CACHE[node.name]
+          // shape by node type: star = trigger, diamond = logic, circle = soldier
+          if (node.nodeType === 'trigger') {
+            drawStar(ctx, x, y, 22, bc, isActive)
+          } else if (node.nodeType === 'logic') {
+            drawDiamond(ctx, x, y, 22, bc, isActive)
+          } else {
+            ctx.beginPath()
+            ctx.arc(x, y, 22, 0, Math.PI * 2)
+            ctx.fillStyle = '#07080F'
+            ctx.fill()
+            ctx.strokeStyle = isActive ? bc : bc + '55'
+            ctx.lineWidth = isActive ? 2 : 1
+            ctx.stroke()
+          }
+
+          const isz = node.nodeType === 'soldier' ? 22 : 16
+          const img = GLOBAL_IMAGE_CACHE[node.iconUrl]
           if (img && img.complete && img.naturalWidth > 0) {
-            ctx.drawImage(img, x - 11, y - 11, 22, 22)
+            ctx.drawImage(img, x - isz / 2, y - isz / 2, isz, isz)
           } else {
             ctx.fillStyle = bc
             ctx.font = `500 9px ${CANVAS_FONT}`
@@ -1156,7 +1487,12 @@ export default function BuilderPage() {
   const hoveredNode = hovered ? nodes[hovered.idx] : null
   const pickerRing = picker ? picker.ring ?? pickRing(nodes) : 0
   const pickerRingColor = ringConfig(pickerRing).color
-  const filteredPicker = INTEGRATIONS.filter((m) => m.name.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
+  const pickerTab = picker?.tab ?? 'soldiers'
+  const pickerAccent = pickerTab === 'triggers' ? '#FFD60A' : pickerTab === 'logic' ? '#00D4FF' : pickerRingColor
+  const pickerList: SpecialMeta[] =
+    pickerTab === 'soldiers' ? INTEGRATIONS.map((m) => ({ name: m.name, sub: m.sub, icon: iconMap[m.name] })) : pickerTab === 'triggers' ? TRIGGERS : LOGIC
+  const filteredPicker = pickerList.filter((m) => m.name.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
+  const pickerTitle = pickerTab === 'triggers' ? 'Choose a Trigger' : pickerTab === 'logic' ? 'Choose Logic' : 'Choose an Integration'
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -1166,10 +1502,22 @@ export default function BuilderPage() {
         style={{ background: '#0d0f1e', borderBottom: '0.5px solid #1e2240', padding: '10px 14px', display: 'flex', alignItems: 'center', gap: 8, flexWrap: 'wrap' }}
       >
         <button
-          onClick={() => openPicker(undefined)}
+          onClick={() => openPicker(undefined, 'soldiers')}
           style={{ background: '#7B2FFF22', border: '0.5px solid #7B2FFF55', borderRadius: 8, padding: '6px 14px', color: '#a78bfa', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}
         >
           + Add Agent
+        </button>
+        <button
+          onClick={() => openPicker(undefined, 'triggers')}
+          style={{ background: '#FFD60A22', border: '0.5px solid #FFD60A55', borderRadius: 8, padding: '6px 14px', color: '#FFD60A', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}
+        >
+          ⚡ Add Trigger
+        </button>
+        <button
+          onClick={() => openPicker(undefined, 'logic')}
+          style={{ background: '#00D4FF22', border: '0.5px solid #00D4FF55', borderRadius: 8, padding: '6px 14px', color: '#00D4FF', fontSize: 12, fontWeight: 500, cursor: 'pointer' }}
+        >
+          🔀 Add Logic
         </button>
 
         {Array.from({ length: ringCount }).map((_, ri) => {
@@ -1210,12 +1558,12 @@ export default function BuilderPage() {
                   setConfigIdx(i)
                   setActiveIdx(i)
                 }}
-                onMouseEnter={(e) => (e.currentTarget.style.borderColor = brandColor(n.name))}
-                onMouseLeave={(e) => (e.currentTarget.style.borderColor = i === activeIdx ? brandColor(n.name) : '#1e2240')}
-                style={{ background: '#111327', border: `0.5px solid ${i === activeIdx ? brandColor(n.name) : '#1e2240'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
+                onMouseEnter={(e) => (e.currentTarget.style.borderColor = n.brandColor)}
+                onMouseLeave={(e) => (e.currentTarget.style.borderColor = i === activeIdx ? n.brandColor : '#1e2240')}
+                style={{ background: '#111327', border: `0.5px solid ${i === activeIdx ? n.brandColor : '#1e2240'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconMap[n.name]} alt={n.name} width={18} height={18} style={{ objectFit: 'contain' }} />
+                <img src={n.iconUrl} alt={n.name} width={18} height={18} style={{ objectFit: 'contain' }} />
                 <span style={{ fontSize: 12, color: '#fff' }}>{n.name}</span>
                 <span style={{ width: 7, height: 7, borderRadius: '50%', background: n.configured ? '#25D366' : '#FF6B00' }} />
                 <span
@@ -1264,7 +1612,7 @@ export default function BuilderPage() {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={iconMap[hoveredNode.name]} alt={hoveredNode.name} width={16} height={16} style={{ objectFit: 'contain' }} />
+                <img src={hoveredNode.iconUrl} alt={hoveredNode.name} width={16} height={16} style={{ objectFit: 'contain' }} />
                 <span style={{ fontSize: 13, color: '#fff', fontWeight: 500 }}>{hoveredNode.name}</span>
               </div>
               <div style={{ fontSize: 11, color: PLASMA.muted, marginTop: 2 }}>{hoveredNode.sub}</div>
@@ -1309,9 +1657,9 @@ export default function BuilderPage() {
           >
             <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
               <div>
-                <div style={{ fontSize: 16, color: '#fff', fontWeight: 500 }}>Choose an Integration</div>
+                <div style={{ fontSize: 16, color: '#fff', fontWeight: 500 }}>{pickerTitle}</div>
                 <div style={{ fontSize: 12, color: '#6b7280', marginTop: 2 }}>
-                  Select agent to add{picker.ring !== undefined ? ` to Ring ${picker.ring + 1}` : ''}
+                  Select a node to add{picker.ring !== undefined ? ` to Ring ${picker.ring + 1}` : ''}
                 </div>
               </div>
               <button onClick={() => setPicker(null)} aria-label="Close" style={{ background: 'none', border: 'none', color: '#6b7280', cursor: 'pointer', fontSize: 20, lineHeight: 1 }}>
@@ -1319,12 +1667,24 @@ export default function BuilderPage() {
               </button>
             </div>
 
+            <div style={{ display: 'flex', gap: 0, borderBottom: '0.5px solid #1e2240', marginTop: 12 }}>
+              {(['soldiers', 'triggers', 'logic'] as const).map((t) => (
+                <button
+                  key={t}
+                  onClick={() => setPicker((p) => (p ? { ...p, tab: t } : p))}
+                  style={{ background: 'none', border: 'none', borderBottom: pickerTab === t ? '2px solid #FF6B00' : '2px solid transparent', color: pickerTab === t ? '#fff' : '#6b7280', fontSize: 13, fontWeight: 500, padding: '8px 14px', cursor: 'pointer', textTransform: 'capitalize' }}
+                >
+                  {t}
+                </button>
+              ))}
+            </div>
+
             <input
               className="ncfg-field"
               autoFocus
               value={pickerQuery}
               onChange={(e) => setPickerQuery(e.target.value)}
-              placeholder="Search integrations..."
+              placeholder="Search..."
               style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 13, width: '100%', margin: '12px 0', outline: 'none', boxSizing: 'border-box' }}
             />
 
@@ -1333,22 +1693,24 @@ export default function BuilderPage() {
                 <div
                   key={m.name}
                   onClick={() => {
-                    addNode(m, picker.ring)
+                    if (pickerTab === 'soldiers') addNode(metaByName[m.name], picker.ring)
+                    else if (pickerTab === 'triggers') addTrigger(m)
+                    else addLogic(m, picker.ring)
                     setPicker(null)
                   }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerRingColor)}
+                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
                   onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
                   style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color 0.15s' }}
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={iconMap[m.name]} alt={m.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} onError={(ev) => ((ev.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />
+                  <img src={m.icon} alt={m.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} onError={(ev) => ((ev.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />
                   <div style={{ minWidth: 0 }}>
                     <div style={{ fontSize: 12, color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>{m.name}</div>
                     <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.2, marginTop: 2 }}>{m.sub}</div>
                   </div>
                 </div>
               ))}
-              {filteredPicker.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 24 }}>No integrations match.</div>}
+              {filteredPicker.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 24 }}>No matches.</div>}
             </div>
           </div>
         </div>
