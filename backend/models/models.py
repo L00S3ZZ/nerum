@@ -185,3 +185,20 @@ class AgentMessage(Base):
     role = Column(String, nullable=False)  # "user" or "assistant"
     content = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class UserDbConnection(Base):
+    """A user's external database the agent may query. Credentials are AES-256-GCM
+    encrypted (core.encryption) exactly like UserIntegration. The LLM only ever
+    sees `id`, `name`, and `db_type` — never the decrypted credentials."""
+    __tablename__ = "user_db_connections"
+    id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+    name = Column(String, nullable=False)              # user label, e.g. "Prod Postgres"
+    db_type = Column(String, nullable=False)           # postgresql | mysql | mongodb
+    encrypted_credentials = Column(Text, nullable=False)  # encrypt_data({host,port,user,password,database,...})
+    allow_write = Column(Boolean, default=False)       # INSERT/UPDATE gate  (default OFF)
+    allow_delete = Column(Boolean, default=False)      # DELETE/DROP/TRUNCATE gate (separate, default OFF)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    last_used_at = Column(DateTime, nullable=True)

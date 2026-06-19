@@ -11,6 +11,7 @@ from routes import (
     agent,
     auth,
     dashboard,
+    db_connections,
     gmail,
     integrations,
     payment,
@@ -58,6 +59,7 @@ app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(workflow.router, prefix="/workflows", tags=["Workflows"])
 app.include_router(agent.router, prefix="/agent", tags=["Agent"])
 app.include_router(integrations.router, prefix="/integrations", tags=["Integrations"])
+app.include_router(db_connections.router, prefix="/db-connections", tags=["Databases"])
 app.include_router(whatsapp.router, prefix="/whatsapp", tags=["WhatsApp"])
 app.include_router(gmail.router, prefix="/email", tags=["Email"])
 app.include_router(telegram.router, prefix="/telegram", tags=["Telegram"])
