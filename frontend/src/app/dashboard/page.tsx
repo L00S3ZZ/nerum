@@ -25,7 +25,7 @@ interface QuickAction {
 }
 const ACTIONS: QuickAction[] = [
   { label: 'New Workflow', desc: 'Build on the canvas', href: '/dashboard/builder', icon: Plus, accent: '#FF6B00' },
-  { label: 'Ask Neru', desc: 'Describe it in words', href: '/dashboard/agent', icon: Sparkles, accent: '#FFD60A' },
+  { label: 'Ask Neru', desc: 'Chat inside the Builder', href: '/dashboard/builder', icon: Sparkles, accent: '#FFD60A' },
   { label: 'Connect an app', desc: '10+ integrations', href: '/dashboard/integrations', icon: Boxes, accent: '#00D4FF' },
   { label: 'Settings', desc: 'Keys & billing', href: '/dashboard/settings', icon: SettingsIcon, accent: '#7B2FFF' },
 ]

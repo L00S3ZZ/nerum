@@ -14,6 +14,7 @@
  * ========================================================================== */
 
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import AgentChatDrawer from '@/components/builder/AgentChatDrawer'
 
 /* ---------------------------------- tokens -------------------------------- */
 const PLASMA = {
@@ -1495,7 +1496,7 @@ export default function BuilderPage() {
   const pickerTitle = pickerTab === 'triggers' ? 'Choose a Trigger' : pickerTab === 'logic' ? 'Choose Logic' : 'Choose an Integration'
 
   return (
-    <div style={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+    <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
       {/* ============================ TOPBAR ============================ */}
       <div
         data-ring-ui
@@ -1729,6 +1730,9 @@ export default function BuilderPage() {
           </div>
         </div>
       )}
+
+      {/* ===================== BOTTOM CHAT DRAWER ===================== */}
+      <AgentChatDrawer />
 
       <style>{`
         .ncfg-field::placeholder { color: #4b5563; }

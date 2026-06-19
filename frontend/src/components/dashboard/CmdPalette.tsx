@@ -8,7 +8,8 @@ type Item = { label: string; icon: string; href: string; hint?: string }
 
 const ITEMS: Item[] = [
   { label: 'Overview', icon: '🏠', href: '/dashboard', hint: 'Dashboard home' },
-  { label: 'AI Agent', icon: '⚡', href: '/dashboard/agent', hint: 'Workflow builder' },
+  { label: 'Builder', icon: '⚡', href: '/dashboard/builder', hint: 'Canvas + Chat with Neru' },
+  { label: 'Templates', icon: '🧩', href: '/dashboard/templates', hint: 'Ready-made workflows' },
   { label: 'Integrations', icon: '🔗', href: '/dashboard/integrations', hint: 'Connect apps' },
   { label: 'Settings', icon: '⚙️', href: '/dashboard/settings', hint: 'Account & billing' },
   { label: 'Docs', icon: '📚', href: '/dashboard', hint: 'Documentation' },
