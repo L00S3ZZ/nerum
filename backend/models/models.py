@@ -169,3 +169,19 @@ class AgentStep(Base):
     tool_result = Column(JSON)
     success = Column(Boolean, default=True)
     executed_at = Column(DateTime, default=datetime.utcnow)
+
+
+class AgentMessage(Base):
+    """One conversation turn (user ask or assistant reply) for a session.
+
+    Read back at the start of each run to give the Commander prior context;
+    written at the end of a run (the goal + the final answer). Tool steps are
+    NOT stored here — see AgentStep for the per-tool execution log.
+    """
+    __tablename__ = "agent_messages"
+    id = Column(Integer, primary_key=True)
+    session_id = Column(String, index=True, nullable=False)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    role = Column(String, nullable=False)  # "user" or "assistant"
+    content = Column(Text, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

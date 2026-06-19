@@ -31,6 +31,7 @@ export interface SSEEvent {
   type: string
   content?: string
   data?: unknown
+  session_id?: string
 }
 
 export const api = {

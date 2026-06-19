@@ -12,11 +12,16 @@ persistence call swallows-and-logs its own errors.
 """
 from datetime import datetime
 
+from sqlalchemy import select
+
 from core.database import AsyncSessionLocal
-from models.models import AgentRun, AgentStep, User
+from models.models import AgentMessage, AgentRun, AgentStep, User
 from .commander import Commander
 from .memory import AgentMemory
 from .tools.executor import ToolExecutor
+
+# How many prior conversation turns to replay into a new run for context.
+_HISTORY_LIMIT = 20
 
 # Human-readable text shown when a tool starts. Falls back to a generic line.
 _TOOL_START = {
@@ -43,6 +48,16 @@ class AgentEngine:
     async def run(self, goal: str, language: str, session_id: str):
         lang = "Tamil" if str(language).lower().startswith("ta") else "English"
         memory = AgentMemory(session_id, self.user.id)
+
+        # Replay prior turns of this session so the Commander has conversation
+        # context. These are plain user/assistant text turns; this run's own
+        # tool_use/tool_result blocks still append on top below as before.
+        for role, content in await self._load_history(session_id):
+            if role == "assistant":
+                memory.add_assistant_message(content)
+            else:
+                memory.add_user_message(content)
+
         memory.add_user_message(
             f"{goal}\n\n(Respond to me, and write any customer-facing messages, in {lang}.)"
         )
@@ -111,7 +126,7 @@ class AgentEngine:
             yield {"type": "error", "content": final_text}
 
         finally:
-            await self._finalize_run(run_id, status, memory, final_text)
+            await self._finalize_run(run_id, session_id, goal, status, memory, final_text)
 
     # ── human-readable helpers ───────────────────────────────────────────
     def _describe(self, tool_name: str, params: dict) -> str:
@@ -145,6 +160,31 @@ class AgentEngine:
         return f"{s['succeeded']} step(s) succeeded, {s['failed']} failed"
 
     # ── persistence (best-effort, own session) ───────────────────────────
+    async def _load_history(self, session_id: str) -> list[tuple[str, str]]:
+        """Last _HISTORY_LIMIT turns for this session, oldest-first.
+
+        Best-effort: a read failure returns an empty history rather than
+        aborting the run (the user just loses context for this turn).
+        """
+        try:
+            async with AsyncSessionLocal() as db:
+                rows = (
+                    await db.scalars(
+                        select(AgentMessage)
+                        .where(
+                            AgentMessage.session_id == session_id,
+                            AgentMessage.user_id == self.user.id,
+                        )
+                        .order_by(AgentMessage.created_at.desc(), AgentMessage.id.desc())
+                        .limit(_HISTORY_LIMIT)
+                    )
+                ).all()
+            rows.reverse()  # back to chronological order for the API
+            return [(r.role, r.content) for r in rows]
+        except Exception as exc:  # noqa: BLE001
+            print(f"[nerum.agent] could not load history for {session_id}: {exc}")
+            return []
+
     async def _create_run(self, session_id: str, goal: str) -> int | None:
         try:
             async with AsyncSessionLocal() as db:
@@ -180,18 +220,36 @@ class AgentEngine:
         except Exception as exc:  # noqa: BLE001
             print(f"[nerum.agent] could not save agent_step ({tool_name}): {exc}")
 
-    async def _finalize_run(self, run_id, status: str, memory: AgentMemory, final_text: str | None) -> None:
-        if run_id is None:
-            return
+    async def _finalize_run(
+        self,
+        run_id,
+        session_id: str,
+        goal: str,
+        status: str,
+        memory: AgentMemory,
+        final_text: str | None,
+    ) -> None:
         try:
             async with AsyncSessionLocal() as db:
-                run = await db.get(AgentRun, run_id)
-                if not run:
-                    return
-                run.status = status
-                run.steps_count = len(memory.steps)
-                run.result_summary = (final_text or "")[:4000]
-                run.completed_at = datetime.utcnow()
+                if run_id is not None:
+                    run = await db.get(AgentRun, run_id)
+                    if run:
+                        run.status = status
+                        run.steps_count = len(memory.steps)
+                        run.result_summary = (final_text or "")[:4000]
+                        run.completed_at = datetime.utcnow()
+
+                # Persist the two conversation turns for future recall: the
+                # user's ask and the assistant's final reply. Tool steps are
+                # logged separately (agent_steps) and are not stored here.
+                db.add(AgentMessage(session_id=session_id, user_id=self.user.id, role="user", content=goal))
+                if final_text:
+                    db.add(AgentMessage(
+                        session_id=session_id,
+                        user_id=self.user.id,
+                        role="assistant",
+                        content=final_text,
+                    ))
                 await db.commit()
         except Exception as exc:  # noqa: BLE001
             print(f"[nerum.agent] could not finalize agent_run {run_id}: {exc}")

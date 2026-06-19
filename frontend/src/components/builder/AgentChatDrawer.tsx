@@ -41,6 +41,10 @@ export default function AgentChatDrawer({ configOpen = false, open, onOpenChange
   const [input, setInput] = useState('')
   const [status, setStatus] = useState<Status>('idle')
   const idRef = useRef(1)
+  // Backend session id — null until the first `session` SSE event. Reused on
+  // every send so the same conversation keeps its server-side memory; reset by
+  // newChat() so a fresh chat gets a fresh server session.
+  const sessionIdRef = useRef<string | null>(null)
   const scrollRef = useRef<HTMLDivElement>(null)
   const busy = status !== 'idle'
 
@@ -76,6 +80,7 @@ export default function AgentChatDrawer({ configOpen = false, open, onOpenChange
   function newChat() {
     setMessages([GREETING])
     idRef.current = 1
+    sessionIdRef.current = null // fresh conversation → fresh server session
     setStatus('idle')
   }
 
@@ -94,8 +99,11 @@ export default function AgentChatDrawer({ configOpen = false, open, onOpenChange
       setMessages((m) => m.map((x) => (x.id === neruId ? { ...x, text: x.text ? `${x.text}\n${chunk}` : chunk } : x)))
 
     api
-      .stream('/agent/run', { message: text, language: 'english' }, (e) => {
-        if (e.type === 'tool_start') {
+      .stream('/agent/run', { message: text, language: 'english', session_id: sessionIdRef.current }, (e) => {
+        if (e.type === 'session') {
+          // Capture the server session id so follow-ups reuse the same memory.
+          if (e.session_id) sessionIdRef.current = e.session_id
+        } else if (e.type === 'tool_start') {
           setStatus('responding')
         } else if (e.type === 'tool_result') {
           appendMsg(String(e.content ?? ''))
@@ -108,7 +116,7 @@ export default function AgentChatDrawer({ configOpen = false, open, onOpenChange
           appendErr(String(e.content ?? 'error'))
           setStatus('idle')
         }
-        // thinking / plan / loop / session events are internal — orbit shows live state
+        // thinking / plan / loop events are internal — orbit shows live state
       })
       .catch((err) => {
         appendErr(err instanceof Error ? err.message : 'Request failed')
