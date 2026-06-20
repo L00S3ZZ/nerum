@@ -2,9 +2,20 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Search, X, Lock, ExternalLink, Eye, EyeOff, KeyRound } from 'lucide-react'
+import { Search, X, Lock, ExternalLink, Eye, EyeOff, KeyRound, Plus } from 'lucide-react'
 import { useToast } from '@/components/dashboard/Toast'
 import { api } from '@/lib/api'
+import {
+  useDbConnections,
+  DbConnectionModal,
+  DeleteDbDialog,
+  DbConnectionCard,
+  DbLogo,
+  DB_META,
+  DB_TYPES,
+  type DbConnection,
+  type DbModalMode,
+} from '@/components/databases/DbConnections'
 
 type Category = 'Messaging' | 'Email' | 'Payments' | 'Productivity' | 'CRM' | 'Ecommerce' | 'Social'
 
@@ -40,7 +51,7 @@ const INTEGRATIONS: Integration[] = [
   { id: 'instagram', name: 'Instagram Business', color: '#E1306C', category: 'Social', slug: 'instagram', hex: 'E1306C' },
 ]
 
-const FILTERS: ('All' | Category)[] = ['All', 'Messaging', 'Email', 'Payments', 'Productivity', 'CRM', 'Ecommerce', 'Social']
+const FILTERS: ('All' | Category | 'Database')[] = ['All', 'Messaging', 'Email', 'Payments', 'Productivity', 'CRM', 'Ecommerce', 'Social', 'Database']
 const INITIAL_CONNECTED = ['whatsapp', 'gmail', 'googlesheets', 'razorpay']
 
 // frontend card id ⇄ backend provider key
@@ -122,7 +133,11 @@ const PROVIDERS = [
 export default function IntegrationsPage() {
   const { toast } = useToast()
   const [query, setQuery] = useState('')
-  const [filter, setFilter] = useState<'All' | Category>('All')
+  const [filter, setFilter] = useState<'All' | Category | 'Database'>('All')
+  // database connections (shared module)
+  const { conns: dbConns, reload: reloadDb } = useDbConnections()
+  const [dbModal, setDbModal] = useState<DbModalMode | null>(null)
+  const [dbDelete, setDbDelete] = useState<DbConnection | null>(null)
   const [modal, setModal] = useState<Integration | null>(null)
   const [connected, setConnected] = useState<Record<string, boolean>>(Object.fromEntries(INITIAL_CONNECTED.map((s) => [s, true])))
   const [aiKeys, setAiKeys] = useState<Record<string, string>>({})
@@ -234,7 +249,7 @@ export default function IntegrationsPage() {
 
         {/* grid */}
         <div className="int-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, padding: 24 }}>
-          {filtered.map((it, i) => {
+          {filter !== 'Database' && filtered.map((it, i) => {
             const isOn = !!connected[it.id]
             return (
               <motion.div
@@ -281,8 +296,67 @@ export default function IntegrationsPage() {
               </motion.div>
             )
           })}
-          {filtered.length === 0 && <p style={{ color: '#9AA0B8', textAlign: 'center', padding: 48, gridColumn: '1 / -1' }}>No integrations match your search.</p>}
+          {filter !== 'Database' && filtered.length === 0 && <p style={{ color: '#9AA0B8', textAlign: 'center', padding: 48, gridColumn: '1 / -1' }}>No integrations match your search.</p>}
+
+          {/* database engine tiles — open the shared add-connection modal */}
+          {(filter === 'All' || filter === 'Database') &&
+            DB_TYPES.filter((ty) => {
+              const q = query.trim().toLowerCase()
+              return !q || DB_META[ty].label.toLowerCase().includes(q) || 'database'.includes(q)
+            }).map((ty, i) => {
+              const m = DB_META[ty]
+              const count = dbConns.filter((c) => c.db_type === ty).length
+              return (
+                <motion.div
+                  key={`db-${ty}`}
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: Math.min(i * 0.03, 0.3), type: 'spring', stiffness: 130, damping: 18 }}
+                  whileHover={{ y: -4 }}
+                  onClick={() => setDbModal({ kind: 'create', presetType: ty })}
+                  className="glass-card"
+                  style={{ padding: 20, display: 'flex', flexDirection: 'column', gap: 14, borderLeft: `4px solid ${m.color}`, cursor: 'pointer', boxShadow: count > 0 ? `0 18px 50px -26px ${m.color}` : undefined }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <DbLogo type={ty} size={46} />
+                    {count > 0 ? (
+                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: 7, fontSize: 11.5, fontWeight: 600, color: '#00E676' }}>
+                        <span style={{ position: 'relative', width: 8, height: 8 }}>
+                          <span className="ping-ring" style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#00E676' }} />
+                          <span style={{ position: 'absolute', inset: 0, borderRadius: '50%', background: '#00E676' }} />
+                        </span>
+                        Connected
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11.5, color: '#6B7090', fontWeight: 500 }}>Database</span>
+                    )}
+                  </div>
+                  <div style={{ flex: 1 }}>
+                    <div style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>{m.label}</div>
+                    <div style={{ fontSize: 12.5, color: '#9AA0B8', marginTop: 3 }}>{count > 0 ? `${count} connection${count > 1 ? 's' : ''}` : 'Connect a database to query'}</div>
+                  </div>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); setDbModal({ kind: 'create', presetType: ty }) }}
+                    style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 6, background: 'rgba(123,47,255,0.14)', border: '1px solid rgba(123,47,255,0.4)', color: '#B98CFF', fontWeight: 600, fontSize: 13, padding: '10px', borderRadius: 9, cursor: 'pointer', width: '100%' }}
+                  >
+                    <Plus size={15} /> Add connection
+                  </button>
+                </motion.div>
+              )
+            })}
         </div>
+
+        {/* connected database connections — manage (test / edit / delete) */}
+        {(filter === 'All' || filter === 'Database') && dbConns.length > 0 && (
+          <div style={{ padding: '0 24px 8px' }}>
+            <h2 className="font-display plasma-gradient-text" style={{ fontSize: 18, fontWeight: 700, letterSpacing: '-0.02em', marginBottom: 14 }}>Your databases</h2>
+            <div className="int-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16 }}>
+              {dbConns.map((c) => (
+                <DbConnectionCard key={c.id} conn={c} onEdit={(x) => setDbModal({ kind: 'edit', conn: x })} onDelete={(x) => setDbDelete(x)} />
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* ===== BYOK AI model keys ===== */}
         <div style={{ padding: '8px 24px 60px' }}>
@@ -402,6 +476,10 @@ export default function IntegrationsPage() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* shared database add/edit modal + delete confirm */}
+      {dbModal && <DbConnectionModal mode={dbModal} onClose={() => setDbModal(null)} onSaved={reloadDb} />}
+      {dbDelete && <DeleteDbDialog conn={dbDelete} onCancel={() => setDbDelete(null)} onDeleted={() => { setDbDelete(null); reloadDb() }} />}
 
       <style>{`
         @media (max-width: 920px) { .int-grid { grid-template-columns: repeat(2, 1fr) !important; } }

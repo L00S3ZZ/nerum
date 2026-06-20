@@ -15,6 +15,14 @@
 
 import { type CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import AgentChatDrawer from '@/components/builder/AgentChatDrawer'
+import {
+  useDbConnections,
+  DbConnectionModal,
+  DbLogo,
+  DB_META,
+  type DbConnection,
+  type DbModalMode,
+} from '@/components/databases/DbConnections'
 
 /* ---------------------------------- tokens -------------------------------- */
 const PLASMA = {
@@ -1139,8 +1147,11 @@ export default function BuilderPage() {
   const [openDropdown, setOpenDropdown] = useState<number | null>(null)
   const [hovered, setHovered] = useState<{ idx: number; x: number; y: number } | null>(null)
   const [configIdx, setConfigIdx] = useState<number | null>(null)
-  const [picker, setPicker] = useState<{ ring: number | undefined; tab: 'soldiers' | 'triggers' | 'logic' } | null>(null)
+  const [picker, setPicker] = useState<{ ring: number | undefined; tab: 'soldiers' | 'triggers' | 'logic' | 'database' } | null>(null)
   const [pickerQuery, setPickerQuery] = useState('')
+  // database connections + add/edit modal (shared module)
+  const { conns: dbConns, reload: reloadDb } = useDbConnections()
+  const [dbModal, setDbModal] = useState<DbModalMode | null>(null)
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
   const [commander, setCommander] = useState<Commander>(initCommander)
   const [sunOpen, setSunOpen] = useState(false)
@@ -1179,7 +1190,7 @@ export default function BuilderPage() {
     setNodes((prev) => prev.map((n, i) => (i === idx ? { ...n, credentials: { ...n.credentials, [key]: val } } : n)))
   }, [])
 
-  const openPicker = useCallback((ring?: number, tab: 'soldiers' | 'triggers' | 'logic' = 'soldiers') => {
+  const openPicker = useCallback((ring?: number, tab: 'soldiers' | 'triggers' | 'logic' | 'database' = 'soldiers') => {
     setPickerQuery('')
     setPicker({ ring, tab })
   }, [])
@@ -1198,6 +1209,13 @@ export default function BuilderPage() {
       return [...prev, createSpecialNode(meta, 'logic', ring)]
     })
   }, [])
+
+  // A connected database becomes a Soldier node — synthesize IntMeta from the
+  // connection so it wires onto the canvas exactly like any other integration.
+  const addDbNode = useCallback((c: DbConnection, ringIndex?: number) => {
+    const m = DB_META[c.db_type]
+    addNode({ name: c.name, sub: m.label, slug: m.slug, hex: m.hex, color: m.color }, ringIndex)
+  }, [addNode])
 
   /**
    * Remove a node, then compact rings: any ring left empty is dropped and the
@@ -1490,11 +1508,12 @@ export default function BuilderPage() {
   const pickerRing = picker ? picker.ring ?? pickRing(nodes) : 0
   const pickerRingColor = ringConfig(pickerRing).color
   const pickerTab = picker?.tab ?? 'soldiers'
-  const pickerAccent = pickerTab === 'triggers' ? '#FFD60A' : pickerTab === 'logic' ? '#00D4FF' : pickerRingColor
+  const pickerAccent = pickerTab === 'triggers' ? '#FFD60A' : pickerTab === 'logic' ? '#00D4FF' : pickerTab === 'database' ? '#7B2FFF' : pickerRingColor
   const pickerList: SpecialMeta[] =
-    pickerTab === 'soldiers' ? INTEGRATIONS.map((m) => ({ name: m.name, sub: m.sub, icon: iconMap[m.name] })) : pickerTab === 'triggers' ? TRIGGERS : LOGIC
+    pickerTab === 'soldiers' ? INTEGRATIONS.map((m) => ({ name: m.name, sub: m.sub, icon: iconMap[m.name] })) : pickerTab === 'triggers' ? TRIGGERS : pickerTab === 'logic' ? LOGIC : []
   const filteredPicker = pickerList.filter((m) => m.name.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
-  const pickerTitle = pickerTab === 'triggers' ? 'Choose a Trigger' : pickerTab === 'logic' ? 'Choose Logic' : 'Choose an Integration'
+  const dbPickerList = dbConns.filter((c) => c.name.toLowerCase().includes(pickerQuery.trim().toLowerCase()))
+  const pickerTitle = pickerTab === 'triggers' ? 'Choose a Trigger' : pickerTab === 'logic' ? 'Choose Logic' : pickerTab === 'database' ? 'Choose a Database' : 'Choose an Integration'
 
   return (
     <div style={{ height: '100%', display: 'flex', flexDirection: 'column', position: 'relative' }}>
@@ -1670,7 +1689,7 @@ export default function BuilderPage() {
             </div>
 
             <div style={{ display: 'flex', gap: 0, borderBottom: '0.5px solid #1e2240', marginTop: 12 }}>
-              {(['soldiers', 'triggers', 'logic'] as const).map((t) => (
+              {(['soldiers', 'triggers', 'logic', 'database'] as const).map((t) => (
                 <button
                   key={t}
                   onClick={() => setPicker((p) => (p ? { ...p, tab: t } : p))}
@@ -1690,33 +1709,85 @@ export default function BuilderPage() {
               style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 8, padding: '8px 12px', color: '#fff', fontSize: 13, width: '100%', margin: '12px 0', outline: 'none', boxSizing: 'border-box' }}
             />
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
-              {filteredPicker.map((m) => (
-                <div
-                  key={m.name}
-                  onClick={() => {
-                    if (pickerTab === 'soldiers') addNode(metaByName[m.name], picker.ring)
-                    else if (pickerTab === 'triggers') addTrigger(m)
-                    else addLogic(m, picker.ring)
-                    setPicker(null)
-                  }}
-                  onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
-                  onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
-                  style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color 0.15s' }}
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={m.icon} alt={m.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} onError={(ev) => ((ev.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />
-                  <div style={{ minWidth: 0 }}>
-                    <div style={{ fontSize: 12, color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>{m.name}</div>
-                    <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.2, marginTop: 2 }}>{m.sub}</div>
-                  </div>
+            {pickerTab === 'database' ? (
+              dbConns.length === 0 ? (
+                /* empty state — no databases connected yet */
+                <div style={{ textAlign: 'center', padding: '32px 16px' }}>
+                  <div style={{ fontSize: 13, color: '#9AA0B8', marginBottom: 14 }}>No databases connected yet</div>
+                  <button
+                    onClick={() => setDbModal({ kind: 'create' })}
+                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'linear-gradient(135deg, #FF6B00, #7B2FFF)', border: 'none', color: '#fff', fontWeight: 600, fontSize: 13, padding: '9px 16px', borderRadius: 9, cursor: 'pointer' }}
+                  >
+                    + Add Database
+                  </button>
                 </div>
-              ))}
-              {filteredPicker.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 24 }}>No matches.</div>}
-            </div>
+              ) : (
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
+                  {dbPickerList.map((c) => {
+                    const m = DB_META[c.db_type]
+                    const first = Object.entries(c.credentials_masked || {})[0]
+                    return (
+                      <div
+                        key={c.id}
+                        onClick={() => { addDbNode(c, picker.ring); setPicker(null) }}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
+                        onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
+                        style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color 0.15s' }}
+                      >
+                        <DbLogo type={c.db_type} size={28} />
+                        <div style={{ minWidth: 0 }}>
+                          <div style={{ fontSize: 12, color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>{c.name}</div>
+                          <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.2, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                            {m.label}{first ? ` · ${first[0]}: ${String(first[1])}` : ''}
+                          </div>
+                        </div>
+                      </div>
+                    )
+                  })}
+                  {/* + Add Database tile — add more without leaving the picker */}
+                  <div
+                    onClick={() => setDbModal({ kind: 'create' })}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#7B2FFF55')}
+                    style={{ background: '#7B2FFF14', border: '0.5px dashed #7B2FFF55', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', color: '#a78bfa', fontSize: 12, fontWeight: 500, transition: 'border-color 0.15s' }}
+                  >
+                    + Add Database
+                  </div>
+                  {dbPickerList.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 16 }}>No matches.</div>}
+                </div>
+              )
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                {filteredPicker.map((m) => (
+                  <div
+                    key={m.name}
+                    onClick={() => {
+                      if (pickerTab === 'soldiers') addNode(metaByName[m.name], picker.ring)
+                      else if (pickerTab === 'triggers') addTrigger(m)
+                      else addLogic(m, picker.ring)
+                      setPicker(null)
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
+                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
+                    style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color 0.15s' }}
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={m.icon} alt={m.name} width={28} height={28} style={{ objectFit: 'contain', flexShrink: 0 }} onError={(ev) => ((ev.currentTarget as HTMLImageElement).style.visibility = 'hidden')} />
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 12, color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>{m.name}</div>
+                      <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.2, marginTop: 2 }}>{m.sub}</div>
+                    </div>
+                  </div>
+                ))}
+                {filteredPicker.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 24 }}>No matches.</div>}
+              </div>
+            )}
           </div>
         </div>
       )}
+
+      {/* shared database add/edit modal (overlays the picker) */}
+      {dbModal && <DbConnectionModal mode={dbModal} onClose={() => setDbModal(null)} onSaved={reloadDb} />}
 
       {/* ===================== RIGHT-CLICK CONTEXT MENU ================ */}
       {menu && (
