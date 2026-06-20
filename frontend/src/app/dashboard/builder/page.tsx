@@ -18,8 +18,11 @@ import AgentChatDrawer from '@/components/builder/AgentChatDrawer'
 import {
   useDbConnections,
   DbConnectionModal,
+  DeleteDbDialog,
+  DbConnectionCard,
   DbLogo,
   DB_META,
+  DB_TYPES,
   type DbConnection,
   type DbModalMode,
 } from '@/components/databases/DbConnections'
@@ -1152,6 +1155,7 @@ export default function BuilderPage() {
   // database connections + add/edit modal (shared module)
   const { conns: dbConns, reload: reloadDb } = useDbConnections()
   const [dbModal, setDbModal] = useState<DbModalMode | null>(null)
+  const [dbDelete, setDbDelete] = useState<DbConnection | null>(null)
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
   const [commander, setCommander] = useState<Commander>(initCommander)
   const [sunOpen, setSunOpen] = useState(false)
@@ -1710,52 +1714,39 @@ export default function BuilderPage() {
             />
 
             {pickerTab === 'database' ? (
-              dbConns.length === 0 ? (
-                /* empty state — no databases connected yet */
-                <div style={{ textAlign: 'center', padding: '32px 16px' }}>
-                  <div style={{ fontSize: 13, color: '#9AA0B8', marginBottom: 14 }}>No databases connected yet</div>
-                  <button
-                    onClick={() => setDbModal({ kind: 'create' })}
-                    style={{ display: 'inline-flex', alignItems: 'center', gap: 7, background: 'linear-gradient(135deg, #FF6B00, #7B2FFF)', border: 'none', color: '#fff', fontWeight: 600, fontSize: 13, padding: '9px 16px', borderRadius: 9, cursor: 'pointer' }}
-                  >
-                    + Add Database
-                  </button>
-                </div>
-              ) : (
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 10 }}>
-                  {dbPickerList.map((c) => {
-                    const m = DB_META[c.db_type]
-                    const first = Object.entries(c.credentials_masked || {})[0]
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+                {/* type tiles — always shown; each opens the modal pre-set to that engine */}
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                  {DB_TYPES.map((ty) => {
+                    const m = DB_META[ty]
                     return (
                       <div
-                        key={c.id}
-                        onClick={() => { addDbNode(c, picker.ring); setPicker(null) }}
-                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
+                        key={ty}
+                        onClick={() => setDbModal({ kind: 'create', presetType: ty, lockType: true })}
+                        onMouseEnter={(e) => (e.currentTarget.style.borderColor = m.color)}
                         onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
-                        style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 10, alignItems: 'center', transition: 'border-color 0.15s' }}
+                        style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, transition: 'border-color 0.15s' }}
                       >
-                        <DbLogo type={c.db_type} size={28} />
-                        <div style={{ minWidth: 0 }}>
-                          <div style={{ fontSize: 12, color: '#fff', fontWeight: 500, lineHeight: 1.2 }}>{c.name}</div>
-                          <div style={{ fontSize: 10, color: '#6b7280', lineHeight: 1.2, marginTop: 2, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                            {m.label}{first ? ` · ${first[0]}: ${String(first[1])}` : ''}
-                          </div>
-                        </div>
+                        <DbLogo type={ty} size={28} />
+                        <div style={{ fontSize: 12, color: '#fff', fontWeight: 500 }}>{m.label}</div>
                       </div>
                     )
                   })}
-                  {/* + Add Database tile — add more without leaving the picker */}
-                  <div
-                    onClick={() => setDbModal({ kind: 'create' })}
-                    onMouseEnter={(e) => (e.currentTarget.style.borderColor = pickerAccent)}
-                    onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#7B2FFF55')}
-                    style={{ background: '#7B2FFF14', border: '0.5px dashed #7B2FFF55', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', gap: 8, alignItems: 'center', justifyContent: 'center', color: '#a78bfa', fontSize: 12, fontWeight: 500, transition: 'border-color 0.15s' }}
-                  >
-                    + Add Database
-                  </div>
-                  {dbPickerList.length === 0 && <div style={{ gridColumn: '1 / -1', textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 16 }}>No matches.</div>}
                 </div>
-              )
+
+                {/* existing saved connections — selecting one drops it on the canvas */}
+                {dbConns.length > 0 && (
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                    <div style={{ fontSize: 11, color: '#6b7280', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Your databases</div>
+                    {dbPickerList.map((c) => (
+                      <div key={c.id} onClick={() => { addDbNode(c, picker.ring); setPicker(null) }} style={{ cursor: 'pointer' }}>
+                        <DbConnectionCard conn={c} onEdit={(x) => setDbModal({ kind: 'edit', conn: x })} onDelete={(x) => setDbDelete(x)} />
+                      </div>
+                    ))}
+                    {dbPickerList.length === 0 && <div style={{ textAlign: 'center', color: '#6b7280', fontSize: 12, padding: 12 }}>No matches.</div>}
+                  </div>
+                )}
+              </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
                 {filteredPicker.map((m) => (
@@ -1786,8 +1777,9 @@ export default function BuilderPage() {
         </div>
       )}
 
-      {/* shared database add/edit modal (overlays the picker) */}
+      {/* shared database add/edit modal + delete confirm (overlay the picker) */}
       {dbModal && <DbConnectionModal mode={dbModal} onClose={() => setDbModal(null)} onSaved={reloadDb} />}
+      {dbDelete && <DeleteDbDialog conn={dbDelete} onCancel={() => setDbDelete(null)} onDeleted={() => { setDbDelete(null); reloadDb() }} />}
 
       {/* ===================== RIGHT-CLICK CONTEXT MENU ================ */}
       {menu && (

@@ -122,7 +122,9 @@ export function testDb(id: number) {
 }
 
 // ── add / edit modal ───────────────────────────────────────────────────────
-export type DbModalMode = { kind: 'create'; presetType?: DbType } | { kind: 'edit'; conn: DbConnection }
+// presetType pre-selects the engine; lockType also hides the in-modal type
+// picker (used when the caller already chose the type via a dedicated tile).
+export type DbModalMode = { kind: 'create'; presetType?: DbType; lockType?: boolean } | { kind: 'edit'; conn: DbConnection }
 
 interface FormState {
   name: string
@@ -144,6 +146,7 @@ function initForm(mode: DbModalMode): FormState {
 
 export function DbConnectionModal({ mode, onClose, onSaved }: { mode: DbModalMode; onClose: () => void; onSaved: () => void }) {
   const isEdit = mode.kind === 'edit'
+  const lockType = mode.kind === 'create' && !!mode.lockType
   const [form, setForm] = useState<FormState>(() => initForm(mode))
   const [saving, setSaving] = useState(false)
   const [modalTest, setModalTest] = useState<TestState | null>(null)
@@ -233,22 +236,26 @@ export function DbConnectionModal({ mode, onClose, onSaved }: { mode: DbModalMod
           <input value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="e.g. Prod Postgres" style={{ ...input, fontFamily: 'var(--font-sans)' }} />
         </label>
 
-        <span style={label}>Database type</span>
-        <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
-          {DB_TYPES.map((ty) => {
-            const m = DB_META[ty]
-            const active = form.db_type === ty
-            return (
-              <button
-                key={ty} type="button" disabled={isEdit} onClick={() => set('db_type', ty)}
-                style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, padding: '12px 8px', borderRadius: 11, cursor: isEdit ? 'not-allowed' : 'pointer', background: active ? `${m.color}1F` : 'rgba(255,255,255,0.03)', border: active ? `1px solid ${m.color}` : '1px solid rgba(255,255,255,0.1)', opacity: isEdit && !active ? 0.4 : 1 }}
-              >
-                <DbLogo type={ty} size={26} />
-                <span style={{ fontSize: 12, fontWeight: 600, color: active ? '#fff' : '#9AA0B8' }}>{m.label}</span>
-              </button>
-            )
-          })}
-        </div>
+        {!lockType && (
+          <>
+            <span style={label}>Database type</span>
+            <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
+              {DB_TYPES.map((ty) => {
+                const m = DB_META[ty]
+                const active = form.db_type === ty
+                return (
+                  <button
+                    key={ty} type="button" disabled={isEdit} onClick={() => set('db_type', ty)}
+                    style={{ flex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 7, padding: '12px 8px', borderRadius: 11, cursor: isEdit ? 'not-allowed' : 'pointer', background: active ? `${m.color}1F` : 'rgba(255,255,255,0.03)', border: active ? `1px solid ${m.color}` : '1px solid rgba(255,255,255,0.1)', opacity: isEdit && !active ? 0.4 : 1 }}
+                  >
+                    <DbLogo type={ty} size={26} />
+                    <span style={{ fontSize: 12, fontWeight: 600, color: active ? '#fff' : '#9AA0B8' }}>{m.label}</span>
+                  </button>
+                )
+              })}
+            </div>
+          </>
+        )}
 
         <div style={{ display: 'flex', gap: 6, background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 10, padding: 4, marginBottom: 16 }}>
           {(['fields', 'uri'] as const).map((mth) => (
@@ -411,11 +418,11 @@ export function DbConnectionCard({ conn, onEdit, onDelete }: { conn: DbConnectio
       )}
 
       <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
-        <button onClick={runTest} disabled={t?.loading} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.35)', color: '#00D4FF', fontWeight: 600, fontSize: 13, padding: '9px', borderRadius: 9, cursor: t?.loading ? 'wait' : 'pointer' }}>
+        <button onClick={(e) => { e.stopPropagation(); runTest() }} disabled={t?.loading} style={{ flex: 1, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: 7, background: 'rgba(0,212,255,0.1)', border: '1px solid rgba(0,212,255,0.35)', color: '#00D4FF', fontWeight: 600, fontSize: 13, padding: '9px', borderRadius: 9, cursor: t?.loading ? 'wait' : 'pointer' }}>
           {t?.loading ? <><Loader2 size={14} className="db-spin" /> Testing…</> : 'Test Connection'}
         </button>
-        <button onClick={() => onEdit(conn)} aria-label="Edit" title="Edit" style={{ background: 'rgba(123,47,255,0.14)', border: '1px solid rgba(123,47,255,0.4)', color: '#B98CFF', padding: '9px 11px', borderRadius: 9, cursor: 'pointer', display: 'inline-flex' }}><Pencil size={15} /></button>
-        <button onClick={() => onDelete(conn)} aria-label="Delete" title="Delete" style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.28)', color: '#FF4D6D', padding: '9px 11px', borderRadius: 9, cursor: 'pointer', display: 'inline-flex' }}><Trash2 size={15} /></button>
+        <button onClick={(e) => { e.stopPropagation(); onEdit(conn) }} aria-label="Edit" title="Edit" style={{ background: 'rgba(123,47,255,0.14)', border: '1px solid rgba(123,47,255,0.4)', color: '#B98CFF', padding: '9px 11px', borderRadius: 9, cursor: 'pointer', display: 'inline-flex' }}><Pencil size={15} /></button>
+        <button onClick={(e) => { e.stopPropagation(); onDelete(conn) }} aria-label="Delete" title="Delete" style={{ background: 'rgba(255,77,109,0.08)', border: '1px solid rgba(255,77,109,0.28)', color: '#FF4D6D', padding: '9px 11px', borderRadius: 9, cursor: 'pointer', display: 'inline-flex' }}><Trash2 size={15} /></button>
       </div>
       <style>{`.db-spin { animation: db-spin 0.8s linear infinite; } @keyframes db-spin { to { transform: rotate(360deg); } }`}</style>
     </div>
