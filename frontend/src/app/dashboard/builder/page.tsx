@@ -24,6 +24,7 @@ import {
   DB_META,
   DB_TYPES,
   type DbConnection,
+  type DbType,
   type DbModalMode,
 } from '@/components/databases/DbConnections'
 
@@ -62,6 +63,11 @@ interface AgentNode {
   query: string
   connectedTo: string[]
   configured: boolean
+  // Database nodes: dbType marks the node as a DB integration; connectionId is
+  // set once a saved connection is attached (clicking the node opens the DB
+  // modal instead of the generic config panel).
+  dbType?: DbType
+  connectionId?: number
 }
 
 interface RingConfig {
@@ -699,7 +705,14 @@ function seedCreds(fields: CredField[]): Record<string, string> {
   return c
 }
 
-function createNode(meta: IntMeta, ring: number): AgentNode {
+/** A DB node's subtitle — engine label plus the first masked credential field. */
+function dbMaskedSub(c: DbConnection): string {
+  const m = DB_META[c.db_type]
+  const first = Object.entries(c.credentials_masked || {})[0]
+  return first ? `${m.label} · ${first[0]}: ${String(first[1])}` : m.label
+}
+
+function createNode(meta: IntMeta, ring: number, db?: { dbType?: DbType; connectionId?: number; configured?: boolean }): AgentNode {
   const cfg = CONFIG[meta.name]
   const credentials: Record<string, string> = {}
   cfg?.creds.forEach((f) => {
@@ -721,7 +734,9 @@ function createNode(meta: IntMeta, ring: number): AgentNode {
     subject: '',
     query: '',
     connectedTo: [],
-    configured: false,
+    configured: db?.configured ?? false,
+    dbType: db?.dbType,
+    connectionId: db?.connectionId,
   }
 }
 
@@ -1156,6 +1171,9 @@ export default function BuilderPage() {
   const { conns: dbConns, reload: reloadDb } = useDbConnections()
   const [dbModal, setDbModal] = useState<DbModalMode | null>(null)
   const [dbDelete, setDbDelete] = useState<DbConnection | null>(null)
+  // id of the DB node whose config modal is open, so onSaved attaches the new
+  // connection back to THAT node instead of creating a separate one.
+  const [dbConfigNodeId, setDbConfigNodeId] = useState<string | null>(null)
   const [menu, setMenu] = useState<{ x: number; y: number; idx: number } | null>(null)
   const [commander, setCommander] = useState<Commander>(initCommander)
   const [sunOpen, setSunOpen] = useState(false)
@@ -1178,11 +1196,11 @@ export default function BuilderPage() {
   /* icons are preloaded once at mount via preloadAllIcons() — see RAF effect below */
 
   /* ------------------------------ mutations ------------------------------ */
-  const addNode = useCallback((meta: IntMeta, ringIndex?: number) => {
+  const addNode = useCallback((meta: IntMeta, ringIndex?: number, db?: { dbType?: DbType; connectionId?: number; configured?: boolean }) => {
     setNodes((prev) => {
       const ring =
         ringIndex !== undefined && countInRing(prev, ringIndex) < ringConfig(ringIndex).capacity ? ringIndex : pickRing(prev)
-      return [...prev, createNode(meta, ring)]
+      return [...prev, createNode(meta, ring, db)]
     })
   }, [])
 
@@ -1214,12 +1232,54 @@ export default function BuilderPage() {
     })
   }, [])
 
-  // A connected database becomes a Soldier node — synthesize IntMeta from the
-  // connection so it wires onto the canvas exactly like any other integration.
+  // Type-tile click → drop an UNCONFIGURED DB node (no connection yet), exactly
+  // like a fresh WhatsApp node. Clicking it later opens the DB modal.
+  const addDbTypeNode = useCallback((dbType: DbType, ringIndex?: number) => {
+    const m = DB_META[dbType]
+    addNode({ name: m.label, sub: 'Click to configure', slug: m.slug, hex: m.hex, color: m.color }, ringIndex, { dbType })
+  }, [addNode])
+
+  // Existing-connection click → drop a fully CONFIGURED DB node (creds already
+  // exist), synthesizing IntMeta so it wires like any other integration.
   const addDbNode = useCallback((c: DbConnection, ringIndex?: number) => {
     const m = DB_META[c.db_type]
-    addNode({ name: c.name, sub: m.label, slug: m.slug, hex: m.hex, color: m.color }, ringIndex)
+    addNode({ name: c.name, sub: dbMaskedSub(c), slug: m.slug, hex: m.hex, color: m.color }, ringIndex, { dbType: c.db_type, connectionId: c.id, configured: true })
   }, [addNode])
+
+  // Open the right config UI for a node: DB nodes open the DB modal (edit if a
+  // connection is already attached, else create pre-locked to the node's type);
+  // every other node opens the standard ConfigPanel.
+  const openNodeConfig = useCallback((idx: number) => {
+    const n = nodesRef.current[idx]
+    if (!n) return
+    setActiveIdx(idx)
+    setSunOpen(false)
+    if (n.dbType) {
+      setConfigIdx(null)
+      setDbConfigNodeId(n.id)
+      const existing = n.connectionId != null ? dbConns.find((c) => c.id === n.connectionId) : undefined
+      setDbModal(existing ? { kind: 'edit', conn: existing } : { kind: 'create', presetType: n.dbType, lockType: true })
+      return
+    }
+    setConfigIdx(idx)
+  }, [dbConns])
+
+  // After a save from a node-opened modal, attach the connection to that node.
+  const handleDbSaved = useCallback((conn?: DbConnection) => {
+    reloadDb()
+    if (!conn || !dbConfigNodeId) return
+    const idx = nodesRef.current.findIndex((n) => n.id === dbConfigNodeId)
+    if (idx < 0) return
+    const m = DB_META[conn.db_type]
+    updateNode(idx, {
+      name: conn.name,
+      sub: dbMaskedSub(conn),
+      connectionId: conn.id,
+      iconUrl: `https://cdn.simpleicons.org/${m.slug}/${m.hex}`,
+      brandColor: m.color,
+      configured: true,
+    })
+  }, [reloadDb, updateNode, dbConfigNodeId])
 
   /**
    * Remove a node, then compact rings: any ring left empty is dropped and the
@@ -1466,9 +1526,7 @@ export default function BuilderPage() {
   const onClick = (e: React.MouseEvent) => {
     const { mx, my, hit } = hitNode(e)
     if (hit) {
-      setActiveIdx(hit.idx)
-      setConfigIdx(hit.idx)
-      setSunOpen(false)
+      openNodeConfig(hit.idx)
       return
     }
     const { w, h } = canvasSizeRef.current
@@ -1579,10 +1637,7 @@ export default function BuilderPage() {
             .map(({ n, i }) => (
               <div
                 key={n.id}
-                onClick={() => {
-                  setConfigIdx(i)
-                  setActiveIdx(i)
-                }}
+                onClick={() => openNodeConfig(i)}
                 onMouseEnter={(e) => (e.currentTarget.style.borderColor = n.brandColor)}
                 onMouseLeave={(e) => (e.currentTarget.style.borderColor = i === activeIdx ? n.brandColor : '#1e2240')}
                 style={{ background: '#111327', border: `0.5px solid ${i === activeIdx ? n.brandColor : '#1e2240'}`, borderRadius: 8, padding: '6px 10px', display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
@@ -1722,7 +1777,7 @@ export default function BuilderPage() {
                     return (
                       <div
                         key={ty}
-                        onClick={() => setDbModal({ kind: 'create', presetType: ty, lockType: true })}
+                        onClick={() => { addDbTypeNode(ty, picker.ring); setPicker(null) }}
                         onMouseEnter={(e) => (e.currentTarget.style.borderColor = m.color)}
                         onMouseLeave={(e) => (e.currentTarget.style.borderColor = '#1e2240')}
                         style={{ background: '#111327', border: '0.5px solid #1e2240', borderRadius: 10, padding: 12, cursor: 'pointer', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, transition: 'border-color 0.15s' }}
@@ -1778,7 +1833,7 @@ export default function BuilderPage() {
       )}
 
       {/* shared database add/edit modal + delete confirm (overlay the picker) */}
-      {dbModal && <DbConnectionModal mode={dbModal} onClose={() => setDbModal(null)} onSaved={reloadDb} />}
+      {dbModal && <DbConnectionModal mode={dbModal} onClose={() => { setDbModal(null); setDbConfigNodeId(null) }} onSaved={handleDbSaved} />}
       {dbDelete && <DeleteDbDialog conn={dbDelete} onCancel={() => setDbDelete(null)} onDeleted={() => { setDbDelete(null); reloadDb() }} />}
 
       {/* ===================== RIGHT-CLICK CONTEXT MENU ================ */}

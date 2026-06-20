@@ -144,7 +144,7 @@ function initForm(mode: DbModalMode): FormState {
   return { name: '', db_type: mode.presetType ?? 'postgresql', method: 'fields', host: '', port: '', user: '', password: '', database: '', ssl: true, uri: '', allow_write: false, allow_delete: false }
 }
 
-export function DbConnectionModal({ mode, onClose, onSaved }: { mode: DbModalMode; onClose: () => void; onSaved: () => void }) {
+export function DbConnectionModal({ mode, onClose, onSaved }: { mode: DbModalMode; onClose: () => void; onSaved: (conn?: DbConnection) => void }) {
   const isEdit = mode.kind === 'edit'
   const lockType = mode.kind === 'create' && !!mode.lockType
   const [form, setForm] = useState<FormState>(() => initForm(mode))
@@ -176,27 +176,26 @@ export function DbConnectionModal({ mode, onClose, onSaved }: { mode: DbModalMod
 
     setSaving(true)
     try {
-      let id: number
+      let savedConn: DbConnection
       if (mode.kind === 'edit') {
         const body: Record<string, unknown> = { name: form.name.trim(), allow_write: form.allow_write, allow_delete: form.allow_delete }
         if (credsEntered) body.credentials = buildCreds(form)
-        const r = await api.patch<DbConnection>(`/db-connections/${mode.conn.id}`, body)
-        id = r.id
+        savedConn = await api.patch<DbConnection>(`/db-connections/${mode.conn.id}`, body)
       } else {
-        const r = await api.post<DbConnection>('/db-connections', {
+        savedConn = await api.post<DbConnection>('/db-connections', {
           name: form.name.trim(), db_type: form.db_type, credentials: buildCreds(form),
           allow_write: form.allow_write, allow_delete: form.allow_delete,
         })
-        id = r.id
       }
+      const id = savedConn.id
       setSaved(true)
-      onSaved()
+      onSaved(savedConn)
       // auto-test, shown inline before the user closes
       setModalTest({ loading: true })
       try {
         const tr = await testDb(id)
         setModalTest({ loading: false, ok: tr.success, msg: tr.success ? 'Connection OK' : (tr.error || 'Failed') })
-        onSaved() // refresh last_used / status
+        onSaved(savedConn) // refresh last_used / status
       } catch (err) {
         setModalTest({ loading: false, ok: false, msg: err instanceof Error ? err.message : 'Test failed' })
       }
