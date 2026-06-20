@@ -769,8 +769,8 @@ const fieldHelp: CSSProperties = { fontSize: 10, color: '#4b5563', marginTop: -6
 const sectionLabel: CSSProperties = { fontSize: 10, color: '#6b7280', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 8, display: 'block', fontWeight: 600 }
 const divider: CSSProperties = { borderTop: '0.5px solid #1e2240', margin: '14px 0' }
 
-/* ============================ Node Config Panel ============================ */
-function ConfigPanel({
+/* ============================ Node Config Modal ============================ */
+function NodeConfigModal({
   node,
   idx,
   nodes,
@@ -922,7 +922,15 @@ function ConfigPanel({
   const caseCount = Number(credsView['caseCount'] || '2')
 
   return (
-    <div style={{ padding: 16, height: '100%', boxSizing: 'border-box' }}>
+    <div
+      onClick={onClose}
+      style={{ position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(3,4,10,0.7)', backdropFilter: 'blur(5px)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24 }}
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="ncfg-scroll"
+        style={{ width: 500, maxWidth: '94vw', maxHeight: '90vh', overflowY: 'auto', background: 'rgba(13,14,26,0.97)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 18, padding: 26, backdropFilter: 'blur(16px)', boxSizing: 'border-box' }}
+      >
       {/* header */}
       <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -938,7 +946,10 @@ function ConfigPanel({
         </button>
       </div>
       <div style={{ display: 'inline-block', fontSize: 11, color: badge.color, fontWeight: 500, marginTop: 6, border: `0.5px solid ${node.brandColor}`, borderRadius: 6, padding: '2px 8px' }}>{badge.text}</div>
-      <div style={divider} />
+      {/* AES-256 banner — same reassurance chrome as DbConnectionModal */}
+      <div style={{ display: 'flex', gap: 9, background: 'rgba(0,212,255,0.06)', border: '1px solid rgba(0,212,255,0.22)', borderRadius: 10, padding: '11px 13px', margin: '14px 0', fontSize: 12.5, color: '#9FD9EC', lineHeight: 1.5 }}>
+        🔒 Credentials are encrypted with AES-256 and stored securely. Nerum never stores plaintext keys.
+      </div>
 
       {/* ---------------- SOLDIER ---------------- */}
       {nt === 'soldier' && (
@@ -1053,6 +1064,7 @@ function ConfigPanel({
         >
           {node.configured ? '✓ Saved' : 'Save'}
         </button>
+      </div>
       </div>
     </div>
   )
@@ -1189,7 +1201,9 @@ export default function BuilderPage() {
 
   const maxRing = nodes.reduce((m, n) => Math.max(m, n.ring), 0)
   const ringCount = maxRing + 1
-  const panelOpen = configIdx !== null || sunOpen
+  // Only the AI Commander (SunPanel) uses the slide-in aside now; node config is
+  // a centered modal that overlays the canvas without resizing it.
+  const panelOpen = sunOpen
   const configNode = configIdx !== null ? nodes[configIdx] : null
   const configRingColor = configNode ? ringConfig(configNode.ring).color : PLASMA.orange
 
@@ -1248,7 +1262,7 @@ export default function BuilderPage() {
 
   // Open the right config UI for a node: DB nodes open the DB modal (edit if a
   // connection is already attached, else create pre-locked to the node's type);
-  // every other node opens the standard ConfigPanel.
+  // every other node opens the NodeConfigModal.
   const openNodeConfig = useCallback((idx: number) => {
     const n = nodesRef.current[idx]
     if (!n) return
@@ -1701,26 +1715,11 @@ export default function BuilderPage() {
           )}
         </div>
 
-        {/* config slide panel */}
+        {/* AI Commander slide panel (node config is now a centered modal — see below) */}
         <aside
           className="ncfg-scroll"
           style={{ position: 'absolute', top: 0, right: 0, bottom: 0, width: PANEL_W, background: '#0d0f1e', borderLeft: '0.5px solid #1e2240', transform: panelOpen ? 'translateX(0)' : 'translateX(100%)', transition: 'transform 0.25s ease', overflowY: 'auto', zIndex: 6 }}
         >
-          {configNode && configIdx !== null && (
-            <ConfigPanel
-              node={configNode}
-              idx={configIdx}
-              nodes={nodes}
-              ringColor={configRingColor}
-              onClose={() => {
-                setConfigIdx(null)
-                setActiveIdx(-1)
-              }}
-              onChange={(patch) => updateNode(configIdx, patch)}
-              onCred={(key, val) => updateCred(configIdx, key, val)}
-              onRemove={() => removeNodeAt(configIdx)}
-            />
-          )}
           {sunOpen && <SunPanel commander={commander} onClose={() => setSunOpen(false)} onChange={(p) => setCommander((c) => ({ ...c, ...p }))} />}
         </aside>
       </div>
@@ -1830,6 +1829,23 @@ export default function BuilderPage() {
             )}
           </div>
         </div>
+      )}
+
+      {/* node config modal — replaces the old slide ConfigPanel for non-DB nodes */}
+      {configNode && configIdx !== null && (
+        <NodeConfigModal
+          node={configNode}
+          idx={configIdx}
+          nodes={nodes}
+          ringColor={configRingColor}
+          onClose={() => {
+            setConfigIdx(null)
+            setActiveIdx(-1)
+          }}
+          onChange={(patch) => updateNode(configIdx, patch)}
+          onCred={(key, val) => updateCred(configIdx, key, val)}
+          onRemove={() => removeNodeAt(configIdx)}
+        />
       )}
 
       {/* shared database add/edit modal + delete confirm (overlay the picker) */}
