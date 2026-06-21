@@ -14,6 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
 from core.database import get_db
+from core.ratelimit import email_key, ip_email_key, ip_key, limiter
 from core.security import (
     create_access_token,
     get_current_user,
@@ -107,9 +108,18 @@ async def _record_login(db: AsyncSession, user: User, request: Request) -> None:
     db.add(LoginHistory(user_id=user.id, email=user.email, ip_address=ip, device=device, logged_in_at=datetime.utcnow()))
 
 
+async def _rl_capture_email(request: Request) -> None:
+    """Stash the request's email on request.state so the rate-limit key functions
+    can bucket per-email. Best-effort: a missing/unparseable body yields ''."""
+    try:
+        data = await request.json()
+        request.state.rl_email = (data.get("email") or "").lower().strip()
+    except Exception:
+        request.state.rl_email = ""
+
+
 # ── routes ────────────────────────────────────────────────────────────
-@router.post("/register", status_code=201)
-async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+async def _register_impl(body: RegisterRequest, db: AsyncSession) -> dict:
     email = body.email.lower().strip()
     if (await db.scalars(select(User).where(User.email == email))).first():
         raise HTTPException(400, "Email already registered. Please log in.")
@@ -121,13 +131,21 @@ async def register(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
     return {"message": "Verification code sent. Check your email."}
 
 
+@router.post("/register", status_code=201)
+@limiter.limit("3/hour", key_func=ip_key)
+async def register(request: Request, body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    return await _register_impl(body, db)
+
+
 @router.post("/signup", status_code=201)
-async def signup(body: RegisterRequest, db: AsyncSession = Depends(get_db)):
-    return await register(body, db)
+@limiter.limit("3/hour", key_func=ip_key)
+async def signup(request: Request, body: RegisterRequest, db: AsyncSession = Depends(get_db)):
+    return await _register_impl(body, db)
 
 
 @router.post("/verify-email")
-async def verify_email(body: OTPRequest, request: Request, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute", key_func=ip_email_key)
+async def verify_email(body: OTPRequest, request: Request, db: AsyncSession = Depends(get_db), _rl: None = Depends(_rl_capture_email)):
     email = body.email.lower().strip()
     await _consume_otp(db, email, "verify", body.otp)
     user = (await db.scalars(select(User).where(User.email == email))).first()
@@ -143,7 +161,9 @@ async def verify_email(body: OTPRequest, request: Request, db: AsyncSession = De
 
 
 @router.post("/login")
-async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute", key_func=ip_key)
+@limiter.limit("5/minute", key_func=email_key)
+async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends(get_db), _rl: None = Depends(_rl_capture_email)):
     email = body.email.lower().strip()
     user = (await db.scalars(select(User).where(User.email == email))).first()
 
@@ -176,7 +196,8 @@ async def login(body: LoginRequest, request: Request, db: AsyncSession = Depends
 
 
 @router.post("/verify-2fa")
-async def verify_2fa(body: OTPRequest, request: Request, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/minute", key_func=ip_email_key)
+async def verify_2fa(body: OTPRequest, request: Request, db: AsyncSession = Depends(get_db), _rl: None = Depends(_rl_capture_email)):
     email = body.email.lower().strip()
     await _consume_otp(db, email, "2fa", body.otp)
     user = (await db.scalars(select(User).where(User.email == email))).first()
@@ -187,7 +208,8 @@ async def verify_2fa(body: OTPRequest, request: Request, db: AsyncSession = Depe
 
 
 @router.post("/forgot-password")
-async def forgot_password(body: ForgotRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("3/hour", key_func=ip_email_key)
+async def forgot_password(request: Request, body: ForgotRequest, db: AsyncSession = Depends(get_db), _rl: None = Depends(_rl_capture_email)):
     email = body.email.lower().strip()
     user = (await db.scalars(select(User).where(User.email == email))).first()
     if user:
@@ -199,7 +221,8 @@ async def forgot_password(body: ForgotRequest, db: AsyncSession = Depends(get_db
 
 
 @router.post("/reset-password")
-async def reset_password(body: ResetRequest, db: AsyncSession = Depends(get_db)):
+@limiter.limit("5/hour", key_func=ip_key)
+async def reset_password(request: Request, body: ResetRequest, db: AsyncSession = Depends(get_db)):
     rec = (
         await db.scalars(
             select(PasswordResetToken).where(PasswordResetToken.token == body.token, PasswordResetToken.used.is_(False))

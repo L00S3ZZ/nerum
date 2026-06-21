@@ -18,5 +18,6 @@ anthropic>=0.40.0
 razorpay==1.4.1
 cryptography==42.0.8
 apscheduler==3.10.4
+slowapi==0.1.9
 google-auth==2.29.0
 google-api-python-client==2.130.0

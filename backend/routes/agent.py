@@ -8,7 +8,7 @@ GET  /agent/conversations     (kept for the existing frontend; no history yet)
 import json
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel
 from sqlalchemy import select
@@ -18,6 +18,7 @@ from agent.engine import AgentEngine
 from core.config import settings
 from core.database import get_db
 from core.encryption import decrypt_data
+from core.ratelimit import limiter, user_key
 from core.security import get_current_user
 from models.models import AgentRun, AgentStep, User, UserIntegration
 from routes.integrations import get_user_byok
@@ -33,6 +34,13 @@ class AgentRequest(BaseModel):
 
 def _sse(event: dict) -> str:
     return f"data: {json.dumps(event, ensure_ascii=False, default=str)}\n\n"
+
+
+async def _rl_capture_user(request: Request, user: User = Depends(get_current_user)) -> None:
+    """Stash the authenticated user's id on request.state so the rate-limit key
+    function can bucket per-user. Reuses the cached get_current_user result, so no
+    extra DB lookup."""
+    request.state.rl_user = user.id
 
 
 async def _load_credentials(db: AsyncSession, user_id: int) -> dict:
@@ -61,10 +69,13 @@ async def _load_credentials(db: AsyncSession, user_id: int) -> dict:
 
 
 @router.post("/run")
+@limiter.limit("10/minute", key_func=user_key)
 async def agent_run(
+    request: Request,
     body: AgentRequest,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    _rl: None = Depends(_rl_capture_user),
 ):
     goal = body.message.strip()
     if not goal:

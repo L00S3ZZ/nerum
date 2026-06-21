@@ -1,5 +1,6 @@
 """Workflow CRUD + REAL execution (no fake success)."""
 import json
+import secrets
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -52,6 +53,7 @@ def _serialize(w: Workflow) -> dict:
         "name": w.name,
         "description": w.description,
         "config": json.loads(w.config or "{}"),
+        "webhook_key": w.webhook_key,
         "is_active": w.is_active,
         "runs": w.runs or 0,
         "last_run": w.last_run.isoformat() if w.last_run else None,
@@ -63,7 +65,14 @@ def _serialize(w: Workflow) -> dict:
 async def create(body: WorkflowBody, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     cfg = body.config.model_dump()
     _validate(cfg)
-    w = Workflow(user_id=user.id, name=body.name, description=body.description, config=json.dumps(cfg), is_active=True)
+    w = Workflow(
+        user_id=user.id,
+        name=body.name,
+        description=body.description,
+        config=json.dumps(cfg),
+        webhook_key=secrets.token_urlsafe(32),
+        is_active=True,
+    )
     db.add(w)
     await db.flush()
     return _serialize(w)

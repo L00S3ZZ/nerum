@@ -3,9 +3,12 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from slowapi.errors import RateLimitExceeded
 
 from core.config import settings
 from core.database import init_db
+from core.ratelimit import limiter
 from core.scheduler import scheduler, start_scheduler
 from routes import (
     agent,
@@ -34,6 +37,21 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Nerum API", version="2.0.0", lifespan=lifespan)
+
+# Rate limiting (slowapi). The limiter is shared via app.state; routes opt in with
+# @limiter.limit(...). A breach raises RateLimitExceeded, which we render as a
+# generic 429 with no internal detail (which limit, counts, etc. stay hidden).
+app.state.limiter = limiter
+
+
+async def _rate_limit_handler(request, exc):
+    return JSONResponse(
+        status_code=429,
+        content={"detail": "Too many requests. Please slow down and try again later."},
+    )
+
+
+app.add_exception_handler(RateLimitExceeded, _rate_limit_handler)
 
 app.add_middleware(
     CORSMiddleware,

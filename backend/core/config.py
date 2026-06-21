@@ -11,13 +11,14 @@ class Settings(BaseSettings):
     # ── Security (REQUIRED — missing key crashes startup, never defaults) ─
     SECRET_KEY: str
     ENCRYPTION_KEY: str
+    META_VERIFY_TOKEN: str  # REQUIRED — Meta webhook handshake token; no default
 
     # ── Services (optional — empty means "not configured", surfaced at call time) ─
     RESEND_API_KEY: str = ""
     META_WHATSAPP_TOKEN: str = ""
     META_PHONE_NUMBER_ID: str = ""
     META_WABA_ID: str = ""
-    META_VERIFY_TOKEN: str = "nerum_verify_2026"
+    META_APP_SECRET: str = ""  # Meta app secret — HMAC key for inbound webhook signatures
     TELEGRAM_BOT_TOKEN: str = ""  # ONE canonical name, used everywhere
     RAZORPAY_KEY_ID: str = ""
     RAZORPAY_KEY_SECRET: str = ""

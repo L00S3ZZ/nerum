@@ -59,6 +59,8 @@ _MIGRATIONS = [
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS google_id VARCHAR",
     "ALTER TABLE users ADD COLUMN IF NOT EXISTS avatar_url VARCHAR",
     "ALTER TABLE otp_codes ADD COLUMN IF NOT EXISTS purpose VARCHAR DEFAULT 'verify'",
+    "ALTER TABLE workflows ADD COLUMN IF NOT EXISTS webhook_key VARCHAR",
+    "CREATE UNIQUE INDEX IF NOT EXISTS ix_workflows_webhook_key ON workflows (webhook_key)",
 ]
 
 
@@ -73,3 +75,35 @@ async def init_db() -> None:
                 await conn.execute(text(stmt))
             except Exception as exc:  # one bad migration shouldn't abort the rest
                 print(f"[nerum] migration skipped: {stmt.split('ADD COLUMN')[0].strip()} … ({exc})")
+    # Backfill runs AFTER the column+index migration above has committed.
+    await _backfill_webhook_keys()
+
+
+async def _backfill_webhook_keys() -> None:
+    """One-time, idempotent: give pre-existing workflows a webhook_key.
+
+    Rows created before the webhook_key column existed have NULL keys. Under the
+    indexed /webhooks/receive lookup a NULL key simply never matches (no 500, no
+    misroute) — those workflows are just unreachable until keyed. Assign each NULL
+    row a fresh token_urlsafe(32). Only NULL rows are touched, so every later boot
+    is a no-op. A failure here is logged, never blocks startup.
+    """
+    import secrets
+
+    async with AsyncSessionLocal() as session:
+        try:
+            ids = (
+                await session.execute(
+                    text("SELECT id FROM workflows WHERE webhook_key IS NULL")
+                )
+            ).scalars().all()
+            for wid in ids:
+                await session.execute(
+                    text("UPDATE workflows SET webhook_key = :k WHERE id = :id"),
+                    {"k": secrets.token_urlsafe(32), "id": wid},
+                )
+            if ids:
+                await session.commit()
+                print(f"[nerum] backfilled webhook_key for {len(ids)} workflow(s)")
+        except Exception as exc:  # backfill must never block boot
+            print(f"[nerum] webhook_key backfill skipped: {exc}")

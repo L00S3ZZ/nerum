@@ -1,4 +1,6 @@
 """Inbound webhooks: Meta WhatsApp verify/receive + custom workflow triggers."""
+import hashlib
+import hmac
 import json
 
 from fastapi import APIRouter, Depends, HTTPException, Request
@@ -9,6 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from core.config import settings
 from core.database import get_db
 from core.encryption import decrypt_data
+from core.ratelimit import ip_key, limiter, webhook_key_key
 from models.models import User, UserIntegration, Workflow, WorkflowRun
 from routes.integrations import get_user_byok
 from services.workflow_executor import WorkflowExecutor
@@ -24,6 +27,28 @@ async def meta_verify(request: Request):
     if params.get("hub.mode") == "subscribe" and params.get("hub.verify_token") == settings.META_VERIFY_TOKEN:
         return PlainTextResponse(params.get("hub.challenge", ""))
     raise HTTPException(403, "Verification failed")
+
+
+def _verify_meta_signature(raw: bytes, header: str | None) -> None:
+    """Authenticate an inbound Meta webhook by its X-Hub-Signature-256 HMAC.
+
+    Fail closed and uniform: every failure (secret unconfigured, missing/malformed
+    header, HMAC mismatch) returns the SAME generic 403 so the caller can't tell
+    them apart; the specific reason is logged server-side only. The caller MUST run
+    this before parsing the payload or triggering any workflow.
+    """
+    secret = settings.META_APP_SECRET
+    if not secret:
+        print("[nerum] meta webhook rejected: META_APP_SECRET not set")
+        raise HTTPException(403, "Invalid webhook signature")
+    if not header or not header.startswith("sha256="):
+        print("[nerum] meta webhook rejected: missing/malformed X-Hub-Signature-256 header")
+        raise HTTPException(403, "Invalid webhook signature")
+    expected = hmac.new(secret.encode(), raw, hashlib.sha256).hexdigest()
+    received = header.split("=", 1)[1]
+    if not hmac.compare_digest(expected, received):
+        print("[nerum] meta webhook rejected: signature mismatch")
+        raise HTTPException(403, "Invalid webhook signature")
 
 
 def _extract_wa_message(body: dict):
@@ -65,6 +90,7 @@ def _is_whatsapp_trigger(cfg: dict) -> bool:
 
 
 @router.post("/meta")
+@limiter.limit("60/minute", key_func=ip_key)
 async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
     """Receive WhatsApp messages and fire the matching user's workflow.
 
@@ -72,9 +98,16 @@ async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
     (delivery receipts, status updates), no-match cases, and any processing error
     are logged and swallowed rather than surfaced as a non-2xx. Work is done
     synchronously for now but fully guarded — a crash can never reach Meta.
+
+    Authentication: the request is rejected with 403 before any parsing if its
+    X-Hub-Signature-256 HMAC doesn't match — a forged payload never reaches the
+    workflow trigger path below.
     """
+    raw = await request.body()
+    _verify_meta_signature(raw, request.headers.get("X-Hub-Signature-256"))
+
     try:
-        body = await request.json()
+        body = json.loads(raw)
     except Exception:
         body = {}
 
@@ -159,29 +192,36 @@ async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/receive/{webhook_key}")
+@limiter.limit("30/minute", key_func=webhook_key_key)
 async def receive(webhook_key: str, request: Request, db: AsyncSession = Depends(get_db)):
-    """Generic webhook trigger: find the workflow by its webhook_key and run it."""
-    if not webhook_key or len(webhook_key) < 8:
-        raise HTTPException(400, "Invalid webhook key")
+    """Generic webhook trigger: find the workflow by its webhook_key and run it.
+
+    The webhook_key is an unguessable server-generated secret (token_urlsafe(32))
+    stored in its own indexed column, so this is a single indexed lookup rather
+    than a scan over every active workflow.
+    """
+    # Single indexed lookup; an empty/NULL key never matches a real row.
+    w = (
+        await db.scalars(
+            select(Workflow).where(
+                Workflow.webhook_key == webhook_key,
+                Workflow.is_active.is_(True),
+            )
+        )
+    ).first()
+    if not w:
+        raise HTTPException(404, "Webhook not found or inactive")
+
+    try:
+        cfg = json.loads(w.config or "{}")
+    except Exception:
+        raise HTTPException(404, "Webhook not found or inactive")
+
     try:
         incoming = await request.json()
     except Exception:
         incoming = dict(await request.form())
 
-    workflows = (await db.scalars(select(Workflow).where(Workflow.is_active.is_(True)))).all()
-    target = None
-    for w in workflows:
-        try:
-            cfg = json.loads(w.config or "{}")
-        except Exception:
-            continue
-        if cfg.get("webhook_key") == webhook_key:
-            target = (w, cfg)
-            break
-    if not target:
-        raise HTTPException(404, "Webhook not found or inactive")
-
-    w, cfg = target
     user = await db.get(User, w.user_id)
     if not user:
         raise HTTPException(404, "Owner not found")
@@ -197,4 +237,6 @@ async def receive(webhook_key: str, request: Request, db: AsyncSession = Depends
     except Exception as exc:
         run.status = "failed"
         run.details = str(exc)[:8000]
-        raise HTTPException(502, f"Workflow failed: {exc}")
+        # Real cause stays server-side; caller gets a generic message.
+        print(f"[nerum] webhook workflow {w.id} failed: {exc}")
+        raise HTTPException(502, "Workflow execution failed")

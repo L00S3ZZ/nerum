@@ -42,6 +42,9 @@ class Workflow(Base):
     trigger = Column(String, default="")
     action = Column(String, default="")
     config = Column(Text, default="{}")
+    # Unguessable per-workflow secret for the generic /webhooks/receive trigger.
+    # Indexed + unique so lookup is a single indexed query, not a full scan.
+    webhook_key = Column(String, unique=True, index=True, nullable=True)
     is_active = Column(Boolean, default=True)
     runs = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)

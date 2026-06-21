@@ -80,10 +80,15 @@ async def verify_payment(body: VerifyBody, user: User = Depends(get_current_user
 @router.post("/razorpay-webhook")
 async def razorpay_webhook(request: Request, x_razorpay_signature: str = Header(None), db: AsyncSession = Depends(get_db)):
     raw = await request.body()
-    if settings.RAZORPAY_WEBHOOK_SECRET:
-        expected = hmac.new(settings.RAZORPAY_WEBHOOK_SECRET.encode(), raw, hashlib.sha256).hexdigest()
-        if not hmac.compare_digest(expected, x_razorpay_signature or ""):
-            raise HTTPException(400, "Invalid webhook signature")
+    # Fail closed: without the secret we cannot authenticate the sender, so reject
+    # rather than process an unverified payload. Same response as a bad signature
+    # so the caller can't tell whether the secret is configured.
+    if not settings.RAZORPAY_WEBHOOK_SECRET:
+        print("[nerum] razorpay webhook rejected: RAZORPAY_WEBHOOK_SECRET not set")
+        raise HTTPException(403, "Invalid webhook signature")
+    expected = hmac.new(settings.RAZORPAY_WEBHOOK_SECRET.encode(), raw, hashlib.sha256).hexdigest()
+    if not hmac.compare_digest(expected, x_razorpay_signature or ""):
+        raise HTTPException(403, "Invalid webhook signature")
     try:
         payload = json.loads(raw)
     except Exception:
