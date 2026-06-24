@@ -8,8 +8,8 @@ from pydantic import BaseModel, Field
 from sqlalchemy import desc, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from core.database import get_db
-from core.security import get_current_user
+from core.database import AsyncSessionLocal, get_db
+from core.security import check_quota, get_current_user
 from models.models import User, Workflow, WorkflowRun
 from routes.integrations import get_user_byok
 from services.workflow_executor import WorkflowExecutor
@@ -121,44 +121,80 @@ async def toggle(wid: int, user: User = Depends(get_current_user), db: AsyncSess
     return {"id": w.id, "is_active": w.is_active}
 
 
-async def _execute(db: AsyncSession, user: User, name: str, config: dict, trigger: dict, workflow_id: int) -> dict:
-    """Run a graph, persist a WorkflowRun, surface real errors."""
-    byok = await get_user_byok(db, user.id)
-    run = WorkflowRun(user_id=user.id, workflow_id=workflow_id, workflow_name=name, action="manual", status="running", ran_at=datetime.utcnow())
-    db.add(run)
-    await db.flush()
+async def _execute(user: User, name: str, config: dict, trigger: dict, workflow_id: int) -> dict:
+    """Run a graph, persist a WorkflowRun, surface real errors.
+
+    Pool-safe shape (H3): a DB session is only checked out for the short
+    bookkeeping windows, never across run_graph's network calls. We (1) open a
+    short session to enforce quota, load BYOK and create the 'running' row, close
+    it, (2) run the graph with NO session held, then (3) open a second short
+    session to write the final status and bump token/run counters. This mirrors
+    core/scheduler.py and keeps the connection pool free during slow execution.
+    """
+    # 1. Short session: quota gate + BYOK + create the running row.
+    async with AsyncSessionLocal() as db:
+        await check_quota(user)  # raises 429 before any work if over the limit
+        byok = await get_user_byok(db, user.id)
+        run = WorkflowRun(
+            user_id=user.id, workflow_id=workflow_id, workflow_name=name,
+            action="manual", status="running", ran_at=datetime.utcnow(),
+        )
+        db.add(run)
+        await db.commit()
+        await db.refresh(run)
+        run_id = run.id
+
+    # 2. Run the graph with NO DB connection checked out of the pool.
+    status = "success"
+    error: str | None = None
+    results = None
     try:
         results = await WorkflowExecutor(byok).run_graph(config, trigger)
-        run.status = "success"
-        run.details = json.dumps(results, default=str)[:8000]
-        user.tokens_used = (user.tokens_used or 0) + 1
-        return {"run_id": run.id, "status": "success", "results": results}
+        details = json.dumps(results, default=str)[:8000]
     except HTTPException as exc:
-        run.status = "failed"
-        run.details = f"{exc.status_code}: {exc.detail}"
-        return {"run_id": run.id, "status": "failed", "error": str(exc.detail)}
+        status, error = "failed", str(exc.detail)
+        details = f"{exc.status_code}: {exc.detail}"
     except Exception as exc:  # pragma: no cover
-        run.status = "failed"
-        run.details = str(exc)[:8000]
-        return {"run_id": run.id, "status": "failed", "error": str(exc)}
+        status, error = "failed", str(exc)
+        details = str(exc)[:8000]
+
+    # 3. Short session: persist the outcome + bump counters.
+    async with AsyncSessionLocal() as db:
+        run = await db.get(WorkflowRun, run_id)
+        if run:
+            run.status = status
+            run.details = details
+        if status == "success":
+            u = await db.get(User, user.id)
+            if u:
+                u.tokens_used = (u.tokens_used or 0) + 1
+        if workflow_id:
+            w = await db.get(Workflow, workflow_id)
+            if w:
+                w.runs = (w.runs or 0) + 1
+                w.last_run = datetime.utcnow()
+        await db.commit()
+
+    if status == "success":
+        return {"run_id": run_id, "status": "success", "results": results}
+    return {"run_id": run_id, "status": "failed", "error": error}
 
 
 @router.post("/run")
-async def run_adhoc(body: AdhocRun, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+async def run_adhoc(body: AdhocRun, user: User = Depends(get_current_user)):
     cfg = body.config.model_dump()
     _validate(cfg)
-    return await _execute(db, user, body.name, cfg, body.input, workflow_id=0)
+    return await _execute(user, body.name, cfg, body.input, workflow_id=0)
 
 
 @router.post("/{wid}/run")
 async def run_saved(wid: int, user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
+    # db here is used ONLY for the initial ownership fetch — _execute opens its
+    # own short sessions and never reuses this one across run_graph.
     w = await _owned(db, user, wid)
     cfg = json.loads(w.config or "{}")
     _validate(cfg)
-    result = await _execute(db, user, w.name, cfg, {}, workflow_id=w.id)
-    w.runs = (w.runs or 0) + 1
-    w.last_run = datetime.utcnow()
-    return result
+    return await _execute(user, w.name, cfg, {}, workflow_id=w.id)
 
 
 @router.get("/{wid}/runs")

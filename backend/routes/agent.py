@@ -16,10 +16,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from agent.engine import AgentEngine
 from core.config import settings
-from core.database import get_db
+from core.database import AsyncSessionLocal, get_db
 from core.encryption import decrypt_data
 from core.ratelimit import limiter, user_key
-from core.security import get_current_user
+from core.security import check_quota, get_current_user
 from models.models import AgentRun, AgentStep, User, UserIntegration
 from routes.integrations import get_user_byok
 
@@ -74,23 +74,34 @@ async def agent_run(
     request: Request,
     body: AgentRequest,
     user: User = Depends(get_current_user),
-    db: AsyncSession = Depends(get_db),
     _rl: None = Depends(_rl_capture_user),
 ):
     goal = body.message.strip()
     if not goal:
         raise HTTPException(400, "Message cannot be empty")
 
+    # Quota gate BEFORE opening the stream — a 429 returns as a normal JSON error
+    # response, never as an SSE event-stream.
+    await check_quota(user)
+
+    # Short session (H3): load BYOK + connected credentials, then close it BEFORE
+    # building the engine / returning the StreamingResponse. The agent loop is the
+    # longest-lived request in the app; it must NOT hold a pooled connection for
+    # its whole duration. The engine already persists every step through its own
+    # short-lived AsyncSessionLocal sessions (see agent/engine.py), so it needs no
+    # request-scoped session — we pass db=None.
+    async with AsyncSessionLocal() as db:
+        byok = await get_user_byok(db, user.id)
+        credentials = await _load_credentials(db, user.id)
+
     # Prefer the user's own Anthropic BYOK key; fall back to the server key.
-    byok = await get_user_byok(db, user.id)
     api_key = byok.get("anthropic") or settings.ANTHROPIC_API_KEY
     if not api_key:
         raise HTTPException(503, "AI not configured — add an Anthropic key (BYOK) or set ANTHROPIC_API_KEY")
 
-    credentials = await _load_credentials(db, user.id)
     session_id = body.session_id or uuid.uuid4().hex
 
-    engine = AgentEngine(user=user, db=db, api_key=api_key, credentials=credentials)
+    engine = AgentEngine(user=user, db=None, api_key=api_key, credentials=credentials)
 
     async def stream():
         # Tell the client its session id up front so follow-ups can reuse it.

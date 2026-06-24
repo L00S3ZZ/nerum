@@ -3,15 +3,15 @@ import hashlib
 import hmac
 import json
 
-from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi import APIRouter, HTTPException, Request
 from fastapi.responses import PlainTextResponse
 from sqlalchemy import desc, select
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.config import settings
-from core.database import get_db
+from core.database import AsyncSessionLocal
 from core.encryption import decrypt_data
 from core.ratelimit import ip_key, limiter, webhook_key_key
+from core.security import token_limit_for
 from models.models import User, UserIntegration, Workflow, WorkflowRun
 from routes.integrations import get_user_byok
 from services.workflow_executor import WorkflowExecutor
@@ -91,7 +91,7 @@ def _is_whatsapp_trigger(cfg: dict) -> bool:
 
 @router.post("/meta")
 @limiter.limit("60/minute", key_func=ip_key)
-async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
+async def meta_incoming(request: Request):
     """Receive WhatsApp messages and fire the matching user's workflow.
 
     Always returns 200 ("received") so Meta never retries: non-message events
@@ -119,71 +119,105 @@ async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
             print(f"[nerum] WhatsApp inbound (non-message/ignored): {json.dumps(body)[:300]}")
             return {"status": "received"}
 
-        # Match the incoming phone_number_id to a user's stored WhatsApp creds.
-        integrations = (
-            await db.scalars(
-                select(UserIntegration).where(
-                    UserIntegration.integration_type == "whatsapp",
-                    UserIntegration.is_active.is_(True),
+        # 1. Short session: resolve owner + target workflow + quota + BYOK, and
+        #    create the 'running' row. Closed BEFORE run_graph so the pool stays
+        #    free during the (slow, networked) execution below.
+        async with AsyncSessionLocal() as db:
+            # Match the incoming phone_number_id to a user's stored WhatsApp creds.
+            integrations = (
+                await db.scalars(
+                    select(UserIntegration).where(
+                        UserIntegration.integration_type == "whatsapp",
+                        UserIntegration.is_active.is_(True),
+                    )
                 )
+            ).all()
+            owner_id = None
+            for row in integrations:
+                try:
+                    creds = decrypt_data(row.encrypted_credentials)
+                except Exception:
+                    continue  # bad/rotated key — don't let one row break routing
+                if str(creds.get("phone_number_id")) == str(phone_number_id):
+                    owner_id = row.user_id
+                    break
+
+            if owner_id is None:
+                print(f"[nerum] WhatsApp inbound: no active integration for phone_number_id={phone_number_id}")
+                return {"status": "received"}
+
+            # Most-recently-created active workflow for this user with a WA trigger.
+            workflows = (
+                await db.scalars(
+                    select(Workflow)
+                    .where(Workflow.user_id == owner_id, Workflow.is_active.is_(True))
+                    .order_by(desc(Workflow.created_at))
+                )
+            ).all()
+            target = None
+            for w in workflows:
+                try:
+                    cfg = json.loads(w.config or "{}")
+                except Exception:
+                    continue
+                if _is_whatsapp_trigger(cfg):
+                    target = (w, cfg)
+                    break
+
+            if not target:
+                print(f"[nerum] WhatsApp inbound: user {owner_id} has no active whatsapp_message workflow")
+                return {"status": "received"}
+
+            w, cfg = target
+            wf_id, wf_name = w.id, w.name
+
+            # Quota gate. Over quota → log and still ack 200 (never break the
+            # "always 200 to Meta" contract); just skip execution.
+            owner = await db.get(User, owner_id)
+            if owner is None:
+                print(f"[nerum] WhatsApp inbound: owner {owner_id} not found")
+                return {"status": "received"}
+            if (owner.tokens_used or 0) >= token_limit_for(owner.plan):
+                print(f"[nerum] WhatsApp inbound: owner {owner_id} over token limit — skipping execution")
+                return {"status": "received"}
+
+            byok = await get_user_byok(db, owner_id)
+            run = WorkflowRun(
+                user_id=owner_id, workflow_id=wf_id, workflow_name=wf_name,
+                action="whatsapp", status="running",
             )
-        ).all()
-        owner_id = None
-        for row in integrations:
-            try:
-                creds = decrypt_data(row.encrypted_credentials)
-            except Exception:
-                continue  # bad/rotated key — don't let one row break routing
-            if str(creds.get("phone_number_id")) == str(phone_number_id):
-                owner_id = row.user_id
-                break
+            db.add(run)
+            await db.commit()
+            await db.refresh(run)
+            run_id = run.id
 
-        if owner_id is None:
-            print(f"[nerum] WhatsApp inbound: no active integration for phone_number_id={phone_number_id}")
-            return {"status": "received"}
-
-        # Most-recently-created active workflow for this user with a WA trigger.
-        workflows = (
-            await db.scalars(
-                select(Workflow)
-                .where(Workflow.user_id == owner_id, Workflow.is_active.is_(True))
-                .order_by(desc(Workflow.created_at))
-            )
-        ).all()
-        target = None
-        for w in workflows:
-            try:
-                cfg = json.loads(w.config or "{}")
-            except Exception:
-                continue
-            if _is_whatsapp_trigger(cfg):
-                target = (w, cfg)
-                break
-
-        if not target:
-            print(f"[nerum] WhatsApp inbound: user {owner_id} has no active whatsapp_message workflow")
-            return {"status": "received"}
-
-        # Same execution path receive() uses: WorkflowExecutor(byok).run_graph(...).
-        # Sender phone + message text land in the trigger payload so downstream
-        # Soldier nodes resolve {{trigger.phone}} / {{trigger.message}}.
-        w, cfg = target
+        # 2. Execute with NO DB connection held. Sender phone + message text land
+        #    in the trigger payload so Soldier nodes resolve {{trigger.phone}} /
+        #    {{trigger.message}}.
         trigger_data = {"phone": sender, "message": text}
-        byok = await get_user_byok(db, owner_id)
-        run = WorkflowRun(
-            user_id=owner_id, workflow_id=w.id, workflow_name=w.name,
-            action="whatsapp", status="running",
-        )
-        db.add(run)
+        status = "success"
         try:
             results = await WorkflowExecutor(byok).run_graph(cfg, trigger_data)
-            run.status = "success"
-            run.details = json.dumps(results, default=str)[:8000]
-            w.runs = (w.runs or 0) + 1
+            details = json.dumps(results, default=str)[:8000]
         except Exception as exc:
-            run.status = "failed"
-            run.details = str(exc)[:8000]
-            print(f"[nerum] WhatsApp workflow {w.id} failed: {exc}")
+            status = "failed"
+            details = str(exc)[:8000]
+            print(f"[nerum] WhatsApp workflow {wf_id} failed: {exc}")
+
+        # 3. Short session: persist the outcome + bump run/token counters.
+        async with AsyncSessionLocal() as db:
+            run = await db.get(WorkflowRun, run_id)
+            if run:
+                run.status = status
+                run.details = details
+            if status == "success":
+                w = await db.get(Workflow, wf_id)
+                if w:
+                    w.runs = (w.runs or 0) + 1
+                u = await db.get(User, owner_id)
+                if u:
+                    u.tokens_used = (u.tokens_used or 0) + 1
+            await db.commit()
     except Exception as exc:
         # Catch-all: log, never raise — Meta must always get a 200.
         print(f"[nerum] WhatsApp inbound handler error: {exc}")
@@ -193,50 +227,83 @@ async def meta_incoming(request: Request, db: AsyncSession = Depends(get_db)):
 
 @router.post("/receive/{webhook_key}")
 @limiter.limit("30/minute", key_func=webhook_key_key)
-async def receive(webhook_key: str, request: Request, db: AsyncSession = Depends(get_db)):
+async def receive(webhook_key: str, request: Request):
     """Generic webhook trigger: find the workflow by its webhook_key and run it.
 
     The webhook_key is an unguessable server-generated secret (token_urlsafe(32))
     stored in its own indexed column, so this is a single indexed lookup rather
     than a scan over every active workflow.
+
+    Pool-safe shape (H3): the DB session is only checked out for the lookup +
+    'running' row creation and again for the final write — never across
+    run_graph's network calls.
     """
-    # Single indexed lookup; an empty/NULL key never matches a real row.
-    w = (
-        await db.scalars(
-            select(Workflow).where(
-                Workflow.webhook_key == webhook_key,
-                Workflow.is_active.is_(True),
+    # 1. Short session: resolve workflow + owner + quota + BYOK, create run row.
+    async with AsyncSessionLocal() as db:
+        # Single indexed lookup; an empty/NULL key never matches a real row.
+        w = (
+            await db.scalars(
+                select(Workflow).where(
+                    Workflow.webhook_key == webhook_key,
+                    Workflow.is_active.is_(True),
+                )
             )
-        )
-    ).first()
-    if not w:
-        raise HTTPException(404, "Webhook not found or inactive")
+        ).first()
+        if not w:
+            raise HTTPException(404, "Webhook not found or inactive")
 
-    try:
-        cfg = json.loads(w.config or "{}")
-    except Exception:
-        raise HTTPException(404, "Webhook not found or inactive")
+        try:
+            cfg = json.loads(w.config or "{}")
+        except Exception:
+            raise HTTPException(404, "Webhook not found or inactive")
 
+        user = await db.get(User, w.user_id)
+        if not user:
+            raise HTTPException(404, "Owner not found")
+        # Quota gate (after the 404 checks so we know the owner first).
+        if (user.tokens_used or 0) >= token_limit_for(user.plan):
+            raise HTTPException(429, "Token limit reached for your plan. Upgrade or wait for reset.")
+
+        byok = await get_user_byok(db, user.id)
+        wf_id, owner_id = w.id, user.id
+        run = WorkflowRun(user_id=owner_id, workflow_id=wf_id, workflow_name=w.name, action="webhook", status="running")
+        db.add(run)
+        await db.commit()
+        await db.refresh(run)
+        run_id = run.id
+
+    # 2. Parse the incoming payload + run the graph with NO connection held.
     try:
         incoming = await request.json()
     except Exception:
         incoming = dict(await request.form())
 
-    user = await db.get(User, w.user_id)
-    if not user:
-        raise HTTPException(404, "Owner not found")
-    byok = await get_user_byok(db, user.id)
-    run = WorkflowRun(user_id=user.id, workflow_id=w.id, workflow_name=w.name, action="webhook", status="running")
-    db.add(run)
+    status = "success"
+    results = None
     try:
         results = await WorkflowExecutor(byok).run_graph(cfg, incoming if isinstance(incoming, dict) else {"data": incoming})
-        run.status = "success"
-        run.details = json.dumps(results, default=str)[:8000]
-        w.runs = (w.runs or 0) + 1
-        return {"success": True, "results": results}
+        details = json.dumps(results, default=str)[:8000]
     except Exception as exc:
-        run.status = "failed"
-        run.details = str(exc)[:8000]
+        status = "failed"
+        details = str(exc)[:8000]
         # Real cause stays server-side; caller gets a generic message.
-        print(f"[nerum] webhook workflow {w.id} failed: {exc}")
-        raise HTTPException(502, "Workflow execution failed")
+        print(f"[nerum] webhook workflow {wf_id} failed: {exc}")
+
+    # 3. Short session: persist the outcome + bump run/token counters.
+    async with AsyncSessionLocal() as db:
+        run = await db.get(WorkflowRun, run_id)
+        if run:
+            run.status = status
+            run.details = details
+        if status == "success":
+            w = await db.get(Workflow, wf_id)
+            if w:
+                w.runs = (w.runs or 0) + 1
+            u = await db.get(User, owner_id)
+            if u:
+                u.tokens_used = (u.tokens_used or 0) + 1
+        await db.commit()
+
+    if status == "success":
+        return {"success": True, "results": results}
+    raise HTTPException(502, "Workflow execution failed")

@@ -72,8 +72,14 @@ async def verify_payment(body: VerifyBody, user: User = Depends(get_current_user
     if not hmac.compare_digest(expected, body.razorpay_signature):
         raise HTTPException(400, "Invalid payment signature")
     pdata = PLANS[body.plan]
-    user.plan = pdata["name"]
-    user.token_limit = pdata["tokens"]
+    # `user` from get_current_user is detached (its session is already closed),
+    # so re-fetch into THIS request's session before mutating or the change
+    # won't be tracked/committed.
+    u = await db.get(User, user.id)
+    if not u:
+        raise HTTPException(404, "User not found")
+    u.plan = pdata["name"]
+    u.token_limit = pdata["tokens"]
     return {"success": True, "plan": pdata["name"]}
 
 

@@ -416,6 +416,11 @@ class ToolExecutor:
             if op_type == "read":
                 rows: list[dict] = []
                 async with conn.transaction():
+                    # Defence-in-depth (M3): make Postgres itself reject any write
+                    # the parser may have misclassified as a read. SET TRANSACTION
+                    # READ ONLY must be the FIRST statement in the transaction, so
+                    # it precedes the statement_timeout SET below.
+                    await conn.execute("SET TRANSACTION READ ONLY")
                     # Server-side statement timeout (belt) — asyncio.wait_for is the
                     # suspenders. Cursor stops at DB_MAX_ROWS (mechanism b).
                     await conn.execute(f"SET LOCAL statement_timeout = {DB_QUERY_TIMEOUT * 1000}")
