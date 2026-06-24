@@ -26,6 +26,7 @@ from sqlalchemy import select
 from core.config import settings
 from core.database import AsyncSessionLocal
 from core.encryption import decrypt_data
+from core.ssrf_guard import SSRFRejected, assert_public_target, extract_host_port
 from models.models import UserDbConnection
 from services.email import send_email as svc_send_email
 from services.sheets import append_to_sheet, read_sheet
@@ -346,6 +347,15 @@ class ToolExecutor:
             creds = decrypt_data(encrypted)
         except Exception:  # noqa: BLE001
             return _err("Stored credentials for this connection could not be read.")
+
+        # 2b. SSRF guard — re-checked on EVERY run (DNS can change between when the
+        #     connection was saved and now; a creation-time pass is not trusted).
+        host, port = extract_host_port(creds, _DB_DEFAULT_PORT.get(db_type, 0))
+        try:
+            await assert_public_target(host, port)
+        except SSRFRejected as exc:
+            logger.info("query_database REJECTED (ssrf): connection_id=%s reason=%s", connection_id, exc)
+            return _err(str(exc))
 
         # 3. Guard the query/operation BEFORE touching the database.
         if db_type in ("postgresql", "mysql"):

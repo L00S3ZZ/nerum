@@ -15,19 +15,27 @@ own connections.
 import asyncio
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from core.database import get_db
 from core.encryption import decrypt_data, encrypt_data, mask_credentials
+from core.ratelimit import limiter, user_key
 from core.security import get_current_user
+from core.ssrf_guard import SSRFRejected, assert_public_target, extract_host_port
 from models.models import User, UserDbConnection
 
 router = APIRouter()
 
 SUPPORTED_DB_TYPES = ["postgresql", "mysql", "mongodb"]
+
+
+async def _rl_capture_user(request: Request, user: User = Depends(get_current_user)) -> None:
+    """Stash the authenticated user's id on request.state so user_key can bucket
+    per-user. Reuses the cached get_current_user result — no extra DB lookup."""
+    request.state.rl_user = user.id
 
 # The /test endpoint is the only place Part 1 touches a real external DB. The
 # skill's 10-second rule applies even here.
@@ -103,10 +111,13 @@ async def list_connections(user: User = Depends(get_current_user), db: AsyncSess
 
 
 @router.post("")
+@limiter.limit("20/hour", key_func=user_key)
 async def create_connection(
+    request: Request,
     body: DbConnBody,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    _rl: None = Depends(_rl_capture_user),
 ):
     if body.db_type not in SUPPORTED_DB_TYPES:
         raise HTTPException(400, f"Unsupported db_type. Use one of: {', '.join(SUPPORTED_DB_TYPES)}")
@@ -114,6 +125,13 @@ async def create_connection(
         raise HTTPException(400, "name is required")
     if not body.credentials:
         raise HTTPException(400, "credentials are required")
+
+    # SSRF guard: refuse internal/reserved targets BEFORE encrypting/storing.
+    host, port = extract_host_port(body.credentials, _DEFAULT_PORT[body.db_type])
+    try:
+        await assert_public_target(host, port)
+    except SSRFRejected as exc:
+        raise HTTPException(400, str(exc))
 
     row = UserDbConnection(
         user_id=user.id,
@@ -145,6 +163,12 @@ async def update_connection(
     if body.credentials is not None:  # rotate
         if not body.credentials:
             raise HTTPException(400, "credentials cannot be empty when provided")
+        # Validate the NEW target before re-encrypting/storing.
+        host, port = extract_host_port(body.credentials, _DEFAULT_PORT[row.db_type])
+        try:
+            await assert_public_target(host, port)
+        except SSRFRejected as exc:
+            raise HTTPException(400, str(exc))
         row.encrypted_credentials = encrypt_data(body.credentials)
     if body.allow_write is not None:
         row.allow_write = body.allow_write
@@ -168,10 +192,13 @@ async def delete_connection(
 
 
 @router.post("/{conn_id}/test")
+@limiter.limit("10/minute", key_func=user_key)
 async def test_connection(
     conn_id: int,
+    request: Request,
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
+    _rl: None = Depends(_rl_capture_user),
 ):
     """Open a connection, run a trivial liveness check (SELECT 1 / ping), close.
 
@@ -183,6 +210,14 @@ async def test_connection(
         creds = decrypt_data(row.encrypted_credentials)
     except Exception:  # noqa: BLE001
         return {"success": False, "error": "Stored credentials could not be read."}
+
+    # Re-validate the target on EVERY call — DNS can change between save and test,
+    # so the creation-time check alone isn't enough. Same {"success": false} shape.
+    host, port = extract_host_port(creds, _DEFAULT_PORT[row.db_type])
+    try:
+        await assert_public_target(host, port)
+    except SSRFRejected as exc:
+        return {"success": False, "error": str(exc)}
 
     try:
         await asyncio.wait_for(_run_liveness(row.db_type, creds), timeout=TEST_TIMEOUT)
