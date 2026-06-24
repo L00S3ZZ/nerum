@@ -11,6 +11,14 @@ from sqlalchemy import JSON, Boolean, Column, DateTime, ForeignKey, Integer, Str
 from core.database import Base
 
 
+# NOTE: core.security.get_current_user returns a DETACHED User instance — it is
+# loaded in its OWN short-lived session (not the route's Depends(get_db) session)
+# which is already closed by the time the route runs. Reading its already-loaded
+# columns is fine, but any route that MUTATES a user field must re-fetch it by id
+# in its own session before committing (e.g. `u = await db.get(User, user.id)`),
+# or the change is silently never persisted. If a relationship is ever added to
+# this model, anything accessing it after get_current_user returns must eager-load
+# it (e.g. selectinload) or it will raise DetachedInstanceError.
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
